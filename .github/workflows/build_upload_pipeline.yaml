@@ -37,12 +37,12 @@ jobs:
       - name: Run unit tests
         run: ./gradlew testDevDebugUnitTest
 
-      - name: Build DEV debug APK
-        run: ./gradlew assembleDevDebug
+      - name: Build DEMO debug APK
+        run: ./gradlew assembleDemoDebug
 
-      - name: Upload DEV debug APK
+      - name: Upload DEMO debug APK
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
-          path: app/build/outputs/apk/dev/debug/*.apk
+          path: app/build/outputs/apk/demo/debug/*.apk
           retention-days: 90
