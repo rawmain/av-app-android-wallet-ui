@@ -1,4 +1,4 @@
-name: Android Unit Tests and Debug Build
+name: PR checks
 
 on:
   push:
