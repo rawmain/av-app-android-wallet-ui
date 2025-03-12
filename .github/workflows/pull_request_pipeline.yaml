@@ -32,6 +32,7 @@ jobs:
         with:
           name: owasp-dependency-check-results
           path: '**/dependency-check-report.*'
+          retention-days: 20
 
   test-and-build:
     runs-on: ubuntu-latest
@@ -56,9 +57,6 @@ jobs:
     - name: Run lint check
       run: ./gradlew lint
 
-#    - name: Run Detekt - configure it for Compose?
-#      run: ./gradlew detekt
-
     - name: Run unit tests
       run: ./gradlew testDevDebugUnitTest
 
@@ -73,12 +71,7 @@ jobs:
         path: |
           **/build/reports/tests/
           **/build/reports/kover
+        retention-days: 20
 
     - name: Build DEV debug APK
       run: ./gradlew assembleDevDebug
-
-    # - name: Upload debug APK
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: debug-apk
-    #     path: app/build/outputs/apk/debug/*.apk
