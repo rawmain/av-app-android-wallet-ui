@@ -40,9 +40,9 @@ jobs:
       - name: Build DEV debug APK
         run: ./gradlew assembleDevDebug
 
-      - name: Upload debug APK
+      - name: Upload DEV debug APK
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/dev/debug/*.apk
           retention-days: 90
