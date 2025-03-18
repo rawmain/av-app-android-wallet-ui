@@ -54,6 +54,9 @@ jobs:
         gradle-version: wrapper
         cache-read-only: false
 
+    - name: Setup memory limit for gradle and JVM
+      run: export GRADLE_OPTS='-XX:MaxRAM=4096m -Dorg.gradle.jvmargs="-XX:MaxRAM=4096m"'
+
     - name: Run lint check
       run: ./gradlew lint
 
