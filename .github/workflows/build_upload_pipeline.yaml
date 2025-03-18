@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout code
@@ -32,7 +32,7 @@ jobs:
           cache-read-only: false
 
       - name: Setup memory limit for gradle and JVM
-        run: export GRADLE_OPTS='-XX:MaxRAM=4G -Xmx4G --max-workers=2 -Dorg.gradle.jvmargs="-XX:MaxRAM=2G -Xmx2G"'
+        run: export GRADLE_OPTS='-XX:MaxRAM=4096m -Xmx4G --max-workers=2 -Dorg.gradle.jvmargs="-XX:MaxRAM=4G -Xmx4G"'
 
       - name: Run lint check
         run: ./gradlew lint
