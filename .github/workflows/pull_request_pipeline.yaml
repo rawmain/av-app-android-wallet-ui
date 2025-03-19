@@ -34,12 +34,15 @@ jobs:
           path: '**/dependency-check-report.*'
           retention-days: 20
 
-  test-and-build:
+  lint-test-build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Copy CI gradle.properties
+      run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
     - name: Set up JDK 17
       uses: actions/setup-java@v3
