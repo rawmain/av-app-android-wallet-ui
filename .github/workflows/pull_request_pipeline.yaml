@@ -34,8 +34,8 @@ jobs:
           path: '**/dependency-check-report.*'
           retention-days: 20
 
-  lint-and-test:
-    runs-on: ubuntu-20.04
+  lint-test-build:
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
