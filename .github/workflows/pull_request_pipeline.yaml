@@ -25,6 +25,27 @@ jobs:
           format: 'HTML'
           args: >
             --failOnCVSS 7
+            --disableBundleAudit
+            --disableCarthageAnalyzer
+            --disableSwiftPackageManagerAnalyzer
+            --disableSwiftPackageResolvedAnalyzer	
+            --disableGolangDep
+            --disableGolangMod
+            --disableAssembly
+            --disableMixAudit
+            --disablePyDist
+            --disablePyPkg
+            --disableMSBuild
+            --disableRubygems
+            --disableCocoapodsAnalyzer
+            --disableCmake
+            --disableDart
+            --disableCpan
+            --disableComposer
+            --disableNugetconf
+            --disableNuspec
+            --disablePoetry
+        timeout-minutes: 25
 
       - name: Upload OWASP Dependency-Check results on failure
         if: failure()
@@ -35,7 +56,7 @@ jobs:
           retention-days: 20
 
   lint-test-build:
-    runs-on: ubuntu-latest
+    runs-on: github-runner-set-app
 
     steps:
     - name: Checkout code
@@ -48,8 +69,11 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'temurin' 
+        distribution: 'temurin'
         cache: gradle
+
+    - name: Setup Android SDK
+      uses: amyu/setup-android@v4
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
