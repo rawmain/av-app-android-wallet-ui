@@ -1,0 +1,10 @@
+# Gradle files
+.gradle/
+build/
+
+# IntelliJ files
+.idea/
+*.iml
+
+# Android files
+local.properties
