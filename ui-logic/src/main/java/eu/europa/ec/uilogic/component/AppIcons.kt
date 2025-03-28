@@ -405,4 +405,22 @@ object AppIcons {
         contentDescriptionId = R.string.content_description_open_in_browser_icon,
         imageVector = null
     )
+
+    val Settings: IconData = IconData(
+        resourceId = R.drawable.ic_settings,
+        contentDescriptionId = R.string.content_description_settings_icon,
+        imageVector = null
+    )
+
+    val EuFlag: IconData = IconData(
+        resourceId = R.drawable.ic_eu_flag,
+        contentDescriptionId = R.string.content_description_eu_flag_icon,
+        imageVector = null
+    )
+
+    val Over18: IconData = IconData(
+        resourceId = R.drawable.ic_over_18,
+        contentDescriptionId = R.string.content_description_over_18_icon,
+        imageVector = null
+    )
 }

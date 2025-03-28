@@ -122,7 +122,7 @@ open class EudiComponentActivity : FragmentActivity() {
             } else if (it.type != DeepLinkType.ISSUANCE) {
                 cacheDeepLink(intent)
                 if (routerHost.userIsLoggedInWithDocuments()) {
-                    routerHost.popToDashboardScreen()
+                    routerHost.popToLandingScreen()
                 }
             }
             setIntent(Intent())

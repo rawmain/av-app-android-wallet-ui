@@ -108,6 +108,10 @@ sealed class IssuanceScreens {
     )
 }
 
+sealed class LandingScreens {
+    data object Landing : Screen(name = "LANDING")
+}
+
 sealed class ModuleRoute(val route: String) : NavigatableItem {
     data object StartupModule : ModuleRoute("STARTUP_MODULE")
     data object CommonModule : ModuleRoute("COMMON_MODULE")
@@ -115,4 +119,5 @@ sealed class ModuleRoute(val route: String) : NavigatableItem {
     data object PresentationModule : ModuleRoute("PRESENTATION_MODULE")
     data object ProximityModule : ModuleRoute("PROXIMITY_MODULE")
     data object IssuanceModule : ModuleRoute("ISSUANCE_MODULE")
+    data object LandingModule : ModuleRoute("LANDING_MODULE")
 }

@@ -35,8 +35,8 @@ import eu.europa.ec.uilogic.component.ListItemMainContentData
 import eu.europa.ec.uilogic.component.ListItemTrailingContentData
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
-import eu.europa.ec.uilogic.navigation.DashboardScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 object TestsData {
@@ -49,7 +49,7 @@ object TestsData {
     const val mockedUserBase64Portrait = "SE"
     const val mockedDocUiNamePid = "EU PID"
     const val mockedDocUiNameMdl = "mDL"
-    const val mockedDocUiNameAge = "Age Verification"
+    const val mockedDocUiNameAge = "Age Verification Over 18"
     const val mockedDocUiNamePhotoId = "Photo ID"
     const val mockedConfigIssuerId = "configurationId"
     const val mockedNoUserFistNameFound = ""
@@ -448,35 +448,39 @@ object TestsData {
             ScopedDocument(
                 name = mockedDocUiNamePid,
                 configurationId = mockedConfigIssuerId,
-                isPid = true
+                isPid = true,
+                isAgeVerification = true
             ),
             ScopedDocument(
                 name = mockedDocUiNameMdl,
                 configurationId = mockedConfigIssuerId,
-                isPid = false
+                isPid = false,
+                isAgeVerification = false
             ),
             ScopedDocument(
                 name = mockedDocUiNameAge,
                 configurationId = mockedConfigIssuerId,
-                isPid = false
+                isPid = false,
+                isAgeVerification = false
             ),
             ScopedDocument(
                 name = mockedDocUiNamePhotoId,
                 configurationId = mockedConfigIssuerId,
-                isPid = false
+                isPid = false,
+                isAgeVerification = false
             )
         ).sortedBy { it.name.lowercase() }
 
     val mockedConfigNavigationTypePop = ConfigNavigation(navigationType = NavigationType.Pop)
     val mockedConfigNavigationTypePush = ConfigNavigation(
         navigationType = NavigationType.PushRoute(
-            route = DashboardScreens.Dashboard.screenRoute,
+            route = LandingScreens.Landing.screenRoute,
             popUpToRoute = IssuanceScreens.AddDocument.screenRoute
         )
     )
     val mockedConfigNavigationTypePopToScreen = ConfigNavigation(
         navigationType = NavigationType.PopTo(
-            screen = DashboardScreens.Dashboard
+            screen = LandingScreens.Landing
         )
     )
 

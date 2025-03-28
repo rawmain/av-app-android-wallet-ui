@@ -123,6 +123,9 @@
     <string name="content_description_change_pin_icon">Change PIN</string>
     <string name="content_description_check_icon">Check</string>
     <string name="content_description_open_in_browser_icon">Open in browser</string>
+    <string name="content_description_settings_icon">Settings</string>
+    <string name="content_description_eu_flag_icon">EU Flag</string>
+    <string name="content_description_over_18_icon">Over 18</string>
 
     <!-- Biometric prompt -->
     <string name="biometric_prompt_title">Biometric authentication</string>
@@ -365,4 +368,11 @@
     <string name="document_category_retail">RETAIL</string>
     <string name="document_category_other">OTHER</string>
 
+    <!-- Landing Screen -->
+    <string name="landing_screen_title">Age Verification App</string>
+    <string name="landing_screen_subtitle">With your proof of age, you can verify your age when using online services, such as a media library.\nThe proof of age only contains the information that you are older than 18, but no personal data.</string>
+    <string name="landing_screen_card_eu_title">European\nUnion</string>
+    <string name="landing_screen_card_age_verification">Age Verification</string>
+    <string name="landing_screen_card_certified">EU certified official credential</string>
+    <string name="landing_screen_primary_button_label_scan">Scan</string>
 </resources>

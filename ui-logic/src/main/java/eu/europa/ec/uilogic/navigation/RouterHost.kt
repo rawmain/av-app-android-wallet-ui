@@ -37,6 +37,7 @@ interface RouterHost {
     fun popToDashboardScreen()
     fun popToIssuanceOnboardingScreen()
     fun isScreenOnBackStackOrForeground(screen: Screen): Boolean
+    fun popToLandingScreen()
 
     @Composable
     fun StartFlow(builder: NavGraphBuilder.(NavController) -> Unit)
@@ -71,7 +72,7 @@ class RouterHostImpl(
     }
 
     override fun userIsLoggedInWithDocuments(): Boolean =
-        isScreenOnBackStackOrForeground(getDashboardScreen())
+        isScreenOnBackStackOrForeground(getLandingScreen())
 
     override fun userIsLoggedInWithNoDocuments(): Boolean =
         isScreenOnBackStackOrForeground(getIssuanceScreen())
@@ -103,11 +104,22 @@ class RouterHostImpl(
         )
     }
 
+    override fun popToLandingScreen() {
+        navController.popBackStack(
+            route = getLandingScreen().screenRoute,
+            inclusive = false
+        )
+    }
+
     private fun getDashboardScreen(): Screen {
         return configUILogic.dashboardScreenIdentifier
     }
 
     private fun getIssuanceScreen(): Screen {
         return configUILogic.issuanceScreenIdentifier
+    }
+
+    private fun getLandingScreen(): Screen {
+        return configUILogic.landingScreenIdentifier
     }
 }

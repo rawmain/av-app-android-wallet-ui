@@ -1,0 +1,33 @@
+<!--
+  ~ Copyright (c) 2023 European Commission
+  ~
+  ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
+  ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
+  ~ except in compliance with the Licence.
+  ~
+  ~ You may obtain a copy of the Licence at:
+  ~ https://joinup.ec.europa.eu/software/page/eupl
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under
+  ~ the Licence is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF
+  ~ ANY KIND, either express or implied. See the Licence for the specific language
+  ~ governing permissions and limitations under the Licence.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="60dp"
+    android:height="60dp"
+    android:viewportWidth="60"
+    android:viewportHeight="60">
+    <path
+        android:fillAlpha="0.35"
+        android:fillColor="#000000"
+        android:fillType="evenOdd"
+        android:pathData="M0,29.927C-0,46.423 13.301,59.854 29.783,60C43.249,60 55.325,50.458 58.518,37.291L58.699,36.496V36.058C58.699,35.036 57.976,34.161 56.964,33.869C55.807,33.577 54.651,34.307 54.361,35.474C51.904,47.007 41.494,55.474 29.639,55.474C15.759,55.474 4.337,43.942 4.337,29.927C4.337,15.912 15.759,4.38 29.639,4.38C37.007,4.38 43.973,7.754 48.74,13.205L49.301,13.869L42.361,18.394L60,26.277V6.861L52.916,11.533C47.422,4.38 38.892,0 29.639,0C13.301,-0 0,13.431 0,29.927Z" />
+    <path
+        android:fillColor="#1544C5"
+        android:pathData="M21.21,19.225H24.138V40.462H20.895V23.676H20.706L14.944,28.413V24.471L21.21,19.225Z" />
+    <path
+        android:fillColor="#1544C5"
+        android:pathData="M27.812,34.771C27.812,32.387 28.946,30.447 31.087,29.621V29.494C29.135,28.667 28.127,26.728 28.127,24.598C28.127,21.323 30.772,18.78 34.833,18.78C38.863,18.78 41.508,21.323 41.508,24.598C41.508,26.728 40.501,28.667 38.549,29.494V29.621C40.689,30.447 41.823,32.387 41.823,34.771C41.823,38.332 39.147,40.907 34.833,40.907C30.488,40.907 27.812,38.332 27.812,34.771ZM31.433,24.979C31.433,26.919 32.881,28.063 34.833,28.063C36.754,28.063 38.234,26.919 38.234,24.979C38.234,23.072 36.754,21.896 34.833,21.896C32.881,21.896 31.433,23.072 31.433,24.979ZM31.15,34.453C31.15,36.551 32.755,37.759 34.833,37.759C36.88,37.759 38.486,36.551 38.486,34.453C38.486,32.355 36.88,31.147 34.833,31.147C32.755,31.147 31.15,32.355 31.15,34.453Z" />
+</vector>

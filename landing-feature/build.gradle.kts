@@ -14,11 +14,24 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.corelogic.model
+import project.convention.logic.config.LibraryModule
+import project.convention.logic.kover.KoverExclusionRules
+import project.convention.logic.kover.excludeFromKoverReport
 
-data class ScopedDocument(
-    val name: String,
-    val configurationId: String,
-    val isPid: Boolean,
-    val isAgeVerification: Boolean,
+plugins {
+    id("project.android.feature")
+    id("project.rqes.sdk")
+}
+
+android {
+    namespace = "eu.europa.ec.landingfeature"
+}
+
+moduleConfig {
+    module = LibraryModule.LandingFeature
+}
+
+excludeFromKoverReport(
+    excludedClasses = KoverExclusionRules.LandingFeature.classes,
+    excludedPackages = KoverExclusionRules.LandingFeature.packages,
 )

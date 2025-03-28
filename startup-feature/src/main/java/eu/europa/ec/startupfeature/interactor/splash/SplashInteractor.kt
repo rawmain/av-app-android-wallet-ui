@@ -28,8 +28,8 @@ import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.DashboardScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.navigation.StartupScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
@@ -81,7 +81,7 @@ class SplashInteractorImpl(
                             onSuccessNavigation = ConfigNavigation(
                                 navigationType = NavigationType.PushScreen(
                                     screen = if (hasDocuments) {
-                                        DashboardScreens.Dashboard
+                                        LandingScreens.Landing
                                     } else {
                                         IssuanceScreens.AddDocument
                                     },

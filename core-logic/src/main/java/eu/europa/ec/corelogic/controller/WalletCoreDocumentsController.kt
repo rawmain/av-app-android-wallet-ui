@@ -177,7 +177,7 @@ class WalletCoreDocumentsControllerImpl(
     private val resourceProvider: ResourceProvider,
     private val eudiWallet: EudiWallet,
     private val walletCoreConfig: WalletCoreConfig,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : WalletCoreDocumentsController {
 
     private val genericErrorMessage
@@ -216,10 +216,16 @@ class WalletCoreDocumentsControllerImpl(
                             else -> false
                         }
 
+                        val isAgeVerification: Boolean = when (config) {
+                            is MsoMdocCredential -> config.docType.toDocumentIdentifier() == DocumentIdentifier.MdocPseudonym
+                            else -> false
+                        }
+
                         ScopedDocument(
                             name = name,
                             configurationId = id.value,
-                            isPid = isPid
+                            isPid = isPid,
+                            isAgeVerification = isAgeVerification
                         )
                     }
                 if (documents.isNotEmpty()) {

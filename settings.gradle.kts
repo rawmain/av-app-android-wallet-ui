@@ -23,7 +23,9 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    @Suppress("UnstableApiUsage")
     repositories {
         google()
         mavenCentral()
@@ -59,3 +61,4 @@ include(":baseline-profile")
 include(":authentication-logic")
 include(":core-logic")
 include(":storage-logic")
+include(":landing-feature")

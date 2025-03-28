@@ -28,4 +28,9 @@ interface ConfigUILogic {
    Define the issuance identifier
    */
     val issuanceScreenIdentifier: Screen
+
+    /*
+   Define the landing identifier
+   */
+    val landingScreenIdentifier: Screen
 }

@@ -51,6 +51,7 @@ sealed interface DocumentIdentifier {
 fun FormatType.toDocumentIdentifier(): DocumentIdentifier = when (this) {
     DocumentIdentifier.MdocPid.formatType -> DocumentIdentifier.MdocPid
     DocumentIdentifier.SdJwtPid.formatType -> DocumentIdentifier.SdJwtPid
+    DocumentIdentifier.MdocPseudonym.formatType -> DocumentIdentifier.MdocPseudonym
     else -> DocumentIdentifier.OTHER(formatType = this)
 }
 

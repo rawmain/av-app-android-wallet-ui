@@ -34,7 +34,7 @@ class ThemeColors {
         private const val black: Long = 0xFF000000
 
         // Light theme base colors palette.
-        private const val eudiw_theme_light_primary: Long = 0xFF2A5FD9
+        private const val eudiw_theme_light_primary: Long = 0xFF1544C5
         private const val eudiw_theme_light_onPrimary: Long = white
         private const val eudiw_theme_light_primaryContainer: Long = 0xFFEADDFF
         private const val eudiw_theme_light_onPrimaryContainer: Long = 0xFF21005D

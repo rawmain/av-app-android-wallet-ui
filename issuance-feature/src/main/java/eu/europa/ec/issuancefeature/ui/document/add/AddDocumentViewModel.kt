@@ -43,6 +43,7 @@ import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.DashboardScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.PresentationScreens
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkType
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
@@ -301,14 +302,14 @@ class AddDocumentViewModel(
         val onSuccessNavigation = when (flowType) {
             IssuanceFlowUiConfig.NO_DOCUMENT -> ConfigNavigation(
                 navigationType = NavigationType.PushScreen(
-                    screen = DashboardScreens.Dashboard,
+                    screen = LandingScreens.Landing,
                     popUpToScreen = IssuanceScreens.AddDocument
                 )
             )
 
             IssuanceFlowUiConfig.EXTRA_DOCUMENT -> ConfigNavigation(
                 navigationType = NavigationType.PopTo(
-                    screen = DashboardScreens.Dashboard
+                    screen = LandingScreens.Landing
                 )
             )
         }

@@ -24,6 +24,7 @@ import eu.europa.ec.commonfeature.di.FeatureCommonModule
 import eu.europa.ec.corelogic.di.LogicCoreModule
 import eu.europa.ec.dashboardfeature.di.FeatureDashboardModule
 import eu.europa.ec.issuancefeature.di.FeatureIssuanceModule
+import eu.europa.ec.landingfeature.di.FeatureLandingModule
 import eu.europa.ec.networklogic.di.LogicNetworkModule
 import eu.europa.ec.onboardingfeature.di.FeatureOnboardingModule
 import eu.europa.ec.presentationfeature.di.FeaturePresentationModule
@@ -57,7 +58,8 @@ private val assembledModules = listOf(
     FeatureOnboardingModule().module,
     FeaturePresentationModule().module,
     FeatureProximityModule().module,
-    FeatureIssuanceModule().module
+    FeatureIssuanceModule().module,
+    FeatureLandingModule().module
 )
 
 internal fun Application.setupKoin(): KoinApplication {

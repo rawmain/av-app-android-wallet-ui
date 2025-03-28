@@ -40,8 +40,8 @@ import eu.europa.ec.uilogic.component.utils.PERCENTAGE_25
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.DashboardScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
@@ -60,14 +60,14 @@ interface AddDocumentInteractor {
 
     fun issueDocument(
         issuanceMethod: IssuanceMethod,
-        configId: String
+        configId: String,
     ): Flow<IssueDocumentPartialState>
 
     fun handleUserAuth(
         context: Context,
         crypto: BiometricCrypto,
         notifyOnAuthenticationFailure: Boolean,
-        resultHandler: DeviceAuthenticationResult
+        resultHandler: DeviceAuthenticationResult,
     )
 
     fun buildGenericSuccessRouteForDeferred(flowType: IssuanceFlowUiConfig): String
@@ -79,7 +79,7 @@ class AddDocumentInteractorImpl(
     private val walletCoreDocumentsController: WalletCoreDocumentsController,
     private val deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
     private val resourceProvider: ResourceProvider,
-    private val uiSerializer: UiSerializer
+    private val uiSerializer: UiSerializer,
 ) : AddDocumentInteractor {
 
     private val genericErrorMsg
@@ -100,7 +100,7 @@ class AddDocumentInteractorImpl(
                         options = state.documents
                             .sortedBy { it.name.lowercase() }
                             .mapNotNull {
-                                if (flowType != IssuanceFlowUiConfig.NO_DOCUMENT || it.isPid) {
+                                if (flowType != IssuanceFlowUiConfig.NO_DOCUMENT || it.isAgeVerification) {
                                     DocumentOptionItemUi(
                                         itemData = ListItemData(
                                             itemId = it.configurationId,
@@ -125,7 +125,7 @@ class AddDocumentInteractorImpl(
 
     override fun issueDocument(
         issuanceMethod: IssuanceMethod,
-        configId: String
+        configId: String,
     ): Flow<IssueDocumentPartialState> =
         walletCoreDocumentsController.issueDocument(
             issuanceMethod = issuanceMethod,
@@ -136,7 +136,7 @@ class AddDocumentInteractorImpl(
         context: Context,
         crypto: BiometricCrypto,
         notifyOnAuthenticationFailure: Boolean,
-        resultHandler: DeviceAuthenticationResult
+        resultHandler: DeviceAuthenticationResult,
     ) {
         deviceAuthenticationInteractor.getBiometricsAvailability {
             when (it) {
@@ -164,14 +164,14 @@ class AddDocumentInteractorImpl(
         val navigation = when (flowType) {
             IssuanceFlowUiConfig.NO_DOCUMENT -> ConfigNavigation(
                 navigationType = NavigationType.PushRoute(
-                    route = DashboardScreens.Dashboard.screenRoute,
+                    route = LandingScreens.Landing.screenRoute,
                     popUpToRoute = IssuanceScreens.AddDocument.screenRoute
                 ),
             )
 
             IssuanceFlowUiConfig.EXTRA_DOCUMENT -> ConfigNavigation(
                 navigationType = NavigationType.PopTo(
-                    screen = DashboardScreens.Dashboard
+                    screen = LandingScreens.Landing
                 )
             )
         }
@@ -187,7 +187,7 @@ class AddDocumentInteractorImpl(
     }
 
     private fun getSuccessScreenArgumentsForDeferred(
-        navigation: ConfigNavigation
+        navigation: ConfigNavigation,
     ): String {
         val (textElementsConfig, imageConfig, buttonText) = Triple(
             first = SuccessUIConfig.TextElementsConfig(

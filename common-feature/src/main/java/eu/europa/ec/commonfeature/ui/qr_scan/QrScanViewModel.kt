@@ -37,6 +37,7 @@ import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.DashboardScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.PresentationScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
@@ -247,7 +248,7 @@ class QrScanViewModel(
             IssuanceFlowUiConfig.NO_DOCUMENT -> {
                 ConfigNavigation(
                     navigationType = NavigationType.PushRoute(
-                        route = DashboardScreens.Dashboard.screenRoute,
+                        route = LandingScreens.Landing.screenRoute,
                         popUpToRoute = IssuanceScreens.AddDocument.screenRoute
                     )
                 )
@@ -256,7 +257,7 @@ class QrScanViewModel(
             IssuanceFlowUiConfig.EXTRA_DOCUMENT -> {
                 ConfigNavigation(
                     navigationType = NavigationType.PopTo(
-                        screen = DashboardScreens.Dashboard
+                        screen = LandingScreens.Landing
                     )
                 )
             }
@@ -274,7 +275,7 @@ class QrScanViewModel(
             IssuanceFlowUiConfig.EXTRA_DOCUMENT -> {
                 ConfigNavigation(
                     navigationType = NavigationType.PopTo(
-                        screen = DashboardScreens.Dashboard
+                        screen = LandingScreens.Landing
                     )
                 )
             }

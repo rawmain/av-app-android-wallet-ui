@@ -14,11 +14,11 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.corelogic.model
+package eu.europa.ec.landingfeature.di
 
-data class ScopedDocument(
-    val name: String,
-    val configurationId: String,
-    val isPid: Boolean,
-    val isAgeVerification: Boolean,
-)
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Module
+
+@Module
+@ComponentScan("eu.europa.ec.landingfeature")
+class FeatureLandingModule
