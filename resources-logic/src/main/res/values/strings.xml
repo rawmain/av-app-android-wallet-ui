@@ -42,6 +42,22 @@
     <string name="generic_bottom_sheet_delete_primary_button_text">Delete</string>
     <string name="generic_bottom_sheet_delete_secondary_button_text">Cancel</string>
 
+    <string name="onboarding_step_1_title">Welcome</string>
+    <string name="onboarding_step_2_title">Consent</string>
+    <string name="onboarding_step_3_title">Security</string>
+    <string name="onboarding_step_4_title">Verification</string>
+
+    <string name="welcome_page_1">The Age Verification App quickly and securely confirms your age for accessing age-restricted services.</string>
+    <string name="welcome_page_2">Simply verify your age once using a national elD or biometric check and receive a proof of age that allows seamless access to age-limited services.</string>
+    <string name="welcome_page_3">You stay in control of your data-only your proof of age is shared, never your personal identification details.</string>
+
+    <string name="welcome_title_1">Welcome</string>
+    <string name="welcome_title_2">Simple Age Verification</string>
+    <string name="welcome_title_3">Privacy Protection</string>
+
+    <string name="welcome_screen_next">Next</string>
+    <string name="welcome_screen_skip">Skip</string>
+
     <!-- Content Description -->
     <string name="content_description_image_or_placeholder_icon">Image or placeholder icon</string>
     <string name="content_description_user_signature_icon">User signature</string>

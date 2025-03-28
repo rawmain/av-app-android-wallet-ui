@@ -23,6 +23,7 @@ import project.convention.logic.config.LibraryModule.CoreLogic
 import project.convention.logic.config.LibraryModule.DashboardFeature
 import project.convention.logic.config.LibraryModule.IssuanceFeature
 import project.convention.logic.config.LibraryModule.NetworkLogic
+import project.convention.logic.config.LibraryModule.OnboardingFeature
 import project.convention.logic.config.LibraryModule.PresentationFeature
 import project.convention.logic.config.LibraryModule.ProximityFeature
 import project.convention.logic.config.LibraryModule.ResourcesLogic
@@ -71,6 +72,7 @@ dependencies {
     api(project(PresentationFeature.path))
     api(project(ProximityFeature.path))
     api(project(IssuanceFeature.path))
+    api(project(OnboardingFeature.path))
 
     // Test Cover Report
     koverModules.forEach {

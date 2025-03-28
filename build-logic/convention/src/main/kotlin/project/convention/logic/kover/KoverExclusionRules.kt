@@ -142,6 +142,13 @@ sealed interface KoverExclusionRules {
             get() = commonPackages
     }
 
+    object OnboardingFeature : FeatureModule {
+        override val classes: List<String>
+            get() = commonClasses
+        override val packages: List<String>
+            get() = commonPackages
+    }
+
     object DashboardFeature : FeatureModule {
         override val classes: List<String>
             get() = commonClasses

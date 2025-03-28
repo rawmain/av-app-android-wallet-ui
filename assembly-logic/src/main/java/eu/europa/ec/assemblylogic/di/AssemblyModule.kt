@@ -25,6 +25,7 @@ import eu.europa.ec.corelogic.di.LogicCoreModule
 import eu.europa.ec.dashboardfeature.di.FeatureDashboardModule
 import eu.europa.ec.issuancefeature.di.FeatureIssuanceModule
 import eu.europa.ec.networklogic.di.LogicNetworkModule
+import eu.europa.ec.onboardingfeature.di.FeatureOnboardingModule
 import eu.europa.ec.presentationfeature.di.FeaturePresentationModule
 import eu.europa.ec.proximityfeature.di.FeatureProximityModule
 import eu.europa.ec.resourceslogic.di.LogicResourceModule
@@ -53,6 +54,7 @@ private val assembledModules = listOf(
     FeatureCommonModule().module,
     FeatureDashboardModule().module,
     FeatureStartupModule().module,
+    FeatureOnboardingModule().module,
     FeaturePresentationModule().module,
     FeatureProximityModule().module,
     FeatureIssuanceModule().module

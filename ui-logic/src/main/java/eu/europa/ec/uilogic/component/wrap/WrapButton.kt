@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SIZE_100
+import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 
 enum class ButtonType {
@@ -40,9 +41,9 @@ enum class ButtonType {
     SECONDARY,
 }
 
-private val buttonsShape: RoundedCornerShape = RoundedCornerShape(SIZE_100.dp)
+internal val buttonsShape: RoundedCornerShape = RoundedCornerShape(SIZE_SMALL.dp)
 
-private val buttonsContentPadding: PaddingValues = PaddingValues(
+internal val buttonsContentPadding: PaddingValues = PaddingValues(
     vertical = 10.dp,
     horizontal = SPACING_LARGE.dp
 )

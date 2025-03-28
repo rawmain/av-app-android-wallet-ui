@@ -27,6 +27,11 @@ sealed class StartupScreens {
     data object Splash : Screen(name = "SPLASH")
 }
 
+sealed class OnboardingScreens {
+    data object Welcome : Screen(name = "WELCOME")
+    data object Consent : Screen(name = "CONSENT")
+}
+
 sealed class CommonScreens {
     data object Success : Screen(name = "SUCCESS", parameters = "?successConfig={successConfig}")
     data object Biometric : Screen(

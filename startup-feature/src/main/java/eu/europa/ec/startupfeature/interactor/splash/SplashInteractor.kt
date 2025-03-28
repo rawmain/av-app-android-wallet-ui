@@ -30,6 +30,8 @@ import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.navigation.CommonScreens
 import eu.europa.ec.uilogic.navigation.DashboardScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
+import eu.europa.ec.uilogic.navigation.OnboardingScreens
+import eu.europa.ec.uilogic.navigation.StartupScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
@@ -54,15 +56,12 @@ class SplashInteractorImpl(
         }
 
         false -> {
-            getQuickPinConfig()
+            getOnboardingRoute()
         }
     }
 
-    private fun getQuickPinConfig(): String {
-        return generateComposableNavigationLink(
-            screen = CommonScreens.QuickPin,
-            arguments = generateComposableArguments(mapOf("pinFlow" to PinFlow.CREATE))
-        )
+    private fun getOnboardingRoute() : String {
+        return OnboardingScreens.Welcome.screenRoute
     }
 
     private fun getBiometricsConfig(): String {
