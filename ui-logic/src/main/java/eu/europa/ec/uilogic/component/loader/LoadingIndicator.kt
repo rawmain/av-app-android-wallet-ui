@@ -24,6 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
+import eu.europa.ec.uilogic.component.preview.PreviewTheme
+import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.Z_LOADING
 import eu.europa.ec.uilogic.extension.clickableNoRipple
 
@@ -37,5 +39,13 @@ fun LoadingIndicator() {
             .clickableNoRipple { }
     ) {
         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+    }
+}
+
+@ThemeModePreviews()
+@Composable
+fun LoadingIndicatorPreview() {
+    PreviewTheme {
+        LoadingIndicator()
     }
 }

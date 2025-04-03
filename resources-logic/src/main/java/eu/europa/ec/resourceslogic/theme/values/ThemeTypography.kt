@@ -66,7 +66,7 @@ internal class ThemeTypography {
                         textAlign = ThemeTextAlign.Start
                     ),
                     titleLarge = ThemeTextStyle(
-                        fontFamily = listOf(RobotoRegular),
+                        fontFamily = listOf(RobotoMedium),
                         fontSize = 22,
                         letterSpacing = 0f,
                         textAlign = ThemeTextAlign.Start

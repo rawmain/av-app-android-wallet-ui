@@ -319,6 +319,14 @@
     <string name="document_details_bottom_sheet_badge_subtitle">A Relying Party is considered trusted when it meets
         predefined criteria for security, data protection, compliance, and responsible data handling.</string>
 
+    <!-- Consent Screen -->
+    <string name="consent_screen_title">First we need your consent</string>
+    <string name="consent_screen_tos_checkbox">I accept the Terms of Service</string>
+    <string name="consent_screen_data_protection_checkbox">I accept the Data Protection Information</string>
+    <string name="consent_screen_tos_button">Terms of Service</string>
+    <string name="consent_screen_data_protection_button">Data Protection Information</string>
+    <string name="consent_screen_confirm_button">Confirm</string>
+
     <!-- Proximity QR -->
     <string name="proximity_qr_title">Present document in person</string>
     <string name="proximity_qr_subtitle">Show this QR code to a Relying Party to present a digital document.</string>

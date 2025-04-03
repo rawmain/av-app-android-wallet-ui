@@ -191,7 +191,7 @@ private fun SinglePage(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = pages[page].title),
             textConfig = TextConfig(
-                style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Start
+                style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Start
             )
         )
         VSpacer.Large()
