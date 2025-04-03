@@ -21,6 +21,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import eu.europa.ec.onboardingfeature.ui.consent.ConsentScreen
+import eu.europa.ec.onboardingfeature.ui.enrollment.EnrollmentScreen
 import eu.europa.ec.onboardingfeature.ui.welcome.WelcomeScreen
 import eu.europa.ec.uilogic.navigation.ModuleRoute
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
@@ -29,7 +30,7 @@ import org.koin.androidx.compose.koinViewModel
 fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
     navigation(
         startDestination = OnboardingScreens.Welcome.screenRoute,
-        route = ModuleRoute.StartupModule.route
+        route = ModuleRoute.OnboardingModule.route
     ) {
 
         composable(route = OnboardingScreens.Welcome.screenRoute) {
@@ -37,6 +38,9 @@ fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
         }
         composable(route = OnboardingScreens.Consent.screenRoute) {
             ConsentScreen(navController, koinViewModel())
+        }
+        composable(route = OnboardingScreens.Enrollment.screenRoute) {
+            EnrollmentScreen(navController, koinViewModel())
         }
     }
 }

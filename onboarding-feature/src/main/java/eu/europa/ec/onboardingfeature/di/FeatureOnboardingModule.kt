@@ -16,8 +16,14 @@
 
 package eu.europa.ec.onboardingfeature.di
 
+import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
+import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.onboardingfeature.interactor.ConsentInteractor
 import eu.europa.ec.onboardingfeature.interactor.ConsentInteractorImpl
+import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractor
+import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractorImpl
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
+import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
@@ -27,7 +33,17 @@ import org.koin.core.annotation.Module
 class FeatureOnboardingModule
 
 @Factory
-fun provideConsentInteractor(
-): ConsentInteractor = ConsentInteractorImpl(
-)
+fun provideConsentInteractor(): ConsentInteractor = ConsentInteractorImpl()
 
+@Factory
+fun provideEnrollmentInteractor(
+    walletCoreDocumentsController: WalletCoreDocumentsController,
+    deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
+    resourceProvider: ResourceProvider,
+    uiSerializer: UiSerializer,
+): EnrollmentInteractor = EnrollmentInteractorImpl(
+    walletCoreDocumentsController,
+    deviceAuthenticationInteractor,
+    resourceProvider,
+    uiSerializer
+)

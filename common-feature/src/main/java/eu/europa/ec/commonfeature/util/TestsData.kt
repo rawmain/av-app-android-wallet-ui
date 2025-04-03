@@ -449,7 +449,7 @@ object TestsData {
                 name = mockedDocUiNamePid,
                 configurationId = mockedConfigIssuerId,
                 isPid = true,
-                isAgeVerification = true
+                isAgeVerification = false
             ),
             ScopedDocument(
                 name = mockedDocUiNameMdl,
@@ -461,7 +461,7 @@ object TestsData {
                 name = mockedDocUiNameAge,
                 configurationId = mockedConfigIssuerId,
                 isPid = false,
-                isAgeVerification = false
+                isAgeVerification = true
             ),
             ScopedDocument(
                 name = mockedDocUiNamePhotoId,

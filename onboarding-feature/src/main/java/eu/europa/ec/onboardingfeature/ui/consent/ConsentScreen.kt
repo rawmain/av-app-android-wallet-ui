@@ -16,6 +16,8 @@
 
 package eu.europa.ec.onboardingfeature.ui.consent
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -53,14 +55,23 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
             ) {
                 Text(text = "Confirm") // string resources TBD in the next PR
             }
-        }) { _ ->
-        Content()
+        }) { paddingValues ->
+        Content(paddingValues)
     }
 }
 
 @Composable
-private fun Content() {
-    TopStepBar(
-        currentStep = 1
-    )
+private fun Content(
+    paddingValues: PaddingValues,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(paddingValues)
+    ) {
+        TopStepBar(
+            currentStep = 1
+        )
+    }
+
 }

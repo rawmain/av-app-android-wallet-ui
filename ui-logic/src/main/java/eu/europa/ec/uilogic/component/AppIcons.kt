@@ -423,4 +423,10 @@ object AppIcons {
         contentDescriptionId = R.string.content_description_over_18_icon,
         imageVector = null
     )
+
+    val NationalEID: IconData = IconData(
+        resourceId = R.drawable.ic_national_eid,
+        contentDescriptionId = R.string.content_description_national_eid_icon,
+        imageVector = null
+    )
 }

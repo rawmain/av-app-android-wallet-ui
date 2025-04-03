@@ -20,7 +20,6 @@ import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.validator.Form
 import eu.europa.ec.businesslogic.validator.FormValidationResult
 import eu.europa.ec.businesslogic.validator.Rule
-import eu.europa.ec.commonfeature.config.IssuanceFlowUiConfig
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractor
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractorPinValidPartialState
@@ -28,7 +27,6 @@ import eu.europa.ec.commonfeature.interactor.QuickPinInteractorSetPinPartialStat
 import eu.europa.ec.commonfeature.model.PinFlow
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
@@ -37,9 +35,9 @@ import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.IssuanceScreens
 import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.ModuleRoute
+import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
@@ -68,7 +66,7 @@ data class State(
     val resetPin: Boolean = false,
     val pinState: PinValidationState,
     val isBottomSheetOpen: Boolean = false,
-    val quickPinSize: Int = 6
+    val quickPinSize: Int = 6,
 ) : ViewState {
     val action: ScreenNavigateAction
         get() {
@@ -120,7 +118,7 @@ class PinViewModel(
     private val interactor: QuickPinInteractor,
     private val resourceProvider: ResourceProvider,
     private val uiSerializer: UiSerializer,
-    @InjectedParam private val pinFlow: PinFlow
+    @InjectedParam private val pinFlow: PinFlow,
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State {
@@ -349,67 +347,46 @@ class PinViewModel(
 
     private fun getNextScreenRoute(): String {
 
-        val navigationAfterCreate = ConfigNavigation(
-            navigationType = NavigationType.PushScreen(
-                screen = IssuanceScreens.AddDocument,
-                arguments = mapOf("flowType" to IssuanceFlowUiConfig.NO_DOCUMENT.name),
-                popUpToScreen = CommonScreens.QuickPin
-            ),
-        )
-
         val navigationAfterUpdate = ConfigNavigation(
             navigationType = NavigationType.PopTo(LandingScreens.Landing),
         )
 
-        return generateComposableNavigationLink(
-            screen = CommonScreens.Success,
-            arguments = generateComposableArguments(
-                mapOf(
-                    SuccessUIConfig.serializedKeyName to uiSerializer.toBase64(
-                        SuccessUIConfig(
-                            textElementsConfig = SuccessUIConfig.TextElementsConfig(
-                                text = when (pinFlow) {
-                                    PinFlow.CREATE -> resourceProvider.getString(R.string.quick_pin_create_success_text)
-                                    PinFlow.UPDATE -> resourceProvider.getString(R.string.quick_pin_change_success_text)
-                                },
-                                description = when (pinFlow) {
-                                    PinFlow.CREATE -> resourceProvider.getString(R.string.quick_pin_create_success_description)
-                                    PinFlow.UPDATE -> resourceProvider.getString(R.string.quick_pin_change_success_description)
-                                }
-                            ),
-                            imageConfig = when (pinFlow) {
-                                PinFlow.CREATE -> SuccessUIConfig.ImageConfig(
-                                    type = SuccessUIConfig.ImageConfig.Type.Drawable(
-                                        icon = AppIcons.WalletSecured
-                                    ),
-                                    tint = null,
-                                )
-
-                                PinFlow.UPDATE -> SuccessUIConfig.ImageConfig()
-                            },
-                            buttonConfig = listOf(
-                                SuccessUIConfig.ButtonConfig(
-                                    text = when (pinFlow) {
-                                        PinFlow.CREATE -> resourceProvider.getString(R.string.quick_pin_create_success_btn)
-                                        PinFlow.UPDATE -> resourceProvider.getString(R.string.quick_pin_change_success_btn)
-                                    },
-                                    style = SuccessUIConfig.ButtonConfig.Style.PRIMARY,
-                                    navigation = when (pinFlow) {
-                                        PinFlow.CREATE -> navigationAfterCreate
-                                        PinFlow.UPDATE -> navigationAfterUpdate
-                                    }
-                                )
-                            ),
-                            onBackScreenToNavigate = when (pinFlow) {
-                                PinFlow.CREATE -> navigationAfterCreate
-                                PinFlow.UPDATE -> navigationAfterUpdate
-                            },
-                        ),
-                        SuccessUIConfig.Parser
-                    ).orEmpty()
+        return when (pinFlow) {
+            PinFlow.CREATE -> {
+                generateComposableNavigationLink(
+                    screen = OnboardingScreens.Enrollment,
+                    arguments = generateComposableArguments(emptyMap<String, String>()),
                 )
-            )
-        )
+            }
+
+            PinFlow.UPDATE -> {
+                generateComposableNavigationLink(
+                    screen = CommonScreens.Success,
+                    arguments = generateComposableArguments(
+                        mapOf(
+                            SuccessUIConfig.serializedKeyName to uiSerializer.toBase64(
+                                SuccessUIConfig(
+                                    textElementsConfig = SuccessUIConfig.TextElementsConfig(
+                                        text = resourceProvider.getString(R.string.quick_pin_change_success_text),
+                                        description = resourceProvider.getString(R.string.quick_pin_change_success_description)
+                                    ),
+                                    imageConfig = SuccessUIConfig.ImageConfig(),
+                                    buttonConfig = listOf(
+                                        SuccessUIConfig.ButtonConfig(
+                                            text = resourceProvider.getString(R.string.quick_pin_change_success_btn),
+                                            style = SuccessUIConfig.ButtonConfig.Style.PRIMARY,
+                                            navigation = navigationAfterUpdate
+                                        )
+                                    ),
+                                    onBackScreenToNavigate = navigationAfterUpdate,
+                                ),
+                                SuccessUIConfig.Parser
+                            ).orEmpty()
+                        )
+                    )
+                )
+            }
+        }
     }
 
     private fun showBottomSheet() {

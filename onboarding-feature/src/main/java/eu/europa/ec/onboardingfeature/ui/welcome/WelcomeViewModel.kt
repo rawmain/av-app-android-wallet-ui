@@ -31,11 +31,13 @@ data class State(
 
 sealed class Event : ViewEvent {
     data object GoNext : Event()
+    data object Pop : Event()
 }
 
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data class SwitchScreen(val screenRoute: String) : Navigation()
+        data object Finish : Navigation()
     }
 }
 
@@ -65,6 +67,10 @@ class WelcomeViewModel : MviViewModel<Event, State, Effect>() {
         when (event) {
             Event.GoNext -> {
                 setEffect { Effect.Navigation.SwitchScreen(OnboardingScreens.Consent.screenRoute) }
+            }
+
+            Event.Pop -> {
+                setEffect { Effect.Navigation.Finish }
             }
         }
     }

@@ -62,7 +62,7 @@ enum class IssuanceMethod {
 
 sealed class IssueDocumentPartialState {
     data class Success(val documentId: String) : IssueDocumentPartialState()
-    data class DeferredSuccess(val deferredDocuments: Map<String, String>) :
+    data class DeferredSuccess(val deferredDocuments: Map<DocumentId, FormatType>) :
         IssueDocumentPartialState()
 
     data class Failure(val errorMessage: String) : IssueDocumentPartialState()

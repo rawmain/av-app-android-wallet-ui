@@ -16,7 +16,9 @@
 
 package eu.europa.ec.onboardingfeature.ui.welcome
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,7 +52,6 @@ import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SIZE_XXX_LARGE
-import eu.europa.ec.uilogic.component.utils.SPACING_MEDIUM
 import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.component.wrap.ButtonConfig
 import eu.europa.ec.uilogic.component.wrap.ButtonType
@@ -60,6 +62,7 @@ import eu.europa.ec.uilogic.component.wrap.WrapImage
 import eu.europa.ec.uilogic.component.wrap.WrapPageIndicator
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
+import eu.europa.ec.uilogic.extension.finish
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
@@ -68,12 +71,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 
 @Composable
 fun WelcomeScreen(navController: NavController, viewModel: WelcomeViewModel) {
+    val context = LocalContext.current
     val state: State by viewModel.viewState.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState { state.pages.size }
 
     ContentScreen(isLoading = false,
         navigatableAction = ScreenNavigateAction.NONE,
-        onBack = { },
+        onBack = { viewModel.setEvent(Event.Pop) },
         stickyBottom = { paddingValues ->
             WrapStickyBottomContent(
                 stickyBottomModifier = Modifier
@@ -94,12 +98,13 @@ fun WelcomeScreen(navController: NavController, viewModel: WelcomeViewModel) {
                     )
                 )
             }
-        }) { _ ->
+        }) { paddingValues ->
         Content(
+            paddingValues = paddingValues,
             pages = state.pages, pagerState = pagerState,
             effectFlow = viewModel.effect,
             onNavigationRequested = { navigationEffect ->
-                handleNavigationEffect(navigationEffect, navController)
+                handleNavigationEffect(navigationEffect, navController, context)
             },
         )
     }
@@ -107,12 +112,17 @@ fun WelcomeScreen(navController: NavController, viewModel: WelcomeViewModel) {
 
 @Composable
 private fun Content(
+    paddingValues: PaddingValues,
     pages: List<SinglePageConfig>,
     pagerState: PagerState,
     effectFlow: Flow<Effect>,
     onNavigationRequested: (Effect.Navigation) -> Unit,
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(paddingValues),
+    ) {
         TopStepBar(0)
         VSpacer.ExtraLarge()
         WelcomePager(pagerState = pagerState, pages = pages)
@@ -122,7 +132,9 @@ private fun Content(
     LaunchedEffect(Unit) {
         effectFlow.onEach { effect ->
             when (effect) {
-                is Effect.Navigation.SwitchScreen -> onNavigationRequested(effect)
+                is Effect.Navigation -> {
+                    onNavigationRequested(effect)
+                }
             }
         }.collect()
     }
@@ -141,12 +153,14 @@ private fun WelcomePager(pagerState: PagerState, pages: List<SinglePageConfig>) 
 }
 
 private fun handleNavigationEffect(
-    navigationEffect: Effect.Navigation, navController: NavController
+    navigationEffect: Effect.Navigation, navController: NavController, context: Context,
 ) {
     when (navigationEffect) {
         is Effect.Navigation.SwitchScreen -> {
             navController.navigate(navigationEffect.screenRoute)
         }
+
+        is Effect.Navigation.Finish -> context.finish()
     }
 }
 
@@ -154,7 +168,7 @@ data class SinglePageConfig(val title: Int, val description: Int, val icon: Icon
 
 @Composable
 private fun SinglePage(
-    pages: List<SinglePageConfig>
+    pages: List<SinglePageConfig>,
 ): @Composable (PagerScope.(page: Int) -> Unit) = { page ->
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -162,7 +176,6 @@ private fun SinglePage(
             .fillMaxWidth()
             .wrapContentHeight()
             .defaultMinSize(minHeight = 180.dp)
-            .padding(horizontal = SPACING_MEDIUM.dp)
     ) {
         WrapImage(
             iconData = pages[page].icon,
@@ -214,10 +227,17 @@ private fun WelcomeScreenPreview() {
             )
         )
         val pagerState = rememberPagerState { pages.size }
-        Content(
-            pages = pages, pagerState = pagerState,
-            effectFlow = Channel<Effect>().receiveAsFlow(),
-            onNavigationRequested = {},
-        )
+        ContentScreen(
+            isLoading = false,
+            navigatableAction = ScreenNavigateAction.NONE
+        ) { paddingValues ->
+            Content(
+                paddingValues = paddingValues,
+                pages = pages, pagerState = pagerState,
+                effectFlow = Channel<Effect>().receiveAsFlow(),
+                onNavigationRequested = {},
+            )
+        }
+
     }
 }

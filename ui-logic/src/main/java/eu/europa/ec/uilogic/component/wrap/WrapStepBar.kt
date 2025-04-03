@@ -26,12 +26,13 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_SMALL
-import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL_PLUS
 
@@ -45,8 +46,7 @@ private const val inactiveTextColorAlpha = 0.5f
 fun WrapStepBar(currentStep: Int, steps: List<String>, modifier: Modifier = Modifier) {
     ElevatedCard(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(buttonsContentPadding),
+            .fillMaxWidth(),
         shape = buttonsShape,
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = SIZE_EXTRA_SMALL.dp),
         colors = CardDefaults.elevatedCardColors(
@@ -55,6 +55,7 @@ fun WrapStepBar(currentStep: Int, steps: List<String>, modifier: Modifier = Modi
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             steps.forEachIndexed { index, text ->
@@ -73,7 +74,9 @@ private fun Label(text: String, index: Int, currentStep: Int) {
         modifier = Modifier.padding(paddingValues),
         text = text,
         color = textColor,
-        style = MaterialTheme.typography.titleSmall
+        style = MaterialTheme.typography.titleSmall,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
     )
 }
 

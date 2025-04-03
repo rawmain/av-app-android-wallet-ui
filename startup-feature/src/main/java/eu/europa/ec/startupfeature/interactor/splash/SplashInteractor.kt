@@ -18,20 +18,16 @@ package eu.europa.ec.startupfeature.interactor.splash
 
 import eu.europa.ec.commonfeature.config.BiometricMode
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
-import eu.europa.ec.commonfeature.config.IssuanceFlowUiConfig
 import eu.europa.ec.commonfeature.config.OnBackNavigationConfig
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractor
-import eu.europa.ec.commonfeature.model.PinFlow
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.IssuanceScreens
 import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
-import eu.europa.ec.uilogic.navigation.StartupScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
@@ -83,13 +79,9 @@ class SplashInteractorImpl(
                                     screen = if (hasDocuments) {
                                         LandingScreens.Landing
                                     } else {
-                                        IssuanceScreens.AddDocument
+                                        OnboardingScreens.Enrollment
                                     },
-                                    arguments = if (!hasDocuments) {
-                                        mapOf("flowType" to IssuanceFlowUiConfig.NO_DOCUMENT.name)
-                                    } else {
-                                        emptyMap()
-                                    }
+                                    arguments = emptyMap()
                                 )
                             ),
                             onBackNavigationConfig = OnBackNavigationConfig(

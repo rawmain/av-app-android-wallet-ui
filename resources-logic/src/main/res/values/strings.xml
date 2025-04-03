@@ -47,6 +47,13 @@
     <string name="onboarding_step_3_title">Security</string>
     <string name="onboarding_step_4_title">Verification</string>
 
+    <!-- Enrollment Screen -->
+    <string name="onboarding_verification_title">Please select your Age Verification Enrollment Method</string>
+    <string name="onboarding_verification_national_id">National eID / National idP</string>
+    <string name="onboarding_verification_national_id_description">Identify online using your eID</string>
+    <string name="onboarding_verification_token">Token / QR-Code</string>
+    <string name="onboarding_verification_token_description">Scan a provided QR Code</string>
+
     <string name="welcome_page_1">The Age Verification App quickly and securely confirms your age for accessing age-restricted services.</string>
     <string name="welcome_page_2">Simply verify your age once using a national elD or biometric check and receive a proof of age that allows seamless access to age-limited services.</string>
     <string name="welcome_page_3">You stay in control of your data-only your proof of age is shared, never your personal identification details.</string>
@@ -126,6 +133,7 @@
     <string name="content_description_settings_icon">Settings</string>
     <string name="content_description_eu_flag_icon">EU Flag</string>
     <string name="content_description_over_18_icon">Over 18</string>
+    <string name="content_description_national_eid_icon">National eID</string>
 
     <!-- Biometric prompt -->
     <string name="biometric_prompt_title">Biometric authentication</string>

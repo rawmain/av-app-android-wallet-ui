@@ -16,15 +16,15 @@
 
 package eu.europa.ec.onboardingfeature.ui.components
 
+
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.resourceslogic.R
+import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_LARGE
-
-
 import eu.europa.ec.uilogic.component.wrap.WrapStepBar
 
 @Composable
@@ -38,6 +38,14 @@ fun TopStepBar(currentStep: Int) {
     WrapStepBar(
         currentStep = currentStep,
         steps = listOf(step1, step2, step3, step4),
-        modifier = Modifier.padding(top = SPACING_EXTRA_LARGE.dp),
+        modifier = Modifier.padding(
+            top = SPACING_EXTRA_LARGE.dp,
+        ),
     )
+}
+
+@ThemeModePreviews
+@Composable
+fun TopStepBarPreview() {
+    TopStepBar(currentStep = 1)
 }

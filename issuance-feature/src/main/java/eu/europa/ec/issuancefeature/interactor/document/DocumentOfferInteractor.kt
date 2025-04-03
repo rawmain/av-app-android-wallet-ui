@@ -163,7 +163,13 @@ class DocumentOfferInteractorImpl(
                                     id == DocumentIdentifier.MdocPid
                                 }
 
-                            if (hasMainPid || hasPidInOffer) {
+                            val hasPseudonyminOffer =
+                                response.offer.offeredDocuments.any { offeredDocument ->
+                                    val id = offeredDocument.documentIdentifier
+                                    id == DocumentIdentifier.MdocPseudonym
+                                }
+
+                            if (hasMainPid || hasPidInOffer || hasPseudonyminOffer) {
 
                                 ResolveDocumentOfferInteractorPartialState.Success(
                                     documents = response.offer.offeredDocuments.map { offeredDocument ->
