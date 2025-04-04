@@ -40,7 +40,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.corelogic.util.CoreActions
-import eu.europa.ec.onboardingfeature.ui.components.TopStepBar
+import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.SystemBroadcastReceiver

@@ -14,7 +14,7 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.onboardingfeature.ui.components
+package eu.europa.ec.uilogic.component
 
 
 import androidx.compose.foundation.layout.padding

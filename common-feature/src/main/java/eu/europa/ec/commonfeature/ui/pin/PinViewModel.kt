@@ -16,6 +16,7 @@
 
 package eu.europa.ec.commonfeature.ui.pin
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.validator.Form
 import eu.europa.ec.businesslogic.validator.FormValidationResult
@@ -53,7 +54,7 @@ enum class PinValidationState {
 }
 
 data class State(
-    private val pinFlow: PinFlow,
+    val pinFlow: PinFlow,
     val isLoading: Boolean = false,
     val isButtonEnabled: Boolean = false,
     val quickPinError: String? = null,
@@ -79,7 +80,7 @@ data class State(
     val onBackEvent: Event
         get() {
             return when (pinFlow) {
-                PinFlow.CREATE -> Event.Finish
+                PinFlow.CREATE -> Event.GoBack
                 PinFlow.UPDATE -> Event.CancelPressed
             }
         }
@@ -89,7 +90,7 @@ sealed class Event : ViewEvent {
     data class NextButtonPressed(val pin: String) : Event()
     data class OnQuickPinEntered(val quickPin: String) : Event()
     data object CancelPressed : Event()
-    data object Finish : Event()
+    data object GoBack : Event()
     sealed class BottomSheet : Event() {
         data class UpdateBottomSheetState(val isOpen: Boolean) : BottomSheet()
 
@@ -106,7 +107,6 @@ sealed class Effect : ViewSideEffect {
         data class SwitchScreen(val screen: String) : Navigation()
 
         data object Pop : Navigation()
-        data object Finish : Navigation()
     }
 
     data object ShowBottomSheet : Effect()
@@ -155,6 +155,8 @@ class PinViewModel(
     }
 
     override fun handleEvents(event: Event) {
+        Log.i("PIN", "Event received: $event")
+
         when (event) {
             is Event.OnQuickPinEntered -> {
                 validateForm(event.quickPin)
@@ -162,7 +164,7 @@ class PinViewModel(
 
             is Event.NextButtonPressed -> {
                 val state = viewState.value
-
+                Log.i("PIN", "state on button pressed: $state")
                 when (state.pinState) {
                     PinValidationState.ENTER -> {
                         // Set state for re-enter phase
@@ -202,7 +204,7 @@ class PinViewModel(
                 }
             }
 
-            is Event.Finish -> setEffect { Effect.Navigation.Finish }
+            is Event.GoBack -> setEffect { Effect.Navigation.Pop }
         }
     }
 
@@ -255,8 +257,17 @@ class PinViewModel(
                 buttonText = calculateButtonText(newPinState),
                 pin = "",
                 resetPin = true,
-                subtitle = calculateSubtitle(newPinState)
+                subtitle = calculateSubtitle(newPinState),
+                title = calculateTitle(newPinState)
             )
+        }
+    }
+
+    private fun calculateTitle(pinState: PinValidationState): String {
+        return when (pinState) {
+            PinValidationState.ENTER -> resourceProvider.getString(R.string.quick_pin_create_title)
+            PinValidationState.REENTER -> resourceProvider.getString(R.string.quick_pin_create_reenter_title)
+            PinValidationState.VALIDATE -> viewState.value.title
         }
     }
 
@@ -313,6 +324,12 @@ class PinViewModel(
                     pin = pin,
                     resetPin = false
                 )
+            }
+            Log.i("PIN", "state after validation: ${viewState.value}")
+
+            // FFWD to next screen if the pin is valid
+            if (validationResult.isValid) {
+                setEvent(Event.NextButtonPressed(pin))
             }
         }
     }
