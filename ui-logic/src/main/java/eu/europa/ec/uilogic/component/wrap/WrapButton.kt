@@ -21,13 +21,13 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -55,7 +55,7 @@ data class ButtonConfig(
     val isWarning: Boolean = false,
     val shape: Shape = buttonsShape,
     val contentPadding: PaddingValues = buttonsContentPadding,
-    val isWithoutContainerBackground: Boolean = false,
+    val buttonColors: ButtonColors? = null,
 )
 
 @Composable
@@ -89,10 +89,8 @@ private fun WrapPrimaryButton(
         ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.error
         )
-    } else if (buttonConfig.isWithoutContainerBackground) {
-        ButtonDefaults.filledTonalButtonColors(containerColor = Color.Transparent)
     } else {
-        ButtonDefaults.buttonColors()
+        buttonConfig.buttonColors ?: ButtonDefaults.buttonColors()
     }
 
     Button(
@@ -129,7 +127,7 @@ private fun WrapSecondaryButton(
             contentColor = MaterialTheme.colorScheme.error
         )
     } else {
-        ButtonDefaults.outlinedButtonColors()
+        buttonConfig.buttonColors ?: ButtonDefaults.outlinedButtonColors()
     }
 
     OutlinedButton(
