@@ -16,57 +16,58 @@
 
 package eu.europa.ec.startupfeature.ui.splash
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
+import eu.europa.ec.uilogic.component.preview.PreviewTheme
+import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
+import eu.europa.ec.uilogic.component.utils.HSpacer
 import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
+import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
+import eu.europa.ec.uilogic.component.utils.SPACING_SMALL_PLUS
+import eu.europa.ec.uilogic.component.utils.VSpacer
+import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapImage
+import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.navigation.ModuleRoute
 import eu.europa.ec.uilogic.navigation.StartupScreens
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 
 @Composable
 fun SplashScreen(
     navController: NavController,
-    viewModel: SplashViewModel
+    viewModel: SplashViewModel,
 ) {
-    val state: State by viewModel.viewState.collectAsStateWithLifecycle()
     Content(
-        state = state,
         effectFlow = viewModel.effect,
-        onNavigationRequested = {
-            when (it) {
-                is Effect.Navigation.SwitchModule -> {
-                    navController.navigate(it.moduleRoute.route) {
-                        popUpTo(ModuleRoute.StartupModule.route) { inclusive = true }
-                    }
-                }
-
-                is Effect.Navigation.SwitchScreen -> {
-                    navController.navigate(it.route) {
-                        popUpTo(StartupScreens.Splash.screenRoute) { inclusive = true }
-                    }
-                }
-            }
+        onNavigationRequested = { navigationEffect ->
+            handleNavigationEffects(navigationEffect, navController)
         }
     )
 
@@ -75,36 +76,49 @@ fun SplashScreen(
     }
 }
 
-@Composable
-private fun Content(
-    state: State,
-    effectFlow: Flow<Effect>,
-    onNavigationRequested: (navigationEffect: Effect.Navigation) -> Unit
+private fun handleNavigationEffects(
+    navigationEffect: Effect.Navigation,
+    navController: NavController,
 ) {
-    val visibilityState = remember {
-        MutableTransitionState(false).apply {
-            targetState = true
+    when (navigationEffect) {
+        is Effect.Navigation.SwitchModule -> {
+            navController.navigate(navigationEffect.moduleRoute.route) {
+                popUpTo(ModuleRoute.StartupModule.route) { inclusive = true }
+            }
         }
-    }
-    Scaffold { paddingValues ->
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.surface),
-            contentAlignment = Alignment.Center
-        ) {
-            AnimatedVisibility(
-                visibleState = visibilityState,
-                enter = fadeIn(animationSpec = tween(state.logoAnimationDuration)),
-                exit = fadeOut(animationSpec = tween(state.logoAnimationDuration)),
-            ) {
-                WrapImage(
-                    iconData = AppIcons.LogoFull
-                )
+
+        is Effect.Navigation.SwitchScreen -> {
+            navController.navigate(navigationEffect.route) {
+                popUpTo(StartupScreens.Splash.screenRoute) { inclusive = true }
             }
         }
     }
+}
+
+@Composable
+private fun Content(
+    effectFlow: Flow<Effect>,
+    onNavigationRequested: (navigationEffect: Effect.Navigation) -> Unit,
+) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        VSpacer.Custom(64)
+        WrapImage(
+            modifier = Modifier
+                .height(50.dp),
+            iconData = AppIcons.EuFlag,
+            contentScale = ContentScale.FillHeight
+        )
+        VSpacer.Large()
+        MapTitleAndLogo()
+        Spacer(modifier = Modifier.weight(1f))
+        Footer()
+    }
+
 
     LaunchedEffect(Unit) {
         effectFlow.onEach { effect ->
@@ -112,5 +126,98 @@ private fun Content(
                 is Effect.Navigation -> onNavigationRequested(effect)
             }
         }.collect()
+    }
+}
+
+@Composable
+private fun MapTitleAndLogo() {
+    Box(
+        modifier = Modifier.padding(horizontal = SPACING_LARGE.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        WrapImage(
+            modifier = Modifier
+                .fillMaxWidth(),
+            iconData = AppIcons.EuMap,
+            contentScale = ContentScale.FillWidth,
+        )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            val gradientTextConfig = TextConfig(
+                style = MaterialTheme.typography.displaySmall.copy(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            Color(0xFF0A215F),
+                        ),
+                    )
+                ),
+                textAlign = TextAlign.Center
+            )
+            WrapText(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = stringResource(R.string.splash_screen_title_line_1),
+                textConfig = gradientTextConfig,
+            )
+            WrapText(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                text = stringResource(R.string.splash_screen_title_line_2),
+                textConfig = gradientTextConfig,
+            )
+            VSpacer.Large()
+            WrapImage(
+                iconData = AppIcons.AgeVerification
+            )
+        }
+    }
+}
+
+@Composable
+private fun Footer() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(
+                RoundedCornerShape(
+                    topStart = 24.dp,
+                    topEnd = 24.dp,
+                    bottomEnd = 0.dp,
+                    bottomStart = 0.dp
+                )
+            )
+            .background(MaterialTheme.colorScheme.primary)
+            .padding(SPACING_SMALL_PLUS.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        HSpacer.XXLarge()
+        WrapText(
+            text = stringResource(R.string.splash_screen_sponsors),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onPrimary,
+            ),
+        )
+        HSpacer.Large()
+        WrapImage(
+            iconData = AppIcons.ScytalesLogo
+        )
+        HSpacer.Large()
+        WrapImage(
+            iconData = AppIcons.TelekomLogo
+        )
+    }
+}
+
+@ThemeModePreviews
+@Composable
+private fun SplashScreenPreview() {
+    PreviewTheme {
+        Content(
+            effectFlow = Channel<Effect>().receiveAsFlow(),
+            onNavigationRequested = {}
+        )
     }
 }

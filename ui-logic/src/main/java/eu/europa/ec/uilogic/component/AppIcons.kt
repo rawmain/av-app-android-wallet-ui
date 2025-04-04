@@ -429,4 +429,28 @@ object AppIcons {
         contentDescriptionId = R.string.content_description_national_eid_icon,
         imageVector = null
     )
+
+    val EuMap: IconData = IconData(
+        resourceId = R.drawable.ic_eu_map,
+        contentDescriptionId = R.string.content_description_eu_map_icon,
+        imageVector = null
+    )
+
+    val AgeVerification: IconData = IconData(
+        resourceId = R.drawable.ic_age_verification,
+        contentDescriptionId = R.string.content_description_age_verification_icon,
+        imageVector = null
+    )
+
+    val TelekomLogo: IconData = IconData(
+        resourceId = R.drawable.ic_telekom_logo,
+        contentDescriptionId = R.string.content_description_telekom_logo_icon,
+        imageVector = null
+    )
+
+    val ScytalesLogo: IconData = IconData(
+        resourceId = R.drawable.ic_scytales_logo,
+        contentDescriptionId = R.string.content_description_scytales_logo_icon,
+        imageVector = null
+    )
 }

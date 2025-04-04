@@ -47,6 +47,11 @@
     <string name="onboarding_step_3_title">Security</string>
     <string name="onboarding_step_4_title">Verification</string>
 
+    <!-- Splash Screen -->
+    <string name="splash_screen_title_line_1">Anonymous Age</string>
+    <string name="splash_screen_title_line_2">Verification</string>
+    <string name="splash_screen_sponsors">Powered by</string>
+
     <!-- Enrollment Screen -->
     <string name="onboarding_verification_title">Please select your Age Verification Enrollment Method</string>
     <string name="onboarding_verification_national_id">National eID / National idP</string>
@@ -54,7 +59,7 @@
     <string name="onboarding_verification_token">Token / QR-Code</string>
     <string name="onboarding_verification_token_description">Scan a provided QR Code</string>
 
-    <string name="welcome_page_1">The Age Verification App quickly and securely confirms your age for accessing age-restricted services.</string>
+    <string name="welcome_page_1">The Anonymous Age Verification App quickly and securely confirms your age for accessing age-restricted services.</string>
     <string name="welcome_page_2">Simply verify your age once using a national elD or biometric check and receive a proof of age that allows seamless access to age-limited services.</string>
     <string name="welcome_page_3">You stay in control of your data-only your proof of age is shared, never your personal identification details.</string>
 
@@ -134,6 +139,10 @@
     <string name="content_description_eu_flag_icon">EU Flag</string>
     <string name="content_description_over_18_icon">Over 18</string>
     <string name="content_description_national_eid_icon">National eID</string>
+    <string name="content_description_eu_map_icon">Eu Map</string>
+    <string name="content_description_age_verification_icon">Age Verification Logo</string>
+    <string name="content_description_telekom_logo_icon">Telekom Logo</string>
+    <string name="content_description_scytales_logo_icon">Scytales Logo</string>
 
     <!-- Biometric prompt -->
     <string name="biometric_prompt_title">Biometric authentication</string>
@@ -385,7 +394,7 @@
     <string name="document_category_other">OTHER</string>
 
     <!-- Landing Screen -->
-    <string name="landing_screen_title">Age Verification App</string>
+    <string name="landing_screen_title">Anonymous Age Verification</string>
     <string name="landing_screen_subtitle">With your proof of age, you can verify your age when using online services, such as a media library.\nThe proof of age only contains the information that you are older than 18, but no personal data.</string>
     <string name="landing_screen_card_eu_title">European\nUnion</string>
     <string name="landing_screen_card_age_verification">Age Verification</string>
