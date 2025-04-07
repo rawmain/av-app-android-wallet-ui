@@ -29,6 +29,7 @@ import org.koin.android.annotation.KoinViewModel
 data class State(
     val tosAccepted: Boolean = false,
     val dataProtectionAccepted: Boolean = false,
+    val over18Accepted: Boolean = false,
     val isButtonEnabled: Boolean = false,
 ) : ViewState
 
@@ -37,6 +38,7 @@ sealed class Event : ViewEvent {
     data object GoBack : Event()
     data object TosSelected : Event()
     data object DataProtectionSelected : Event()
+    data object Over18Selected : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -56,22 +58,32 @@ class ConsentViewModel : MviViewModel<Event, State, Effect>() {
                 val nextScreenRoute = getQuickPinConfig()
                 setEffect { Effect.Navigation.SwitchScreen(nextScreenRoute) }
             }
+
             Event.GoBack -> {
                 setEffect { Effect.Navigation.Pop }
             }
+
             Event.TosSelected -> {
                 setState { copy(tosAccepted = !tosAccepted) }
                 validateForm()
             }
+
             Event.DataProtectionSelected -> {
                 setState { copy(dataProtectionAccepted = !dataProtectionAccepted) }
+                validateForm()
+            }
+
+            Event.Over18Selected -> {
+                setState { copy(over18Accepted = !over18Accepted) }
                 validateForm()
             }
         }
     }
 
     private fun validateForm() {
-        val isButtonEnabled = viewState.value.tosAccepted && viewState.value.dataProtectionAccepted
+        val isButtonEnabled = viewState.value.tosAccepted &&
+                viewState.value.dataProtectionAccepted &&
+                viewState.value.over18Accepted
         setState { copy(isButtonEnabled = isButtonEnabled) }
     }
 

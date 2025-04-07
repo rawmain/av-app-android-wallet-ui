@@ -341,6 +341,7 @@
     <string name="consent_screen_title">First we need your consent</string>
     <string name="consent_screen_tos_checkbox">I accept the Terms of Service</string>
     <string name="consent_screen_data_protection_checkbox">I accept the Data Protection Information</string>
+    <string name="consent_screen_over_18_checkbox">I am 18 years old or older</string>
     <string name="consent_screen_tos_button">Terms of Service</string>
     <string name="consent_screen_data_protection_button">Data Protection Information</string>
     <string name="consent_screen_confirm_button">Confirm</string>

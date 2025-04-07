@@ -71,6 +71,12 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
         text = stringResource(R.string.consent_screen_data_protection_checkbox),
     )
 
+    val over18CheckBoxData = CheckboxWithTextData(
+        isChecked = state.value.over18Accepted,
+        onCheckedChange = { viewModel.setEvent(Event.Over18Selected) },
+        text = stringResource(R.string.consent_screen_over_18_checkbox),
+    )
+
     val config = ButtonConfig(
         type = ButtonType.PRIMARY,
         onClick = { viewModel.setEvent(Event.GoNext) },
@@ -82,21 +88,13 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.GoBack) },
         stickyBottom = { paddingValues ->
-            WrapStickyBottomContent(
-                stickyBottomModifier = Modifier
-                    .fillMaxWidth()
-                    .padding(paddingValues),
-                stickyBottomConfig = StickyBottomConfig(
-                    type = StickyBottomType.OneButton(config = config), showDivider = false
-                )
-            ) {
-                Text(text = stringResource(R.string.consent_screen_confirm_button))
-            }
+            ContinueButton(paddingValues, config)
         }) { paddingValues ->
         Content(
             paddingValues = paddingValues,
             tosCheckBoxData = tosCheckBoxData,
             dataProtectionCheckBoxData = dataProtectionCheckBoxData,
+            over18CheckBoxData = over18CheckBoxData,
             effectFlow = viewModel.effect,
             onNavigationRequested = { navigationEffect ->
                 handleNavigationEffect(navigationEffect, navController)
@@ -105,12 +103,30 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
 }
 
 @Composable
+private fun ContinueButton(
+    paddingValues: PaddingValues,
+    config: ButtonConfig,
+) {
+    WrapStickyBottomContent(
+        stickyBottomModifier = Modifier
+            .fillMaxWidth()
+            .padding(paddingValues),
+        stickyBottomConfig = StickyBottomConfig(
+            type = StickyBottomType.OneButton(config = config), showDivider = false
+        )
+    ) {
+        Text(text = stringResource(R.string.consent_screen_confirm_button))
+    }
+}
+
+@Composable
 private fun Content(
     paddingValues: PaddingValues,
     tosCheckBoxData: CheckboxWithTextData,
     dataProtectionCheckBoxData: CheckboxWithTextData,
+    over18CheckBoxData: CheckboxWithTextData,
     effectFlow: Flow<Effect>,
-    onNavigationRequested: (Effect.Navigation) -> Unit
+    onNavigationRequested: (Effect.Navigation) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -120,7 +136,8 @@ private fun Content(
         TopStepBar(currentStep = 1)
         ConsentAndTosSection(
             tosCheckBoxData = tosCheckBoxData,
-            dataProtectionCheckBoxData = dataProtectionCheckBoxData
+            dataProtectionCheckBoxData = dataProtectionCheckBoxData,
+            over18CheckBoxData = over18CheckBoxData
         )
     }
 
@@ -135,12 +152,13 @@ private fun Content(
 
 private fun handleNavigationEffect(
     navigationEffect: Effect.Navigation,
-    navController: NavController
+    navController: NavController,
 ) {
     when (navigationEffect) {
         is Effect.Navigation.SwitchScreen -> {
             navController.navigate(navigationEffect.screenRoute)
         }
+
         is Effect.Navigation.Pop -> {
             navController.popBackStack()
         }
@@ -149,7 +167,9 @@ private fun handleNavigationEffect(
 
 @Composable
 fun ConsentAndTosSection(
-    tosCheckBoxData: CheckboxWithTextData, dataProtectionCheckBoxData: CheckboxWithTextData
+    tosCheckBoxData: CheckboxWithTextData,
+    dataProtectionCheckBoxData: CheckboxWithTextData,
+    over18CheckBoxData: CheckboxWithTextData,
 ) {
     Column(
         modifier = Modifier
@@ -168,6 +188,7 @@ fun ConsentAndTosSection(
 
         WrapCheckboxWithText(checkboxData = tosCheckBoxData)
         WrapCheckboxWithText(checkboxData = dataProtectionCheckBoxData)
+        WrapCheckboxWithText(checkboxData = over18CheckBoxData)
 
         VSpacer.Small()
 
@@ -200,11 +221,34 @@ private fun ContentPreview() {
             text = "I accept the Data Protection Information",
         )
 
-        Content(
-            paddingValues = PaddingValues(0.dp),
-            tosCheckBoxData = tosCheckBoxData,
-            dataProtectionCheckBoxData = dataProtectionCheckBoxData,
-            effectFlow = flowOf(),
-            onNavigationRequested = {})
+        val over18CheckBoxData = CheckboxWithTextData(
+            isChecked = true,
+            onCheckedChange = {},
+            text = "I confirm that I am 18 years old or older",
+        )
+
+        val buttonConfig = ButtonConfig(
+            type = ButtonType.PRIMARY,
+            onClick = { },
+            enabled = true
+        )
+
+        ContentScreen(
+            stickyBottom = {
+                ContinueButton(
+                    paddingValues = it,
+                    config = buttonConfig
+                )
+            }
+        ) {
+            Content(
+                paddingValues = it,
+                tosCheckBoxData = tosCheckBoxData,
+                dataProtectionCheckBoxData = dataProtectionCheckBoxData,
+                over18CheckBoxData = over18CheckBoxData,
+                effectFlow = flowOf(),
+                onNavigationRequested = {}
+            )
+        }
     }
 }
