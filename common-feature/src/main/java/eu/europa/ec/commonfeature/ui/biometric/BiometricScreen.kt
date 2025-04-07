@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -40,8 +39,6 @@ import eu.europa.ec.commonfeature.config.BiometricMode
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
 import eu.europa.ec.commonfeature.config.OnBackNavigationConfig
 import eu.europa.ec.resourceslogic.R
-import eu.europa.ec.uilogic.component.AppIconAndText
-import eu.europa.ec.uilogic.component.AppIconAndTextData
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.content.ContentHeader
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
@@ -53,8 +50,11 @@ import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
 import eu.europa.ec.uilogic.component.utils.SIZE_MEDIUM
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
+import eu.europa.ec.uilogic.component.utils.VSpacer
+import eu.europa.ec.uilogic.component.wrap.OtpTextField
+import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapIconButton
-import eu.europa.ec.uilogic.component.wrap.WrapPinTextField
+import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.FlowCompletion
 import eu.europa.ec.uilogic.config.NavigationType
@@ -278,36 +278,27 @@ private fun MainContent(
         }
 
         is BiometricMode.Login -> {
-            AppIconAndText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = SPACING_LARGE.dp),
-                appIconAndTextData = AppIconAndTextData(),
-            )
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = SPACING_LARGE.dp),
-                verticalArrangement = Arrangement.spacedBy(SPACING_SMALL.dp, Alignment.Top)
+                ,
             ) {
-                Text(
-                    text = mode.title,
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                )
+                VSpacer.Custom(80)
 
                 val subtitle = if (state.userBiometricsAreEnabled) {
                     mode.subTitleWhenBiometricsEnabled
                 } else {
                     mode.subTitleWhenBiometricsNotEnabled
                 }
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+
+                WrapText(
+                    textConfig = TextConfig(style = MaterialTheme.typography.titleLarge),
+                    text = mode.title
+                )
+                VSpacer.Large()
+                WrapText(
+                    textConfig = TextConfig(style = MaterialTheme.typography.bodyMedium),
+                    text = subtitle
                 )
             }
 
@@ -330,15 +321,16 @@ private fun PinFieldLayout(
     state: State,
     onPinInput: (String) -> Unit,
 ) {
-    WrapPinTextField(
+    OtpTextField(
         modifier = modifier,
-        onPinUpdate = onPinInput,
+        onUpdate = onPinInput,
         length = state.quickPinSize,
         hasError = !state.quickPinError.isNullOrEmpty(),
         errorMessage = state.quickPinError,
         visualTransformation = PasswordVisualTransformation(),
         pinWidth = 42.dp,
-        focusOnCreate = !state.userBiometricsAreEnabled
+        focusOnCreate = !state.userBiometricsAreEnabled,
+        otpText = state.quickPin
     )
 }
 
@@ -347,16 +339,54 @@ private fun PinFieldLayout(
  */
 @ThemeModePreviews
 @Composable
-private fun PreviewBiometricScreen() {
+private fun PreviewBiometricDefaultScreen() {
+    val defaultMode = BiometricMode.Default(
+        descriptionWhenBiometricsEnabled = stringResource(R.string.loading_biometry_biometrics_enabled_description),
+        descriptionWhenBiometricsNotEnabled = stringResource(R.string.loading_biometry_biometrics_not_enabled_description),
+        textAbovePin = stringResource(R.string.biometric_default_mode_text_above_pin_field),
+    )
     PreviewTheme {
         Body(
             state = State(
                 config = BiometricUiConfig(
-                    mode = BiometricMode.Default(
-                        descriptionWhenBiometricsEnabled = stringResource(R.string.loading_biometry_biometrics_enabled_description),
-                        descriptionWhenBiometricsNotEnabled = stringResource(R.string.loading_biometry_biometrics_not_enabled_description),
-                        textAbovePin = stringResource(R.string.biometric_default_mode_text_above_pin_field),
+                    mode = defaultMode,
+                    isPreAuthorization = true,
+                    onSuccessNavigation = ConfigNavigation(
+                        navigationType = NavigationType.PushScreen(CommonScreens.Biometric)
                     ),
+                    onBackNavigationConfig = OnBackNavigationConfig(
+                        onBackNavigation = ConfigNavigation(
+                            navigationType = NavigationType.PushScreen(CommonScreens.Biometric),
+                        ),
+                        hasToolbarBackIcon = true
+                    )
+                )
+            ),
+            effectFlow = Channel<Effect>().receiveAsFlow(),
+            onEventSent = {},
+            onNavigationRequested = {},
+            padding = PaddingValues(SIZE_MEDIUM.dp)
+        )
+    }
+}
+
+/**
+ * Preview composable of [Body].
+ */
+@ThemeModePreviews
+@Composable
+private fun PreviewBiometricLoginScreen() {
+    val loginMode = BiometricMode.Login(
+        title = stringResource(R.string.biometric_login_title),
+        subTitleWhenBiometricsEnabled = stringResource(R.string.loading_biometry_biometrics_enabled_description),
+        subTitleWhenBiometricsNotEnabled = stringResource(R.string.loading_biometry_biometrics_not_enabled_description),
+    )
+    PreviewTheme {
+
+        Body(
+            state = State(
+                config = BiometricUiConfig(
+                    mode = loginMode,
                     isPreAuthorization = true,
                     onSuccessNavigation = ConfigNavigation(
                         navigationType = NavigationType.PushScreen(CommonScreens.Biometric)
