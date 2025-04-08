@@ -193,12 +193,15 @@ fun ConsentAndTosSection(
         VSpacer.Small()
 
         WrapLink(
-            data = WrapLinkData(textId = R.string.consent_screen_tos_button),
+            data = WrapLinkData(textId = R.string.consent_screen_tos_button, isExternal = true),
             onClick = { /* Handle link click */ },
         )
         VSpacer.Small()
         WrapLink(
-            data = WrapLinkData(textId = R.string.consent_screen_data_protection_button),
+            data = WrapLinkData(
+                textId = R.string.consent_screen_data_protection_button,
+                isExternal = true
+            ),
             onClick = { /* Handle link click */ },
         )
     }

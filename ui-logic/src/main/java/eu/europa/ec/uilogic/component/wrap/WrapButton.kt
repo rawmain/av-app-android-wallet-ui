@@ -32,7 +32,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
-import eu.europa.ec.uilogic.component.utils.SIZE_100
 import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 
@@ -90,7 +89,8 @@ private fun WrapPrimaryButton(
             containerColor = MaterialTheme.colorScheme.error
         )
     } else {
-        buttonConfig.buttonColors ?: ButtonDefaults.buttonColors()
+        buttonConfig.buttonColors ?: ButtonDefaults.buttonColors().copy(disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+        disabledContainerColor = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.25f))
     }
 
     Button(

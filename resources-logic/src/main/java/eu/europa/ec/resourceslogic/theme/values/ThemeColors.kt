@@ -60,7 +60,7 @@ class ThemeColors {
         private const val eudiw_theme_light_outline: Long = 0xFF79747E
         private const val eudiw_theme_light_outlineVariant: Long = 0xFFCAC4D0
         private const val eudiw_theme_light_scrim: Long = black
-        private const val eudiw_theme_light_inverseSurface: Long = 0xFF322F35
+        private const val eudiw_theme_light_inverseSurface: Long = 0xFF000000
         private const val eudiw_theme_light_inverseOnSurface: Long = 0xFFF5EFF7
         private const val eudiw_theme_light_inversePrimary: Long = 0xFFD0BCFF
         private const val eudiw_theme_light_surfaceDim: Long = 0xFFE2E8F3

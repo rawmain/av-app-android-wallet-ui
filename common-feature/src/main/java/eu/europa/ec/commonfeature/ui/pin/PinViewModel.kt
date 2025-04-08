@@ -355,11 +355,12 @@ class PinViewModel(
     }
 
     private fun calculateButtonText(pinState: PinValidationState): String {
-        return when (pinState) {
-            PinValidationState.ENTER -> resourceProvider.getString(R.string.generic_next_capitalized)
-            PinValidationState.REENTER -> resourceProvider.getString(R.string.generic_confirm_capitalized)
-            PinValidationState.VALIDATE -> resourceProvider.getString(R.string.generic_next_capitalized)
+        val stringResId = when (pinState) {
+            PinValidationState.ENTER -> R.string.quick_pin_next_button
+            PinValidationState.REENTER -> R.string.quick_pin_confirm_button
+            PinValidationState.VALIDATE -> R.string.quick_pin_next_button
         }
+        return resourceProvider.getString(stringResId)
     }
 
     private fun getNextScreenRoute(): String {

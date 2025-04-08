@@ -40,7 +40,7 @@ private val paddingValues = PaddingValues(
     horizontal = SPACING_SMALL_PLUS.dp, vertical = SPACING_EXTRA_SMALL.dp
 )
 
-private const val inactiveTextColorAlpha = 0.5f
+private const val inactiveTextColorAlpha = 0.35f
 
 @Composable
 fun WrapStepBar(currentStep: Int, steps: List<String>, modifier: Modifier = Modifier) {

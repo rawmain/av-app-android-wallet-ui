@@ -36,7 +36,7 @@ import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SIZE_SMALL_PLUS
 import eu.europa.ec.uilogic.component.utils.SPACING_MEDIUM
 
-private const val inactiveDotColorAlpha = 0.3f
+private const val inactiveDotColorAlpha = 0.15f
 
 @Composable
 fun WrapPageIndicator(pagerState: PagerState) {

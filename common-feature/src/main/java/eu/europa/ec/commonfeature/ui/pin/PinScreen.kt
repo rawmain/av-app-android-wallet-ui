@@ -51,6 +51,7 @@ import eu.europa.ec.uilogic.component.wrap.ButtonConfig
 import eu.europa.ec.uilogic.component.wrap.ButtonType
 import eu.europa.ec.uilogic.component.wrap.DialogBottomSheet
 import eu.europa.ec.uilogic.component.wrap.OtpTextField
+import eu.europa.ec.uilogic.component.wrap.PinHintText
 import eu.europa.ec.uilogic.component.wrap.StickyBottomConfig
 import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
@@ -191,12 +192,7 @@ private fun Content(
             text = state.title
         )
         VSpacer.Large()
-        WrapText(
-            textConfig = TextConfig(style = MaterialTheme.typography.bodyMedium),
-            text = state.subtitle
-        )
 
-        VSpacer.Small()
         PinFieldLayout(
             modifier = Modifier.fillMaxWidth().wrapContentHeight(),
             state = state,
@@ -251,6 +247,10 @@ private fun PinFieldLayout(
     state: State,
     onPinInput: (String) -> Unit,
 ) {
+    PinHintText(state.subtitle)
+
+    VSpacer.Small()
+
     OtpTextField(
         modifier = modifier,
         onUpdate = onPinInput,

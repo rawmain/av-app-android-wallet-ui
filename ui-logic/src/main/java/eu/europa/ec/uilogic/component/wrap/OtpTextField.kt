@@ -16,6 +16,7 @@
 
 package eu.europa.ec.uilogic.component.wrap
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,7 +49,7 @@ import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
 import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_SMALL
-import eu.europa.ec.uilogic.component.utils.SIZE_SMALL_PLUS
+import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
 
 @Composable
 fun OtpTextField(
@@ -72,7 +73,7 @@ fun OtpTextField(
 
     Column(modifier = modifier) {
         BasicTextField(
-            modifier = modifier.focusRequester(focusRequester),
+            modifier = Modifier.focusRequester(focusRequester),
             value = TextFieldValue(otpText, selection = TextRange(otpText.length)),
             onValueChange = {
                 onUpdate.invoke(it.text)
@@ -115,6 +116,15 @@ fun OtpTextField(
 }
 
 @Composable
+fun PinHintText(pinHintText: String) {
+    WrapText(
+        textConfig = TextConfig(style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.66f)),
+        text = pinHintText
+    )
+}
+
+@Composable
 private fun CharView(
     index: Int,
     text: String,
@@ -130,7 +140,7 @@ private fun CharView(
     val borderColor = when {
         hasError -> MaterialTheme.colorScheme.error
         isFocused -> MaterialTheme.colorScheme.primary
-        else -> MaterialTheme.colorScheme.outline
+        else -> MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.5f)
     }
 
     val borderWidth = when {
@@ -138,6 +148,8 @@ private fun CharView(
         else -> 1.dp
     }
     Text(
+        style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center,
+        text = char,
         modifier = Modifier
             .width(pinWidth)
             .border(
@@ -145,8 +157,9 @@ private fun CharView(
                 color = borderColor,
                 shape = RoundedCornerShape(SIZE_EXTRA_SMALL.dp)
             )
-            .padding(vertical = SIZE_SMALL_PLUS.dp), text = char,
-        style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center
+            .background(MaterialTheme.colorScheme.onPrimary)
+
+            .padding(vertical = SIZE_SMALL.dp)
     )
 
 }
@@ -156,14 +169,18 @@ private fun CharView(
 @Composable
 private fun PreviewOtpTextField() {
     PreviewTheme {
-        OtpTextField(
-            modifier = Modifier.wrapContentSize(),
-            onUpdate = {},
-            length = 6,
-            otpText = "123456",
-            visualTransformation = PasswordVisualTransformation(),
-            pinWidth = 42.dp,
-        )
+        Column {
+            PinHintText(pinHintText = "Enter the PIN")
+            OtpTextField(
+                modifier = Modifier.wrapContentSize(),
+                onUpdate = {},
+                length = 6,
+                otpText = "123456",
+                visualTransformation = PasswordVisualTransformation(),
+                pinWidth = 42.dp,
+            )
+        }
+
     }
 }
 

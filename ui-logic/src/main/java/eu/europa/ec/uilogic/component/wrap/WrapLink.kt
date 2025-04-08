@@ -34,6 +34,7 @@ import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 
 data class WrapLinkData(
     val textId: Int,
+    val isExternal: Boolean = false,
 )
 
 private val linkSpacing = TextUnit(value = 0.8f, type = TextUnitType.Sp)
@@ -47,8 +48,10 @@ fun WrapLink(
         withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
             append(stringResource(id = data.textId))
         }
-        withStyle(style = SpanStyle()) {
-            append(" ↗")
+        if (data.isExternal) {
+            withStyle(style = SpanStyle()) {
+                append(" ↗")
+            }
         }
     }
 
@@ -68,10 +71,10 @@ fun WrapLink(
 
 @Composable
 @ThemeModePreviews
-fun WrapLinkPreview() {
+private fun WrapLinkPreview() {
     PreviewTheme {
         WrapLink(
-            data = WrapLinkData(textId = R.string.consent_screen_data_protection_button),
+            data = WrapLinkData(textId = R.string.consent_screen_data_protection_button, isExternal = true),
             onClick = {})
     }
 }

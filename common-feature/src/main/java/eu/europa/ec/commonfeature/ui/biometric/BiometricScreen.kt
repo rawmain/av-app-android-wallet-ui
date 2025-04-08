@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -52,8 +53,12 @@ import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.component.wrap.OtpTextField
+import eu.europa.ec.uilogic.component.wrap.PinHintText
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapIconButton
+import eu.europa.ec.uilogic.component.wrap.WrapImage
+import eu.europa.ec.uilogic.component.wrap.WrapLink
+import eu.europa.ec.uilogic.component.wrap.WrapLinkData
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.FlowCompletion
@@ -242,85 +247,115 @@ private fun MainContent(
 ) {
     when (val mode = state.config.mode) {
         is BiometricMode.Default -> {
-            val description = if (state.userBiometricsAreEnabled) {
-                mode.descriptionWhenBiometricsEnabled
-            } else {
-                mode.descriptionWhenBiometricsNotEnabled
-            }
-            ContentHeader(
-                modifier = Modifier.fillMaxWidth(),
-                config = ContentHeaderConfig(description = description)
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = SPACING_SMALL.dp)
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = SPACING_SMALL.dp),
-                    text = mode.textAbovePin,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-
-                PinFieldLayout(
-                    modifier = Modifier.fillMaxWidth(),
-                    state = state,
-                    onPinInput = { quickPin ->
-                        onEventSent(Event.OnQuickPinEntered(quickPin))
-                    }
-                )
-            }
+            VerifyIdentity(state, mode, onEventSent)
         }
 
         is BiometricMode.Login -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                ,
-            ) {
-                VSpacer.Custom(80)
-
-                val subtitle = if (state.userBiometricsAreEnabled) {
-                    mode.subTitleWhenBiometricsEnabled
-                } else {
-                    mode.subTitleWhenBiometricsNotEnabled
-                }
-
-                WrapText(
-                    textConfig = TextConfig(style = MaterialTheme.typography.titleLarge),
-                    text = mode.title
-                )
-                VSpacer.Large()
-                WrapText(
-                    textConfig = TextConfig(style = MaterialTheme.typography.bodyMedium),
-                    text = subtitle
-                )
-            }
-
-            PinFieldLayout(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = SPACING_LARGE.dp),
-                state = state,
-                onPinInput = { quickPin ->
-                    onEventSent(Event.OnQuickPinEntered(quickPin))
-                }
-            )
+            LoginOnAppStartup(mode, state, onEventSent)
         }
     }
 }
 
 @Composable
+private fun LoginOnAppStartup(
+    mode: BiometricMode.Login,
+    state: State,
+    onEventSent: (event: Event) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+    ) {
+        VSpacer.Custom(80)
+
+        WrapImage(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            iconData = AppIcons.LogoPlain
+        )
+        VSpacer.ExtraLarge()
+        WrapText(
+            textConfig = TextConfig(style = MaterialTheme.typography.titleLarge),
+            text = mode.title
+        )
+
+        VSpacer.Large()
+
+        val subtitle = if (state.userBiometricsAreEnabled) {
+            mode.subTitleWhenBiometricsEnabled
+        } else {
+            mode.subTitleWhenBiometricsNotEnabled
+        }
+        WrapText(
+            textConfig = TextConfig(style = MaterialTheme.typography.bodyLarge),
+            text = subtitle
+        )
+        VSpacer.Large()
+        PinFieldLayout(
+            state = state,
+            onPinInput = { quickPin ->
+                onEventSent(Event.OnQuickPinEntered(quickPin))
+            }
+        )
+        if (!state.userBiometricsAreEnabled) {
+            WrapLink(WrapLinkData(R.string.biometric_login_forgot_pin)) {
+                //handle forgot pin click
+            }
+        }
+    }
+
+}
+
+@Composable
+private fun VerifyIdentity(
+    state: State,
+    mode: BiometricMode.Default,
+    onEventSent: (event: Event) -> Unit
+) {
+    val description = if (state.userBiometricsAreEnabled) {
+        mode.descriptionWhenBiometricsEnabled
+    } else {
+        mode.descriptionWhenBiometricsNotEnabled
+    }
+    ContentHeader(
+        modifier = Modifier.fillMaxWidth(),
+        config = ContentHeaderConfig(description = description)
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = SPACING_SMALL.dp)
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = SPACING_SMALL.dp),
+            text = mode.textAbovePin,
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        )
+
+        PinFieldLayout(
+            state = state,
+            onPinInput = { quickPin ->
+                onEventSent(Event.OnQuickPinEntered(quickPin))
+            }
+        )
+    }
+}
+
+@Composable
 private fun PinFieldLayout(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = SPACING_SMALL.dp, bottom = SPACING_LARGE.dp),
     state: State,
     onPinInput: (String) -> Unit,
 ) {
+    val pinHintText = stringResource(R.string.quick_pin_create_enter_subtitle)
+    PinHintText(pinHintText)
+
     OtpTextField(
         modifier = modifier,
         onUpdate = onPinInput,
@@ -360,7 +395,8 @@ private fun PreviewBiometricDefaultScreen() {
                         ),
                         hasToolbarBackIcon = true
                     )
-                )
+                ),
+                userBiometricsAreEnabled = false,
             ),
             effectFlow = Channel<Effect>().receiveAsFlow(),
             onEventSent = {},
