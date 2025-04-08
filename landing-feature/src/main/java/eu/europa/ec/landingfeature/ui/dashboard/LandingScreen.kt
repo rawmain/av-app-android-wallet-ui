@@ -201,7 +201,7 @@ private fun TopBar(
             modifier = Modifier
                 .height(40.dp)
                 .align(Alignment.Center),
-            iconData = AppIcons.LogoFull,
+            iconData = AppIcons.LogoPlain,
             contentScale = ContentScale.Fit,
         )
 

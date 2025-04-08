@@ -106,14 +106,7 @@ private fun Content(
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        VSpacer.Custom(64)
-        WrapImage(
-            modifier = Modifier
-                .height(50.dp),
-            iconData = AppIcons.EuFlag,
-            contentScale = ContentScale.FillHeight
-        )
-        VSpacer.Large()
+        Spacer(modifier = Modifier.weight(0.3f))
         MapTitleAndLogo()
         Spacer(modifier = Modifier.weight(1f))
         Footer()
@@ -144,6 +137,12 @@ private fun MapTitleAndLogo() {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            WrapImage(
+                modifier = Modifier.height(80.dp),
+                iconData = AppIcons.LogoPlain,
+                contentScale = ContentScale.FillHeight
+            )
+            VSpacer.ExtraLarge()
             val gradientTextConfig = TextConfig(
                 style = MaterialTheme.typography.displaySmall.copy(
                     brush = Brush.verticalGradient(
@@ -167,10 +166,6 @@ private fun MapTitleAndLogo() {
                 text = stringResource(R.string.splash_screen_title_line_2),
                 textConfig = gradientTextConfig,
             )
-            VSpacer.Large()
-            WrapImage(
-                iconData = AppIcons.AgeVerification
-            )
         }
     }
 }
@@ -192,8 +187,9 @@ private fun Footer() {
             .padding(SPACING_SMALL_PLUS.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        HSpacer.XXLarge()
+        Spacer(modifier = Modifier.weight(0.2f))
         WrapText(
+            modifier = Modifier,
             text = stringResource(R.string.splash_screen_sponsors),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.bodyLarge,
@@ -208,6 +204,7 @@ private fun Footer() {
         WrapImage(
             iconData = AppIcons.TelekomLogo
         )
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 

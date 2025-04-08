@@ -46,7 +46,7 @@ android {
 
     defaultConfig {
         // App name
-        manifestPlaceholders["appName"] = "AV Wallet"
+        manifestPlaceholders["appName"] = "Age Verification"
     }
 }
 

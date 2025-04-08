@@ -136,12 +136,6 @@ object AppIcons {
         imageVector = null
     )
 
-    val LogoFull: IconData = IconData(
-        resourceId = R.drawable.ic_logo_full,
-        contentDescriptionId = R.string.content_description_logo_full_icon,
-        imageVector = null
-    )
-
     val LogoPlain: IconData = IconData(
         resourceId = R.drawable.ic_logo_plain,
         contentDescriptionId = R.string.content_description_logo_plain_icon,
@@ -433,12 +427,6 @@ object AppIcons {
     val EuMap: IconData = IconData(
         resourceId = R.drawable.ic_eu_map,
         contentDescriptionId = R.string.content_description_eu_map_icon,
-        imageVector = null
-    )
-
-    val AgeVerification: IconData = IconData(
-        resourceId = R.drawable.ic_age_verification,
-        contentDescriptionId = R.string.content_description_age_verification_icon,
         imageVector = null
     )
 
