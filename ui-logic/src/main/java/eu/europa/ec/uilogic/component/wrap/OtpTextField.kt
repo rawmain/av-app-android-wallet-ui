@@ -76,6 +76,9 @@ fun OtpTextField(
             modifier = Modifier.focusRequester(focusRequester),
             value = TextFieldValue(otpText, selection = TextRange(otpText.length)),
             onValueChange = {
+                if (it.text.length > length) {
+                    return@BasicTextField
+                }
                 onUpdate.invoke(it.text)
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
