@@ -14,12 +14,19 @@
  * governing permissions and limitations under the Licence.
  */
 
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package eu.europa.ec.uilogic.component.wrap
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RippleConfiguration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -39,6 +46,13 @@ data class WrapLinkData(
 
 private val linkSpacing = TextUnit(value = 0.8f, type = TextUnitType.Sp)
 
+val BaseRippleConfiguration: RippleConfiguration
+    @Composable get() = RippleConfiguration(
+        color = MaterialTheme.colorScheme.secondary,
+        rippleAlpha = RippleAlpha(0.1f, 0.1f, 0.04f, 0.3f)
+    )
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WrapLink(
     data: WrapLinkData,
@@ -59,14 +73,15 @@ fun WrapLink(
         style = MaterialTheme.typography.bodyMedium.copy(letterSpacing = linkSpacing),
         color = MaterialTheme.colorScheme.primary,
     )
-
-    WrapText(
-        modifier = Modifier
-            .wrapContentWidth()
-            .clickable { onClick() },
-        text = linkText,
-        textConfig = textConfig
-    )
+    CompositionLocalProvider(LocalRippleConfiguration provides BaseRippleConfiguration) {
+        WrapText(
+            modifier = Modifier
+                .wrapContentWidth()
+                .clickable { onClick() },
+            text = linkText,
+            textConfig = textConfig
+        )
+    }
 }
 
 @Composable
@@ -74,7 +89,8 @@ fun WrapLink(
 private fun WrapLinkPreview() {
     PreviewTheme {
         WrapLink(
-            data = WrapLinkData(textId = R.string.consent_screen_data_protection_button, isExternal = true),
-            onClick = {})
+            data = WrapLinkData(
+                textId = R.string.consent_screen_data_protection_button, isExternal = true
+            ), onClick = {})
     }
 }

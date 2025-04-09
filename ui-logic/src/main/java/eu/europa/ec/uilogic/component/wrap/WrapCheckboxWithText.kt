@@ -22,8 +22,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,34 +49,38 @@ data class CheckboxWithTextData(
 )
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WrapCheckboxWithText(
     checkboxData: CheckboxWithTextData, modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier
-            .padding(vertical = SPACING_SMALL_PLUS.dp)
-            .fillMaxWidth()
-            .toggleable(
-                value = checkboxData.isChecked,
-                onValueChange = checkboxData.onCheckedChange ?: {},
-                role = Role.Checkbox
-            ), verticalAlignment = Alignment.CenterVertically
-    ) {
+    CompositionLocalProvider(LocalRippleConfiguration provides BaseRippleConfiguration) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .toggleable(
+                    value = checkboxData.isChecked,
+                    onValueChange = checkboxData.onCheckedChange ?: {},
+                    role = Role.Checkbox,
+                )
+                .padding(vertical = SPACING_SMALL_PLUS.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
-        Checkbox(
-            checked = checkboxData.isChecked,
-            onCheckedChange = null // null recommended for accessibility with screenreaders
-        )
+            Checkbox(
+                checked = checkboxData.isChecked,
+                onCheckedChange = null // null recommended for accessibility with screenreaders
+            )
 
-        HSpacer.Small()
+            HSpacer.Small()
 
-        val textConfig = TextConfig(
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Start,
-            maxLines = 4
-        )
-        WrapText(text = checkboxData.text, textConfig = textConfig)
+            val textConfig = TextConfig(
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Start,
+                maxLines = 4
+            )
+            WrapText(text = checkboxData.text, textConfig = textConfig)
+        }
     }
 }
 
