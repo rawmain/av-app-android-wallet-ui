@@ -262,7 +262,7 @@ class EnrollmentViewModel(
                                 QrScanUiConfig(
                                     title = resourceProvider.getString(R.string.issuance_qr_scan_title),
                                     subTitle = resourceProvider.getString(R.string.issuance_qr_scan_subtitle),
-                                    qrScanFlow = QrScanFlow.Issuance(IssuanceFlowUiConfig.EXTRA_DOCUMENT)
+                                    qrScanFlow = QrScanFlow.Issuance(IssuanceFlowUiConfig.NO_DOCUMENT)
                                 ),
                                 QrScanUiConfig.Parser
                             )
