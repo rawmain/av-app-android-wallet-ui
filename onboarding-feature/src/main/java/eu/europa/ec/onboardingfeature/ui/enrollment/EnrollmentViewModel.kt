@@ -78,7 +78,7 @@ sealed class Effect : ViewSideEffect {
 
 enum class EnrollmentMethod {
     NATIONAL_ID,
-    TOKEN_QR,
+//    TOKEN_QR,
 }
 
 @KoinViewModel
@@ -110,9 +110,9 @@ class EnrollmentViewModel(
                         issueNationalEID(event.context)
                     }
 
-                    EnrollmentMethod.TOKEN_QR -> {
-                        goToQrScan()
-                    }
+//                    EnrollmentMethod.TOKEN_QR -> {
+//                        goToQrScan()
+//                    }
                 }
             }
 

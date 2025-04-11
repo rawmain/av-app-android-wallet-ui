@@ -30,7 +30,7 @@ sealed interface DocumentIdentifier {
             get() = "eu.europa.ec.eudi.pid.1"
     }
 
-    data object MdocPseudonym : DocumentIdentifier {
+    data object MdocEUDIAgeOver18 : DocumentIdentifier {
         override val formatType: FormatType
             get() = "eu.europa.ec.eudi.pseudonym.age_over_18.1"
     }
@@ -38,6 +38,11 @@ sealed interface DocumentIdentifier {
     data object SdJwtPid : DocumentIdentifier {
         override val formatType: FormatType
             get() = "urn:eu.europa.ec.eudi:pid:1"
+    }
+
+    data object AVAgeOver18 : DocumentIdentifier {
+        override val formatType: FormatType
+            get() = "eu.europa.ec.agev10n"
     }
 
     data class OTHER(
@@ -51,7 +56,8 @@ sealed interface DocumentIdentifier {
 fun FormatType.toDocumentIdentifier(): DocumentIdentifier = when (this) {
     DocumentIdentifier.MdocPid.formatType.lowercase() -> DocumentIdentifier.MdocPid
     DocumentIdentifier.SdJwtPid.formatType.lowercase() -> DocumentIdentifier.SdJwtPid
-    DocumentIdentifier.MdocPseudonym.formatType.lowercase() -> DocumentIdentifier.MdocPseudonym
+    DocumentIdentifier.MdocEUDIAgeOver18.formatType.lowercase() -> DocumentIdentifier.MdocEUDIAgeOver18
+    DocumentIdentifier.AVAgeOver18.formatType.lowercase() -> DocumentIdentifier.AVAgeOver18
     else -> DocumentIdentifier.OTHER(formatType = this)
 }
 
@@ -69,7 +75,8 @@ private fun createDocumentIdentifier(
     return when (formatType.lowercase()) {
         DocumentIdentifier.MdocPid.formatType.lowercase() -> DocumentIdentifier.MdocPid
         DocumentIdentifier.SdJwtPid.formatType.lowercase() -> DocumentIdentifier.SdJwtPid
-        DocumentIdentifier.MdocPseudonym.formatType.lowercase() -> DocumentIdentifier.MdocPseudonym
+        DocumentIdentifier.MdocEUDIAgeOver18.formatType.lowercase() -> DocumentIdentifier.MdocEUDIAgeOver18
+        DocumentIdentifier.AVAgeOver18.formatType.lowercase() -> DocumentIdentifier.AVAgeOver18
         else -> DocumentIdentifier.OTHER(formatType = formatType)
     }
 }

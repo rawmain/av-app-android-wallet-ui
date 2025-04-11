@@ -40,10 +40,10 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.corelogic.util.CoreActions
-import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.SystemBroadcastReceiver
+import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -212,7 +212,7 @@ private fun EnrollmentMethodCard(
                 modifier = Modifier.size(24.dp),
                 iconData = when (method) {
                     EnrollmentMethod.NATIONAL_ID -> AppIcons.NationalEID
-                    EnrollmentMethod.TOKEN_QR -> AppIcons.QrScanner
+//                    EnrollmentMethod.TOKEN_QR -> AppIcons.QrScanner
                 },
                 customTint = MaterialTheme.colorScheme.primary
             )
@@ -242,7 +242,7 @@ private fun getMethodTitle(method: EnrollmentMethod): String {
     return stringResource(
         when (method) {
             EnrollmentMethod.NATIONAL_ID -> R.string.onboarding_verification_national_id
-            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_token
+//            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_token
         }
     )
 }
@@ -252,7 +252,7 @@ private fun getMethodDescription(method: EnrollmentMethod): String {
     return stringResource(
         when (method) {
             EnrollmentMethod.NATIONAL_ID -> R.string.onboarding_verification_national_id_description
-            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_token_description
+//            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_token_description
         }
     )
 }

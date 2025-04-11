@@ -55,7 +55,7 @@ sealed class ResolveDocumentOfferInteractorPartialState {
         val documents: List<DocumentOfferItemUi>,
         val issuerName: String,
         val issuerLogo: URI?,
-        val txCodeLength: Int?
+        val txCodeLength: Int?,
     ) : ResolveDocumentOfferInteractorPartialState()
 
     data class NoDocument(
@@ -79,7 +79,7 @@ sealed class IssueDocumentsInteractorPartialState {
 
     data class UserAuthRequired(
         val crypto: BiometricCrypto,
-        val resultHandler: DeviceAuthenticationResult
+        val resultHandler: DeviceAuthenticationResult,
     ) : IssueDocumentsInteractorPartialState()
 }
 
@@ -90,14 +90,14 @@ interface DocumentOfferInteractor {
         offerUri: String,
         issuerName: String,
         navigation: ConfigNavigation,
-        txCode: String? = null
+        txCode: String? = null,
     ): Flow<IssueDocumentsInteractorPartialState>
 
     fun handleUserAuthentication(
         context: Context,
         crypto: BiometricCrypto,
         notifyOnAuthenticationFailure: Boolean,
-        resultHandler: DeviceAuthenticationResult
+        resultHandler: DeviceAuthenticationResult,
     )
 
     fun resumeOpenId4VciWithAuthorization(uri: String)
@@ -107,7 +107,7 @@ class DocumentOfferInteractorImpl(
     private val walletCoreDocumentsController: WalletCoreDocumentsController,
     private val deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
     private val resourceProvider: ResourceProvider,
-    private val uiSerializer: UiSerializer
+    private val uiSerializer: UiSerializer,
 ) : DocumentOfferInteractor {
 
     private val genericErrorMsg
@@ -163,13 +163,13 @@ class DocumentOfferInteractorImpl(
                                     id == DocumentIdentifier.MdocPid
                                 }
 
-                            val hasPseudonyminOffer =
+                            val hasOver18Offer =
                                 response.offer.offeredDocuments.any { offeredDocument ->
                                     val id = offeredDocument.documentIdentifier
-                                    id == DocumentIdentifier.MdocPseudonym
+                                    id == DocumentIdentifier.MdocEUDIAgeOver18 || id == DocumentIdentifier.AVAgeOver18
                                 }
 
-                            if (hasMainPid || hasPidInOffer || hasPseudonyminOffer) {
+                            if (hasMainPid || hasPidInOffer || hasOver18Offer) {
 
                                 ResolveDocumentOfferInteractorPartialState.Success(
                                     documents = response.offer.offeredDocuments.map { offeredDocument ->
@@ -204,7 +204,7 @@ class DocumentOfferInteractorImpl(
         offerUri: String,
         issuerName: String,
         navigation: ConfigNavigation,
-        txCode: String?
+        txCode: String?,
     ): Flow<IssueDocumentsInteractorPartialState> =
         flow {
             walletCoreDocumentsController.issueDocumentsByOfferUri(
@@ -260,7 +260,7 @@ class DocumentOfferInteractorImpl(
         context: Context,
         crypto: BiometricCrypto,
         notifyOnAuthenticationFailure: Boolean,
-        resultHandler: DeviceAuthenticationResult
+        resultHandler: DeviceAuthenticationResult,
     ) {
         deviceAuthenticationInteractor.getBiometricsAvailability {
             when (it) {
@@ -290,7 +290,7 @@ class DocumentOfferInteractorImpl(
 
     private fun buildGenericSuccessRouteForDeferred(
         description: String,
-        navigation: ConfigNavigation
+        navigation: ConfigNavigation,
     ): String {
         val successScreenArguments = getDeferredSuccessScreenArguments(description, navigation)
         return generateComposableNavigationLink(
@@ -301,7 +301,7 @@ class DocumentOfferInteractorImpl(
 
     private fun getDeferredSuccessScreenArguments(
         description: String,
-        navigation: ConfigNavigation
+        navigation: ConfigNavigation,
     ): String {
         val (textElementsConfig, imageConfig, buttonText) = Triple(
             first = SuccessUIConfig.TextElementsConfig(

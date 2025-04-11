@@ -29,6 +29,7 @@ import eu.europa.ec.corelogic.model.FormatType
 import eu.europa.ec.corelogic.model.ScopedDocument
 import eu.europa.ec.corelogic.model.toDocumentIdentifier
 import eu.europa.ec.eudi.openid4vci.MsoMdocCredential
+import eu.europa.ec.eudi.openid4vci.SdJwtVcCredential
 import eu.europa.ec.eudi.wallet.EudiWallet
 import eu.europa.ec.eudi.wallet.document.DeferredDocument
 import eu.europa.ec.eudi.wallet.document.Document
@@ -217,7 +218,10 @@ class WalletCoreDocumentsControllerImpl(
                         }
 
                         val isAgeVerification: Boolean = when (config) {
-                            is MsoMdocCredential -> config.docType.toDocumentIdentifier() == DocumentIdentifier.MdocPseudonym
+                            is MsoMdocCredential -> config.docType.toDocumentIdentifier() == DocumentIdentifier.MdocEUDIAgeOver18 ||
+                                    config.docType.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18
+
+                            is SdJwtVcCredential -> config.type.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18
                             else -> false
                         }
 

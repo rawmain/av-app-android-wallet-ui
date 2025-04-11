@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -316,21 +315,6 @@ private fun AgeVerificationCard() {
                             textConfig = labelSmallTextConfig
                         )
                     }
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        WrapIcon(
-                            modifier = Modifier.size(10.dp),
-                            iconData = AppIcons.Certified,
-                            customTint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        HSpacer.ExtraSmall()
-                        WrapText(
-                            text = stringResource(R.string.landing_screen_card_certified),
-                            textConfig = labelSmallTextConfig
-                        )
-                    }
-
                 }
                 VSpacer.Large()
                 Row(

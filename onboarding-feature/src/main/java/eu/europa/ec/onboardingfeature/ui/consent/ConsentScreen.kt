@@ -71,12 +71,6 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
         text = stringResource(R.string.consent_screen_data_protection_checkbox),
     )
 
-    val over18CheckBoxData = CheckboxWithTextData(
-        isChecked = state.value.over18Accepted,
-        onCheckedChange = { viewModel.setEvent(Event.Over18Selected) },
-        text = stringResource(R.string.consent_screen_over_18_checkbox),
-    )
-
     val config = ButtonConfig(
         type = ButtonType.PRIMARY,
         onClick = { viewModel.setEvent(Event.GoNext) },
@@ -94,7 +88,6 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
             paddingValues = paddingValues,
             tosCheckBoxData = tosCheckBoxData,
             dataProtectionCheckBoxData = dataProtectionCheckBoxData,
-            over18CheckBoxData = over18CheckBoxData,
             effectFlow = viewModel.effect,
             onNavigationRequested = { navigationEffect ->
                 handleNavigationEffect(navigationEffect, navController)
@@ -124,7 +117,6 @@ private fun Content(
     paddingValues: PaddingValues,
     tosCheckBoxData: CheckboxWithTextData,
     dataProtectionCheckBoxData: CheckboxWithTextData,
-    over18CheckBoxData: CheckboxWithTextData,
     effectFlow: Flow<Effect>,
     onNavigationRequested: (Effect.Navigation) -> Unit,
 ) {
@@ -137,7 +129,6 @@ private fun Content(
         ConsentAndTosSection(
             tosCheckBoxData = tosCheckBoxData,
             dataProtectionCheckBoxData = dataProtectionCheckBoxData,
-            over18CheckBoxData = over18CheckBoxData
         )
     }
 
@@ -169,7 +160,6 @@ private fun handleNavigationEffect(
 fun ConsentAndTosSection(
     tosCheckBoxData: CheckboxWithTextData,
     dataProtectionCheckBoxData: CheckboxWithTextData,
-    over18CheckBoxData: CheckboxWithTextData,
 ) {
     Column(
         modifier = Modifier
@@ -188,7 +178,6 @@ fun ConsentAndTosSection(
 
         WrapCheckboxWithText(checkboxData = tosCheckBoxData)
         WrapCheckboxWithText(checkboxData = dataProtectionCheckBoxData)
-        WrapCheckboxWithText(checkboxData = over18CheckBoxData)
 
         VSpacer.Small()
 
@@ -224,12 +213,6 @@ private fun ContentPreview() {
             text = "I accept the Data Protection Information",
         )
 
-        val over18CheckBoxData = CheckboxWithTextData(
-            isChecked = true,
-            onCheckedChange = {},
-            text = "I confirm that I am 18 years old or older",
-        )
-
         val buttonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
             onClick = { },
@@ -248,7 +231,6 @@ private fun ContentPreview() {
                 paddingValues = it,
                 tosCheckBoxData = tosCheckBoxData,
                 dataProtectionCheckBoxData = dataProtectionCheckBoxData,
-                over18CheckBoxData = over18CheckBoxData,
                 effectFlow = flowOf(),
                 onNavigationRequested = {}
             )

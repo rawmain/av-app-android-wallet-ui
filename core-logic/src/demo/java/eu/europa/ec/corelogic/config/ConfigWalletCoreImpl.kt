@@ -31,7 +31,7 @@ internal class WalletCoreConfigImpl(
 ) : WalletCoreConfig {
 
     private companion object {
-        const val VCI_ISSUER_URL = "https://issuer.eudiw.dev"
+        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev"
         const val VCI_CLIENT_ID = "wallet-dev"
         const val AUTHENTICATION_REQUIRED = false
     }
@@ -81,13 +81,7 @@ internal class WalletCoreConfigImpl(
 
                     configureReaderTrustStore(
                         context,
-                        R.raw.pid_issuer_cacz01,
-                        R.raw.pid_issuer_caee01,
-                        R.raw.pid_issuer_caeu01,
-                        R.raw.pid_issuer_calu01,
-                        R.raw.pid_issuer_canl01,
-                        R.raw.pid_issuer_capt01,
-                        R.raw.pid_issuer_caut01
+                        R.raw.av_issuer_ca01
                     )
                 }
             }
