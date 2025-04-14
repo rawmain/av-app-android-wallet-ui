@@ -30,7 +30,7 @@ sealed interface DocumentIdentifier {
             get() = "eu.europa.ec.eudi.pid.1"
     }
 
-    data object MdocPseudonym : DocumentIdentifier {
+    data object MdocEUDIAgeOver18 : DocumentIdentifier {
         override val formatType: FormatType
             get() = "eu.europa.ec.eudi.pseudonym.age_over_18.1"
     }
@@ -38,6 +38,11 @@ sealed interface DocumentIdentifier {
     data object SdJwtPid : DocumentIdentifier {
         override val formatType: FormatType
             get() = "urn:eu.europa.ec.eudi:pid:1"
+    }
+
+    data object AVAgeOver18 : DocumentIdentifier {
+        override val formatType: FormatType
+            get() = "eu.europa.ec.agev10n"
     }
 
     data class OTHER(
@@ -49,8 +54,10 @@ sealed interface DocumentIdentifier {
  * @return A [DocumentIdentifier] from a FormatType.
  */
 fun FormatType.toDocumentIdentifier(): DocumentIdentifier = when (this) {
-    DocumentIdentifier.MdocPid.formatType -> DocumentIdentifier.MdocPid
-    DocumentIdentifier.SdJwtPid.formatType -> DocumentIdentifier.SdJwtPid
+    DocumentIdentifier.MdocPid.formatType.lowercase() -> DocumentIdentifier.MdocPid
+    DocumentIdentifier.SdJwtPid.formatType.lowercase() -> DocumentIdentifier.SdJwtPid
+    DocumentIdentifier.MdocEUDIAgeOver18.formatType.lowercase() -> DocumentIdentifier.MdocEUDIAgeOver18
+    DocumentIdentifier.AVAgeOver18.formatType.lowercase() -> DocumentIdentifier.AVAgeOver18
     else -> DocumentIdentifier.OTHER(formatType = this)
 }
 
@@ -65,9 +72,11 @@ fun Document.toDocumentIdentifier(): DocumentIdentifier {
 private fun createDocumentIdentifier(
     formatType: FormatType
 ): DocumentIdentifier {
-    return when (formatType) {
-        DocumentIdentifier.MdocPid.formatType -> DocumentIdentifier.MdocPid
-        DocumentIdentifier.SdJwtPid.formatType -> DocumentIdentifier.SdJwtPid
+    return when (formatType.lowercase()) {
+        DocumentIdentifier.MdocPid.formatType.lowercase() -> DocumentIdentifier.MdocPid
+        DocumentIdentifier.SdJwtPid.formatType.lowercase() -> DocumentIdentifier.SdJwtPid
+        DocumentIdentifier.MdocEUDIAgeOver18.formatType.lowercase() -> DocumentIdentifier.MdocEUDIAgeOver18
+        DocumentIdentifier.AVAgeOver18.formatType.lowercase() -> DocumentIdentifier.AVAgeOver18
         else -> DocumentIdentifier.OTHER(formatType = formatType)
     }
 }
@@ -93,8 +102,8 @@ private fun createDocumentIdentifier(
 fun DocumentIdentifier.toDocumentCategory(allCategories: DocumentCategories): DocumentCategory {
     return allCategories.value.entries.find { (_, identifiersInCategory) ->
         val formatTypesInCategory: List<FormatType> = identifiersInCategory
-            .map { it.formatType }
+            .map { it.formatType.lowercase() }
 
-        this.formatType in formatTypesInCategory
+        this.formatType.lowercase() in formatTypesInCategory
     }?.key ?: DocumentCategory.Other
 }

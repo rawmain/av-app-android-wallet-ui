@@ -23,7 +23,7 @@ import eu.europa.ec.presentationfeature.interactor.PresentationSuccessInteractor
 import eu.europa.ec.presentationfeature.interactor.PresentationSuccessInteractorGetUiItemsPartialState
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
-import eu.europa.ec.uilogic.navigation.DashboardScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
@@ -37,7 +37,7 @@ class PresentationSuccessViewModel(
         val deepLinkWithUriOrPopToDashboard = ConfigNavigation(
             navigationType = redirectUri?.let {
                 NavigationType.Deeplink(it.toString(), interactor.initiatorRoute)
-            } ?: NavigationType.PopTo(DashboardScreens.Dashboard)
+            } ?: NavigationType.PopTo(LandingScreens.Landing)
         )
 
         return deepLinkWithUriOrPopToDashboard

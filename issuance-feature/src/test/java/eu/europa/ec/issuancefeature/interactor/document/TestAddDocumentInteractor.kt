@@ -144,7 +144,7 @@ class TestAddDocumentInteractor {
                 assertEquals(
                     AddDocumentInteractorPartialState.Success(
                         options = listOf(
-                            mockedPidOptionItemUi
+                            mockedAgeOptionItemUi
                         )
                     ),
                     awaitItem()

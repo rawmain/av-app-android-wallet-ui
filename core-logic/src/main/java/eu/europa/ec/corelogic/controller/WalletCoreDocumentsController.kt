@@ -29,6 +29,7 @@ import eu.europa.ec.corelogic.model.FormatType
 import eu.europa.ec.corelogic.model.ScopedDocument
 import eu.europa.ec.corelogic.model.toDocumentIdentifier
 import eu.europa.ec.eudi.openid4vci.MsoMdocCredential
+import eu.europa.ec.eudi.openid4vci.SdJwtVcCredential
 import eu.europa.ec.eudi.wallet.EudiWallet
 import eu.europa.ec.eudi.wallet.document.DeferredDocument
 import eu.europa.ec.eudi.wallet.document.Document
@@ -62,7 +63,7 @@ enum class IssuanceMethod {
 
 sealed class IssueDocumentPartialState {
     data class Success(val documentId: String) : IssueDocumentPartialState()
-    data class DeferredSuccess(val deferredDocuments: Map<String, String>) :
+    data class DeferredSuccess(val deferredDocuments: Map<DocumentId, FormatType>) :
         IssueDocumentPartialState()
 
     data class Failure(val errorMessage: String) : IssueDocumentPartialState()
@@ -177,7 +178,7 @@ class WalletCoreDocumentsControllerImpl(
     private val resourceProvider: ResourceProvider,
     private val eudiWallet: EudiWallet,
     private val walletCoreConfig: WalletCoreConfig,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : WalletCoreDocumentsController {
 
     private val genericErrorMessage
@@ -216,10 +217,19 @@ class WalletCoreDocumentsControllerImpl(
                             else -> false
                         }
 
+                        val isAgeVerification: Boolean = when (config) {
+                            is MsoMdocCredential -> config.docType.toDocumentIdentifier() == DocumentIdentifier.MdocEUDIAgeOver18 ||
+                                    config.docType.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18
+
+                            is SdJwtVcCredential -> config.type.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18
+                            else -> false
+                        }
+
                         ScopedDocument(
                             name = name,
                             configurationId = id.value,
-                            isPid = isPid
+                            isPid = isPid,
+                            isAgeVerification = isAgeVerification
                         )
                     }
                 if (documents.isNotEmpty()) {

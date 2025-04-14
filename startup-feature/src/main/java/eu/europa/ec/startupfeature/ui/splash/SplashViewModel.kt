@@ -26,10 +26,9 @@ import eu.europa.ec.uilogic.navigation.ModuleRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
+import kotlin.time.Duration.Companion.milliseconds
 
-data class State(
-    val logoAnimationDuration: Int = 1500
-) : ViewState
+data object State : ViewState
 
 sealed class Event : ViewEvent {
     data object Initialize : Event()
@@ -47,8 +46,7 @@ sealed class Effect : ViewSideEffect {
 class SplashViewModel(
     private val interactor: SplashInteractor,
 ) : MviViewModel<Event, State, Effect>() {
-    override fun setInitialState(): State = State()
-
+    override fun setInitialState() = State
     override fun handleEvents(event: Event) {
         when (event) {
             Event.Initialize -> enterApplication()
@@ -57,7 +55,7 @@ class SplashViewModel(
 
     private fun enterApplication() {
         viewModelScope.launch {
-            delay((viewState.value.logoAnimationDuration + 500).toLong())
+            delay(500.milliseconds)
             val screenRoute = interactor.getAfterSplashRoute()
             setEffect {
                 Effect.Navigation.SwitchScreen(screenRoute)

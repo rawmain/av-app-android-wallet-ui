@@ -41,6 +41,36 @@
     <string name="generic_bottom_sheet_delete_subtitle">This document will be permanently deleted from your wallet and may affect access to services.</string>
     <string name="generic_bottom_sheet_delete_primary_button_text">Delete</string>
     <string name="generic_bottom_sheet_delete_secondary_button_text">Cancel</string>
+    <string name="generic_scan_qr">Scan QR</string>
+    <string name="generic_or">OR</string>
+
+    <string name="onboarding_step_1_title">Welcome</string>
+    <string name="onboarding_step_2_title">Consent</string>
+    <string name="onboarding_step_3_title">Security</string>
+    <string name="onboarding_step_4_title">Verification</string>
+
+    <!-- Splash Screen -->
+    <string name="splash_screen_title_line_1">Anonymous Age</string>
+    <string name="splash_screen_title_line_2">Verification</string>
+    <string name="splash_screen_sponsors">Powered by</string>
+
+    <!-- Enrollment Screen -->
+    <string name="onboarding_verification_title">Please select your Age Verification Enrollment Method</string>
+    <string name="onboarding_verification_national_id">National eID / National idP</string>
+    <string name="onboarding_verification_national_id_description">Identify online using your eID</string>
+    <string name="onboarding_verification_token">Token / QR-Code</string>
+    <string name="onboarding_verification_token_description">Scan a provided QR Code</string>
+
+    <string name="welcome_page_1">The Anonymous Age Verification App quickly and securely confirms your age for accessing age-restricted services.</string>
+    <string name="welcome_page_2">Simply verify your age once using a national elD or biometric check and receive a proof of age that allows seamless access to age-limited services.</string>
+    <string name="welcome_page_3">You stay in control of your data-only your proof of age is shared, never your personal identification details.</string>
+
+    <string name="welcome_title_1">Welcome</string>
+    <string name="welcome_title_2">Simple Age Verification</string>
+    <string name="welcome_title_3">Privacy Protection</string>
+
+    <string name="welcome_screen_next">Next</string>
+    <string name="welcome_screen_skip">Skip</string>
 
     <!-- Content Description -->
     <string name="content_description_image_or_placeholder_icon">Image or placeholder icon</string>
@@ -107,13 +137,22 @@
     <string name="content_description_change_pin_icon">Change PIN</string>
     <string name="content_description_check_icon">Check</string>
     <string name="content_description_open_in_browser_icon">Open in browser</string>
+    <string name="content_description_settings_icon">Settings</string>
+    <string name="content_description_eu_flag_icon">EU Flag</string>
+    <string name="content_description_over_18_icon">Over 18</string>
+    <string name="content_description_national_eid_icon">National eID</string>
+    <string name="content_description_eu_map_icon">Eu Map</string>
+    <string name="content_description_age_verification_icon">Age Verification Logo</string>
+    <string name="content_description_telekom_logo_icon">Telekom Logo</string>
+    <string name="content_description_scytales_logo_icon">Scytales Logo</string>
 
     <!-- Biometric prompt -->
     <string name="biometric_prompt_title">Biometric authentication</string>
     <string name="biometric_prompt_subtitle">Authenticate using your biometrics</string>
-    <string name="biometric_login_title">Welcome back</string>
-    <string name="biometric_login_biometrics_enabled_subtitle">Use your biometrics to access the EUDI Wallet.</string>
-    <string name="biometric_login_biometrics_not_enabled_subtitle">To access the EUDI Wallet you need to provide your PIN.</string>
+    <string name="biometric_login_title">Welcome Back!</string>
+    <string name="biometric_login_biometrics_enabled_subtitle">Use your biometrics to access the Age Verification Wallet.</string>
+    <string name="biometric_login_biometrics_not_enabled_subtitle">To access the Age Verification Wallet, please enter your PIN.</string>
+    <string name="biometric_login_forgot_pin">Forgot your PIN?</string>
 
     <!-- Biometrics -->
     <string name="biometric_no_hardware">Your device does not support biometric authentication</string>
@@ -131,15 +170,19 @@
     <string name="quick_pin_invalid_error">Invalid quick pin</string>
     <string name="quick_pin_numerical_rule_invalid_error_message">Only numerical values are allowed</string>
     <string name="quick_pin_non_match">Pins do not match</string>
+    <string name="quick_pin_confirm_button">Confirm</string>
+    <string name="quick_pin_next_button">Next</string>
 
-    <string name="quick_pin_create_title">Welcome to your Wallet</string>
-    <string name="quick_pin_create_enter_subtitle">Secure your wallet with a PIN code and connect to your National System.</string>
-    <string name="quick_pin_create_reenter_subtitle">Re-enter the quick pin</string>
+
+    <string name="quick_pin_create_title">Assign a new Age Verification App PIN</string>
+    <string name="quick_pin_create_reenter_title">Repeat your PIN</string>
+    <string name="quick_pin_create_enter_subtitle">Your 6-digit PIN</string>
+    <string name="quick_pin_create_reenter_subtitle">Repeat your 6-digit PIN</string>
 
     <string name="quick_pin_change_title">Change quick pin</string>
     <string name="quick_pin_change_validate_current_subtitle">Type your current pin</string>
-    <string name="quick_pin_change_enter_new_subtitle">Select a quick pin for future logins</string>
-    <string name="quick_pin_change_reenter_new_subtitle">Re-enter the new quick pin</string>
+    <string name="quick_pin_change_enter_new_subtitle">@string/quick_pin_create_reenter_subtitle</string>
+    <string name="quick_pin_change_reenter_new_subtitle">@string/quick_pin_create_reenter_subtitle</string>
 
     <string name="quick_pin_create_success_text">Your wallet is secured!</string>
     <string name="quick_pin_create_success_description">To activate your wallet, connect to your National System to add your Digital ID.</string>
@@ -160,7 +203,7 @@
     <string name="request_relying_party_description">requests the following</string>
     <string name="request_warning_text">Please review carefully before sharing your data.</string>
     <string name="request_collapsed_supporting_text">@string/generic_view_details</string>
-    <string name="request_no_data">The requested document is not available in your EUDI Wallet.
+    <string name="request_no_data">The requested document is not available in your Age Verification Wallet.
         Please contact the authorised issuer for further information.</string>
     <string name="request_sticky_button_text">Share</string>
     <string name="request_bottom_sheet_warning_title">Warning</string>
@@ -218,6 +261,11 @@
     <string name="home_screen_authenticate_option_in_person">In person</string>
     <string name="home_screen_add_document_option_online">Online</string>
 
+    <string name="home_screen_sign_document">Sign document</string>
+    <string name="home_screen_sign_document_description">Sign a document digitally by choosing a file from your device or by scanning a QR code.</string>
+    <string name="home_screen_sign_document_option_from_device">From device</string>
+    <string name="home_screen_sign_document_option_scan_qr">Scan QR</string>
+
     <!-- Home Screen Learn More Popups content -->
     <string name="home_screen_authenticate_learn_more_inner_title">Sign documents safely</string>
     <string name="home_screen_authenticate_learn_more_description">Sign documents with just your wallet. Providing a legally binding e-signature will be faster and easier than ever, enabling you to conduct business whenever you are.</string>
@@ -232,8 +280,8 @@
     <string name="documents_screen_add_document_title">Add document</string>
     <string name="documents_screen_add_document_description">Add documents to your wallet by choosing from a list or by scanning a provided QR code.</string>
     <string name="documents_screen_add_document_option_list">From list</string>
-    <string name="documents_screen_add_document_option_qr">Scan QR</string>
-    <string name="documents_screen_add_document_option_or">OR</string>
+    <string name="documents_screen_add_document_option_qr">@string/generic_scan_qr</string>
+    <string name="documents_screen_add_document_option_or">@string/generic_or</string>
     <string name="documents_screen_filters_title">Filter</string>
     <string name="documents_screen_filters_sort_by">Sort by</string>
     <string name="documents_screen_filters_ascending">Ascending</string>
@@ -268,6 +316,7 @@
     <string name="qr_scan_permission_not_granted">Camera permission not provided\nOpen App Settings</string>
     <string name="qr_scan_informative_text_presentation_flow">Having trouble scanning the QR Code?\nPlease try an alternative way</string>
     <string name="qr_scan_informative_text_issuance_flow">Having trouble scanning the QR Code?\nPlease try an alternative way</string>
+    <string name="qr_scan_informative_text_signature_flow">Having trouble scanning the QR Code?\nPlease try an alternative way</string>
 
     <!-- Document Details -->
     <string name="document_details_portrait_readable_identifier">Shown above</string>
@@ -292,6 +341,15 @@
     <string name="document_details_bottom_sheet_badge_subtitle">A Relying Party is considered trusted when it meets
         predefined criteria for security, data protection, compliance, and responsible data handling.</string>
 
+    <!-- Consent Screen -->
+    <string name="consent_screen_title">First we need your consent</string>
+    <string name="consent_screen_tos_checkbox">I accept the Terms of Service</string>
+    <string name="consent_screen_data_protection_checkbox">I accept the Data Protection Information</string>
+    <string name="consent_screen_over_18_checkbox">I am 18 years old or older</string>
+    <string name="consent_screen_tos_button">Terms of Service</string>
+    <string name="consent_screen_data_protection_button">Data Protection Information</string>
+    <string name="consent_screen_confirm_button">Confirm</string>
+
     <!-- Proximity QR -->
     <string name="proximity_qr_title">Present document in person</string>
     <string name="proximity_qr_subtitle">Show this QR code to a Relying Party to present a digital document.</string>
@@ -302,9 +360,15 @@
     <string name="presentation_qr_scan_title">Present document online</string>
     <string name="presentation_qr_scan_subtitle">Scan a QR code provided from a Relying Party to present a digital document.</string>
 
+    <!-- Signature Qr Scan -->
+    <string name="signature_qr_scan_title">Sign document</string>
+    <string name="signature_qr_scan_subtitle">Scan a QR code to electronically sign a document.</string>
+
     <!-- Issuance Add Document Screen -->
     <string name="issuance_add_document_title">Add document from list</string>
     <string name="issuance_add_document_subtitle">Choose a digital document from the list below to add to your wallet.</string>
+    <string name="issuance_add_document_scan_qr_footer_text">@string/generic_or</string>
+    <string name="issuance_add_document_scan_qr_footer_button_text">@string/generic_scan_qr</string>
     <string name="issuance_add_document_deferred_success_text">@string/generic_deferred_success_text</string>
     <string name="issuance_add_document_deferred_success_description">Your document has been requested. You will be notified when it has been issued to your wallet.</string>
     <string name="issuance_add_document_deferred_success_primary_button_text">@string/generic_ok</string>
@@ -349,4 +413,11 @@
     <string name="document_category_retail">RETAIL</string>
     <string name="document_category_other">OTHER</string>
 
+    <!-- Landing Screen -->
+    <string name="landing_screen_title">Anonymous Age Verification</string>
+    <string name="landing_screen_subtitle">With your proof of age, you can verify your age when using online services, such as a media library.\nThe proof of age only contains the information that you are older than 18, but no personal data.</string>
+    <string name="landing_screen_card_eu_title">European\nUnion</string>
+    <string name="landing_screen_card_age_verification">Age Verification</string>
+    <string name="landing_screen_card_certified">EU certified official credential</string>
+    <string name="landing_screen_primary_button_label_scan">Scan</string>
 </resources>

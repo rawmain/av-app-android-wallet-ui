@@ -18,18 +18,16 @@ package eu.europa.ec.startupfeature.interactor.splash
 
 import eu.europa.ec.commonfeature.config.BiometricMode
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
-import eu.europa.ec.commonfeature.config.IssuanceFlowUiConfig
 import eu.europa.ec.commonfeature.config.OnBackNavigationConfig
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractor
-import eu.europa.ec.commonfeature.model.PinFlow
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.DashboardScreens
-import eu.europa.ec.uilogic.navigation.IssuanceScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
+import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
@@ -54,15 +52,12 @@ class SplashInteractorImpl(
         }
 
         false -> {
-            getQuickPinConfig()
+            getOnboardingRoute()
         }
     }
 
-    private fun getQuickPinConfig(): String {
-        return generateComposableNavigationLink(
-            screen = CommonScreens.QuickPin,
-            arguments = generateComposableArguments(mapOf("pinFlow" to PinFlow.CREATE))
-        )
+    private fun getOnboardingRoute() : String {
+        return OnboardingScreens.Welcome.screenRoute
     }
 
     private fun getBiometricsConfig(): String {
@@ -82,15 +77,11 @@ class SplashInteractorImpl(
                             onSuccessNavigation = ConfigNavigation(
                                 navigationType = NavigationType.PushScreen(
                                     screen = if (hasDocuments) {
-                                        DashboardScreens.Dashboard
+                                        LandingScreens.Landing
                                     } else {
-                                        IssuanceScreens.AddDocument
+                                        OnboardingScreens.Enrollment
                                     },
-                                    arguments = if (!hasDocuments) {
-                                        mapOf("flowType" to IssuanceFlowUiConfig.NO_DOCUMENT.name)
-                                    } else {
-                                        emptyMap()
-                                    }
+                                    arguments = emptyMap()
                                 )
                             ),
                             onBackNavigationConfig = OnBackNavigationConfig(

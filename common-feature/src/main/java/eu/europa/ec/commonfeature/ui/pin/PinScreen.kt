@@ -17,12 +17,12 @@
 package eu.europa.ec.commonfeature.ui.pin
 
 import android.content.Context
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
@@ -32,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -42,23 +41,23 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.commonfeature.model.PinFlow
 import eu.europa.ec.resourceslogic.R
-import eu.europa.ec.uilogic.component.AppIconAndText
-import eu.europa.ec.uilogic.component.AppIconAndTextData
+import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
-import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
-import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
+import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.component.wrap.BottomSheetTextData
 import eu.europa.ec.uilogic.component.wrap.ButtonConfig
 import eu.europa.ec.uilogic.component.wrap.ButtonType
 import eu.europa.ec.uilogic.component.wrap.DialogBottomSheet
+import eu.europa.ec.uilogic.component.wrap.OtpTextField
+import eu.europa.ec.uilogic.component.wrap.PinHintText
 import eu.europa.ec.uilogic.component.wrap.StickyBottomConfig
 import eu.europa.ec.uilogic.component.wrap.StickyBottomType
+import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapModalBottomSheet
-import eu.europa.ec.uilogic.component.wrap.WrapPinTextField
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
-import eu.europa.ec.uilogic.extension.finish
+import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.navigation.CommonScreens
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -92,6 +91,7 @@ fun PinScreen(
                 stickyBottomModifier = Modifier
                     .fillMaxWidth()
                     .padding(paddingValues),
+
                 stickyBottomConfig = StickyBottomConfig(
                     type = StickyBottomType.OneButton(
                         config = ButtonConfig(
@@ -101,7 +101,8 @@ fun PinScreen(
                                 viewModel.setEvent(Event.NextButtonPressed(pin = state.pin))
                             }
                         )
-                    )
+                    ),
+                    showDivider = false,
                 )
             ) {
                 Text(text = state.buttonText)
@@ -162,7 +163,6 @@ private fun handleNavigationEffect(
         is Effect.Navigation.SwitchModule -> navController.navigate(navigationEffect.moduleRoute.route)
 
         is Effect.Navigation.Pop -> navController.popBackStack()
-        is Effect.Navigation.Finish -> context.finish()
     }
 }
 
@@ -182,47 +182,24 @@ private fun Content(
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-        AppIconAndText(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = SPACING_LARGE.dp),
-            appIconAndTextData = AppIconAndTextData(),
+        if (state.pinFlow == PinFlow.CREATE) {
+            TopStepBar(currentStep = 2)
+        }
+
+        VSpacer.ExtraLarge()
+        WrapText(
+            textConfig = TextConfig(style = MaterialTheme.typography.titleLarge),
+            text = state.title
         )
+        VSpacer.Large()
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = SPACING_LARGE.dp),
-            verticalArrangement = Arrangement.spacedBy(SPACING_SMALL.dp, Alignment.Top)
-        ) {
-            Text(
-                text = state.title,
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            )
-            Text(
-                text = state.subtitle,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = SPACING_LARGE.dp),
-            verticalArrangement = Arrangement.spacedBy(SPACING_SMALL.dp, Alignment.Top)
-        ) {
-            PinFieldLayout(
-                modifier = Modifier.fillMaxWidth(),
-                state = state,
-                onPinInput = { quickPin ->
-                    onEventSend(Event.OnQuickPinEntered(quickPin))
-                }
-            )
-        }
+        PinFieldLayout(
+            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+            state = state,
+            onPinInput = { quickPin ->
+                onEventSend(Event.OnQuickPinEntered(quickPin))
+            }
+        )
     }
 
     LaunchedEffect(Unit) {
@@ -270,15 +247,19 @@ private fun PinFieldLayout(
     state: State,
     onPinInput: (String) -> Unit,
 ) {
-    WrapPinTextField(
+    PinHintText(state.subtitle)
+
+    VSpacer.Small()
+
+    OtpTextField(
         modifier = modifier,
-        onPinUpdate = onPinInput,
+        onUpdate = onPinInput,
+        otpText = state.pin,
         length = state.quickPinSize,
         hasError = !state.quickPinError.isNullOrEmpty(),
         errorMessage = state.quickPinError,
         visualTransformation = PasswordVisualTransformation(),
         pinWidth = 42.dp,
-        clearCode = state.resetPin,
         focusOnCreate = true
     )
 }
@@ -291,8 +272,11 @@ private fun PinScreenEmptyPreview() {
         Content(
             state = State(
                 pinFlow = PinFlow.CREATE,
-                pinState = PinValidationState.ENTER
-            ),
+                pinState = PinValidationState.ENTER,
+                title = "Title",
+                subtitle = "Subtitle",
+
+                ),
             effectFlow = Channel<Effect>().receiveAsFlow(),
             onEventSend = {},
             onNavigationRequested = {},

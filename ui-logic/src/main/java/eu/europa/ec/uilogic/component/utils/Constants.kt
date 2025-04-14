@@ -37,6 +37,9 @@ const val SPACING_EXTRA_SMALL = 4
 /** Value 8 */
 const val SPACING_SMALL = 8
 
+/** Value 12 */
+const val SPACING_SMALL_PLUS = 12
+
 /** Value 16 */
 const val SPACING_MEDIUM = 16
 
@@ -72,6 +75,9 @@ const val SIZE_EXTRA_SMALL = 4
 
 /** Size 8 */
 const val SIZE_SMALL = 8
+
+/** Size 12 */
+const val SIZE_SMALL_PLUS = 12
 
 /** Size 16 */
 const val SIZE_MEDIUM = 16

@@ -32,10 +32,12 @@ enum class LibraryModule(val path: String) {
     BaselineProfileLogic(":baseline-profile"),
     CommonFeature(":common-feature"),
     StartupFeature(":startup-feature"),
+    OnboardingFeature(":onboarding-feature"),
     DashboardFeature(":dashboard-feature"),
     PresentationFeature(":presentation-feature"),
     ProximityFeature(":proximity-feature"),
-    IssuanceFeature(":issuance-feature");
+    IssuanceFeature(":issuance-feature"),
+    LandingFeature(":landing-feature");
 
     val isLogicModule: Boolean
         get() {

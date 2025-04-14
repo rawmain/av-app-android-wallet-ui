@@ -23,7 +23,9 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    @Suppress("UnstableApiUsage")
     repositories {
         google()
         mavenCentral()
@@ -38,7 +40,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "EUDI Wallet"
+rootProject.name = "AV Wallet"
 include(":app")
 include(":business-logic")
 include(":ui-logic")
@@ -49,6 +51,7 @@ include(":startup-feature")
 include(":test-logic")
 include(":test-feature")
 include(":common-feature")
+include(":onboarding-feature")
 include(":dashboard-feature")
 include(":presentation-feature")
 include(":proximity-feature")
@@ -58,3 +61,4 @@ include(":baseline-profile")
 include(":authentication-logic")
 include(":core-logic")
 include(":storage-logic")
+include(":landing-feature")

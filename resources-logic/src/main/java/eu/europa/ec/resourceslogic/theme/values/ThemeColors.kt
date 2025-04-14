@@ -34,10 +34,10 @@ class ThemeColors {
         private const val black: Long = 0xFF000000
 
         // Light theme base colors palette.
-        private const val eudiw_theme_light_primary: Long = 0xFF2A5FD9
+        private const val eudiw_theme_light_primary: Long = 0xFF1544C5
         private const val eudiw_theme_light_onPrimary: Long = white
-        private const val eudiw_theme_light_primaryContainer: Long = 0xFFEADDFF
-        private const val eudiw_theme_light_onPrimaryContainer: Long = 0xFF21005D
+        private const val eudiw_theme_light_primaryContainer: Long = 0xFFEFF0FB
+        private const val eudiw_theme_light_onPrimaryContainer: Long = 0xFF222433
         private const val eudiw_theme_light_secondary: Long = 0xFFD6D9F9
         private const val eudiw_theme_light_onSecondary: Long = 0xF1D192B
         private const val eudiw_theme_light_secondaryContainer: Long = 0xFFE8DEF8
@@ -60,7 +60,7 @@ class ThemeColors {
         private const val eudiw_theme_light_outline: Long = 0xFF79747E
         private const val eudiw_theme_light_outlineVariant: Long = 0xFFCAC4D0
         private const val eudiw_theme_light_scrim: Long = black
-        private const val eudiw_theme_light_inverseSurface: Long = 0xFF322F35
+        private const val eudiw_theme_light_inverseSurface: Long = 0xFF000000
         private const val eudiw_theme_light_inverseOnSurface: Long = 0xFFF5EFF7
         private const val eudiw_theme_light_inversePrimary: Long = 0xFFD0BCFF
         private const val eudiw_theme_light_surfaceDim: Long = 0xFFE2E8F3

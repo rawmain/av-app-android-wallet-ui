@@ -21,18 +21,18 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
-import eu.europa.ec.uilogic.component.utils.SIZE_100
+import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 
 enum class ButtonType {
@@ -40,9 +40,9 @@ enum class ButtonType {
     SECONDARY,
 }
 
-private val buttonsShape: RoundedCornerShape = RoundedCornerShape(SIZE_100.dp)
+internal val buttonsShape: RoundedCornerShape = RoundedCornerShape(SIZE_SMALL.dp)
 
-private val buttonsContentPadding: PaddingValues = PaddingValues(
+internal val buttonsContentPadding: PaddingValues = PaddingValues(
     vertical = 10.dp,
     horizontal = SPACING_LARGE.dp
 )
@@ -54,7 +54,7 @@ data class ButtonConfig(
     val isWarning: Boolean = false,
     val shape: Shape = buttonsShape,
     val contentPadding: PaddingValues = buttonsContentPadding,
-    val isWithoutContainerBackground: Boolean = false,
+    val buttonColors: ButtonColors? = null,
 )
 
 @Composable
@@ -88,10 +88,9 @@ private fun WrapPrimaryButton(
         ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.error
         )
-    } else if (buttonConfig.isWithoutContainerBackground) {
-        ButtonDefaults.filledTonalButtonColors(containerColor = Color.Transparent)
     } else {
-        ButtonDefaults.buttonColors()
+        buttonConfig.buttonColors ?: ButtonDefaults.buttonColors().copy(disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+        disabledContainerColor = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.25f))
     }
 
     Button(
@@ -128,7 +127,7 @@ private fun WrapSecondaryButton(
             contentColor = MaterialTheme.colorScheme.error
         )
     } else {
-        ButtonDefaults.outlinedButtonColors()
+        buttonConfig.buttonColors ?: ButtonDefaults.outlinedButtonColors()
     }
 
     OutlinedButton(

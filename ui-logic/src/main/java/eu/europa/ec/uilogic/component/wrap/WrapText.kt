@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,6 +55,23 @@ data class TextConfig(
 fun WrapText(
     modifier: Modifier = Modifier,
     text: String,
+    textConfig: TextConfig,
+) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = textConfig.style ?: LocalTextStyle.current,
+        color = textConfig.color ?: MaterialTheme.colorScheme.onSurface,
+        textAlign = textConfig.textAlign,
+        maxLines = textConfig.maxLines,
+        overflow = textConfig.overflow,
+    )
+}
+
+@Composable
+fun WrapText(
+    modifier: Modifier = Modifier,
+    text: AnnotatedString,
     textConfig: TextConfig,
 ) {
     Text(

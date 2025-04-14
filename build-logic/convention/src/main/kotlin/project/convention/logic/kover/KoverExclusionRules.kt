@@ -33,7 +33,8 @@ val koverModules: Map<LibraryModule, KoverExclusionRules> = mapOf(
     LibraryModule.DashboardFeature to KoverExclusionRules.DashboardFeature,
     LibraryModule.PresentationFeature to KoverExclusionRules.PresentationFeature,
     LibraryModule.ProximityFeature to KoverExclusionRules.ProximityFeature,
-    LibraryModule.IssuanceFeature to KoverExclusionRules.IssuanceFeature
+    LibraryModule.IssuanceFeature to KoverExclusionRules.IssuanceFeature,
+    LibraryModule.LandingFeature to KoverExclusionRules.LandingFeature,
 )
 
 sealed interface KoverExclusionRules {
@@ -142,6 +143,13 @@ sealed interface KoverExclusionRules {
             get() = commonPackages
     }
 
+    object OnboardingFeature : FeatureModule {
+        override val classes: List<String>
+            get() = commonClasses
+        override val packages: List<String>
+            get() = commonPackages
+    }
+
     object DashboardFeature : FeatureModule {
         override val classes: List<String>
             get() = commonClasses
@@ -215,6 +223,16 @@ sealed interface KoverExclusionRules {
         override val packages: List<String>
             get() = commonPackages + listOf(
                 "eu.europa.ec.storagelogic"
+            )
+    }
+
+    object LandingFeature : FeatureModule {
+        override val classes: List<String>
+            get() = commonClasses
+
+        override val packages: List<String>
+            get() = commonPackages + listOf(
+                "eu.europa.ec.landingfeature.ui.scanner.component",
             )
     }
 }

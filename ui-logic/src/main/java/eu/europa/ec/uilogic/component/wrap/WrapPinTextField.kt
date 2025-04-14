@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -65,7 +64,7 @@ import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.EmptyTextToolbar
 import eu.europa.ec.uilogic.component.utils.HSpacer
 import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
-import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
+import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 
 @Composable
@@ -83,7 +82,7 @@ fun WrapPinTextField(
     shouldHideKeyboardOnCompletion: Boolean = false,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = MaterialTheme.colorScheme.primary,
-        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+        unfocusedBorderColor = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.6f),
     )
 ) {
 
@@ -123,8 +122,8 @@ fun WrapPinTextField(
     if (clearCode) {
         textFieldStateList.forEach {
             it.value = ""
-            onPinUpdate.invoke("")
         }
+        onPinUpdate.invoke("")
         focusRequesters.requestFocus(0)
     }
 
@@ -137,7 +136,7 @@ fun WrapPinTextField(
     ) {
         Column(modifier = modifier) {
             Row(
-                modifier = Modifier.wrapContentWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 for (currentTextField in fieldsRange) {
@@ -174,7 +173,7 @@ fun WrapPinTextField(
                                         }
                                     }
                                 ),
-                            shape = RoundedCornerShape(SIZE_SMALL.dp),
+                            shape = RoundedCornerShape(SIZE_EXTRA_SMALL.dp),
                             value = textFieldStateList[currentTextField].value,
                             textStyle = LocalTextStyle.current.copy(
                                 fontWeight = FontWeight.Bold,

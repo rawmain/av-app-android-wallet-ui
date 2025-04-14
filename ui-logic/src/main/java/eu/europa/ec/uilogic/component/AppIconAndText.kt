@@ -45,8 +45,9 @@ fun AppIconAndText(
         ),
         verticalAlignment = Alignment.Top
     ) {
-        WrapImage(iconData = appIconAndTextData.appIcon)
-        WrapImage(iconData = appIconAndTextData.appText)
+        WrapImage(
+            iconData = appIconAndTextData.appIcon
+        )
     }
 }
 
