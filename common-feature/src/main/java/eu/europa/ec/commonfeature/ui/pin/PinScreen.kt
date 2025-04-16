@@ -16,7 +16,6 @@
 
 package eu.europa.ec.commonfeature.ui.pin
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -115,7 +114,6 @@ fun PinScreen(
             onEventSend = { event -> viewModel.setEvent(event) },
             onNavigationRequested = { navigationEffect ->
                 handleNavigationEffect(
-                    context,
                     navigationEffect,
                     navController
                 )
@@ -147,7 +145,6 @@ fun PinScreen(
 }
 
 private fun handleNavigationEffect(
-    context: Context,
     navigationEffect: Effect.Navigation,
     navController: NavController
 ) {
@@ -159,8 +156,6 @@ private fun handleNavigationEffect(
                 }
             }
         }
-
-        is Effect.Navigation.SwitchModule -> navController.navigate(navigationEffect.moduleRoute.route)
 
         is Effect.Navigation.Pop -> navController.popBackStack()
     }

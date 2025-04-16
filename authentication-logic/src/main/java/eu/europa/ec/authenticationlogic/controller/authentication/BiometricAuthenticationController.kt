@@ -129,7 +129,7 @@ class BiometricAuthenticationControllerImpl(
                     data.errorCode != BiometricsAuthError.Cancel.code &&
                     data.errorCode != BiometricsAuthError.CancelByUser.code
                 ) {
-                    authenticate(context, notifyOnAuthenticationFailure, listener)
+                    listener.invoke(BiometricsAuthenticate.Failed(data.errorString.toString()))
                 } else {
                     listener.invoke(BiometricsAuthenticate.Cancelled)
                 }

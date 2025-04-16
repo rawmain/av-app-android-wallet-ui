@@ -29,6 +29,7 @@ import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.model.PinFlow
 import eu.europa.ec.commonfeature.ui.biometric.BiometricScreen
+import eu.europa.ec.commonfeature.ui.biometricsetup.BiometricSetupScreen
 import eu.europa.ec.commonfeature.ui.pin.PinScreen
 import eu.europa.ec.commonfeature.ui.qr_scan.QrScanScreen
 import eu.europa.ec.commonfeature.ui.success.SuccessScreen
@@ -118,6 +119,13 @@ fun NavGraphBuilder.featureCommonGraph(navController: NavController) {
                         )
                     }
                 )
+            )
+        }
+
+        composable(CommonScreens.BiometricSetup.screenRoute) {
+            BiometricSetupScreen(
+                navController = navController,
+                viewModel = getViewModel(),
             )
         }
 
