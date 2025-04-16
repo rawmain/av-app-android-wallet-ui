@@ -1,3 +1,10 @@
+# Screenshots
+
+Please add screenshots to help explain your changes if applicable
+| Before | After |
+| ------ | ----- |
+| ![placeholder_1]() | ![placeholder2]() |
+
 # Description of changes
 Add a description of the change here
 
