@@ -26,10 +26,8 @@ import eu.europa.ec.eudi.wallet.document.DocumentId
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.ListItemData
 import eu.europa.ec.uilogic.component.ListItemMainContentData
-import eu.europa.ec.uilogic.component.ListItemTrailingContentData
 import eu.europa.ec.uilogic.component.RelyingPartyData
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
 import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
@@ -107,9 +105,6 @@ class DocumentIssuanceSuccessInteractorImpl(
                             itemId = documentId,
                             mainContentData = ListItemMainContentData.Text(text = document.name),
                             supportingText = resourceProvider.getString(R.string.document_success_collapsed_supporting_text),
-                            trailingContentData = ListItemTrailingContentData.Icon(
-                                iconData = AppIcons.KeyboardArrowDown
-                            )
                         ),
                         nestedItems = claimsUi,
                         isExpanded = false,

@@ -35,7 +35,7 @@
     <string name="generic_dash">-</string>
     <string name="generic_default_relying_party_name">Relying Party</string>
     <string name="generic_default_issuer_name">Issuer</string>
-    <string name="generic_view_details">View details</string>
+    <string name="generic_view_details">Credential details</string>
     <string name="generic_deferred_success_text">In progress!</string>
     <string name="generic_bottom_sheet_delete_title">Delete document?</string>
     <string name="generic_bottom_sheet_delete_subtitle">This document will be permanently deleted from your wallet and may affect access to services.</string>

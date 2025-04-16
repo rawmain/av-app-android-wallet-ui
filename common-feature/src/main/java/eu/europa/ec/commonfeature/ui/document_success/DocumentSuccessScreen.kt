@@ -160,10 +160,8 @@ private fun Content(
                     header = successItem.header,
                     data = successItem.nestedItems,
                     onItemClick = null,
-                    onExpandedChange = { expandedItem ->
-                        onEventSend(Event.ExpandOrCollapseSuccessDocumentItem(itemId = expandedItem.itemId))
-                    },
-                    isExpanded = successItem.isExpanded,
+                    onExpandedChange = { },
+                    isExpanded = true,
                     throttleClicks = false,
                     hideSensitiveContent = false,
                     collapsedMainContentVerticalPadding = SPACING_MEDIUM.dp,
