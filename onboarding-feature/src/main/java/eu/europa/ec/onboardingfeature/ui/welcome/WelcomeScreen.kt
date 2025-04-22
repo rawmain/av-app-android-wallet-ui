@@ -20,9 +20,8 @@ import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
@@ -43,10 +42,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.IconData
+import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -147,7 +146,7 @@ private fun WelcomePager(pagerState: PagerState, pages: List<SinglePageConfig>) 
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .defaultMinSize(minHeight = 190.dp),
+            .defaultMinSize(minHeight = 250.dp),
         pageContent = SinglePage(pages)
     )
 }
@@ -180,10 +179,7 @@ private fun SinglePage(
         WrapImage(
             iconData = pages[page].icon,
             contentScale = ContentScale.FillHeight,
-            modifier = Modifier
-                .heightIn(max = SIZE_XXX_LARGE.dp)
-                .fillMaxHeight()
-                .wrapContentHeight()
+            modifier = Modifier.height(SIZE_XXX_LARGE.dp)
 
         )
         VSpacer.Large()
