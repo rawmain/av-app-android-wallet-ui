@@ -40,11 +40,11 @@ class SplashInteractorImpl(
     private val quickPinInteractor: QuickPinInteractor,
     private val uiSerializer: UiSerializer,
     private val resourceProvider: ResourceProvider,
-    private val walletCoreDocumentsController: WalletCoreDocumentsController
+    private val walletCoreDocumentsController: WalletCoreDocumentsController,
 ) : SplashInteractor {
 
     private val hasDocuments: Boolean
-        get() = walletCoreDocumentsController.getAllDocuments().isNotEmpty()
+        get() = walletCoreDocumentsController.getAgeOver18IssuedDocument() != null
 
     override fun getAfterSplashRoute(): String = when (quickPinInteractor.hasPin()) {
         true -> {
@@ -56,7 +56,7 @@ class SplashInteractorImpl(
         }
     }
 
-    private fun getOnboardingRoute() : String {
+    private fun getOnboardingRoute(): String {
         return OnboardingScreens.Welcome.screenRoute
     }
 

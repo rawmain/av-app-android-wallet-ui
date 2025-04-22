@@ -425,6 +425,6 @@
     <string name="landing_screen_card_age_verification">Age Verification</string>
     <string name="landing_screen_card_certified">EU certified official credential</string>
     <string name="landing_screen_primary_button_label_scan">Scan</string>
-
-
+    <string name="landing_screen_credential_details">Credential Details</string>
+    <string name="landing_screen_no_age_credential_found">There are no age credentials available</string>
 </resources>

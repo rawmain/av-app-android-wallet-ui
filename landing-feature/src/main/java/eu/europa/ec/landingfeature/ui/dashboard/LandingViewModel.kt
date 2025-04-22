@@ -17,14 +17,20 @@
 package eu.europa.ec.landingfeature.ui.dashboard
 
 import android.net.Uri
+import androidx.lifecycle.viewModelScope
 import eu.europa.ec.commonfeature.config.OfferUiConfig
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.QrScanFlow
 import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.config.RequestUriConfig
+import eu.europa.ec.commonfeature.extensions.toExpandableListItems
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
+import eu.europa.ec.landingfeature.interactor.LandingPageInteractor
+import eu.europa.ec.landingfeature.interactor.LandingPageInteractor.GetAgeCredentialPartialState
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
+import eu.europa.ec.uilogic.component.content.ContentErrorConfig
+import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.mvi.MviViewModel
@@ -39,16 +45,20 @@ import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.navigation.helper.hasDeepLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
+import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
 data class State(
     val isLoading: Boolean = false,
+    val error: ContentErrorConfig? = null,
+    val documentClaims: List<ExpandableListItem>? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
     data class Init(val deepLinkUri: Uri?) : Event()
     data object GoToSettings : Event()
     data object GoToScanQR : Event()
+    data object Finish : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -66,6 +76,7 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class LandingViewModel(
+    private val landingPageInteractor: LandingPageInteractor,
     private val resourceProvider: ResourceProvider,
     private val uiSerializer: UiSerializer,
 ) : MviViewModel<Event, State, Effect>() {
@@ -78,6 +89,7 @@ class LandingViewModel(
         when (event) {
             is Event.Init -> {
                 handleDeepLink(event.deepLinkUri)
+                getAgeCredential(event)
             }
 
             is Event.GoToSettings -> {
@@ -87,6 +99,50 @@ class LandingViewModel(
             is Event.GoToScanQR -> {
                 navigateToQrScan()
             }
+
+            Event.Finish -> {
+                setEffect { Effect.Navigation.Pop }
+            }
+        }
+    }
+
+    private fun getAgeCredential(event: Event) {
+        setState {
+            copy(
+                isLoading = true,
+                error = null
+            )
+        }
+        viewModelScope.launch {
+            landingPageInteractor.getAgeCredential()
+                .collect { result ->
+                    when (result) {
+                        is GetAgeCredentialPartialState.Success -> {
+                            val listItems = result.ageCredentialUi.claims.map { domainClaim ->
+                                domainClaim.toExpandableListItems(docId = result.ageCredentialUi.docId)
+                            }
+                            setState {
+                                copy(
+                                    isLoading = false,
+                                    documentClaims = listItems
+                                )
+                            }
+                        }
+
+                        is GetAgeCredentialPartialState.Failure -> {
+                            setState {
+                                copy(
+                                    isLoading = false,
+                                    error = ContentErrorConfig(
+                                        onRetry = { setEvent(event) },
+                                        errorSubTitle = result.error,
+                                        onCancel = { setEvent(Event.Finish) }
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
         }
     }
 

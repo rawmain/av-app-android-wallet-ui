@@ -347,8 +347,13 @@ val mockedMdlBasicFields: Map<String, ByteArray> = mapOf(
     "sex" to byteArrayOf(1),
 )
 
+val mockedAgeVerificationBasicFields: Map<String, ByteArray> = mapOf(
+    "age_over_18" to byteArrayOf(-11),
+)
+
 const val mockedPidDocType = "eu.europa.ec.eudi.pid.1"
 const val mockedPidNameSpace = "eu.europa.ec.eudi.pid.1"
+const val mockedAgeVerificationNameSpaceAndType = "eu.europa.ec.agev10n"
 const val mockedMdlDocType = "org.iso.18013.5.1.mDL"
 const val mockedMdlNameSpace = "org.iso.18013.5.1"
 
@@ -482,6 +487,17 @@ val mockedMdlWithNoUserNameAndNoUserImage: IssuedDocument = mockedFullMdl.copy(
             mockedMdlFields
                 .minus("given_name")
                 .minus("portrait")
+        )
+    )
+)
+
+val mockedAgeVerificationDocument: IssuedDocument = mockedFullMdl.copy(
+    data = MsoMdocData(
+        format = MsoMdocFormat(mockedAgeVerificationNameSpaceAndType),
+        metadata = null,
+        nameSpacedData = createMockedNamespaceData(
+            mockedAgeVerificationNameSpaceAndType,
+            mockedAgeVerificationBasicFields
         )
     )
 )

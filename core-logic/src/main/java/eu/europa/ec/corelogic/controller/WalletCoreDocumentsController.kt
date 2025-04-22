@@ -172,6 +172,8 @@ interface WalletCoreDocumentsController {
     suspend fun getScopedDocuments(locale: Locale): FetchScopedDocumentsPartialState
 
     fun getAllDocumentCategories(): DocumentCategories
+
+    fun getAgeOver18IssuedDocument(): IssuedDocument?
 }
 
 class WalletCoreDocumentsControllerImpl(
@@ -518,6 +520,11 @@ class WalletCoreDocumentsControllerImpl(
 
     override fun getAllDocumentCategories(): DocumentCategories {
         return walletCoreConfig.documentCategories
+    }
+
+    override fun getAgeOver18IssuedDocument(): IssuedDocument? {
+        return eudiWallet.getDocuments().filterIsInstance<IssuedDocument>()
+            .firstOrNull { it.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18 }
     }
 
     private fun issueDocumentWithOpenId4VCI(configId: String): Flow<IssueDocumentsPartialState> =

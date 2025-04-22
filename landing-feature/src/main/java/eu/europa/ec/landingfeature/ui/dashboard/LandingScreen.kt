@@ -31,7 +31,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -54,6 +56,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
+import eu.europa.ec.uilogic.component.ListItemData
+import eu.europa.ec.uilogic.component.ListItemMainContentData
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -64,12 +68,14 @@ import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_MEDIUM
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.utils.VSpacer
+import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
 import eu.europa.ec.uilogic.component.wrap.StickyBottomConfig
 import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapIcon
 import eu.europa.ec.uilogic.component.wrap.WrapIconButton
 import eu.europa.ec.uilogic.component.wrap.WrapImage
+import eu.europa.ec.uilogic.component.wrap.WrapListItems
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.extension.finish
@@ -104,39 +110,14 @@ fun LandingScreen(
                     type = StickyBottomType.Generic
                 )
             ) {
-                Column {
-                    FloatingActionButton(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        onClick = {
-                            viewModel.setEvent(Event.GoToScanQR)
-                        },
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        shape = CircleShape,
-                    ) {
-                        WrapIcon(
-                            modifier = Modifier.padding(SPACING_LARGE.dp),
-                            iconData = AppIcons.QrScanner
-                        )
-                    }
-                    VSpacer.ExtraSmall()
-                    WrapText(
-                        text = stringResource(R.string.landing_screen_primary_button_label_scan),
-                        textConfig = TextConfig(
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                    VSpacer.XXLarge()
-                }
+                ScanButton(onEventSend = { viewModel.setEvent(it) })
             }
         },
     ) { paddingValues ->
         Content(
             paddingValues = paddingValues,
+            documentClaims = state.documentClaims
         )
-
     }
 
     LifecycleEffect(
@@ -156,6 +137,39 @@ fun LandingScreen(
                 is Effect.Navigation -> handleNavigationEffect(effect, hostNavController, context)
             }
         }.collect()
+    }
+}
+
+@Composable
+private fun ScanButton(
+    onEventSend: (Event) -> Unit,
+) {
+    Column {
+        VSpacer.Small()
+        FloatingActionButton(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = {
+                onEventSend(Event.GoToScanQR)
+            },
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            shape = CircleShape,
+        ) {
+            WrapIcon(
+                modifier = Modifier.padding(SPACING_LARGE.dp),
+                iconData = AppIcons.QrScanner
+            )
+        }
+        VSpacer.ExtraSmall()
+        WrapText(
+            text = stringResource(R.string.landing_screen_primary_button_label_scan),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        VSpacer.Small()
     }
 }
 
@@ -217,6 +231,7 @@ private fun TopBar(
 @Composable
 private fun Content(
     paddingValues: PaddingValues,
+    documentClaims: List<ExpandableListItem>?,
 ) {
     Column(
         modifier = Modifier
@@ -228,9 +243,9 @@ private fun Content(
                     start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                     end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
                 )
-            ),
+            )
+            .verticalScroll(rememberScrollState()),
     ) {
-        VSpacer.XXLarge()
         WrapText(
             text = stringResource(R.string.landing_screen_title),
             textConfig = TextConfig(
@@ -251,8 +266,36 @@ private fun Content(
 
         AgeVerificationCard()
 
+        if (!documentClaims.isNullOrEmpty()) {
+            CredentialDetails(documentClaims)
+        }
+
         VSpacer.XXLarge()
     }
+}
+
+@Composable
+private fun CredentialDetails(documentClaims: List<ExpandableListItem>) {
+    VSpacer.ExtraLarge()
+
+    WrapText(
+        text = stringResource(R.string.landing_screen_credential_details),
+        textConfig = TextConfig(
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            textAlign = TextAlign.Start
+        )
+    )
+
+    VSpacer.ExtraSmall()
+
+    WrapListItems(
+        modifier = Modifier.fillMaxWidth(),
+        items = documentClaims,
+        onItemClick = null,
+        mainContentVerticalPadding = 16.dp,
+        addDivider = true
+    )
 }
 
 @Composable
@@ -355,6 +398,22 @@ private fun LandingScreenPreview() {
             },
         ) { paddingValues ->
             Content(
+                documentClaims = listOf(
+                    ExpandableListItem.SingleListItemData(
+                        header = ListItemData(
+                            itemId = "0",
+                            overlineText = "Age over 18",
+                            mainContentData = ListItemMainContentData.Text(text = "True"),
+                        )
+                    ),
+                    ExpandableListItem.SingleListItemData(
+                        header = ListItemData(
+                            itemId = "1",
+                            overlineText = "Expiration Date",
+                            mainContentData = ListItemMainContentData.Text(text = "30/12/2025"),
+                        )
+                    )
+                ),
                 paddingValues = paddingValues,
             )
         }
