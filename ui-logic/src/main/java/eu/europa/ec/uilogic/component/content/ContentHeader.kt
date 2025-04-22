@@ -87,7 +87,7 @@ fun ContentHeader(
             AppIconAndText(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = SPACING_LARGE.dp),
+                    .padding(bottom = SPACING_LARGE.dp),
                 appIconAndTextData = appIconAndTextData,
             )
 
@@ -138,7 +138,7 @@ fun ContentHeader(
 @ThemeModePreviews
 @Composable
 private fun ContentHeaderPreview(
-    @PreviewParameter(TextLengthPreviewProvider::class) text: String
+    @PreviewParameter(TextLengthPreviewProvider::class) text: String,
 ) {
     PreviewTheme {
         ContentHeader(
