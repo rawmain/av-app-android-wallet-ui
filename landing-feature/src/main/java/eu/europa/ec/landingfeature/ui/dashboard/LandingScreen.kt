@@ -294,7 +294,8 @@ private fun CredentialDetails(documentClaims: List<ExpandableListItem>) {
         items = documentClaims,
         onItemClick = null,
         mainContentVerticalPadding = 16.dp,
-        addDivider = true
+        addDivider = true,
+        onExpandedChange = {}
     )
 }
 
