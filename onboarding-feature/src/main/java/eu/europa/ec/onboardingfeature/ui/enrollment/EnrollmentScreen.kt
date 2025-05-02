@@ -170,8 +170,17 @@ private fun Content(
                 style = MaterialTheme.typography.titleLarge,
             ),
         )
+        VSpacer.Large()
 
-        VSpacer.ExtraLarge()
+        WrapText(
+            text = stringResource(R.string.onboarding_verification_description),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 6
+            ),
+        )
+
+        VSpacer.Large()
 
         Column(
             modifier = Modifier.fillMaxWidth(),
