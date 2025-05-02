@@ -60,7 +60,8 @@
     <string name="splash_screen_sponsors">Powered by</string>
 
     <!-- Enrollment Screen -->
-    <string name="onboarding_verification_title">Please select your Age Verification Enrollment Method</string>
+    <string name="onboarding_verification_title">Choose your age verification method</string>
+    <string name="onboarding_verification_description">This verification is needed to create a proof of age that you are over 18. The eID details will not be shared with online services you access.</string>
     <string name="onboarding_verification_national_id">National eID / National idP</string>
     <string name="onboarding_verification_national_id_description">Identify online using your eID</string>
     <string name="onboarding_verification_token">Token / QR-Code</string>
@@ -165,8 +166,8 @@
     <string name="biometric_unknown_error">Something went wrong initializing biometric authentication. Please try again</string>
     <string name="biometric_default_mode_text_above_pin_field">PIN</string>">
 
-    <string name="biometric_setup_title">Biometrically unlock the app</string>
-    <string name="biometric_setup_description">Use your fingerprint or facial recognition to log in to the \"%1$s\" app.</string>
+    <string name="biometric_setup_title">Biometric access</string>
+    <string name="biometric_setup_description">Use your fingerprint or face recognition to log in to the \"%1$s\" app.</string>
     <string name="biometric_setup_enable">Start setup</string>
     <string name="biometric_setup_skip">Skip</string>
 
@@ -186,7 +187,7 @@
 
 
     <string name="quick_pin_create_title">Choose a PIN to access the app</string>
-    <string name="quick_pin_create_reenter_title">Repeat your PIN</string>
+    <string name="quick_pin_create_reenter_title">Confirm your PIN</string>
     <string name="quick_pin_create_enter_subtitle">Your 6-digit PIN</string>
     <string name="quick_pin_create_reenter_subtitle">Repeat your 6-digit PIN</string>
 
@@ -481,7 +482,7 @@
 
     <!-- Landing Screen -->
     <string name="landing_screen_title">Age Verification</string>
-    <string name="landing_screen_subtitle">With your proof of age, you can verify your age when using online services, such as a media library.\nThe proof of age only contains the information that you are older than 18, but no personal data.</string>
+    <string name="landing_screen_subtitle">With your proof of age, you can prove to services restricted to adults that you are old enough to access them.\nThe proof of age shows only that you are older than 18. It contains no other personal information."</string>
     <string name="landing_screen_card_eu_title">European\nUnion</string>
     <string name="landing_screen_card_age_verification">Age Verification</string>
     <string name="landing_screen_card_certified">EU certified official credential</string>
