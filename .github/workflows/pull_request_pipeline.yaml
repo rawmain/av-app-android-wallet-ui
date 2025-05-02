@@ -56,7 +56,7 @@ jobs:
           retention-days: 20
 
   lint-test-build:
-    runs-on: github-runner-set-app
+    runs-on: github-runner-dune
 
     steps:
     - name: Checkout code
