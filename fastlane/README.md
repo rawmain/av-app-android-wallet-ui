@@ -29,7 +29,7 @@ Runs all the unit tests
 [bundle exec] fastlane android deploy
 ```
 
-Build Wallet and upload it to appcenter
+Build AV and upload it to appcenter
 
 ### android prepare_binary
 

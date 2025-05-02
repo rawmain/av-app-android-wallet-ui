@@ -1,4 +1,4 @@
-# Age Verification (AV) Android Wallet application
+# Age Verification (AV) Android application
 
 ----
 
@@ -13,13 +13,18 @@
 
 ## Overview
 
-The Age Verification (AV) Android Wallet project is an Android app forked from [EUDI Android Wallet reference application](https://github.com/eu-digital-identity-wallet/eudi-app-android-wallet-ui) , which is built based on the [Architecture Reference Framework](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/architecture-and-reference-framework-main.md)  
+The Age Verification (AV) project is an Android app forked
+from [EUDI Android Wallet reference application](https://github.com/eu-digital-identity-wallet/eudi-app-android-wallet-ui) ,
+which is built based on
+the [Architecture Reference Framework](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/architecture-and-reference-framework-main.md)  
 and aims to showcase a robust and interoperable platform for digital identification, authentication, and electronic signatures based on common standards across the European Union.
-The Age Verification (AV) Android Wallet Implementation is based on a modular architecture composed of business-agnostic, reusable components that will evolve in incremental steps and can be re-used across multiple projects.
+The Age Verification (AV) Android Implementation is based on a modular architecture composed of
+business-agnostic, reusable components that will evolve in incremental steps and can be re-used
+across multiple projects.
 
-The AV Android Wallet is the application that allows users to:
+The AV Android is the application that allows users to:
 
-1. Obtain, store, and present age verification scopes.
+1. Obtain, store, and present age verification credentials.
 2. Share age data on remote and proximity scenarios.
 
 # 💡 Specifications Employed
@@ -82,7 +87,7 @@ Enrollment via National IDP
 5. Review your presentation request, tap "Next", and then select "Open with your Wallet" if you are
    using the same device as the Age Verification App otherwise open the AV app and click the Scan
    button.
-6. When prompted to open the wallet app, tap "Open".
+6. When prompted to open the AV app, tap "Open".
 7. You will be redirected to the app’s "Request" screen, where you can select or deselect which attributes to share with the Verifier. You must select at least one attribute to proceed.
 8. Tap "Share".
 9. Enter the PIN you set up during the initial steps.
@@ -101,7 +106,8 @@ You can find instructions on how to configure the application [here](wiki/config
 
 ## Disclaimer
 
-The released software is an initial development release version: 
+The released software is an initial development release version:
+
 -  The initial development release is an early endeavor reflecting the efforts of a short time-boxed period, and by no means can be considered as the final product.  
 -  The initial development release may be changed substantially over time and might introduce new features but also may change or remove existing ones, potentially breaking compatibility with your existing code.
 -  The initial development release is limited in functional scope.
@@ -124,7 +130,7 @@ The released software is an initial development release version:
 
 *business-logic*: App business logic.
 
-*core-logic*: Wallet core logic.
+*core-logic*: Age Verification core logic.
 
 *storage-logic*: Persistent storage cache.
 
