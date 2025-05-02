@@ -56,8 +56,7 @@
     <string name="onboarding_step_4_title">Verification</string>
 
     <!-- Splash Screen -->
-    <string name="splash_screen_title_line_1">Anonymous Age</string>
-    <string name="splash_screen_title_line_2">Verification</string>
+    <string name="splash_screen_title">Age Verification</string>
     <string name="splash_screen_sponsors">Powered by</string>
 
     <!-- Enrollment Screen -->
@@ -67,9 +66,9 @@
     <string name="onboarding_verification_token">Token / QR-Code</string>
     <string name="onboarding_verification_token_description">Scan a provided QR Code</string>
 
-    <string name="welcome_page_1">The Anonymous Age Verification App quickly and securely confirms your age for accessing age-restricted services.</string>
-    <string name="welcome_page_2">Simply verify your age once using a national elD or biometric check and receive a proof of age that allows seamless access to age-limited services.</string>
-    <string name="welcome_page_3">You stay in control of your data-only your proof of age is shared, never your personal identification details.</string>
+    <string name="welcome_page_1">Using this app you can securely prove you are over 18 when accessing services restricted to adults.</string>
+    <string name="welcome_page_2">Verify that you are over 18 once, use this proof to securely access many services restricted to adults.</string>
+    <string name="welcome_page_3">You stay in control of your data: only the proof that you are over 18 is shared. No other personal details are stored or shared with online services.</string>
 
     <string name="welcome_title_1">Welcome</string>
     <string name="welcome_title_2">Simple Age Verification</string>
@@ -186,7 +185,7 @@
     <string name="quick_pin_next_button">Next</string>
 
 
-    <string name="quick_pin_create_title">Assign a new Age Verification App PIN</string>
+    <string name="quick_pin_create_title">Choose a PIN to access the app</string>
     <string name="quick_pin_create_reenter_title">Repeat your PIN</string>
     <string name="quick_pin_create_enter_subtitle">Your 6-digit PIN</string>
     <string name="quick_pin_create_reenter_subtitle">Repeat your 6-digit PIN</string>
@@ -481,7 +480,7 @@
     <string name="transaction_category_month_year">MONTH</string>">
 
     <!-- Landing Screen -->
-    <string name="landing_screen_title">Anonymous Age Verification</string>
+    <string name="landing_screen_title">Age Verification</string>
     <string name="landing_screen_subtitle">With your proof of age, you can verify your age when using online services, such as a media library.\nThe proof of age only contains the information that you are older than 18, but no personal data.</string>
     <string name="landing_screen_card_eu_title">European\nUnion</string>
     <string name="landing_screen_card_age_verification">Age Verification</string>

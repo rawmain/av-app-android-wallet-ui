@@ -143,28 +143,21 @@ private fun MapTitleAndLogo() {
                 contentScale = ContentScale.FillHeight
             )
             VSpacer.ExtraLarge()
-            val gradientTextConfig = TextConfig(
-                style = MaterialTheme.typography.displaySmall.copy(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            Color(0xFF0A215F),
-                        ),
-                    )
-                ),
-                textAlign = TextAlign.Center
-            )
             WrapText(
                 modifier = Modifier
                     .fillMaxWidth(),
-                text = stringResource(R.string.splash_screen_title_line_1),
-                textConfig = gradientTextConfig,
-            )
-            WrapText(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                text = stringResource(R.string.splash_screen_title_line_2),
-                textConfig = gradientTextConfig,
+                text = stringResource(R.string.splash_screen_title),
+                textConfig = TextConfig(
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                Color(0xFF0A215F),
+                            ),
+                        )
+                    ),
+                    textAlign = TextAlign.Center
+                )
             )
         }
     }
