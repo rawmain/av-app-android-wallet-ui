@@ -28,7 +28,7 @@ You can configure the *EudiWalletConfig* per flavor. You can find both implement
 
 ```Kotlin
     private companion object {
-        const val VCI_ISSUER_URL = "https://issuer.eudiw.dev"
+        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev/"
         const val VCI_CLIENT_ID = "wallet-demo"
         const val AUTHENTICATION_REQUIRED = false
     }
@@ -52,7 +52,7 @@ _config = EudiWalletConfig {
 }
 ```
 
-The application's IACA certificates are located [here](https://github.com/eu-digital-identity-wallet/eudi-app-android-wallet-ui/tree/main/resources-logic/src/main/res/raw)
+The application's IACA certificates are located [here](https://github.com/eu-digital-identity-wallet/av-app-android-wallet-ui/tree/main/resources-logic/src/main/res/raw)
 
 3. Preregistered Client Scheme
 

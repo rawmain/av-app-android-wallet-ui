@@ -1,5 +1,7 @@
 # Age Verification (AV) Android application
 
+![Proof of age attestations for all Europeans - An age verification sokution for EU citizens and residents](./docs/media/top-banner-av.png)
+
 ----
 
 ## Table of contents
@@ -24,16 +26,14 @@ across multiple projects.
 
 The AV Android is the application that allows users to:
 
-1. Obtain, store, and present age verification credentials.
-2. Share age data on remote and proximity scenarios.
+1. Obtain, store, and present an age verification attestation.
+2. Share the proof of age attestation with online services to gain access.
 
 # 💡 Specifications Employed
 
-The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.com/eu-digital-identity-wallet/eudi-lib-android-wallet-core) and a list of available libraries to facilitate remote presentation, proximity, and issuing test/demo functionality following the specification of the [ARF](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework), including:
+The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.com/eu-digital-identity-wallet/eudi-lib-android-wallet-core) and a list of available libraries to facilitate remote presentation and issuing test/demo functionality following partially the specification of the [ARF](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework), including:
  
 - OpenID4VP - draft 23 (remote presentation), presentation exchange v2.0,
- 
-- ISO18013-5 (proximity presentation),
  
 - OpenID4VCI draft 14 (issuing)
  
@@ -58,7 +58,7 @@ Enrollment via National IDP
 
 ### Minimum device requirements
 
-- API level 28.
+- Android API level 28.
 
 ### Onboarding flow
 
@@ -66,8 +66,9 @@ Enrollment via National IDP
 2. You will be asked to confirm the privacy policy and terms of use.
 3. You will be asked to create a PIN for future logins.
 4. You will be asked to confirm your PIN.
-5. You will be asked to choose a method to verify your age:
-6. You will have to get a credential from a national idp (demo):
+5. You will be asked to configure biometric access to the app.
+6. You will be asked to choose a method to verify your age.
+7. You will have to get a credential from a national idp (demo).
 
 #### Get a credential from a national idp (demo)
 

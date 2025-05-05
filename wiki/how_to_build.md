@@ -39,7 +39,7 @@ depending on the flavor of your choice).
 These are the contents of the ConfigWalletCoreImpl file (dev flavor) and you don't need to change anything:
 ```Kotlin
 private companion object {
-        const val VCI_ISSUER_URL = "https://dev.issuer.eudiw.dev"
+        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev/"
         const val VCI_CLIENT_ID = "wallet-dev"
         const val AUTHENTICATION_REQUIRED = false
 }
@@ -48,7 +48,7 @@ private companion object {
 ### Running with local services
 The first step here is to have all three services running locally on your machine,
 you can follow these Repositories for further instructions:
-* [Issuer](https://github.com/eu-digital-identity-wallet/eudi-srv-web-issuing-eudiw-py)
+* [Issuer](https://github.com/eu-digital-identity-wallet/av-srv-web-issuing-avw-py)
 * [Web Verifier UI](https://github.com/eu-digital-identity-wallet/eudi-web-verifier)
 * [Web Verifier Endpoint](https://github.com/eu-digital-identity-wallet/eudi-srv-web-verifier-endpoint-23220-4-kt)
 
@@ -57,7 +57,7 @@ After this, and assuming you are now running everything locally,
 you need to change the contents of the ConfigWalletCoreImpl file, from:
 ```Kotlin
 private companion object {
-        const val VCI_ISSUER_URL = "https://dev.issuer.eudiw.dev"
+        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev/"
         const val VCI_CLIENT_ID = "wallet-dev"
         const val AUTHENTICATION_REQUIRED = false
 }
