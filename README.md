@@ -104,10 +104,6 @@ To publish the app on the Google Play Store, several steps must be completed. A 
 
 * **Review and Launch:** Double-check all information and settings. Once everything is complete and all sections are marked as finished, confirm the release to submit your app for review. Google will review your submission, which can take several hours to a couple of days. After approval, your app will be published on the Play Store
 
-### Demo Videos
-
-./wiki/enrollment-national-idp.mp4
-
 ## Documentation  
 
 [Age Verification Solution Technical Specification](https://github.com/eu-digital-identity-wallet/av-doc-technical-specification)
