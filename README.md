@@ -11,11 +11,6 @@ SPDX-License-Identifier: Apache-2.0
 </h1>
 
 <p align="center">
-    <a href="/../../commits/" title="Last Commit"><img src="https://img.shields.io/github/last-commit/eu-digital-identity-wallet/av-app-android-wallet-ui?style=flat"></a>
-    <a href="/../../issues" title="Open Issues"><img src="https://img.shields.io/github/issues/eu-digital-identity-wallet/av-app-android-wallet-ui?style=flat"></a>
-</p>
-
-<p align="center">
   <a href="#about">About</a> •
   <a href="#disclaimer">Disclaimer</a> •
   <a href="#development">Development</a> •
