@@ -17,7 +17,6 @@
 package eu.europa.ec.onboardingfeature.ui.enrollment
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -42,8 +41,8 @@ import androidx.navigation.NavController
 import eu.europa.ec.corelogic.util.CoreActions
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
-import eu.europa.ec.uilogic.component.SystemBroadcastReceiver
 import eu.europa.ec.uilogic.component.TopStepBar
+import eu.europa.ec.uilogic.component.content.BroadcastAction
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -74,7 +73,25 @@ fun EnrollmentScreen(
         isLoading = state.isLoading,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.Pop) },
-        contentErrorConfig = state.error
+        contentErrorConfig = state.error,
+        broadcastAction = BroadcastAction(
+            intentFilters = listOf(
+                CoreActions.VCI_RESUME_ACTION,
+                CoreActions.VCI_DYNAMIC_PRESENTATION
+            ),
+            callback = {
+                when (it?.action) {
+                    CoreActions.VCI_RESUME_ACTION -> it.extras?.getString("uri")?.let { link ->
+                        viewModel.setEvent(Event.OnResumeIssuance(link))
+                    }
+
+                    CoreActions.VCI_DYNAMIC_PRESENTATION -> it.extras?.getString("uri")
+                        ?.let { link ->
+                            viewModel.setEvent(Event.OnDynamicPresentation(link))
+                        }
+                }
+            }
+        )
     ) { paddingValues ->
         Content(
             paddingValues = paddingValues,
@@ -103,15 +120,6 @@ fun EnrollmentScreen(
     ) {
         viewModel.setEvent(Event.Init(context.getPendingDeepLink()))
     }
-
-    SystemBroadcastReceiver(
-        actions = listOf(
-            CoreActions.VCI_RESUME_ACTION,
-            CoreActions.VCI_DYNAMIC_PRESENTATION
-        )
-    ) { intent ->
-        handleBroadcastIntent(intent, viewModel)
-    }
 }
 
 private fun handleEffect(
@@ -134,19 +142,6 @@ private fun handleEffect(
             effect.deepLinkUri,
             effect.arguments
         )
-    }
-}
-
-private const val URI = "uri"
-
-private fun handleBroadcastIntent(
-    intent: Intent?,
-    viewModel: EnrollmentViewModel,
-) {
-    val link = intent?.extras?.getString(URI) ?: return
-    when (intent.action) {
-        CoreActions.VCI_RESUME_ACTION -> viewModel.setEvent(Event.OnResumeIssuance(link))
-        CoreActions.VCI_DYNAMIC_PRESENTATION -> viewModel.setEvent(Event.OnDynamicPresentation(link))
     }
 }
 

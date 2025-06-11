@@ -51,9 +51,9 @@ import eu.europa.ec.eudi.wallet.issue.openid4vci.OfferResult
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.storagelogic.controller.BookmarkStorageController
-import eu.europa.ec.storagelogic.controller.RevokedDocumentsStorageController
-import eu.europa.ec.storagelogic.controller.TransactionLogStorageController
+import eu.europa.ec.storagelogic.dao.BookmarkDao
+import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
+import eu.europa.ec.storagelogic.dao.TransactionLogDao
 import eu.europa.ec.storagelogic.model.Bookmark
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -205,10 +205,10 @@ class WalletCoreDocumentsControllerImpl(
     private val resourceProvider: ResourceProvider,
     private val eudiWallet: EudiWallet,
     private val walletCoreConfig: WalletCoreConfig,
-    private val transactionLogStorageController: TransactionLogStorageController,
-    private val bookmarkStorageController: BookmarkStorageController,
-    private val revokedDocumentsStorageController: RevokedDocumentsStorageController,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val bookmarkDao: BookmarkDao,
+    private val transactionLogDao: TransactionLogDao,
+    private val revokedDocumentDao: RevokedDocumentDao,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : WalletCoreDocumentsController {
 
     private val genericErrorMessage
@@ -242,8 +242,7 @@ class WalletCoreDocumentsControllerImpl(
 
                         val isPid: Boolean = when (config) {
                             is MsoMdocCredential -> config.docType.toDocumentIdentifier() == DocumentIdentifier.MdocPid
-                            // TODO: Re-activate once SD-JWT PID Rule book is in place in ARF.
-                            //is SdJwtVcCredential -> config.type.toDocumentIdentifier() == DocumentIdentifier.SdJwtPid
+                            is SdJwtVcCredential -> config.type.toDocumentIdentifier() == DocumentIdentifier.SdJwtPid
                             else -> false
                         }
 
@@ -370,7 +369,7 @@ class WalletCoreDocumentsControllerImpl(
         eudiWallet.deleteDocumentById(documentId = documentId)
             .kotlinResult
             .onSuccess {
-                revokedDocumentsStorageController.delete(documentId)
+                revokedDocumentDao.delete(documentId)
                 emit(DeleteDocumentPartialState.Success)
             }
             .onFailure {
@@ -557,12 +556,15 @@ class WalletCoreDocumentsControllerImpl(
 
     override fun getAgeOver18IssuedDocument(): IssuedDocument? {
         return eudiWallet.getDocuments().filterIsInstance<IssuedDocument>()
-            .firstOrNull { it.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18 }
+            .firstOrNull {
+                it.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18 ||
+                        it.toDocumentIdentifier() == DocumentIdentifier.MdocEUDIAgeOver18
+            }
     }
 
     override suspend fun getTransactionLogs(): List<TransactionLogData> =
         withContext(dispatcher) {
-            transactionLogStorageController.retrieveAll()
+            transactionLogDao.retrieveAll()
                 .mapNotNull { transactionLog ->
                     transactionLog
                         .toCoreTransactionLog()
@@ -573,26 +575,26 @@ class WalletCoreDocumentsControllerImpl(
 
     override suspend fun getTransactionLog(id: String): TransactionLogData? =
         withContext(dispatcher) {
-            transactionLogStorageController.retrieve(id)
+            transactionLogDao.retrieve(id)
                 ?.toCoreTransactionLog()
                 ?.parseTransactionLog()
                 ?.toTransactionLogData(id)
         }
 
     override suspend fun isDocumentBookmarked(documentId: DocumentId): Boolean =
-        bookmarkStorageController.retrieve(documentId) != null
+        bookmarkDao.retrieve(documentId) != null
 
     override suspend fun storeBookmark(bookmarkId: DocumentId) =
-        bookmarkStorageController.store(Bookmark(bookmarkId))
+        bookmarkDao.store(Bookmark(bookmarkId))
 
     override suspend fun deleteBookmark(bookmarkId: DocumentId) =
-        bookmarkStorageController.delete(bookmarkId)
+        bookmarkDao.delete(bookmarkId)
 
     override suspend fun getRevokedDocumentIds(): List<String> =
-        revokedDocumentsStorageController.retrieveAll().map { it.identifier }
+        revokedDocumentDao.retrieveAll().map { it.identifier }
 
     override suspend fun isDocumentRevoked(id: String): Boolean =
-        revokedDocumentsStorageController.retrieve(id) != null
+        revokedDocumentDao.retrieve(id) != null
 
     override suspend fun resolveDocumentStatus(document: IssuedDocument): Result<Status> =
         eudiWallet.resolveStatus(document)

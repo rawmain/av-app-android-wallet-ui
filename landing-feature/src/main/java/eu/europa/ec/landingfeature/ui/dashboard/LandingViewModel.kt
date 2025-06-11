@@ -23,7 +23,7 @@ import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.QrScanFlow
 import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.config.RequestUriConfig
-import eu.europa.ec.commonfeature.extensions.toExpandableListItems
+import eu.europa.ec.commonfeature.extension.toExpandableListItems
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
 import eu.europa.ec.landingfeature.interactor.LandingPageInteractor
 import eu.europa.ec.landingfeature.interactor.LandingPageInteractor.GetAgeCredentialPartialState

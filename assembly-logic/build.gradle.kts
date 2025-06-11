@@ -76,7 +76,7 @@ dependencies {
     api(project(OnboardingFeature.path))
     api(project(LandingFeature.path))
 
-    // Test Cover Report
+    // Modules Kover Report
     koverModules.forEach {
         kover(project(it.key.path)) {
             excludeFromKoverReport(
@@ -87,6 +87,7 @@ dependencies {
     }
 }
 
+// Current Module Kover Report
 excludeFromKoverReport(
     excludedClasses = KoverExclusionRules.AssemblyLogic.classes,
     excludedPackages = KoverExclusionRules.AssemblyLogic.packages,

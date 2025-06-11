@@ -16,6 +16,7 @@
 
 package eu.europa.ec.landingfeature.interactor
 
+import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.util.transformPathsToDomainClaims
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.extension.toClaimPaths
@@ -51,6 +52,9 @@ class TestLandingPageInteractor {
     private lateinit var walletCoreDocumentsController: WalletCoreDocumentsController
 
     @Mock
+    private lateinit var uuidProvider: UuidProvider
+
+    @Mock
     private lateinit var resourceProvider: ResourceProvider
 
     private lateinit var interactor: LandingPageInteractor
@@ -64,6 +68,7 @@ class TestLandingPageInteractor {
         interactor = LandingPageInteractorImpl(
             walletCoreDocumentsController = walletCoreDocumentsController,
             resourceProvider = resourceProvider,
+            uuidProvider = uuidProvider
         )
 
         whenever(resourceProvider.genericErrorMessage()).thenReturn(mockedGenericErrorMessage)
@@ -104,8 +109,8 @@ class TestLandingPageInteractor {
                         claims = transformPathsToDomainClaims(
                             paths = mockedAgeVerificationDocument.data.claims.flatMap { it.toClaimPaths() },
                             claims = mockedAgeVerificationDocument.data.claims,
-                            metadata = mockedAgeVerificationDocument.metadata,
                             resourceProvider = resourceProvider,
+                            uuidProvider = uuidProvider
                         )
                     )
                 )

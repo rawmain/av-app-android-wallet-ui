@@ -3,10 +3,11 @@
 This guide aims to assist developers build and test the Android Age Verification application.
 
 ## Table of contents
-
-* [Prerequisites](#Prerequisites)
-* [Building the app](#building-the-app)
-* [How to work with self-signed certificates](#how-to-work-with-self-signed-certificates)
+* [Overview](#overview)
+* [Setup Apps](#setup-apps)
+* [How to work with self signed certificates](#how-to-work-with-self-signed-certificates)
+## Overview
+This guide aims to assist developers in building the Android Wallet application.
 
 ## Prerequisites
 
@@ -28,9 +29,10 @@ and two Build Types:
 
 which, ultimately, result in the following Build Variants:
 
-- "devDebug", "devRelease", "demoDebug", "demoRelease" .
+- "devDebug", "devRelease", "demoDebug", "demoRelease".
 
-To change the Build Variant, go to Build -> Select Build Variant and from the tool window you can click on the "Active Build Variant" of the module ":app" and select the one you prefer. It will automatically apply it for the other modules as well.
+To change the Build Variant, go to Build -> Select Build Variant and from the tool window you can click on the "Active Build Variant" of the module ":app" and select the one you prefer.
+It will automatically apply it to the other modules as well.
 
 To run the App on a device, firstly you must connect your device with the Android Studio, and then go to Run -> Run 'app'. To run the App on an emulator, simply go to Run -> Run 'app'.
 
@@ -39,7 +41,7 @@ If you wish to test the application with the Issuer and Verifier services provid
 
 The Configuration is defined in two ***ConfigWalletCoreImpl.kt*** files (located in the "**core-logic**" module, in either *src\dev\java\eu\europa\ec\corelogic\config* or *src\demo\java\eu\europa\ec\corelogic\config*, depending on the flavor of your choice).
 
-These are the contents of the ConfigWalletCoreImpl file (dev flavor) and you don't need to change anything:
+These are the contents of the ConfigWalletCoreImpl file (dev flavor), and you don't need to change anything:
 ```Kotlin
 private companion object {
         const val VCI_ISSUER_URL = "https://issuer.ageverification.dev/"
@@ -65,7 +67,7 @@ private companion object {
         const val AUTHENTICATION_REQUIRED = false
 }
 ```
-into something like this:
+with this:
 ```Kotlin
 private companion object {
         const val VCI_ISSUER_URL = "local_IP_address_of_issuer"
@@ -77,25 +79,22 @@ private companion object {
 for example:
 ```Kotlin
 private companion object {
-        const val VCI_ISSUER_URL = "https://192.168.1.1:5000"
+        const val VCI_ISSUER_URL = "https://10.0.2.2"
         const val VCI_CLIENT_ID = "wallet-dev"
         const val AUTHENTICATION_REQUIRED = false
 }
 ```
+## Why 10.0.2.2?
 
-Finally, you have to also change the content of ***network_security_config.xml*** file and allow HTTP traffic, to this:
-```Xml
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true" />
-</network-security-config>
-```
+When using the Android emulator, 10.0.2.2 is a special alias that routes to localhost on your development machine.
+So if you’re running the issuer locally on your host, the emulator can access it via https://10.0.2.2.
 
 ## How to work with self-signed certificates
 
 This section describes configuring the application to interact with services utilizing self-signed certificates.
 
 1. Open the build.gradle.kts file of the "core-logic" module.
-2. In the 'dependencies' block add the following two:
+2. In the 'dependencies' block, add the following two:
     ```Gradle
     implementation(libs.ktor.android)
     implementation(libs.ktor.logging)
@@ -156,7 +155,7 @@ This section describes configuring the application to interact with services uti
 
     }
     ```
-5. Finally, add this custom HttpClient to the EudiWallet provider function *provideEudiWallet* located in *LogicCoreModule.kt*
+5. Also, add this custom HttpClient to the EudiWallet provider function *provideEudiWallet* located in *LogicCoreModule.kt*
     ```Kotlin
     @Single
     fun provideEudiWallet(
@@ -171,5 +170,31 @@ This section describes configuring the application to interact with services uti
         }
     }
     ```
+6. Finally, you need to use the preregistered clientId scheme instead of X509.
+   
+   Change this:
+   ```Kotlin
+   withClientIdSchemes(
+    listOf(ClientIdScheme.X509SanDns)
+   )
+    ```
+   
+   into something like this:
+   ```Kotlin
+   withClientIdSchemes(
+    listOf(
+        ClientIdScheme.Preregistered(
+            preregisteredVerifiers =
+                listOf(
+                    PreregisteredVerifier(
+                        clientId = "Verifier",
+                        legalName = "Verifier",
+                        verifierApi = "https://10.0.2.2"
+                    )
+                )
+            )
+        )
+   )
+   ```
 
-For all configuration options please refer to [this document](configuration.md)
+   For all configuration options, please refer to [this document](configuration.md)

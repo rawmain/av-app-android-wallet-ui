@@ -17,6 +17,7 @@
 package eu.europa.ec.landingfeature.interactor
 
 import eu.europa.ec.businesslogic.extension.safeAsync
+import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.util.transformPathsToDomainClaims
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.extension.toClaimPaths
@@ -43,6 +44,7 @@ interface LandingPageInteractor {
 class LandingPageInteractorImpl(
     private val walletCoreDocumentsController: WalletCoreDocumentsController,
     private val resourceProvider: ResourceProvider,
+    private val uuidProvider: UuidProvider,
 ) : LandingPageInteractor {
 
     private val genericErrorMsg
@@ -58,8 +60,8 @@ class LandingPageInteractorImpl(
                 val domainClaims = transformPathsToDomainClaims(
                     paths = claimsPaths,
                     claims = it.data.claims,
-                    metadata = it.metadata,
                     resourceProvider = resourceProvider,
+                    uuidProvider = uuidProvider
                 )
 
                 val ageCredentialUi = AgeCredentialUi(
