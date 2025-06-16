@@ -123,10 +123,20 @@ This project has adopted the [Contributor Covenant](https://www.contributor-cove
 
 By participating in this project, you agree to abide by its [Code of Conduct](./CODE_OF_CONDUCT.md) at all times.
 
-## Licensing
+## License
 
-Copyright (C) 2025 European Commission, Scytales, T-Systems International GmbH and all other contributors.
+### License details
 
-This project follows the [REUSE standard for software licensing](https://reuse.software/). Each file contains copyright and license information, and license texts can be found in the [./LICENSES](./LICENSES) folder. For more information visit https://reuse.software/. You can find a guide for developers at https://telekom.github.io/reuse-template/.  
+Copyright (c) 2025 European Commission
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the LICENSES folder.
+Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
+Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
+except in compliance with the Licence.
+
+You may obtain a copy of the Licence at:
+https://joinup.ec.europa.eu/software/page/eupl
+
+Unless required by applicable law or agreed to in writing, software distributed under 
+the Licence is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF 
+ANY KIND, either express or implied. See the Licence for the specific language 
+governing permissions and limitations under the Licence.
