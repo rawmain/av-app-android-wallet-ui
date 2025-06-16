@@ -49,6 +49,9 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             val mdocOpenId4VpScheme = "mdoc-openid4vp"
             val mdocOpenid4VpHost = "*"
 
+            val avspScheme = "avsp"
+            val avspHost = "*"
+
             val openId4VpScheme = "openid4vp"
             val openid4VpHost = "*"
 
@@ -89,6 +92,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     addConfigField("EUDI_OPENID4VP_SCHEME", eudiOpenId4VpScheme)
                     addConfigField("MDOC_OPENID4VP_SCHEME", mdocOpenId4VpScheme)
                     addConfigField("OPENID4VP_SCHEME", openId4VpScheme)
+                    addConfigField("AVSP_SCHEME", avspScheme)
                     addConfigField("CREDENTIAL_OFFER_SCHEME", credentialOfferScheme)
                     addConfigField("ISSUE_AUTHORIZATION_SCHEME", openId4VciAuthorizationScheme)
                     addConfigField("ISSUE_AUTHORIZATION_HOST", openId4VciAuthorizationHost)
@@ -112,6 +116,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     manifestPlaceholders["mdocOpenid4vpHost"] = mdocOpenid4VpHost
                     manifestPlaceholders["openid4vpScheme"] = openId4VpScheme
                     manifestPlaceholders["openid4vpHost"] = openid4VpHost
+                    manifestPlaceholders["avspScheme"] = avspScheme
+                    manifestPlaceholders["avspHost"] = avspHost
 
                     // Manifest placeholders used for OpenId4VCI
                     manifestPlaceholders["credentialOfferHost"] = credentialOfferHost

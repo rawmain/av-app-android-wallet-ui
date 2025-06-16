@@ -33,13 +33,12 @@ import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.testfeature.MockResourceProviderForStringCalls.mockIssuerName
 import eu.europa.ec.testfeature.MockResourceProviderForStringCalls.mockTransformToUiItemsCall
+import eu.europa.ec.testfeature.createMockedPidWithBasicFields
+import eu.europa.ec.testfeature.createMockedPidWithBasicFieldsAndMetadata
+import eu.europa.ec.testfeature.createMockedSdJwtPidWithBasicFields
 import eu.europa.ec.testfeature.mockedDefaultLocale
 import eu.europa.ec.testfeature.mockedGenericErrorMessage
-import eu.europa.ec.testfeature.mockedIssuerLogo
-import eu.europa.ec.testfeature.mockedPidWithBasicFields
-import eu.europa.ec.testfeature.mockedPidWithBasicFieldsAndMetadata
 import eu.europa.ec.testfeature.mockedSdJwtPidId
-import eu.europa.ec.testfeature.mockedSdJwtPidWithBasicFields
 import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.rule.CoroutineTestRule
@@ -57,7 +56,6 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import java.net.URI
 
 class TestDocumentIssuanceSuccessInteractor {
 
@@ -118,6 +116,7 @@ class TestDocumentIssuanceSuccessInteractor {
     fun `Given Case 1, When getUiItems is called, Then Success state with full document UI and header config is returned`() {
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
             mockHeaderConfigDescription(isErrorCase = false)
             mockGenderValues()
             mockSupportingText()
@@ -170,6 +169,7 @@ class TestDocumentIssuanceSuccessInteractor {
     fun `Given Case 2, When getUiItems is called, Then Success state with full document UI is returned`() {
         coroutineRule.runTest {
             // Given
+            val mockedSdJwtPidWithBasicFields = createMockedSdJwtPidWithBasicFields()
             mockHeaderConfigDescription(isErrorCase = false)
             mockItemId()
             mockGenderValues()
@@ -224,6 +224,7 @@ class TestDocumentIssuanceSuccessInteractor {
     fun `Given Case 3, When getUiItems is called, Then Success state with one document UI is returned`() {
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
             mockHeaderConfigDescription(isErrorCase = false)
             mockGenderValues()
             mockSupportingText()
@@ -276,6 +277,7 @@ class TestDocumentIssuanceSuccessInteractor {
     fun `Given Case 4, When getUiItems is called, Then Success state with empty list is returned`() {
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
             mockHeaderConfigDescription(isErrorCase = true)
             mockGenderValues()
             mockSupportingText()
@@ -356,6 +358,8 @@ class TestDocumentIssuanceSuccessInteractor {
     fun `Given Case 6, When getUiItems is called, Then Success state with full document UI list is returned`() {
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
+            val mockedSdJwtPidWithBasicFields = createMockedSdJwtPidWithBasicFields()
             mockHeaderConfigDescription(isErrorCase = false)
             mockGenderValues()
             mockSupportingText()
@@ -454,6 +458,7 @@ class TestDocumentIssuanceSuccessInteractor {
     fun `Given Case 8, When getUiItems is called, Then Success state is returned`() {
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFieldsAndMetadata = createMockedPidWithBasicFieldsAndMetadata()
             mockHeaderConfigDescription(isErrorCase = false)
             mockGenderValues()
             mockSupportingText()
@@ -461,7 +466,7 @@ class TestDocumentIssuanceSuccessInteractor {
 
             // When
             interactor.getUiItems(
-                documentIds = listOf(mockedPidId)
+                documentIds = listOf(mockedPidWithBasicFieldsAndMetadata.id)
             ).runFlowTest {
                 // Then
                 assertEquals(
@@ -482,7 +487,6 @@ class TestDocumentIssuanceSuccessInteractor {
                             description = mockedSuccessDescription,
                             relyingPartyData = RelyingPartyData(
                                 name = mockedIssuerName,
-                                logo = URI.create(mockedIssuerLogo),
                                 isVerified = false
                             )
                         ),

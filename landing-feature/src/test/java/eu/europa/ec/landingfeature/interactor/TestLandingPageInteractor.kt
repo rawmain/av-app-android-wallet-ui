@@ -24,7 +24,7 @@ import eu.europa.ec.landingfeature.interactor.LandingPageInteractor.GetAgeCreden
 import eu.europa.ec.landingfeature.model.AgeCredentialUi
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.testfeature.mockedAgeVerificationDocument
+import eu.europa.ec.testfeature.createMockedIssuedDocument
 import eu.europa.ec.testfeature.mockedDefaultLocale
 import eu.europa.ec.testfeature.mockedExceptionWithMessage
 import eu.europa.ec.testfeature.mockedExceptionWithNoMessage
@@ -94,9 +94,11 @@ class TestLandingPageInteractor {
     @Test
     fun `Given Case 1, When getAgeCredential is called, Then Case 1 Expected Result is returned`() {
         coroutineRule.runTest {
+            val mockedDoc = createMockedIssuedDocument(credentialsCount = 2)
+
             // Given
             whenever(walletCoreDocumentsController.getAgeOver18IssuedDocument())
-                .thenReturn(mockedAgeVerificationDocument)
+                .thenReturn(mockedDoc)
 
             whenever(resourceProvider.getString(any())).thenReturn("mockedString")
 
@@ -105,13 +107,14 @@ class TestLandingPageInteractor {
                 // Then
                 val expectedState = GetAgeCredentialPartialState.Success(
                     ageCredentialUi = AgeCredentialUi(
-                        docId = mockedAgeVerificationDocument.id,
+                        docId = mockedDoc.id,
                         claims = transformPathsToDomainClaims(
-                            paths = mockedAgeVerificationDocument.data.claims.flatMap { it.toClaimPaths() },
-                            claims = mockedAgeVerificationDocument.data.claims,
+                            paths = mockedDoc.data.claims.flatMap { it.toClaimPaths() },
+                            claims = mockedDoc.data.claims,
                             resourceProvider = resourceProvider,
                             uuidProvider = uuidProvider
-                        )
+                        ),
+                        credentialCount = 2
                     )
                 )
                 assertEquals(expectedState, awaitItem())

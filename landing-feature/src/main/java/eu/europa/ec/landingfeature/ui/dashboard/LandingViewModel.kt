@@ -39,6 +39,7 @@ import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.CommonScreens
 import eu.europa.ec.uilogic.navigation.DashboardScreens
+import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkAction
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkType
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
@@ -52,6 +53,7 @@ data class State(
     val isLoading: Boolean = false,
     val error: ContentErrorConfig? = null,
     val documentClaims: List<ExpandableListItem>? = null,
+    val credentialCount: Int? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -59,6 +61,7 @@ sealed class Event : ViewEvent {
     data object GoToSettings : Event()
     data object GoToScanQR : Event()
     data object Finish : Event()
+    data object AddCredentials : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -103,6 +106,14 @@ class LandingViewModel(
             Event.Finish -> {
                 setEffect { Effect.Navigation.Pop }
             }
+
+            Event.AddCredentials -> {
+                if (viewState.value.credentialCount == 0) {
+                    setEffect {
+                        Effect.Navigation.SwitchScreen(OnboardingScreens.Enrollment.screenRoute)
+                    }
+                }
+            }
         }
     }
 
@@ -124,7 +135,8 @@ class LandingViewModel(
                             setState {
                                 copy(
                                     isLoading = false,
-                                    documentClaims = listItems
+                                    documentClaims = listItems,
+                                    credentialCount = result.ageCredentialUi.credentialCount
                                 )
                             }
                         }

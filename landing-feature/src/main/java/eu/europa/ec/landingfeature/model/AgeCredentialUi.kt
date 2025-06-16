@@ -21,4 +21,5 @@ import eu.europa.ec.corelogic.model.DomainClaim
 data class AgeCredentialUi(
     val docId: String,
     val claims: List<DomainClaim>,
+    val credentialCount: Int,
 )

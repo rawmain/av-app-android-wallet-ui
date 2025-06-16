@@ -16,7 +16,6 @@
 
 package eu.europa.ec.corelogic.controller
 
-import com.android.identity.securearea.KeyUnlockData
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
@@ -36,6 +35,7 @@ import eu.europa.ec.eudi.openid4vci.MsoMdocCredential
 import eu.europa.ec.eudi.openid4vci.SdJwtVcCredential
 import eu.europa.ec.eudi.statium.Status
 import eu.europa.ec.eudi.wallet.EudiWallet
+import eu.europa.ec.eudi.wallet.document.CreateDocumentSettings.CredentialPolicy
 import eu.europa.ec.eudi.wallet.document.DeferredDocument
 import eu.europa.ec.eudi.wallet.document.Document
 import eu.europa.ec.eudi.wallet.document.DocumentExtensions.DefaultKeyUnlockData
@@ -63,6 +63,7 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
@@ -629,20 +630,28 @@ class WalletCoreDocumentsControllerImpl(
                 }
 
                 is IssueEvent.DocumentRequiresCreateSettings -> {
-                    event.resume(eudiWallet.getDefaultCreateDocumentSettings())
+                    event.resume(
+                        eudiWallet.getDefaultCreateDocumentSettings(
+                            offeredDocument = event.offeredDocument,
+                            numberOfCredentials = 30,
+                            credentialPolicy = CredentialPolicy.OneTimeUse
+                        )
+                    )
                 }
 
                 is IssueEvent.DocumentRequiresUserAuth -> {
                     val keyUnlockData = event.document.DefaultKeyUnlockData
-                    trySendBlocking(
-                        IssueDocumentsPartialState.UserAuthRequired(
-                            BiometricCrypto(keyUnlockData?.getCryptoObjectForSigning(event.signingAlgorithm)),
-                            DeviceAuthenticationResult(
-                                onAuthenticationSuccess = { event.resume(keyUnlockData as KeyUnlockData) },
-                                onAuthenticationError = { event.cancel(null) }
+                    runBlocking {
+                        trySendBlocking(
+                            IssueDocumentsPartialState.UserAuthRequired(
+                                BiometricCrypto(keyUnlockData?.getCryptoObjectForSigning()),
+                                DeviceAuthenticationResult(
+                                    onAuthenticationSuccess = { event.resume(mapOf(keyUnlockData!!.alias to keyUnlockData)) },
+                                    onAuthenticationError = { event.cancel(null) }
+                                )
                             )
                         )
-                    )
+                    }
                 }
 
                 is IssueEvent.Failure -> {
@@ -667,6 +676,10 @@ class WalletCoreDocumentsControllerImpl(
                             )
                         )
                         return@OnIssueEvent
+                    }
+
+                    runBlocking {
+                        cleanupDepletedDocuments(event.issuedDocuments)
                     }
 
                     if (event.issuedDocuments.size == totalDocumentsToBeIssued) {
@@ -701,5 +714,32 @@ class WalletCoreDocumentsControllerImpl(
         }
 
         return listener
+    }
+
+    private suspend fun cleanupDepletedDocuments(issuedDocuments: List<DocumentId>) {
+        val types = issuedDocuments.mapNotNull { documentId ->
+            getDocumentById(documentId)?.format?.let { format ->
+                when (format) {
+                    is MsoMdocFormat -> format.docType
+                    is SdJwtVcFormat -> format.vct
+                    else -> null
+                }
+            }
+        }.distinct()
+        val depletedDocuments = getAllIssuedDocuments().filter { document ->
+            document.credentialPolicy == CredentialPolicy.OneTimeUse && document.credentialsCount() == 0
+        }
+        val docsToRemove = depletedDocuments.filter { document ->
+            types.any { type ->
+                when (document.format) {
+                    is MsoMdocFormat -> (document.format as MsoMdocFormat).docType == type
+                    is SdJwtVcFormat -> (document.format as SdJwtVcFormat).vct == type
+                    else -> false
+                }
+            }
+        }
+        docsToRemove.forEach { depletedDoc ->
+            eudiWallet.deleteDocumentById(depletedDoc.id)
+        }
     }
 }

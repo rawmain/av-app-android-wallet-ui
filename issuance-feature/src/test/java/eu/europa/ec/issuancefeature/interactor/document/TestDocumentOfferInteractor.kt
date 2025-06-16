@@ -65,11 +65,11 @@ import eu.europa.ec.issuancefeature.ui.offer.model.DocumentOfferItemUi
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.resourceslogic.theme.values.ThemeColors
+import eu.europa.ec.testfeature.createMockedMainPid
 import eu.europa.ec.testfeature.mockedDefaultLocale
 import eu.europa.ec.testfeature.mockedExceptionWithMessage
 import eu.europa.ec.testfeature.mockedExceptionWithNoMessage
 import eu.europa.ec.testfeature.mockedGenericErrorMessage
-import eu.europa.ec.testfeature.mockedMainPid
 import eu.europa.ec.testfeature.mockedMdlDocName
 import eu.europa.ec.testfeature.mockedMdlDocType
 import eu.europa.ec.testfeature.mockedNotifyOnAuthenticationFailure
@@ -160,6 +160,8 @@ class TestDocumentOfferInteractor {
     fun `Given Case 1, When resolveDocumentOffer is called, Then Case 1 Expected Result is returned`() =
         coroutineRule.runTest {
             // Given
+            val mockedMainPid = createMockedMainPid()
+
             val mockedOffer = mockOffer(
                 issuerName = mockedIssuerName
             )
@@ -295,12 +297,13 @@ class TestDocumentOfferInteractor {
     fun `Given Case 4, When resolveDocumentOffer is called, Then Case 4 Expected Result is returned`() =
         coroutineRule.runTest {
             // Given
+            val mockedMainPid = createMockedMainPid()
             val mockedOffer = mockOffer(
                 issuerName = mockedIssuerName,
                 offeredDocuments = listOf(
                     mockOfferedDocument(
                         display = listOf(
-                            eu.europa.ec.eudi.openid4vci.Display(
+                            Display(
                                 name = mockedOfferedDocumentName,
                                 locale = Locale("es")
                             )

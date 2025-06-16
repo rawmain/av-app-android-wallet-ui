@@ -489,4 +489,6 @@
     <string name="landing_screen_primary_button_label_scan">Scan</string>
     <string name="landing_screen_credential_details">Credential Details</string>
     <string name="landing_screen_no_age_credential_found">There are no age credentials available</string>
+    <string name="landing_screen_credentials_left">%1$d left</string>
+    <string name="landing_screen_add_credentials">Add more</string>
 </resources>

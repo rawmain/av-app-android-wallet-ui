@@ -67,6 +67,7 @@ class LandingPageInteractorImpl(
                 val ageCredentialUi = AgeCredentialUi(
                     docId = it.id,
                     claims = domainClaims,
+                    credentialCount = it.credentialsCount()
                 )
 
                 emit(GetAgeCredentialPartialState.Success(ageCredentialUi))

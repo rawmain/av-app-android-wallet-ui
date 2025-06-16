@@ -478,7 +478,7 @@ Für weitere Informationen wenden Sie sich bitte an den autorisierten Aussteller
     <string name="transaction_category_this_week">DIESE WOCHE</string>">
     <string name="transaction_category_month_year">MONAT</string>">
 
-    <!-- Startseite -->
+    <!-- Landing -->
     <string name="landing_screen_title">Altersverifizierung</string>
     <string name="landing_screen_subtitle">Mit Ihrem Altersnachweis können Sie gegenüber Diensten, die ausschließlich Erwachsenen vorbehalten sind, nachweisen, dass Sie alt genug sind, um darauf zuzugreifen. Der Altersnachweis zeigt lediglich, dass Sie über 18 Jahre alt sind. Er enthält keine weiteren personenbezogenen Daten.</string>
     <string name="landing_screen_card_eu_title">Europäische Union</string>
@@ -487,4 +487,6 @@ Für weitere Informationen wenden Sie sich bitte an den autorisierten Aussteller
     <string name="landing_screen_primary_button_label_scan">Scannen</string>
     <string name="landing_screen_credential_details">Zugangsdaten</string>
     <string name="landing_screen_no_age_credential_found">Es sind keine Altersnachweise verfügbar</string>
+    <string name="landing_screen_credentials_left">%1$d übrig</string>
+    <string name="landing_screen_add_credentials">Mehr hinzufügen</string>
 </resources>

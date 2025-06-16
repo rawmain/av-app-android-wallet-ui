@@ -97,7 +97,8 @@ fun EnrollmentScreen(
             paddingValues = paddingValues,
             onMethodSelected = { method ->
                 viewModel.setEvent(Event.SelectEnrollmentMethod(method, context))
-            }
+            },
+            showStepBar = state.isOnboarding
         )
     }
 
@@ -149,14 +150,16 @@ private fun handleEffect(
 private fun Content(
     paddingValues: PaddingValues,
     onMethodSelected: (EnrollmentMethod) -> Unit,
+    showStepBar: Boolean = true,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-        TopStepBar(currentStep = 3)
-
+        if (showStepBar) {
+            TopStepBar(currentStep = 3)
+        }
         VSpacer.ExtraLarge()
 
         WrapText(
@@ -272,8 +275,27 @@ private fun EnrollmentScreenPreview() {
         ) { paddingValues ->
             Content(
                 paddingValues = paddingValues,
-                onMethodSelected = {}
+                onMethodSelected = {},
+                showStepBar = true
             )
         }
     }
-} 
+}
+
+@ThemeModePreviews
+@Composable
+private fun EnrollmentScreenWithoutStepBarPreview() {
+    PreviewTheme {
+        ContentScreen(
+            isLoading = false,
+            navigatableAction = ScreenNavigateAction.NONE,
+            onBack = {},
+        ) { paddingValues ->
+            Content(
+                paddingValues = paddingValues,
+                onMethodSelected = {},
+                showStepBar = false
+            )
+        }
+    }
+}
