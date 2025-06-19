@@ -43,8 +43,12 @@ The AV Android is the application that allows users to:
 
 This is an initial version of the software, developed solely for the purpose of demonstrating the business flow of the solution. It is not intended for production use, and does not yet include the full set of functional, security, or integration features required for a live deployment.
 
+**Important:** App hardening (such as code obfuscation, anti-tampering, anti-debugging, and other
+protections) is **not included** in this release. The application is not protected against reverse
+engineering or other attacks. Production deployments must implement appropriate app hardening
+measures.
+
 The current release provides only basic functionality, with several key features to be introduced in future versions, including:
- - Support for batch issuing
  - App and device verification based on Google Play Integrity API and Apple App Attestation
  - Additional issuance methods beyond the currently implemented eID based method. 
 
