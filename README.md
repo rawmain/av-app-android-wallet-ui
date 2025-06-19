@@ -68,10 +68,10 @@ This version should be considered a foundational prototype to support early test
 ### Specifications Employed
 
 The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.com/eu-digital-identity-wallet/eudi-lib-android-wallet-core) and a list of available libraries to facilitate remote presentation and issuing test/demo functionality following partially the specification of the [ARF](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework), including:
- 
-- OpenID4VP - draft 23 (remote presentation), presentation exchange v2.0,
- 
-- OpenID4VCI draft 14 (issuing)
+
+- OpenID4VP - draft 25 (remote presentation)
+
+- OpenID4VCI draft 15 (issuing)
   
 ### Build
 
