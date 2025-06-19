@@ -39,9 +39,9 @@ import eu.europa.ec.dashboardfeature.model.DocumentUi
 import eu.europa.ec.eudi.wallet.document.Document
 import eu.europa.ec.eudi.wallet.document.DocumentId
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
+import eu.europa.ec.testfeature.createMockedFullDocuments
 import eu.europa.ec.testfeature.mockedExceptionWithMessage
 import eu.europa.ec.testfeature.mockedExceptionWithNoMessage
-import eu.europa.ec.testfeature.mockedFullDocuments
 import eu.europa.ec.testfeature.mockedGenericErrorMessage
 import eu.europa.ec.testfeature.mockedPlainFailureMessage
 import eu.europa.ec.testlogic.extension.runFlowTest
@@ -116,8 +116,9 @@ class TestDocumentsInteractor {
     fun `Given Case 1, When deleteDocument is called, Then Case 1 Expected Result is returned`() {
         coroutineRule.runTest {
             // Given
+            val mockedFullDocumets = createMockedFullDocuments()
             whenever(walletCoreDocumentsController.getAllDocuments())
-                .thenReturn(mockedFullDocuments)
+                .thenReturn(mockedFullDocumets)
             assert(walletCoreDocumentsController.getAllDocuments().size == 2)
             mockDeleteDocumentCall(response = DeleteDocumentPartialState.Success)
 

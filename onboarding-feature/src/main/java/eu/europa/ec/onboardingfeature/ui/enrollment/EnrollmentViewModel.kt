@@ -56,6 +56,7 @@ import org.koin.android.annotation.KoinViewModel
 data class State(
     val isLoading: Boolean = false,
     val error: ContentErrorConfig? = null,
+    val isOnboarding: Boolean = true,
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -91,7 +92,9 @@ class EnrollmentViewModel(
     private var issuanceJob: Job? = null
 
     override fun setInitialState(): State {
-        return State()
+        return State(
+            isOnboarding = !enrollmentInteractor.hasDocuments()
+        )
     }
 
     override fun handleEvents(event: Event) {
@@ -132,7 +135,16 @@ class EnrollmentViewModel(
             }
 
             Event.Pop -> {
-                setEffect { Effect.Navigation.Finish }
+                if (!viewState.value.isOnboarding) {
+                    setEffect {
+                        Effect.Navigation.SwitchScreen(
+                            LandingScreens.Landing.screenRoute,
+                            inclusive = true
+                        )
+                    }
+                } else {
+                    setEffect { Effect.Navigation.Finish }
+                }
             }
         }
     }
@@ -203,7 +215,12 @@ class EnrollmentViewModel(
                                         )
                                     },
                                     errorSubTitle = state.error,
-                                    onCancel = { setEvent(Event.DismissError) }
+                                    onCancel = {
+                                        setEvent(Event.DismissError)
+                                        if (!viewState.value.isOnboarding) {
+                                            setEvent(Event.Pop)
+                                        }
+                                    }
                                 )
                             )
                         }
@@ -319,4 +336,4 @@ class EnrollmentViewModel(
             }
         }
     }
-} 
+}

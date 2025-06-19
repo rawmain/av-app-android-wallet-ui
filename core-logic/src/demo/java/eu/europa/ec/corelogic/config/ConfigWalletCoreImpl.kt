@@ -31,7 +31,7 @@ internal class WalletCoreConfigImpl(
 ) : WalletCoreConfig {
 
     private companion object {
-        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev"
+        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev" // Avoid / at the end
         const val VCI_CLIENT_ID = "wallet-dev"
         const val AUTHENTICATION_REQUIRED = false
     }
@@ -57,13 +57,17 @@ internal class WalletCoreConfigImpl(
                         )
 
                         withClientIdSchemes(
-                            listOf(ClientIdScheme.X509SanDns)
+                            listOf(
+                                ClientIdScheme.X509SanDns,
+                                ClientIdScheme.RedirectUri
+                            )
                         )
                         withSchemes(
                             listOf(
                                 BuildConfig.OPENID4VP_SCHEME,
                                 BuildConfig.EUDI_OPENID4VP_SCHEME,
-                                BuildConfig.MDOC_OPENID4VP_SCHEME
+                                BuildConfig.MDOC_OPENID4VP_SCHEME,
+                                BuildConfig.AVSP_SCHEME
                             )
                         )
                         withFormats(
@@ -81,7 +85,14 @@ internal class WalletCoreConfigImpl(
 
                     configureReaderTrustStore(
                         context,
-                        R.raw.av_issuer_ca01
+                        R.raw.av_issuer_ca01,
+                        R.raw.pidissuerca02_cz,
+                        R.raw.pidissuerca02_ee,
+                        R.raw.pidissuerca02_eu,
+                        R.raw.pidissuerca02_lu,
+                        R.raw.pidissuerca02_nl,
+                        R.raw.pidissuerca02_pt,
+                        R.raw.pidissuerca02_ut
                     )
                 }
             }

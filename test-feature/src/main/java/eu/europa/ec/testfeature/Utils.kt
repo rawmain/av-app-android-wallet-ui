@@ -81,4 +81,37 @@ object MockResourceProviderForStringCalls {
         whenever(resourceProvider.getLocale())
             .thenReturn(mockedDefaultLocale)
     }
+
+    fun mockIssuerName(
+        resourceProvider: ResourceProvider,
+        name: String
+    ) {
+        whenever(resourceProvider.getString(R.string.issuance_success_header_issuer_default_name))
+            .thenReturn(name)
+    }
+
+//    fun mockTestDocument(): IssuedDocument {
+//        val doc: IssuedDocument = mock<IssuedDocument> {
+//            on { id } doReturn mockedMdlId
+//            on { name } doReturn mockedMdlDocName
+//            on { documentManagerId } doReturn "fabulas"
+//            on { isCertified } doReturn false
+//            on { keyAlias } doReturn "massa"
+////            on { secureArea } doReturn secureArea
+//            on { createdAt } doReturn Instant.parse(mockedDocumentCreationDate)
+//            on { issuedAt } doReturn Instant.parse(mockedDocumentCreationDate)
+//            on { validFrom } doReturn Instant.now()
+//            on { validUntil } doReturn Instant.parse(mockedDocumentValidUntilDate)
+//            on { issuerProvidedData } doReturn byteArrayOf()
+//            on { data } doReturn MsoMdocData(
+//                format = MsoMdocFormat(mockedAgeVerificationNameSpaceAndType),
+//                issuerMetadata = null,
+//                nameSpacedData = createMockedNamespaceData(
+//                    mockedAgeVerificationNameSpaceAndType,
+//                    mockedAgeVerificationBasicFields
+//                )
+//            )
+//        }
+//        return doc
+//    }
 }

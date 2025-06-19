@@ -16,7 +16,6 @@
 
 package eu.europa.ec.corelogic.controller
 
-import com.android.identity.securearea.KeyUnlockData
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
@@ -36,6 +35,7 @@ import eu.europa.ec.eudi.openid4vci.MsoMdocCredential
 import eu.europa.ec.eudi.openid4vci.SdJwtVcCredential
 import eu.europa.ec.eudi.statium.Status
 import eu.europa.ec.eudi.wallet.EudiWallet
+import eu.europa.ec.eudi.wallet.document.CreateDocumentSettings.CredentialPolicy
 import eu.europa.ec.eudi.wallet.document.DeferredDocument
 import eu.europa.ec.eudi.wallet.document.Document
 import eu.europa.ec.eudi.wallet.document.DocumentExtensions.DefaultKeyUnlockData
@@ -51,9 +51,9 @@ import eu.europa.ec.eudi.wallet.issue.openid4vci.OfferResult
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.storagelogic.controller.BookmarkStorageController
-import eu.europa.ec.storagelogic.controller.RevokedDocumentsStorageController
-import eu.europa.ec.storagelogic.controller.TransactionLogStorageController
+import eu.europa.ec.storagelogic.dao.BookmarkDao
+import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
+import eu.europa.ec.storagelogic.dao.TransactionLogDao
 import eu.europa.ec.storagelogic.model.Bookmark
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +63,7 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
@@ -205,10 +206,10 @@ class WalletCoreDocumentsControllerImpl(
     private val resourceProvider: ResourceProvider,
     private val eudiWallet: EudiWallet,
     private val walletCoreConfig: WalletCoreConfig,
-    private val transactionLogStorageController: TransactionLogStorageController,
-    private val bookmarkStorageController: BookmarkStorageController,
-    private val revokedDocumentsStorageController: RevokedDocumentsStorageController,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val bookmarkDao: BookmarkDao,
+    private val transactionLogDao: TransactionLogDao,
+    private val revokedDocumentDao: RevokedDocumentDao,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : WalletCoreDocumentsController {
 
     private val genericErrorMessage
@@ -242,8 +243,7 @@ class WalletCoreDocumentsControllerImpl(
 
                         val isPid: Boolean = when (config) {
                             is MsoMdocCredential -> config.docType.toDocumentIdentifier() == DocumentIdentifier.MdocPid
-                            // TODO: Re-activate once SD-JWT PID Rule book is in place in ARF.
-                            //is SdJwtVcCredential -> config.type.toDocumentIdentifier() == DocumentIdentifier.SdJwtPid
+                            is SdJwtVcCredential -> config.type.toDocumentIdentifier() == DocumentIdentifier.SdJwtPid
                             else -> false
                         }
 
@@ -370,7 +370,7 @@ class WalletCoreDocumentsControllerImpl(
         eudiWallet.deleteDocumentById(documentId = documentId)
             .kotlinResult
             .onSuccess {
-                revokedDocumentsStorageController.delete(documentId)
+                revokedDocumentDao.delete(documentId)
                 emit(DeleteDocumentPartialState.Success)
             }
             .onFailure {
@@ -557,12 +557,15 @@ class WalletCoreDocumentsControllerImpl(
 
     override fun getAgeOver18IssuedDocument(): IssuedDocument? {
         return eudiWallet.getDocuments().filterIsInstance<IssuedDocument>()
-            .firstOrNull { it.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18 }
+            .firstOrNull {
+                it.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18 ||
+                        it.toDocumentIdentifier() == DocumentIdentifier.MdocEUDIAgeOver18
+            }
     }
 
     override suspend fun getTransactionLogs(): List<TransactionLogData> =
         withContext(dispatcher) {
-            transactionLogStorageController.retrieveAll()
+            transactionLogDao.retrieveAll()
                 .mapNotNull { transactionLog ->
                     transactionLog
                         .toCoreTransactionLog()
@@ -573,26 +576,26 @@ class WalletCoreDocumentsControllerImpl(
 
     override suspend fun getTransactionLog(id: String): TransactionLogData? =
         withContext(dispatcher) {
-            transactionLogStorageController.retrieve(id)
+            transactionLogDao.retrieve(id)
                 ?.toCoreTransactionLog()
                 ?.parseTransactionLog()
                 ?.toTransactionLogData(id)
         }
 
     override suspend fun isDocumentBookmarked(documentId: DocumentId): Boolean =
-        bookmarkStorageController.retrieve(documentId) != null
+        bookmarkDao.retrieve(documentId) != null
 
     override suspend fun storeBookmark(bookmarkId: DocumentId) =
-        bookmarkStorageController.store(Bookmark(bookmarkId))
+        bookmarkDao.store(Bookmark(bookmarkId))
 
     override suspend fun deleteBookmark(bookmarkId: DocumentId) =
-        bookmarkStorageController.delete(bookmarkId)
+        bookmarkDao.delete(bookmarkId)
 
     override suspend fun getRevokedDocumentIds(): List<String> =
-        revokedDocumentsStorageController.retrieveAll().map { it.identifier }
+        revokedDocumentDao.retrieveAll().map { it.identifier }
 
     override suspend fun isDocumentRevoked(id: String): Boolean =
-        revokedDocumentsStorageController.retrieve(id) != null
+        revokedDocumentDao.retrieve(id) != null
 
     override suspend fun resolveDocumentStatus(document: IssuedDocument): Result<Status> =
         eudiWallet.resolveStatus(document)
@@ -627,20 +630,28 @@ class WalletCoreDocumentsControllerImpl(
                 }
 
                 is IssueEvent.DocumentRequiresCreateSettings -> {
-                    event.resume(eudiWallet.getDefaultCreateDocumentSettings())
+                    event.resume(
+                        eudiWallet.getDefaultCreateDocumentSettings(
+                            offeredDocument = event.offeredDocument,
+                            numberOfCredentials = 30,
+                            credentialPolicy = CredentialPolicy.OneTimeUse
+                        )
+                    )
                 }
 
                 is IssueEvent.DocumentRequiresUserAuth -> {
                     val keyUnlockData = event.document.DefaultKeyUnlockData
-                    trySendBlocking(
-                        IssueDocumentsPartialState.UserAuthRequired(
-                            BiometricCrypto(keyUnlockData?.getCryptoObjectForSigning(event.signingAlgorithm)),
-                            DeviceAuthenticationResult(
-                                onAuthenticationSuccess = { event.resume(keyUnlockData as KeyUnlockData) },
-                                onAuthenticationError = { event.cancel(null) }
+                    runBlocking {
+                        trySendBlocking(
+                            IssueDocumentsPartialState.UserAuthRequired(
+                                BiometricCrypto(keyUnlockData?.getCryptoObjectForSigning()),
+                                DeviceAuthenticationResult(
+                                    onAuthenticationSuccess = { event.resume(mapOf(keyUnlockData!!.alias to keyUnlockData)) },
+                                    onAuthenticationError = { event.cancel(null) }
+                                )
                             )
                         )
-                    )
+                    }
                 }
 
                 is IssueEvent.Failure -> {
@@ -665,6 +676,10 @@ class WalletCoreDocumentsControllerImpl(
                             )
                         )
                         return@OnIssueEvent
+                    }
+
+                    runBlocking {
+                        cleanupDepletedDocuments(event.issuedDocuments)
                     }
 
                     if (event.issuedDocuments.size == totalDocumentsToBeIssued) {
@@ -699,5 +714,32 @@ class WalletCoreDocumentsControllerImpl(
         }
 
         return listener
+    }
+
+    private suspend fun cleanupDepletedDocuments(issuedDocuments: List<DocumentId>) {
+        val types = issuedDocuments.mapNotNull { documentId ->
+            getDocumentById(documentId)?.format?.let { format ->
+                when (format) {
+                    is MsoMdocFormat -> format.docType
+                    is SdJwtVcFormat -> format.vct
+                    else -> null
+                }
+            }
+        }.distinct()
+        val depletedDocuments = getAllIssuedDocuments().filter { document ->
+            document.credentialPolicy == CredentialPolicy.OneTimeUse && document.credentialsCount() == 0
+        }
+        val docsToRemove = depletedDocuments.filter { document ->
+            types.any { type ->
+                when (document.format) {
+                    is MsoMdocFormat -> (document.format as MsoMdocFormat).docType == type
+                    is SdJwtVcFormat -> (document.format as SdJwtVcFormat).vct == type
+                    else -> false
+                }
+            }
+        }
+        docsToRemove.forEach { depletedDoc ->
+            eudiWallet.deleteDocumentById(depletedDoc.id)
+        }
     }
 }

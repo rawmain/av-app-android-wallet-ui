@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.2.0-beta01 - 2025-06-18
+
+### Added
+
+- Added AVSP URI scheme handling to support deep linking
+- Added RedirectUri configuration to supported client ID schemes
+- Added support for EUDI issuer
+- Added automatic cleanup for depleted one-time-use documents
+- Added credential count tracking to age verification documents
+
+### Changed
+
+- Updated EUDI Wallet Core dependency to version 0.17.0
+- Updated document creation settings to request 30 credentials and use OneTimeUse policy
+- Modified document metadata API usage (DocumentMetaData → IssuerMetadata)
+- Updated BiometricCrypto implementation
+
 ## v0.1.0-beta01 - 2025-04-10
 
 ### Added

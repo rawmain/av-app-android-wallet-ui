@@ -16,6 +16,7 @@
 
 package eu.europa.ec.landingfeature.di
 
+import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.landingfeature.interactor.LandingPageInteractor
 import eu.europa.ec.landingfeature.interactor.LandingPageInteractorImpl
@@ -32,8 +33,10 @@ class FeatureLandingModule
 fun provideLandingPageInteractor(
     walletCoreDocumentsController: WalletCoreDocumentsController,
     resourceProvider: ResourceProvider,
+    uuidProvider: UuidProvider,
 ): LandingPageInteractor =
     LandingPageInteractorImpl(
         walletCoreDocumentsController,
-        resourceProvider
+        resourceProvider,
+        uuidProvider
     )

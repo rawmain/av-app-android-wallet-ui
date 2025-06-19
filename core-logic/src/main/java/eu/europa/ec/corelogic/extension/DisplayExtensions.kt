@@ -18,7 +18,7 @@ package eu.europa.ec.corelogic.extension
 
 import eu.europa.ec.businesslogic.extension.getLocalizedString
 import eu.europa.ec.eudi.openid4vci.Display
-import eu.europa.ec.eudi.wallet.document.metadata.DocumentMetaData
+import eu.europa.ec.eudi.wallet.document.metadata.IssuerMetadata
 
 import java.util.Locale
 
@@ -36,7 +36,7 @@ import java.util.Locale
  *
  * @see getLocalizedString
  */
-fun List<DocumentMetaData.Claim.Display>?.getLocalizedClaimName(
+fun List<IssuerMetadata.Claim.Display>?.getLocalizedClaimName(
     userLocale: Locale,
     fallback: String,
 ): String {
@@ -88,7 +88,7 @@ fun List<Display>.getLocalizedDisplayName(
  *
  * @see getLocalizedString
  */
-fun DocumentMetaData?.getLocalizedDocumentName(
+fun IssuerMetadata?.getLocalizedDocumentName(
     userLocale: Locale,
     fallback: String,
 ): String {

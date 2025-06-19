@@ -22,6 +22,10 @@ plugins {
 
 android {
     namespace = "eu.europa.ec.testlogic"
+
+    lint {
+        disable += "FlowOperatorInvokedInComposition"
+    }
 }
 
 moduleConfig {

@@ -16,6 +16,7 @@
 
 package eu.europa.ec.dashboardfeature.interactor
 
+import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.ui.document_details.domain.DocumentDetailsDomain
 import eu.europa.ec.commonfeature.util.TestsData.mockedBasicMdlDomain
 import eu.europa.ec.commonfeature.util.TestsData.mockedBasicPidDomain
@@ -33,19 +34,18 @@ import eu.europa.ec.eudi.wallet.document.format.MsoMdocData
 import eu.europa.ec.eudi.wallet.document.format.MsoMdocFormat
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.testfeature.MockResourceProviderForStringCalls
+import eu.europa.ec.testfeature.createMockedMdlWithBasicFields
 import eu.europa.ec.testfeature.createMockedNamespaceData
+import eu.europa.ec.testfeature.createMockedPidWithBasicFields
 import eu.europa.ec.testfeature.mockedBookmarkId
 import eu.europa.ec.testfeature.mockedDefaultLocale
 import eu.europa.ec.testfeature.mockedExceptionWithMessage
 import eu.europa.ec.testfeature.mockedExceptionWithNoMessage
 import eu.europa.ec.testfeature.mockedGenericErrorMessage
 import eu.europa.ec.testfeature.mockedMdlId
-import eu.europa.ec.testfeature.mockedMdlWithBasicFields
 import eu.europa.ec.testfeature.mockedOldestPidId
-import eu.europa.ec.testfeature.mockedOldestPidWithBasicFields
 import eu.europa.ec.testfeature.mockedPidId
 import eu.europa.ec.testfeature.mockedPidNameSpace
-import eu.europa.ec.testfeature.mockedPidWithBasicFields
 import eu.europa.ec.testfeature.mockedPlainFailureMessage
 import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
@@ -71,6 +71,9 @@ class TestDocumentDetailsInteractor {
     private lateinit var walletCoreDocumentsController: WalletCoreDocumentsController
 
     @Mock
+    private lateinit var uuidProvider: UuidProvider
+
+    @Mock
     private lateinit var resourceProvider: ResourceProvider
 
     private lateinit var interactor: DocumentDetailsInteractor
@@ -84,6 +87,7 @@ class TestDocumentDetailsInteractor {
         interactor = DocumentDetailsInteractorImpl(
             walletCoreDocumentsController = walletCoreDocumentsController,
             resourceProvider = resourceProvider,
+            uuidProvider = uuidProvider
         )
 
         whenever(resourceProvider.genericErrorMessage()).thenReturn(mockedGenericErrorMessage)
@@ -108,6 +112,7 @@ class TestDocumentDetailsInteractor {
     fun `Given Case 1, When getDocumentDetails is called, Then Case 1 Expected Result is returned`() {
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
             MockResourceProviderForStringCalls.mockTransformToUiItemCall(resourceProvider)
 
             mockGetDocumentByIdCall(response = mockedPidWithBasicFields)
@@ -144,6 +149,7 @@ class TestDocumentDetailsInteractor {
     fun `Given Case 2, When getDocumentDetails is called, Then Case 2 Expected Result is returned`() {
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
             MockResourceProviderForStringCalls.mockTransformToUiItemCall(resourceProvider)
 
             mockGetDocumentByIdCall(response = mockedPidWithBasicFields)
@@ -180,6 +186,7 @@ class TestDocumentDetailsInteractor {
     fun `Given Case 3, When getDocumentDetails is called, Then Case 3 Expected Result is returned`() {
         coroutineRule.runTest {
             // Given
+            val mockedMdlWithBasicFields = createMockedMdlWithBasicFields()
             MockResourceProviderForStringCalls.mockTransformToUiItemCall(resourceProvider)
 
             mockGetDocumentByIdCall(response = mockedMdlWithBasicFields)
@@ -249,21 +256,20 @@ class TestDocumentDetailsInteractor {
     fun `Given Case 5, When getDocumentDetails is called, Then Case 5 Expected Result is returned`() {
         coroutineRule.runTest {
             // Given
-            MockResourceProviderForStringCalls.mockTransformToUiItemCall(resourceProvider)
-
-            mockGetDocumentByIdCall(
-                response = mockedPidWithBasicFields.copy(
-                    data = MsoMdocData(
-                        format = MsoMdocFormat(mockedPidNameSpace),
-                        metadata = null,
-                        nameSpacedData = createMockedNamespaceData(
-                            mockedPidNameSpace, mapOf(
-                                "no_data_item" to byteArrayOf(0)
-                            )
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields(
+                data = MsoMdocData(
+                    format = MsoMdocFormat(mockedPidNameSpace),
+                    issuerMetadata = null,
+                    nameSpacedData = createMockedNamespaceData(
+                        mockedPidNameSpace, mapOf(
+                            "no_data_item" to byteArrayOf(0)
                         )
                     )
                 )
             )
+            MockResourceProviderForStringCalls.mockTransformToUiItemCall(resourceProvider)
+
+            mockGetDocumentByIdCall(response = mockedPidWithBasicFields)
             mockRetrieveBookmarkCall(response = false)
             mockIsDocumentRevoked(isRevoked = false)
 
@@ -370,6 +376,7 @@ class TestDocumentDetailsInteractor {
     fun `Given Case 1, When deleteDocument is called, Then it returns Failure with failure's error message`() {
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
             mockGetAllDocumentsCall(
                 response = listOf(
                     mockedPidWithBasicFields
@@ -409,6 +416,7 @@ class TestDocumentDetailsInteractor {
     fun `Given Case 2, When deleteDocument is called, Then it returns AllDocumentsDeleted`() {
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
             mockGetAllDocumentsCall(
                 response = listOf(
                     mockedPidWithBasicFields
@@ -442,6 +450,9 @@ class TestDocumentDetailsInteractor {
     fun `Given Case 3, When deleteDocument is called, Then it returns AllDocumentsDeleted`() {
         coroutineRule.runTest {
             // Given
+            val mockedMdlWithBasicFields = createMockedMdlWithBasicFields()
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
+            val mockedOldestPidWithBasicFields = createMockedPidWithBasicFields()
             mockGetAllDocumentsCall(
                 response = listOf(
                     mockedMdlWithBasicFields,
@@ -477,6 +488,8 @@ class TestDocumentDetailsInteractor {
     fun `Given Case 4, When deleteDocument is called, Then it returns SingleDocumentDeleted`() {
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
+            val mockedOldestPidWithBasicFields = createMockedPidWithBasicFields()
             mockGetAllDocumentsWithTypeCall(
                 response = listOf(
                     mockedPidWithBasicFields,
@@ -617,7 +630,7 @@ class TestDocumentDetailsInteractor {
             mockStoreBookmarkCall(bookmarkId = mockedBookmarkId)
 
             // Act
-            interactor.storeBookmark(bookmarkId = mockedBookmarkId).runFlowTest {
+            interactor.storeBookmark(documentId = mockedBookmarkId).runFlowTest {
                 // Assert
                 assertEquals(
                     DocumentDetailsInteractorStoreBookmarkPartialState.Success(
@@ -644,7 +657,7 @@ class TestDocumentDetailsInteractor {
             )
 
             // Act
-            interactor.storeBookmark(bookmarkId = mockedBookmarkId).runFlowTest {
+            interactor.storeBookmark(documentId = mockedBookmarkId).runFlowTest {
                 // Assert
                 assertEquals(
                     DocumentDetailsInteractorStoreBookmarkPartialState.Failure,
@@ -668,7 +681,7 @@ class TestDocumentDetailsInteractor {
             mockDeleteBookmarkCall(bookmarkId = mockedBookmarkId)
 
             // Act
-            interactor.deleteBookmark(bookmarkId = mockedBookmarkId).runFlowTest {
+            interactor.deleteBookmark(documentId = mockedBookmarkId).runFlowTest {
                 // Assert
                 assertEquals(
                     DocumentDetailsInteractorDeleteBookmarkPartialState.Success,
@@ -693,7 +706,7 @@ class TestDocumentDetailsInteractor {
             )
 
             // When
-            interactor.deleteBookmark(bookmarkId = mockedBookmarkId).runFlowTest {
+            interactor.deleteBookmark(documentId = mockedBookmarkId).runFlowTest {
                 // Then
                 assertEquals(
                     DocumentDetailsInteractorDeleteBookmarkPartialState.Failure,

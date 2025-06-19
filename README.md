@@ -33,12 +33,16 @@ The AV Android is the application that allows users to:
 1. Obtain, store, and present an age verification attestation.
 2. Share the proof of age attestation with online services to gain access.
 
-## Dislaimer
+## Disclaimer
 
 This is an initial version of the software, developed solely for the purpose of demonstrating the business flow of the solution. It is not intended for production use, and does not yet include the full set of functional, security, or integration features required for a live deployment.
 
+**Important:** App hardening (such as code obfuscation, anti-tampering, anti-debugging, and other
+protections) is **not included** in this release. The application is not protected against reverse
+engineering or other attacks. Production deployments must implement appropriate app hardening
+measures.
+
 The current release provides only basic functionality, with several key features to be introduced in future versions, including:
- - Support for batch issuing
  - App and device verification based on Google Play Integrity API and Apple App Attestation
  - Additional issuance methods beyond the currently implemented eID based method. 
 
@@ -58,10 +62,10 @@ This version should be considered a foundational prototype to support early test
 ### Specifications Employed
 
 The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.com/eu-digital-identity-wallet/eudi-lib-android-wallet-core) and a list of available libraries to facilitate remote presentation and issuing test/demo functionality following partially the specification of the [ARF](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework), including:
- 
-- OpenID4VP - draft 23 (remote presentation), presentation exchange v2.0,
- 
-- OpenID4VCI draft 14 (issuing)
+
+- OpenID4VP - draft 25 (remote presentation)
+
+- OpenID4VCI draft 15 (issuing)
   
 ### Build
 

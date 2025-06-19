@@ -80,77 +80,10 @@ const val OPENID4VP_VERIFIER_CLIENT_ID = "your_verifier_client_id"
 }
 ```
 
-4. RQES
-
-Via the *ConfigLogic* interface inside the business-logic module.
-
-```Kotlin
-interface ConfigLogic {
-    /**
-     * RQES Config.
-     */
-    val rqesConfig: EudiRQESUiConfig
-}
-```
-
-You can configure the *RQESConfig*, which implements the EudiRQESUiConfig interface from the RQESUi SDK, per flavor. Both implementations are inside the business-logic module at src/demo/config/RQESConfigImpl and src/dev/config/RQESConfigImpl.
-
-```Kotlin
-class RQESConfigImpl : EudiRQESUiConfig {
-
-    // Optional. Default English translations will be used if not set.
-    override val translations: Map<String, Map<LocalizableKey, String>> get()
-
-    // Optional. Default theme will be used if not set.
-    override val themeManager: ThemeManager get()
-
-    override val rqesServiceConfig: RqesServiceConfig get()
-
-    override val qtsps: List<QtspData> get()
-
-    // Optional. Default is false.
-    override val printLogs: Boolean get()
-
-    override val documentRetrievalConfig: DocumentRetrievalConfig get()
-}
-```
-
-Example:
-
-```Kotlin
-class RQESConfigImpl : EudiRQESUiConfig {
-
-    override val rqesServiceConfig: RqesServiceConfig
-        get() = RqesServiceConfig(
-            clientId = "your_clientid",
-            clientSecret = "your_secret",
-            authFlowRedirectionURI = URI.create("your_uri"),
-            hashAlgorithm = HashAlgorithmOID.SHA_256,
-        )
-
-    override val qtsps: List<QtspData>
-        get() = listOf(
-            QtspData(
-                name = "your_name",
-                endpoint = "your_endpoint".toUri(),
-                scaUrl = "your_sca",
-            )
-        )
-
-    override val printLogs: Boolean get() = BuildConfig.DEBUG
-
-    override val documentRetrievalConfig: DocumentRetrievalConfig
-        get() = DocumentRetrievalConfig.X509Certificates(
-            context = context,
-            certificates = listOf(R.raw.my_certificate),
-            shouldLog = should_log_option
-        )
-}
-```
-
 ## DeepLink Schemas configuration
 
-According to the specifications, issuance, presentation, and RQES require deep-linking for the same device flows.
+According to the specifications, issuance, presentation require deep-linking for the same device
+flows.
 
 If you want to adjust any schema, you can alter the *AndroidLibraryConventionPlugin* inside the build-logic module.
 
@@ -164,15 +97,11 @@ val mdocOpenid4VpHost = "*"
 val openId4VpScheme = "openid4vp"
 val openid4VpHost = "*"
 
+val avspScheme = "avsp"
+val avspHost = "*"
+
 val credentialOfferScheme = "openid-credential-offer"
 val credentialOfferHost = "*"
-
-val rqesScheme = "rqes"
-val rqesHost = "oauth"
-val rqesPath = "/callback"
-
-val rqesDocRetrievalScheme = "eudi-rqes"
-val rqesDocRetrievalHost = "*"
 ```
 
 Let's assume you want to change the credential offer schema to custom-my-offer:// the *AndroidLibraryConventionPlugin* should look like this:
@@ -186,6 +115,9 @@ val mdocOpenid4VpHost = "*"
 
 val openId4VpScheme = "openid4vp"
 val openid4VpHost = "*"
+
+val avspScheme = "avsp"
+val avspHost = "*"
 
 val credentialOfferScheme = "custom-my-offer"
 val credentialOfferHost = "*"
@@ -253,7 +185,8 @@ enum class DeepLinkType(val schemas: List<String>, val host: String? = null) {
         schemas = listOf(
             BuildConfig.OPENID4VP_SCHEME,
             BuildConfig.EUDI_OPENID4VP_SCHEME,
-            BuildConfig.MDOC_OPENID4VP_SCHEME
+            BuildConfig.MDOC_OPENID4VP_SCHEME, 
+            BuildConfig.AVSP_SCHEME
         )
     ),
     CREDENTIAL_OFFER(
@@ -269,13 +202,6 @@ enum class DeepLinkType(val schemas: List<String>, val host: String? = null) {
     DYNAMIC_PRESENTATION(
         emptyList()
     ),
-    RQES(
-        schemas = listOf(BuildConfig.RQES_SCHEME),
-        host = BuildConfig.RQES_HOST
-    ),
-    RQES_DOC_RETRIEVAL(
-        schemas = listOf(BuildConfig.RQES_DOC_RETRIEVAL_SCHEME)
-    ),
     EXTERNAL(emptyList())
 }
 ```
@@ -289,6 +215,7 @@ In the case of an additive change regarding OpenID4VP, you also need to update t
                 BuildConfig.OPENID4VP_SCHEME,
                 BuildConfig.EUDI_OPENID4VP_SCHEME,
                 BuildConfig.MDOC_OPENID4VP_SCHEME,
+                BuildConfig.AVSP_SCHEME,
                 BuildConfig.YOUR_OWN_OPENID4VP_SCHEME
             )
     )
@@ -381,6 +308,32 @@ This section describes configuring the application to interact with services uti
         }
     }
     ```
+
+## Batch Document Issuance Configuration
+
+The app is configured to use batch document issuance by default, requesting a batch of 30
+one time use credentials at once and discarding the used one after a presentation.
+If you want to change the batch size, or credential usage policy (Rotate Use vs One Time Use)
+you can do so by modifying the `issuanceCallback` function in `WalletCoreDocumentController.kt`
+and updating the parameters passed to the wallet SDK. eg.
+
+```Kotlin
+is IssueEvent.DocumentRequiresCreateSettings -> {
+   event.resume(
+      eudiWallet.getDefaultCreateDocumentSettings(
+         offeredDocument = event.offeredDocument,
+         numberOfCredentials = 30, // Change the batch size here
+         credentialPolicy = CredentialPolicy.OneTimeUse // Change the credential usage policy here
+      )
+   )
+}
+```
+
+Note that the batch size will be limited by the issuer's metadata configuration, so you may not be
+able to request a batch larger than what the issuer allows. to understand the issuer's
+configuration, you can check the issuer's metadata endpoint, which is usually available at
+`https://<issuer-url>/.well-known/openid-configuration`. specifically, look for
+the `credential_batch_size` field in the metadata response.
 
 ## Theme configuration
 
