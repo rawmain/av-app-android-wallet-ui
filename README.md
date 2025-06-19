@@ -84,6 +84,16 @@ To test the app, there is an issuer and verifier service available online. This 
  
 - **Relying Party functionality:** To support development and testing, one can access a test/demo service for remote presentation at: [Age Verification Verifier](https://verifier.ageverification.dev/)
 
+### Videos
+
+#### Issuance Flow
+
+https://github.com/user-attachments/assets/f8b5fb53-9ec6-4853-aa88-c0197d4162c9
+
+#### Presentation Flow
+
+https://github.com/user-attachments/assets/d8195932-81ec-4f7e-aaf4-898ac680c10f
+
 ### How to release the app
 
 To publish the app on the Google Play Store, several steps must be completed. A detailed description can be found [here](./docs/release_guide.md):
