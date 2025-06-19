@@ -376,6 +376,32 @@ This section describes configuring the application to interact with services uti
     }
     ```
 
+## Batch Document Issuance Configuration
+
+The app is configured to use batch document issuance by default, requesting a batch of 30
+one time use credentials at once and discarding the used one after a presentation.
+If you want to change the batch size, or credential usage policy (Rotate Use vs One Time Use)
+you can do so by modifying the `issuanceCallback` function in `WalletCoreDocumentController.kt`
+and updating the parameters passed to the wallet SDK. eg.
+
+```Kotlin
+is IssueEvent.DocumentRequiresCreateSettings -> {
+   event.resume(
+      eudiWallet.getDefaultCreateDocumentSettings(
+         offeredDocument = event.offeredDocument,
+         numberOfCredentials = 30, // Change the batch size here
+         credentialPolicy = CredentialPolicy.OneTimeUse // Change the credential usage policy here
+      )
+   )
+}
+```
+
+Note that the batch size will be limited by the issuer's metadata configuration, so you may not be
+able to request a batch larger than what the issuer allows. to understand the issuer's
+configuration, you can check the issuer's metadata endpoint, which is usually available at
+`https://<issuer-url>/.well-known/openid-configuration`. specifically, look for
+the `credential_batch_size` field in the metadata response.
+
 ## Theme configuration
 
 The application allows the configuration of:
