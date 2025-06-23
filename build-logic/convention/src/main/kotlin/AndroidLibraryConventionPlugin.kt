@@ -40,7 +40,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             val config =
                 extensions.create<LibraryPluginConfig>("moduleConfig", LibraryModule.Unspecified)
 
-            val walletScheme = "eudi-wallet"
+            val walletScheme = "av"
             val walletHost = "*"
 
             val eudiOpenId4VpScheme = "eudi-openid4vp"
@@ -52,13 +52,16 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             val avspScheme = "avsp"
             val avspHost = "*"
 
+            val avScheme = "av"
+            val avHost = "*"
+
             val openId4VpScheme = "openid4vp"
             val openid4VpHost = "*"
 
             val credentialOfferScheme = "openid-credential-offer"
             val credentialOfferHost = "*"
 
-            val openId4VciAuthorizationScheme = "eu.europa.ec.euidi"
+            val openId4VciAuthorizationScheme = "eu.europa.ec.av"
             val openId4VciAuthorizationHost = "authorization"
 
             val rqesScheme = "rqes"
@@ -93,6 +96,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     addConfigField("MDOC_OPENID4VP_SCHEME", mdocOpenId4VpScheme)
                     addConfigField("OPENID4VP_SCHEME", openId4VpScheme)
                     addConfigField("AVSP_SCHEME", avspScheme)
+                    addConfigField("AV_SCHEME", avScheme)
                     addConfigField("CREDENTIAL_OFFER_SCHEME", credentialOfferScheme)
                     addConfigField("ISSUE_AUTHORIZATION_SCHEME", openId4VciAuthorizationScheme)
                     addConfigField("ISSUE_AUTHORIZATION_HOST", openId4VciAuthorizationHost)
@@ -118,6 +122,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     manifestPlaceholders["openid4vpHost"] = openid4VpHost
                     manifestPlaceholders["avspScheme"] = avspScheme
                     manifestPlaceholders["avspHost"] = avspHost
+                    manifestPlaceholders["avScheme"] = avScheme
+                    manifestPlaceholders["avHost"] = avHost
 
                     // Manifest placeholders used for OpenId4VCI
                     manifestPlaceholders["credentialOfferHost"] = credentialOfferHost
