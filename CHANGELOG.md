@@ -1,6 +1,19 @@
 # Changelog
 
-## v1.0.0 - 2025-06-24
+## v0.1.0-beta03 - 2025-06-24
+
+### Added
+
+- Added `av://` URI scheme handling to support deep linking
+
+### Changed
+
+- Updated app version name to `0.1.0-beta03`
+- Updated Age Verification document identifier to versioned `eu.europa.ec.av.1`
+- Updated issuance and presentation flows videos
+- Updated EUDI Wallet Core dependency to stable version 0.17.0
+
+## v0.1.0-beta02 - 2025-06-18
 
 ### Added
 
@@ -12,7 +25,7 @@
 
 ### Changed
 
-- Updated EUDI Wallet Core dependency to version 0.17.0
+- Updated EUDI Wallet Core dependency to version 0.17.0-SNAPSHOT
 - Updated document creation settings to request 30 credentials and use OneTimeUse policy
 - Modified document metadata API usage (DocumentMetaData → IssuerMetadata)
 - Updated BiometricCrypto implementation
@@ -33,7 +46,7 @@
 
 ### Changed
 
-- Updated app version name to 0.1.0-beta01
+- Updated app version name to `0.1.0-beta01`
 - Updated app icons and other UI assets
 - Updated QR scan flow configuration to use NO_DOCUMENT for issuance
 - Updated issuer URLs and document identifiers for age verification
