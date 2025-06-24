@@ -88,11 +88,11 @@ To test the app, there is an issuer and verifier service available online. This 
 
 #### Issuance Flow
 
-https://github.com/user-attachments/assets/f8b5fb53-9ec6-4853-aa88-c0197d4162c9
+![Issuance Flow](./docs/media/issuance-flow.mp4)
 
 #### Presentation Flow
 
-https://github.com/user-attachments/assets/d8195932-81ec-4f7e-aaf4-898ac680c10f
+![Presentation Flow](./docs/media/presentation-flow.mp4)
 
 ### How to release the app
 
