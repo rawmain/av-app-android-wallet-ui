@@ -31,7 +31,7 @@ internal class WalletCoreConfigImpl(
 ) : WalletCoreConfig {
 
     private companion object {
-        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev" // Avoid / at the end
+        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev" // Avoid adding / at the end
         const val VCI_CLIENT_ID = "wallet-dev"
         const val AUTHENTICATION_REQUIRED = false
     }
@@ -64,10 +64,12 @@ internal class WalletCoreConfigImpl(
                         )
                         withSchemes(
                             listOf(
+                                // Add your new scheme here to solve "Not supported scheme" error
                                 BuildConfig.OPENID4VP_SCHEME,
                                 BuildConfig.EUDI_OPENID4VP_SCHEME,
                                 BuildConfig.MDOC_OPENID4VP_SCHEME,
-                                BuildConfig.AVSP_SCHEME
+                                BuildConfig.AVSP_SCHEME,
+                                BuildConfig.AV_SCHEME
                             )
                         )
                         withFormats(
