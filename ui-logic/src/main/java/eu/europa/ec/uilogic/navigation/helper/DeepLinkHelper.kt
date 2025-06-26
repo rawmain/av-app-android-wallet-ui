@@ -178,7 +178,9 @@ enum class DeepLinkType(val schemas: List<String>, val host: String? = null) {
         schemas = listOf(
             BuildConfig.OPENID4VP_SCHEME,
             BuildConfig.EUDI_OPENID4VP_SCHEME,
-            BuildConfig.MDOC_OPENID4VP_SCHEME
+            BuildConfig.MDOC_OPENID4VP_SCHEME,
+            BuildConfig.AVSP_SCHEME,
+            BuildConfig.AV_SCHEME
         )
     ),
     CREDENTIAL_OFFER(
