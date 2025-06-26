@@ -37,7 +37,6 @@ val koverModules: Map<LibraryModule, KoverExclusionRules> = mapOf(
     LibraryModule.UiLogic to KoverExclusionRules.UiLogic,
     LibraryModule.CommonFeature to KoverExclusionRules.CommonFeature,
     LibraryModule.StartupFeature to KoverExclusionRules.StartupFeature,
-    LibraryModule.DashboardFeature to KoverExclusionRules.DashboardFeature,
     LibraryModule.PresentationFeature to KoverExclusionRules.PresentationFeature,
     LibraryModule.ProximityFeature to KoverExclusionRules.ProximityFeature,
     LibraryModule.IssuanceFeature to KoverExclusionRules.IssuanceFeature,

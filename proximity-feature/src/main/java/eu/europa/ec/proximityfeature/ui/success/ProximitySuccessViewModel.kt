@@ -23,7 +23,7 @@ import eu.europa.ec.proximityfeature.interactor.ProximitySuccessInteractor
 import eu.europa.ec.proximityfeature.interactor.ProximitySuccessInteractorGetUiItemsPartialState
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
-import eu.europa.ec.uilogic.navigation.DashboardScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
@@ -34,7 +34,7 @@ class ProximitySuccessViewModel(
 
     override fun getNextScreenConfigNavigation(): ConfigNavigation {
         val popToDashboard = ConfigNavigation(
-            navigationType = NavigationType.PopTo(DashboardScreens.Dashboard),
+            navigationType = NavigationType.PopTo(LandingScreens.Landing),
         )
 
         return popToDashboard

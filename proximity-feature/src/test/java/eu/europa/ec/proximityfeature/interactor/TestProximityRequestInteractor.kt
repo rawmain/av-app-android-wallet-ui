@@ -43,7 +43,7 @@ import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.extension.toFlow
 import eu.europa.ec.testlogic.rule.CoroutineTestRule
-import eu.europa.ec.uilogic.navigation.DashboardScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
@@ -675,7 +675,7 @@ class TestProximityRequestInteractor {
     @Test
     fun `Given a RequestUriConfig with Ble mode, When setConfig is called, Then it calls walletCorePresentationController#setConfig with PresentationControllerConfig_Ble`() {
         // Given
-        val initiator = DashboardScreens.Dashboard.screenRoute
+        val initiator = LandingScreens.Landing.screenRoute
         val config = RequestUriConfig(
             mode = PresentationMode.Ble(initiator)
         )
@@ -691,7 +691,7 @@ class TestProximityRequestInteractor {
     @Test
     fun `Given a RequestUriConfig with OpenId4Vp mode, When setConfig is called, Then it calls walletCorePresentationController#setConfig with PresentationControllerConfig_OpenId4Vp`() {
         // Given
-        val initiator = DashboardScreens.Dashboard.screenRoute
+        val initiator = LandingScreens.Landing.screenRoute
         val config = RequestUriConfig(
             mode = PresentationMode.OpenId4Vp(uri = "", initiator)
         )

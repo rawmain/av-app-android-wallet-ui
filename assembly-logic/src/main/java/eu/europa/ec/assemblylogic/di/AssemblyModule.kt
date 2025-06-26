@@ -22,7 +22,6 @@ import eu.europa.ec.authenticationlogic.di.LogicAuthenticationModule
 import eu.europa.ec.businesslogic.di.LogicBusinessModule
 import eu.europa.ec.commonfeature.di.FeatureCommonModule
 import eu.europa.ec.corelogic.di.LogicCoreModule
-import eu.europa.ec.dashboardfeature.di.FeatureDashboardModule
 import eu.europa.ec.issuancefeature.di.FeatureIssuanceModule
 import eu.europa.ec.landingfeature.di.FeatureLandingModule
 import eu.europa.ec.networklogic.di.LogicNetworkModule
@@ -53,7 +52,6 @@ private val assembledModules = listOf(
 
     // Feature Modules
     FeatureCommonModule().module,
-    FeatureDashboardModule().module,
     FeatureStartupModule().module,
     FeatureOnboardingModule().module,
     FeaturePresentationModule().module,
