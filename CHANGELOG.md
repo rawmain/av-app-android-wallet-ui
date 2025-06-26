@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.1.0-beta04 - 2025-06-26
+
+### Changed
+
+- Fixes same device presentation
+
+### Removed
+
+- Android Studio module templates
+
 ## v0.1.0-beta03 - 2025-06-24
 
 ### Added
