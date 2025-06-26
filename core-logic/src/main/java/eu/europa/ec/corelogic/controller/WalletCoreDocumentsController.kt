@@ -21,15 +21,11 @@ import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.extension.getLocalizedDisplayName
-import eu.europa.ec.corelogic.extension.parseTransactionLog
-import eu.europa.ec.corelogic.extension.toCoreTransactionLog
-import eu.europa.ec.corelogic.extension.toTransactionLogData
 import eu.europa.ec.corelogic.model.DeferredDocumentData
 import eu.europa.ec.corelogic.model.DocumentCategories
 import eu.europa.ec.corelogic.model.DocumentIdentifier
 import eu.europa.ec.corelogic.model.FormatType
 import eu.europa.ec.corelogic.model.ScopedDocument
-import eu.europa.ec.corelogic.model.TransactionLogData
 import eu.europa.ec.corelogic.model.toDocumentIdentifier
 import eu.europa.ec.eudi.openid4vci.MsoMdocCredential
 import eu.europa.ec.eudi.openid4vci.SdJwtVcCredential
@@ -190,10 +186,6 @@ interface WalletCoreDocumentsController {
     suspend fun isDocumentRevoked(id: String): Boolean
 
     suspend fun resolveDocumentStatus(document: IssuedDocument): Result<Status>
-
-    suspend fun getTransactionLogs(): List<TransactionLogData>
-
-    suspend fun getTransactionLog(id: String): TransactionLogData?
 
     suspend fun isDocumentBookmarked(documentId: DocumentId): Boolean
 
@@ -562,25 +554,6 @@ class WalletCoreDocumentsControllerImpl(
                         it.toDocumentIdentifier() == DocumentIdentifier.MdocEUDIAgeOver18
             }
     }
-
-    override suspend fun getTransactionLogs(): List<TransactionLogData> =
-        withContext(dispatcher) {
-            transactionLogDao.retrieveAll()
-                .mapNotNull { transactionLog ->
-                    transactionLog
-                        .toCoreTransactionLog()
-                        ?.parseTransactionLog()
-                        ?.toTransactionLogData(transactionLog.identifier)
-                }
-        }
-
-    override suspend fun getTransactionLog(id: String): TransactionLogData? =
-        withContext(dispatcher) {
-            transactionLogDao.retrieve(id)
-                ?.toCoreTransactionLog()
-                ?.parseTransactionLog()
-                ?.toTransactionLogData(id)
-        }
 
     override suspend fun isDocumentBookmarked(documentId: DocumentId): Boolean =
         bookmarkDao.retrieve(documentId) != null

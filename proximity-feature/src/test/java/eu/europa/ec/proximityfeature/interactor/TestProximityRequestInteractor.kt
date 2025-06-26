@@ -43,7 +43,7 @@ import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.extension.toFlow
 import eu.europa.ec.testlogic.rule.CoroutineTestRule
-import eu.europa.ec.uilogic.navigation.DashboardScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow

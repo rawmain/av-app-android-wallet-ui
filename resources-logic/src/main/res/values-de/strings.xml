@@ -230,120 +230,14 @@ Für weitere Informationen wenden Sie sich bitte an den autorisierten Aussteller
     <string name="loading_biometry_biometrics_enabled_description">Genehmigen Sie die Transaktion mit Ihren biometrischen Daten.</string>
     <string name="loading_biometry_biometrics_not_enabled_description">Um die Transaktion zu genehmigen, müssen Sie Ihre Identität bestätigen.</string>
 
-
-
-    <!-- Documents Screen -->
-    <string name="documents_screen_title">Dokumente</string>
-    <string name="documents_screen_search_label">Dokumente suchen</string>
-    <string name="documents_screen_search_no_results">Keine Dokumente entsprechen Ihrer Suche. Ändern Sie Ihre Suchanfrage oder Filter.</string>
-    <string name="documents_screen_search_no_results_id">noResultsId</string>
-    <string name="documents_screen_add_document_title">Dokument hinzufügen</string>
-    <string name="documents_screen_add_document_description">Fügen Sie Dokumente zu Ihrer Wallet hinzu, indem Sie sie aus einer Liste auswählen oder einen bereitgestellten QR-Code scannen.</string>
-    <string name="documents_screen_add_document_option_list">Aus Liste</string>
-    <string name="documents_screen_add_document_option_qr">@string/generic_scan_qr</string>
-    <string name="documents_screen_add_document_option_or">@string/generic_or</string>
-    <string name="documents_screen_filters_title">@string/generic_filters_title</string>
-    <string name="documents_screen_filters_sort_by">@string/generic_filters_sort_by</string>
-    <string name="documents_screen_filters_ascending">@string/generic_filters_ascending</string>
-    <string name="documents_screen_filters_descending">@string/generic_filters_descending</string>
-    <string name="documents_screen_filters_sort_default">Standard</string>
-    <string name="documents_screen_filters_sort_date_issued">Ausstellungsdatum</string>
-    <string name="documents_screen_filters_sort_expiry_date">Ablaufdatum</string>
-    <string name="documents_screen_filters_filter_by_issuer">Nach Aussteller filtern</string>
-    <string name="documents_screen_filters_filter_by_category">Nach Kategorie filtern</string>
-    <string name="documents_screen_filters_filter_by_all">Alle</string>
-    <string name="documents_screen_filters_filter_by_state">Nach Bundesland filtern</string>
-    <string name="documents_screen_filters_filter_by_state_revoked">Widerrufen</string>
-    <string name="documents_screen_filters_filter_by_state_valid">Gültig</string>
-    <string name="documents_screen_filters_filter_by_state_expired">Abgelaufen</string>
-    <string name="documents_screen_filters_filter_by_expiry_period">Nach Ablaufzeitraum filtern</string>
-    <string name="documents_screen_filters_filter_by_expiry_period_1">Nächste 7 Tage</string>
-    <string name="documents_screen_filters_filter_by_expiry_period_2">Nächste 30 Tage</string>
-    <string name="documents_screen_filters_filter_by_expiry_period_3">Über 30 Tage</string>
-    <string name="documents_screen_filters_filter_by_expiry_period_4">Vor heute (abgelaufen)</string>
-    <string name="documents_screen_filters_apply">@string/generic_filters_apply</string>
-    <string name="documents_screen_filters_reset">@string/generic_filters_reset</string>
-
-    <!-- Transaktionsbildschirm -->
-    <string name="transactions_screen_title">Transaktionen</string>
-    <string name="transactions_screen_search_label">Transaktionen suchen</string>
-    <string name="transactions_screen_search_no_results_id">noTransactionsId</string>
-    <string name="transactions_screen_search_no_results">Keine Transaktionen gefunden. Ändern Sie Ihre Suchanfrage oder Filter.</string>
-    <string name="transactions_screen_0_minutes_ago_message">Gerade eben</string>
-    <plurals name="transactions_screen_some_minutes_ago_message">
-        <item quantity="one">Vor %d Minuten</item>
-        <item quantity="other">Vor %d Minuten</item>
-    </plurals>
-    <string name="transactions_screen_text_field_date_pattern">TT.MM.JJJJ</string>
-
-    <!-- Transaktionsbildschirm, Filterbezeichnungen-->
-    <string name="transactions_screen_filters_title">@string/generic_filters_title</string>
-    <string name="transactions_screen_filters_sort_by">@string/generic_filters_sort_by</string>
-    <string name="transactions_screen_filters_ascending">@string/generic_filters_ascending</string>
-    <string name="transactions_screen_filters_descending">@string/generic_filters_descending</string>
-    <string name="transactions_screen_filters_sort_transaction_date">Transaktionsdatum</string>
-    <string name="transactions_screen_filter_by_date_period">Filtern nach Transaktionsdatumszeitraum</string>
-    <string name="transactions_screen_filter_by_status">Filtern nach Status</string>
-    <string name="transactions_screen_filters_filter_by_relying_party">Filtern nach Vertrauende Partei</string>
-    <string name="transactions_screen_filters_filter_by_transaction_type">Nach Transaktionstyp filtern</string>
-    <string name="transactions_screen_filters_filter_by_transaction_type_presentation">Präsentation</string>
-    <string name="transactions_screen_filters_filter_by_transaction_type_issuance">Ausstellung</string>
-    <string name="transactions_screen_filters_filter_by_transaction_type_signing">Signierung</string>
-    <string name="transactions_screen_filters_date_from">Datum von</string>
-    <string name="transactions_screen_filters_date_to">Datum bis</string>
-    <string name="transactions_filter_item_status_completed">Abgeschlossen</string>
-    <string name="transactions_filter_item_status_failed">Fehlgeschlagen</string>
-    <string name="transactions_filter_item_no_relying_party_transactions">Keine vertrauende Partei</string>
-    <string name="transactions_screen_filters_apply">@string/generic_filters_apply</string>
-    <string name="transactions_screen_filters_reset">@string/generic_filters_reset</string>
-
-    <!-- Dokument signieren -->
-    <string name="document_sign_title">Dokument signieren</string>
-    <string name="document_sign_subtitle">Wählen Sie ein Dokument von Ihrem Gerät aus, um es elektronisch zu signieren.</string>
-    <string name="document_sign_select_document">Dokument auswählen</string>
-    <string name="document_sign_select_document_button_id">Dokument-Button-ID signieren</string>
-
     <!-- QR-Scan -->
     <string name="qr_scan_permission_not_granted">Kameraberechtigung nicht erteilt\nApp öffnen Einstellungen</string>
     <string name="qr_scan_informative_text_presentation_flow">Probleme beim Scannen des QR-Codes?\nBitte versuchen Sie es mit einer anderen Methode</string>
     <string name="qr_scan_informative_text_issuance_flow">Probleme beim Scannen des QR-Codes?\nBitte versuchen Sie es mit einer anderen Methode</string>
     <string name="qr_scan_informative_text_signature_flow">Probleme beim Scannen des QR-Codes?\nBitte versuchen Sie es mit einer anderen Methode</string>
 
-    <!-- Dokumentdetails -->
-    <string name="document_details_revoked_document_message">Dieses Dokument wurde vom Aussteller gesperrt. Für weitere Informationen wenden Sie sich bitte an den ausstellenden Dienst.</string>
-    <string name="document_details_portrait_readable_identifier">Wie oben angezeigt</string>
     <string name="document_details_boolean_item_true_readable_value">Ja</string>
     <string name="document_details_boolean_item_false_readable_value">Nein</string>
-
-    <string name="document_details_bottom_sheet_delete_title">@string/generic_bottom_sheet_delete_title</string>
-    <string name="document_details_bottom_sheet_delete_subtitle">@string/generic_bottom_sheet_delete_subtitle</string>
-    <string name="document_details_bottom_sheet_delete_primary_button_text">@string/generic_bottom_sheet_delete_primary_button_text</string>
-    <string name="document_details_bottom_sheet_delete_secondary_button_text">@string/generic_bottom_sheet_delete_secondary_button_text</string>
-
-    <string name="document_details_main_section_text">DOKUMENTDETAILS</string>
-    <string name="document_details_issuer_section_text">AUSSTELLER</string>
-    <string name="document_details_secondary_button_text">Dokument löschen</string>
-
-    <string name="document_details_bottom_sheet_bookmark_info_title">Zu Favoriten hinzugefügt</string>
-    <string name="document_details_bottom_sheet_bookmark_info_message">Das Dokument wurde erfolgreich zu Ihrer Favoritenliste hinzugefügt.</string>
-    <string name="document_details_bottom_sheet_bookmark_removed_info_title">Aus Favoriten entfernt</string>
-    <string name="document_details_bottom_sheet_bookmark_removed_info_message">Das Dokument wurde erfolgreich aus Ihrer Favoritenliste entfernt.</string>
-
-    <string name="document_details_bottom_sheet_badge_title">Vertrauenswürdige Partei</string>
-    <string name="document_details_bottom_sheet_badge_subtitle">Eine vertrauende Partei gilt als vertrauenswürdig, wenn sie vordefinierte Kriterien für Sicherheit, Datenschutz, Compliance und verantwortungsvollen Umgang mit Daten erfüllt.</string>
-
-    <!-- Transaktionsdetails -->
-    <string name="transaction_details_screen_title">Transaktionsinformationen</string>
-    <string name="transaction_details_screen_card_date_label">Datum</string>
-    <string name="transaction_details_request_deletion_message">Sie können die Einstellung der Verarbeitung personenbezogener Daten im Zusammenhang mit dieser Transaktion beantragen. Dies kann Ihren Zugriff auf Dienste beeinträchtigen.</string>
-    <string name="transaction_details_report_transaction_message">Wenn Sie der Meinung sind, dass diese vertrauende Partei unrechtmäßig personenbezogene Daten angefordert hat, können Sie diese Transaktion den Behörden melden.</string>
-    <string name="transaction_details_request_deletion_button">Datenlöschung beantragen</string>
-    <string name="transaction_details_report_transaction_button">Verdächtige Transaktion melden</string>
-    <string name="transaction_details_data_shared_section_title">GETEILTE DATEN</string>
-    <string name="transaction_details_data_shared_prefix_id">transactionDetailsDataSharedId</string>
-    <string name="transaction_details_data_signed_section_title">SIGNIERTE DATEN</string>
-    <string name="transaction_details_data_signed_prefix_id">transactionDetailsDataSignedId</string>
-    <string name="transaction_details_collapsed_supporting_text">@string/generic_view_details</string>
 
     <!-- Zustimmungsbildschirm -->
     <string name="consent_screen_title">Zuerst benötigen wir Ihre Zustimmung</string>
