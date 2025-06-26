@@ -38,7 +38,7 @@ import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.DashboardScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkAction
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkType
@@ -68,7 +68,7 @@ sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data class SwitchScreen(
             val screenRoute: String,
-            val popUpToScreenRoute: String = DashboardScreens.Dashboard.screenRoute,
+            val popUpToScreenRoute: String = LandingScreens.Landing.screenRoute,
             val inclusive: Boolean = false,
         ) : Navigation()
 
@@ -208,7 +208,7 @@ class LandingViewModel(
                         offerURI = it.link.toString(),
                         onSuccessNavigation = ConfigNavigation(
                             navigationType = NavigationType.PopTo(
-                                screen = DashboardScreens.Dashboard
+                                screen = LandingScreens.Landing
                             )
                         ),
                         onCancelNavigation = ConfigNavigation(
@@ -228,7 +228,7 @@ class LandingViewModel(
                     RequestUriConfig(
                         PresentationMode.OpenId4Vp(
                             uri.toString(),
-                            DashboardScreens.Dashboard.screenRoute
+                            LandingScreens.Landing.screenRoute
                         )
                     ),
                     RequestUriConfig

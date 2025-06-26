@@ -230,63 +230,7 @@ Für weitere Informationen wenden Sie sich bitte an den autorisierten Aussteller
     <string name="loading_biometry_biometrics_enabled_description">Genehmigen Sie die Transaktion mit Ihren biometrischen Daten.</string>
     <string name="loading_biometry_biometrics_not_enabled_description">Um die Transaktion zu genehmigen, müssen Sie Ihre Identität bestätigen.</string>
 
-    <!-- Dashboard -->
-    <string name="dashboard_document_has_not_expired">Gültig bis:\ %1$s</string>
-    <string name="dashboard_document_has_expired">Abgelaufen</string>
-    <string name="dashboard_document_deferred_pending">Ausstehend</string>
-    <string name="dashboard_document_deferred_failed">Ausstellung fehlgeschlagen</string>
-    <string name="dashboard_document_revoked">Widerrufen</string>
 
-    <string name="dashboard_bottom_sheet_bluetooth_title">Bluetooth aktivieren?</string>
-    <string name="dashboard_bottom_sheet_bluetooth_subtitle">Bluetooth aktivieren, um Ihre Informationen über die Option „Persönlich oder online authentifizieren“ freizugeben</string>
-    <string name="dashboard_bottom_sheet_bluetooth_primary_button_text">@string/generic_enable_capitalized</string>
-    <string name="dashboard_bottom_sheet_bluetooth_secondary_button_text">@string/generic_cancel_capitalized</string>
-
-    <string name="dashboard_bottom_sheet_deferred_document_pressed_title">@string/generic_bottom_sheet_delete_title</string>
-    <string name="dashboard_bottom_sheet_deferred_document_pressed_subtitle">@string/generic_bottom_sheet_delete_subtitle</string>
-    <string name="dashboard_bottom_sheet_deferred_document_pressed_primary_button_text">@string/generic_bottom_sheet_delete_primary_button_text</string>
-    <string name="dashboard_bottom_sheet_deferred_document_pressed_secondary_button_text">@string/generic_bottom_sheet_delete_secondary_button_text</string>
-
-    <string name="dashboard_bottom_sheet_deferred_documents_ready_title">Ausgestellte Dokumente</string>
-    <string name="dashboard_bottom_sheet_deferred_documents_ready_subtitle">Neue Dokumente wurden Ihrer Brieftasche hinzugefügt.</string>
-
-    <string name="dashboard_bottom_sheet_revoked_document_dialog_title">Widerrufene Dokumente</string>
-    <string name="dashboard_bottom_sheet_revoked_document_dialog_subtitle">Die folgenden Dokumente wurden widerrufen.</string>
-
-    <string name="dashboard_intent_chooser_logs_share_title">Protokolle teilen</string>
-
-    <!-- Dashboard-Seitenmenü -->
-    <string name="dashboard_side_menu_title">Mein EU-Wallet</string>
-    <string name="dashboard_side_menu_change_pin">PIN ändern</string>
-    <string name="dashboard_side_menu_change_pin_id">PIN-ID ändern</string>
-    <string name="dashboard_side_menu_retrieve_logs">Protokolle abrufen</string>
-    <string name="dashboard_side_menu_retrieve_logs_id">retrieveLogsId</string>
-    <string name="dashboard_side_menu_changelog">Änderungsprotokoll</string>
-    <string name="dashboard_side_menu_changelog_id">Änderungsprotokoll-ID</string>
-
-    <!-- Startbildschirm -->
-    <string name="home_screen_title">Startseite</string>
-    <string name="home_screen_welcome">Willkommen zurück</string>
-    <string name="home_screen_welcome_user_message">Willkommen zurück, %1$s</string>
-    <string name="home_screen_authentication_card_title">Authentifizieren, Transaktionen autorisieren und digitale Dokumente persönlich oder online teilen.</string>
-    <string name="home_screen_sign_card_title">Signieren Sie digitale Dokumente elektronisch mit Ihrer Wallet, indem Sie eine Datei von Ihrem Gerät auswählen.</string>
-    <string name="home_screen_authenticate">Authentifizieren</string>
-    <string name="home_screen_authenticate_description">Authentifizieren Sie sich, indem Sie Ihre Daten persönlich (in unmittelbarer Nähe) oder online (Website/Dienst) teilen.</string>
-    <string name="home_screen_sign">Signieren</string>
-    <string name="home_screen_learn_more">Mehr erfahren</string>
-    <string name="home_screen_authenticate_option_in_person">Persönlich</string>
-    <string name="home_screen_add_document_option_online">Online</string>
-
-    <string name="home_screen_sign_document">Dokument signieren</string>
-    <string name="home_screen_sign_document_description">Signieren Sie ein Dokument digital, indem Sie eine Datei auf Ihrem Gerät auswählen oder einen QR-Code scannen.</string>
-    <string name="home_screen_sign_document_option_from_device">Vom Gerät</string>
-    <string name="home_screen_sign_document_option_scan_qr">QR-Code scannen</string>
-
-    <!-- Home Screen Learn More Popups content -->
-    <string name="home_screen_authenticate_learn_more_inner_title">Dokumente sicher signieren</string>
-    <string name="home_screen_authenticate_learn_more_description">Unterschreiben Sie Dokumente einfach mit Ihrem Wallet. Die Bereitstellung einer rechtsverbindlichen elektronischen Signatur wird schneller und einfacher denn je und ermöglicht Ihnen, Ihre Geschäfte jederzeit und überall abzuwickeln.</string>
-    <string name="home_screen_sign_learn_more_inner_title">Zugriff auf Online-Dienste</string>
-    <string name="home_screen_sign_learn_more_description">Identifizieren Sie sich bei einer Vielzahl öffentlicher und privater Online-Dienste und schützen Sie gleichzeitig Ihre Privatsphäre. Beweisen Sie Ihre Identität mit nur wenigen Fingertipps – Sie müssen nicht unzählige Passwörter verwalten.</string>
 
     <!-- Documents Screen -->
     <string name="documents_screen_title">Dokumente</string>

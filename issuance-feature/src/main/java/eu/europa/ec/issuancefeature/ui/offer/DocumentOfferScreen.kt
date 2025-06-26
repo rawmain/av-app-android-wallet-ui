@@ -64,8 +64,8 @@ import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.extension.cacheDeepLink
 import eu.europa.ec.uilogic.extension.getPendingDeepLink
-import eu.europa.ec.uilogic.navigation.DashboardScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.helper.handleDeepLinkAction
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -274,7 +274,7 @@ private fun ContentPreview() {
                 offerURI = "",
                 onSuccessNavigation = ConfigNavigation(
                     navigationType = NavigationType.PushScreen(
-                        screen = DashboardScreens.Dashboard,
+                        screen = LandingScreens.Landing,
                         popUpToScreen = IssuanceScreens.AddDocument
                     )
                 ),
