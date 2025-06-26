@@ -34,7 +34,6 @@ enum class LibraryModule(val path: String) {
     StartupFeature(":startup-feature"),
     OnboardingFeature(":onboarding-feature"),
     PresentationFeature(":presentation-feature"),
-    ProximityFeature(":proximity-feature"),
     IssuanceFeature(":issuance-feature"),
     LandingFeature(":landing-feature");
 

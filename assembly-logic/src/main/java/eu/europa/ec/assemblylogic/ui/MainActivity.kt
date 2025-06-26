@@ -23,7 +23,6 @@ import eu.europa.ec.issuancefeature.router.featureIssuanceGraph
 import eu.europa.ec.landingfeature.router.featureLandingGraph
 import eu.europa.ec.onboardingfeature.router.featureOnboardingGraph
 import eu.europa.ec.presentationfeature.router.presentationGraph
-import eu.europa.ec.proximityfeature.router.featureProximityGraph
 import eu.europa.ec.startupfeature.router.featureStartupGraph
 import eu.europa.ec.uilogic.container.EudiComponentActivity
 
@@ -36,7 +35,6 @@ class MainActivity : EudiComponentActivity() {
                 featureOnboardingGraph(it)
                 featureCommonGraph(it)
                 presentationGraph(it)
-                featureProximityGraph(it)
                 featureIssuanceGraph(it)
                 featureLandingGraph(it)
             }
