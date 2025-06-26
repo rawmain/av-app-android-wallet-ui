@@ -64,7 +64,7 @@ internal class WalletCoreConfigImpl(
                         )
                         withSchemes(
                             listOf(
-                                // Add your new scheme here to solve "Not supported scheme" error
+                                // Add your new scheme here and to DeepLinkHelper/DeepLinkType to solve "Not supported scheme" error
                                 BuildConfig.OPENID4VP_SCHEME,
                                 BuildConfig.EUDI_OPENID4VP_SCHEME,
                                 BuildConfig.MDOC_OPENID4VP_SCHEME,
