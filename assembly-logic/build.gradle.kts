@@ -25,7 +25,6 @@ import project.convention.logic.config.LibraryModule.LandingFeature
 import project.convention.logic.config.LibraryModule.NetworkLogic
 import project.convention.logic.config.LibraryModule.OnboardingFeature
 import project.convention.logic.config.LibraryModule.PresentationFeature
-import project.convention.logic.config.LibraryModule.ProximityFeature
 import project.convention.logic.config.LibraryModule.ResourcesLogic
 import project.convention.logic.config.LibraryModule.StartupFeature
 import project.convention.logic.config.LibraryModule.StorageLogic
@@ -69,7 +68,6 @@ dependencies {
     api(project(CommonFeature.path))
     api(project(StartupFeature.path))
     api(project(PresentationFeature.path))
-    api(project(ProximityFeature.path))
     api(project(IssuanceFeature.path))
     api(project(OnboardingFeature.path))
     api(project(LandingFeature.path))

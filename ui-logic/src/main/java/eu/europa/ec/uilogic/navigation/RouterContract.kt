@@ -51,11 +51,6 @@ sealed class CommonScreens {
     )
 }
 
-sealed class DashboardScreens {
-    data object Dashboard : Screen(name = "DASHBOARD")
-
-}
-
 sealed class PresentationScreens {
     data object PresentationRequest : Screen(
         name = "PRESENTATION_REQUEST",
@@ -65,22 +60,6 @@ sealed class PresentationScreens {
     data object PresentationLoading : Screen(name = "PRESENTATION_LOADING")
 
     data object PresentationSuccess : Screen(name = "PRESENTATION_SUCCESS")
-}
-
-sealed class ProximityScreens {
-    data object QR : Screen(
-        name = "PROXIMITY_QR",
-        parameters = "?requestUriConfig={requestUriConfig}"
-    )
-
-    data object Request : Screen(
-        name = "PROXIMITY_REQUEST",
-        parameters = "?requestUriConfig={requestUriConfig}"
-    )
-
-    data object Loading : Screen(name = "PROXIMITY_LOADING")
-
-    data object Success : Screen(name = "PROXIMITY_SUCCESS")
 }
 
 sealed class IssuanceScreens {
@@ -114,7 +93,6 @@ sealed class ModuleRoute(val route: String) : NavigatableItem {
     data object CommonModule : ModuleRoute("COMMON_MODULE")
     data object DashboardModule : ModuleRoute("DASHBOARD_MODULE")
     data object PresentationModule : ModuleRoute("PRESENTATION_MODULE")
-    data object ProximityModule : ModuleRoute("PROXIMITY_MODULE")
     data object IssuanceModule : ModuleRoute("ISSUANCE_MODULE")
     data object LandingModule : ModuleRoute("LANDING_MODULE")
     data object OnboardingModule : ModuleRoute("ONBOARDING_MODULE")
