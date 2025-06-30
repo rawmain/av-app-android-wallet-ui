@@ -268,7 +268,7 @@ private fun Content(
             textConfig = TextConfig(
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
-                maxLines = 6
+                maxLines = Int.MAX_VALUE
             )
         )
         VSpacer.ExtraLarge()
