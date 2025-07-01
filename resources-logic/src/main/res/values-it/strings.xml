@@ -1,0 +1,283 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+
+    <string name="generic_error_message">Ops! Qualcosa è andato storto</string>
+    <string name="generic_error_description">Se il problema persiste, si prega di contattare l\'assistenza clienti</string>
+    <string name="generic_error_button_retry">RIPROVA</string>
+    <string name="generic_network_error_message">Non sei connesso a Internet</string>
+    <string name="generic_error_retry">Per favore riprova</string>
+    <string name="generic_cancel">Annulla</string>
+    <string name="generic_cancel_capitalized" tools:ignore="ButtonCase">ANNULLA</string>
+    <string name="generic_next_capitalized" tools:ignore="ButtonCase">AVANTI</string>
+    <string name="generic_confirm_capitalized" tools:ignore="ButtonCase">CONFERMA</string>
+    <string name="generic_continue">Continua</string>
+    <string name="generic_continue_capitalized" tools:ignore="ButtonCase">CONTINUA</string>
+    <string name="generic_enable_capitalized" tools:ignore="ButtonCase">ABILITA</string>
+    <string name="generic_success">Successo</string>
+    <string name="generic_close">Chiudi</string>
+    <string name="generic_ok">OK</string>
+    <string name="generic_dash">-</string>
+    <string name="generic_default_relying_party_name">Parte richiedente</string>
+    <string name="generic_default_issuer_name">Emittente</string>
+    <string name="generic_view_details">Dettagli credenziali</string>
+    <string name="generic_deferred_success_text">In corso!</string>
+    <string name="generic_bottom_sheet_delete_title">Eliminare il documento?</string>
+    <string name="generic_bottom_sheet_delete_subtitle">Questo documento verrà eliminato permanentemente dal tuo portafoglio e potrebbe influire sull\'accesso ai servizi.</string>
+    <string name="generic_bottom_sheet_delete_primary_button_text">Elimina</string>
+    <string name="generic_bottom_sheet_delete_secondary_button_text">Annulla</string>
+    <string name="generic_scan_qr">Scansiona QR</string>
+    <string name="generic_or">OPPURE</string>
+    <string name="generic_filters_apply">Applica</string>
+    <string name="generic_filters_reset">Ripristina tutto</string>
+    <string name="generic_filters_title">Filtro</string>
+    <string name="generic_filters_sort_by">Ordina per</string>
+    <string name="generic_filters_ascending">Ascendente</string>
+    <string name="generic_filters_descending">Discendente</string>
+
+    <string name="onboarding_step_1_title">Benvenuto</string>
+    <string name="onboarding_step_2_title">Consenso</string>
+    <string name="onboarding_step_3_title">Sicurezza</string>
+    <string name="onboarding_step_4_title">Verifica</string>
+
+
+    <string name="splash_screen_title">Verifica dell\'età</string>
+    <string name="splash_screen_sponsors">Offerto da</string>
+
+
+    <string name="onboarding_verification_title">Scegli il tuo metodo di verifica dell\'età</string>
+    <string name="onboarding_verification_description">Questa verifica è necessaria per creare una prova dell\'età che hai più di 18 anni. I dettagli EID non saranno condivisi con i servizi online a cui accedi.</string>
+    <string name="onboarding_verification_national_id">eID nazionale / IdP nazionale</string>
+    <string name="onboarding_verification_national_id_description">Identificati online usando il tuo eID</string>
+    <string name="onboarding_verification_token">Token / Codice QR</string>
+    <string name="onboarding_verification_token_description">Scansiona un codice QR fornito</string>
+
+    <string name="welcome_page_1">Utilizzando questa app puoi dimostrare in modo sicuro di avere più di 18 anni quando accedi ai servizi limitati agli adulti.</string>
+    <string name="welcome_page_2">Verifica una sola volta di avere più di 18 anni, poi utilizza questa prova per accedere in modo sicuro a molti servizi riservati agli adulti.</string>
+    <string name="welcome_page_3">Rimani in controllo dei tuoi dati: solo la prova che hai più di 18 anni è condivisa. Nessun altro dettaglio personale viene archiviato o condiviso con i servizi online.</string>
+
+    <string name="welcome_title_1">Benvenuto</string>
+    <string name="welcome_title_2">Verifica dell\'età semplice</string>
+    <string name="welcome_title_3">Protezione della privacy</string>
+
+    <string name="welcome_screen_next">Avanti</string>
+    <string name="welcome_screen_skip">Salta</string>
+
+
+    <string name="content_description_image_or_placeholder_icon">Icona di immagine o segnaposto</string>
+    <string name="content_description_more_vert_icon">Più articoli</string>
+    <string name="content_description_arrow_back_icon">Torna indietro</string>
+    <string name="content_description_close_icon">Chiudi</string>
+    <string name="content_description_warning_icon">Avvertimento</string>
+    <string name="content_description_error_icon">Errore</string>
+    <string name="content_description_touch_id_icon">Touch ID</string>
+    <string name="content_description_qr_icon">QR</string>
+    <string name="content_description_qr_scanner_icon">Scanner QR</string>
+    <string name="content_description_user_icon">Utente</string>
+    <string name="content_description_id_icon">Id</string>
+    <string name="content_description_logo_plain_icon">Icona logo semplice</string>
+    <string name="content_description_logo_text_icon">Icona del logo del testo</string>
+    <string name="content_description_arrow_up_icon">Freccia su</string>
+    <string name="content_description_arrow_down_icon">Freccia giù</string>
+    <string name="content_description_add_icon">Aggiungere</string>
+    <string name="content_description_edit_icon">Modificare</string>
+    <string name="content_description_verified_icon">Verificato</string>
+    <string name="content_description_message_icon">Messaggio</string>
+    <string name="content_description_success_icon">Successo</string>
+    <string name="content_description_clock_timer_icon">Timer dell\'orologio</string>
+    <string name="content_description_arrow_right_icon">Freccia a destra</string>
+    <string name="content_description_open_new_icon">Apri nuovo</string>
+    <string name="content_description_handle_bar_icon">Manubrio</string>
+    <string name="content_description_search_icon">Ricerca</string>
+    <string name="content_description_present_document_same_device_icon">Documento presente di persona</string>
+    <string name="content_description_add_document_from_qr_icon">Aggiungi documento da QR</string>
+
+    <string name="content_description_bookmark_icon">Segnalibro</string>
+    <string name="content_description_bookmark_filled_icon">Segnalibri pieni</string>
+    <string name="content_description_certified_icon">Certificato</string>
+    <string name="content_description_documents_icon">Documenti</string>
+    <string name="content_description_download_icon">Scaricamento</string>
+    <string name="content_description_filters_icon">Filtri</string>
+    <string name="content_description_home_icon">Casa</string>
+    <string name="content_description_in_progress_icon">In corso</string>
+    <string name="content_description_notifications_icon">Notifiche</string>
+    <string name="content_description_transactions_icon">Transazioni</string>
+    <string name="content_description_wallet_activated_icon">Portafoglio attivato</string>
+    <string name="content_description_wallet_secured_icon">Portafoglio fissato</string>
+    <string name="content_description_info_icon">Informazioni</string>
+    <string name="content_description_issuer_icon">Emittente</string>
+    <string name="content_description_issuer_logo_icon">Logo dell\'emittente</string>
+    <string name="content_description_menu_icon">Menu</string>
+    <string name="content_description_signature_icon">Firma</string>
+    <string name="content_description_authenticate_icon">Carte d\'identità autenticazione</string>
+    <string name="content_description_change_pin_icon">Cambia il perno</string>
+    <string name="content_description_check_icon">Controllo</string>
+    <string name="content_description_open_in_browser_icon">Aprire nel browser</string>
+    <string name="content_description_settings_icon">Impostazioni</string>
+    <string name="content_description_eu_flag_icon">Flag dell\'UE</string>
+    <string name="content_description_over_18_icon">Oltre 18</string>
+    <string name="content_description_national_eid_icon">eID Nazionale</string>
+    <string name="content_description_eu_map_icon">Mappa dell\'UE</string>
+    <string name="content_description_age_verification_icon">Logo di verifica dell\'età</string>
+    <string name="content_description_telekom_logo_icon">Logo Telekom</string>
+    <string name="content_description_scytales_logo_icon">Logo Scytales</string>
+    <string name="content_description_date_range_icon">Seleziona l\'intervallo di date del filtro</string>
+
+
+    <string name="biometric_prompt_title">Autenticazione biometrica</string>
+    <string name="biometric_prompt_subtitle">Autentica usando la tua biometria</string>
+    <string name="biometric_login_title">Bentornato!</string>
+    <string name="biometric_login_biometrics_enabled_subtitle">Usa la tua biometria per accedere al portafoglio di verifica dell\'età.</string>
+    <string name="biometric_login_biometrics_not_enabled_subtitle">Per accedere al portafoglio di verifica dell\'età, inserisci il pin.</string>
+    <string name="biometric_login_forgot_pin">Hai dimenticato il tuo PIN?</string>
+
+
+    <string name="biometric_no_hardware">Il tuo dispositivo non supporta l\'autenticazione biometrica</string>
+    <string name="biometric_unknown_error">Qualcosa è andato storto durante l\'inizializzazione dell\'autenticazione biometrica. Per favore riprova</string>
+    <string name="biometric_default_mode_text_above_pin_field">PIN</string>
+
+    <string name="biometric_setup_title">Accesso biometrico</string>
+    <string name="biometric_setup_description">Usa la tua impronta digitale o il riconoscimento del viso per accedere all\'app \"%1$s\".</string>
+    <string name="biometric_setup_enable">Avvia configurazione</string>
+    <string name="biometric_setup_skip">Salta</string>
+
+
+    <string name="document_success_header_description">Hai condiviso correttamente le seguenti informazioni con</string>
+    <string name="document_success_header_description_when_error">Hai condiviso con successo le informazioni con</string>
+    <string name="document_success_relying_party_default_name">@string/generic_default_relying_party_name</string>
+    <string name="document_success_collapsed_supporting_text">@string/generic_view_details</string>
+    <string name="document_success_sticky_button_text">@string/generic_close</string>
+
+
+    <string name="quick_pin_invalid_error">Pin rapido non valido</string>
+    <string name="quick_pin_numerical_rule_invalid_error_message">Sono consentiti solo valori numerici</string>
+    <string name="quick_pin_non_match">I pin non corrispondono</string>
+    <string name="quick_pin_confirm_button">Confermare</string>
+    <string name="quick_pin_next_button">Prossimo</string>
+
+
+    <string name="quick_pin_create_title">Scegli un PIN per accedere all\'app</string>
+    <string name="quick_pin_create_reenter_title">Conferma il tuo PIN</string>
+    <string name="quick_pin_create_enter_subtitle">Il tuo PIN a 6 cifre</string>
+    <string name="quick_pin_create_reenter_subtitle">Ripeti il tuo PIN a 6 cifre</string>
+
+    <string name="quick_pin_change_title">Cambia il PIN</string>
+    <string name="quick_pin_change_validate_current_subtitle">Digita il tuo PIN attuale</string>
+    <string name="quick_pin_change_enter_new_subtitle">@string/quick_pin_create_reenter_subtitle</string>
+    <string name="quick_pin_change_reenter_new_subtitle">@string/quick_pin_create_reenter_subtitle</string>
+
+    <string name="quick_pin_create_success_text">Il tuo portafoglio è protetto!</string>
+    <string name="quick_pin_change_success_text">@string/generic_success</string>
+    <string name="quick_pin_change_success_description">Hai cambiato con successo il PIN</string>
+    <string name="quick_pin_change_success_btn">TORNA ALLA HOME</string>
+
+    <string name="quick_pin_bottom_sheet_cancel_title">Annullare la modifica del PIN?</string>
+    <string name="quick_pin_bottom_sheet_cancel_subtitle">Annullando tornerai alla home senza modificare il PIN</string>
+    <string name="quick_pin_bottom_sheet_cancel_primary_button_text">@string/generic_continue_capitalized</string>
+    <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">@string/generic_cancel_capitalized</string>
+
+
+    <string name="request_header_description">La seguente transazione richiede l\'autorizzazione e l\'autenticazione.</string>
+    <string name="request_header_main_text">Richiesta di condivisione dei dati</string>
+    <string name="request_relying_party_default_name">@string/generic_default_relying_party_name</string>
+    <string name="request_relying_party_description">richiede quanto segue</string>
+    <string name="request_warning_text">Si prega di rivedere attentamente prima di condividere i tuoi dati.</string>
+    <string name="request_collapsed_supporting_text">@string/generic_view_details</string>
+    <string name="request_no_data">Il documento richiesto non è disponibile nel portafoglio di verifica dell\'età.
+        Si prega di contattare l\'emittente autorizzato per ulteriori informazioni.</string>
+    <string name="request_sticky_button_text">Condividere</string>
+    <string name="request_bottom_sheet_warning_title">Avvertimento</string>
+    <string name="request_bottom_sheet_warning_subtitle">Scegliere di non condividere determinati dati può comportare l\'impossibilità di emettere il documento richiesto.</string>
+    <string name="request_gender_male">Maschio</string>
+    <string name="request_gender_female">Femmina</string>
+    <string name="request_gender_not_known">Non noto</string>
+    <string name="request_gender_not_applicable">Non applicabile</string>
+    <string name="request_element_identifier_not_available">Non disponibile</string>
+
+
+    <string name="loading_header_description">Attendere prego…</string>
+    <string name="loading_biometry_biometrics_enabled_description">Usa la tua biometria per approvare la transazione.</string>
+    <string name="loading_biometry_biometrics_not_enabled_description">Per approvare la transazione è necessario verificare la tua identità.</string>
+
+
+    <string name="qr_scan_permission_not_granted">Autorizzazione della fotocamera non fornita\nApri le impostazioni dell\'app</string>
+    <string name="qr_scan_informative_text_presentation_flow">Hai difficoltà a scansionare il codice QR?\nPer favore prova un modo alternativo</string>
+    <string name="qr_scan_informative_text_issuance_flow">Hai difficoltà a scansionare il codice QR?\nPer favore prova un modo alternativo</string>
+    <string name="qr_scan_informative_text_signature_flow">Hai difficoltà a scansionare il codice QR?\nPer favore prova un modo alternativo</string>
+
+    <string name="document_details_boolean_item_true_readable_value">SÌ</string>
+    <string name="document_details_boolean_item_false_readable_value">NO</string>
+
+
+    <string name="consent_screen_title">Per prima cosa abbiamo bisogno del tuo consenso</string>
+    <string name="consent_screen_tos_checkbox">Accetto i termini di servizio</string>
+    <string name="consent_screen_data_protection_checkbox">Accetto le informazioni sulla protezione dei dati</string>
+    <string name="consent_screen_tos_button">Termini di servizio</string>
+    <string name="consent_screen_data_protection_button">Informazioni sulla protezione dei dati</string>
+    <string name="consent_screen_confirm_button">Confermare</string>
+
+
+    <string name="presentation_qr_scan_title">Presenta documento online</string>
+    <string name="presentation_qr_scan_subtitle">Scansiona un codice QR fornito da una parte di affidamento per presentare un documento digitale.</string>
+
+
+    <string name="issuance_add_document_title">Aggiungi documento dall\'elenco</string>
+    <string name="issuance_add_document_subtitle">Scegli un documento digitale dall\'elenco qui sotto per aggiungere al tuo portafoglio.</string>
+    <string name="issuance_add_document_scan_qr_footer_text">@string/generic_or</string>
+    <string name="issuance_add_document_scan_qr_footer_button_text">@string/generic_scan_qr</string>
+    <string name="issuance_add_document_deferred_success_text">@string/generic_deferred_success_text</string>
+    <string name="issuance_add_document_deferred_success_description">Il tuo documento è stato richiesto. Sarai avvisato quando è stato emesso sul tuo portafoglio.</string>
+    <string name="issuance_add_document_deferred_success_primary_button_text">@string/generic_ok</string>
+
+
+    <string name="issuance_success_header_description">Hai aggiunto correttamente quanto segue al tuo portafoglio</string>
+    <string name="issuance_success_header_description_when_error">Hai aggiunto con successo i documenti al tuo portafoglio</string>
+    <string name="issuance_success_header_issuer_default_name">@string/generic_default_issuer_name</string>
+
+
+    <string name="issuance_qr_scan_title">Aggiungi documento da QR</string>
+    <string name="issuance_qr_scan_subtitle">Scansiona un codice QR fornito da un emittente per aggiungere un documento digitale al tuo portafoglio.</string>
+
+
+    <string name="issuance_document_offer_primary_button_text_add">Aggiungere</string>
+    <string name="issuance_document_offer_deferred_success_text">@string/generic_deferred_success_text</string>
+    <string name="issuance_document_offer_deferred_success_description">I tuoi documenti da %1$s sono stati richiesti. Sarai avvisato quando saranno stati emessi sul tuo portafoglio.</string>
+    <string name="issuance_document_offer_deferred_success_primary_button_text">@string/generic_ok</string>
+    <string name="issuance_document_offer_error_missing_pid_text">Il portafoglio deve essere attivato per primo con un ID nazionale</string>
+    <string name="issuance_document_offer_error_invalid_txcode_format">Formato del codice di transazione non valido. La lunghezza dovrebbe essere compresa tra %1$d e %2$d cifre e sono consentiti solo caratteri numerici.</string>
+    <string name="issuance_document_offer_error_no_document">Impossibile recuperare ed elaborare l\'offerta di credenziale</string>
+
+    <string name="issuance_document_offer_description">La seguente transazione richiede la tua autorizzazione e autenticazione.</string>
+    <string name="issuance_document_offer_header_main_text">RICHIESTA DI EMISSIONE</string>
+    <string name="issuance_document_offer_relying_party_default_name">@string/generic_default_issuer_name</string>
+    <string name="issuance_document_offer_relying_party_description">vuole aggiungere quanto segue</string>
+
+
+    <string name="issuance_code_title">%1$s richiede verifica</string>
+    <string name="issuance_code_caption">Digita il codice di transazione a %1$d cifre che hai ricevuto.</string>
+
+
+    <string name="issuance_generic_error">Qualcosa è andato storto durante l\'emissione dei tuoi documenti</string>
+
+
+    <string name="document_category_government">GOVERNO</string>
+    <string name="document_category_travel">VIAGGI</string>
+    <string name="document_category_finance">FINANZA</string>
+    <string name="document_category_education">ISTRUZIONE</string>
+    <string name="document_category_health">SALUTE</string>
+    <string name="document_category_social_security">PREVIDENZA SOCIALE</string>
+    <string name="document_category_retail">VENDITA AL DETTAGLIO</string>
+    <string name="document_category_other">ALTRO</string>
+
+
+    <string name="landing_screen_title">Verifica dell\'età</string>
+    <string name="landing_screen_subtitle">Con la tua prova dell\'età, puoi dimostrare ai servizi limitati agli adulti che sei abbastanza grande per accedervi.\nLa prova dell\'età mostra solo che hai più di 18 anni. Non contiene altre informazioni personali ".</string>
+    <string name="landing_screen_card_eu_title">Unione\nEuropea</string>
+    <string name="landing_screen_card_age_verification">Verifica dell\'età</string>
+    <string name="landing_screen_card_certified">Credenziale ufficiale certificata dall\'UE</string>
+    <string name="landing_screen_primary_button_label_scan">Scansiona</string>
+    <string name="landing_screen_credential_details">Dettagli credenziali</string>
+    <string name="landing_screen_no_age_credential_found">Non sono disponibili credenziali di età</string>
+    <string name="landing_screen_credentials_left">%1$d rimasti</string>
+    <string name="landing_screen_add_credentials">Aggiungi altri</string>
+</resources>

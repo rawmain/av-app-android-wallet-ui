@@ -1,0 +1,283 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+
+    <string name="generic_error_message">Oups! Κάτι πήγε στραβά</string>
+    <string name="generic_error_description">Εάν το ζήτημα επιμένει, επικοινωνήστε με την υποστήριξη πελατών</string>
+    <string name="generic_error_button_retry">ΠΡΟΣΠΑΘΗΣΤΕ ΞΑΝΑ</string>
+    <string name="generic_network_error_message">Δεν είστε συνδεδεμένοι στο Διαδίκτυο</string>
+    <string name="generic_error_retry">Δοκιμάστε ξανά</string>
+    <string name="generic_cancel">Ακύρωση</string>
+    <string name="generic_cancel_capitalized" tools:ignore="ButtonCase">ΑΚΥΡΩΣΗ</string>
+    <string name="generic_next_capitalized" tools:ignore="ButtonCase">ΕΠΟΜΕΝΟ</string>
+    <string name="generic_confirm_capitalized" tools:ignore="ButtonCase">ΕΠΙΒΕΒΑΙΩΣΗ</string>
+    <string name="generic_continue">Συνέχεια</string>
+    <string name="generic_continue_capitalized" tools:ignore="ButtonCase">ΣΥΝΕΧΕΙΑ</string>
+    <string name="generic_enable_capitalized" tools:ignore="ButtonCase">ΕΝΕΡΓΟΠΟΙΗΣΗ</string>
+    <string name="generic_success">Επιτυχία</string>
+    <string name="generic_close">Κλείσιμο</string>
+    <string name="generic_ok">OK</string>
+    <string name="generic_dash">-</string>
+    <string name="generic_default_relying_party_name">Αιτών Οργανισμός</string>
+    <string name="generic_default_issuer_name">Εκδότης</string>
+    <string name="generic_view_details">Λεπτομέρειες πιστοποίησης</string>
+    <string name="generic_deferred_success_text">Σε εξέλιξη!</string>
+    <string name="generic_bottom_sheet_delete_title">Διαγραφή εγγράφου;</string>
+    <string name="generic_bottom_sheet_delete_subtitle">Αυτό το έγγραφο θα διαγραφεί μόνιμα από το πορτοφόλι σας και ενδέχεται να επηρεάσει την πρόσβαση σε υπηρεσίες.</string>
+    <string name="generic_bottom_sheet_delete_primary_button_text">Διαγράφω</string>
+    <string name="generic_bottom_sheet_delete_secondary_button_text">Ματαίωση</string>
+    <string name="generic_scan_qr">Σάρωση QR</string>
+    <string name="generic_or">Ή</string>
+    <string name="generic_filters_apply">Εφαρμόζω</string>
+    <string name="generic_filters_reset">Επαναφορά όλων</string>
+    <string name="generic_filters_title">Φίλτρο</string>
+    <string name="generic_filters_sort_by">Ταξινομίζω</string>
+    <string name="generic_filters_ascending">Ανερχόμενος</string>
+    <string name="generic_filters_descending">Φθίνων</string>
+
+    <string name="onboarding_step_1_title">Καλωσόρισμα</string>
+    <string name="onboarding_step_2_title">Συγκατάθεση</string>
+    <string name="onboarding_step_3_title">Ασφάλεια</string>
+    <string name="onboarding_step_4_title">Επαλήθευση</string>
+
+
+    <string name="splash_screen_title">Επαλήθευση ηλικίας</string>
+    <string name="splash_screen_sponsors">Τροφοδοτείται από</string>
+
+
+    <string name="onboarding_verification_title">Επιλέξτε τη μέθοδο επαλήθευσης ηλικίας</string>
+    <string name="onboarding_verification_description">Αυτή η επαλήθευση είναι απαραίτητη για τη δημιουργία μιας απόδειξης ηλικίας ότι είστε άνω των 18 ετών. Οι λεπτομέρειες του EID δεν θα μοιραστούν με τις ηλεκτρονικές υπηρεσίες που έχετε πρόσβαση.</string>
+    <string name="onboarding_verification_national_id">Εθνικό EID / Εθνικό IDP</string>
+    <string name="onboarding_verification_national_id_description">Προσδιορίστε το διαδίκτυο χρησιμοποιώντας το EID σας</string>
+    <string name="onboarding_verification_token">Διακριτικός / QR-κώδικας</string>
+    <string name="onboarding_verification_token_description">Σάρωση ενός παρεχόμενου κώδικα QR</string>
+
+    <string name="welcome_page_1">Χρησιμοποιώντας αυτήν την εφαρμογή, μπορείτε να αποδείξετε με ασφάλεια ότι είστε άνω των 18 ετών όταν έχετε πρόσβαση σε υπηρεσίες που περιορίζονται σε ενήλικες.</string>
+    <string name="welcome_page_2">Βεβαιωθείτε ότι είστε πάνω από 18 μία φορά, χρησιμοποιήστε αυτήν την απόδειξη για να αποκτήσετε πρόσβαση σε πολλές υπηρεσίες που περιορίζονται σε ενήλικες.</string>
+    <string name="welcome_page_3">Μείνετε στον έλεγχο των δεδομένων σας: Μόνο η απόδειξη ότι είστε άνω των 18 μοιράζονται. Δεν αποθηκεύονται ή μοιράζονται άλλα προσωπικά στοιχεία με ηλεκτρονικές υπηρεσίες.</string>
+
+    <string name="welcome_title_1">Καλωσόρισμα</string>
+    <string name="welcome_title_2">Απλή επαλήθευση ηλικίας</string>
+    <string name="welcome_title_3">Προστασία απορρήτου</string>
+
+    <string name="welcome_screen_next">Επόμενος</string>
+    <string name="welcome_screen_skip">Παραλείπω</string>
+
+
+    <string name="content_description_image_or_placeholder_icon">Εικονίδιο εικόνας ή θέσης θέσης</string>
+    <string name="content_description_more_vert_icon">Περισσότερα αντικείμενα</string>
+    <string name="content_description_arrow_back_icon">Πάω πίσω</string>
+    <string name="content_description_close_icon">Κοντά</string>
+    <string name="content_description_warning_icon">Προειδοποίηση</string>
+    <string name="content_description_error_icon">Σφάλμα</string>
+    <string name="content_description_touch_id_icon">Αναγνωριστικό αφής</string>
+    <string name="content_description_qr_icon">QR</string>
+    <string name="content_description_qr_scanner_icon">Σαρωτής QR</string>
+    <string name="content_description_user_icon">Μεταχειριζόμενος</string>
+    <string name="content_description_id_icon">Ταυτότητα</string>
+    <string name="content_description_logo_plain_icon">Εικονίδιο απλού λογότυπου</string>
+    <string name="content_description_logo_text_icon">Εικονίδιο λογότυπου κειμένου</string>
+    <string name="content_description_arrow_up_icon">Βέλος</string>
+    <string name="content_description_arrow_down_icon">Βέλος</string>
+    <string name="content_description_add_icon">Προσθέτω</string>
+    <string name="content_description_edit_icon">Εκδίδω</string>
+    <string name="content_description_verified_icon">Επαληθευμένος</string>
+    <string name="content_description_message_icon">Μήνυμα</string>
+    <string name="content_description_success_icon">Επιτυχία</string>
+    <string name="content_description_clock_timer_icon">Χρονοδιακόπτης</string>
+    <string name="content_description_arrow_right_icon">Βέλος σωστά</string>
+    <string name="content_description_open_new_icon">Άνοιγμα νέου</string>
+    <string name="content_description_handle_bar_icon">Ράβδος χειρισμού</string>
+    <string name="content_description_search_icon">Ερευνα</string>
+    <string name="content_description_present_document_same_device_icon">Παρουσιάστε το έγγραφο αυτοπροσώπως</string>
+    <string name="content_description_add_document_from_qr_icon">Προσθήκη εγγράφου από QR</string>
+
+    <string name="content_description_bookmark_icon">Σελιδοδείκρος</string>
+    <string name="content_description_bookmark_filled_icon">Σελιδοδείκτης</string>
+    <string name="content_description_certified_icon">Επικυρωμένος</string>
+    <string name="content_description_documents_icon">Έγγραφα</string>
+    <string name="content_description_download_icon">Λήψη</string>
+    <string name="content_description_filters_icon">Φίλτρα</string>
+    <string name="content_description_home_icon">Αρχική</string>
+    <string name="content_description_in_progress_icon">Σε εξέλιξη</string>
+    <string name="content_description_notifications_icon">Ειδοποιήσεις</string>
+    <string name="content_description_transactions_icon">Συναλλαγές</string>
+    <string name="content_description_wallet_activated_icon">Ενεργοποιημένο πορτοφόλι</string>
+    <string name="content_description_wallet_secured_icon">Ασφαλισμένο πορτοφόλι</string>
+    <string name="content_description_info_icon">Πληροφορίες</string>
+    <string name="content_description_issuer_icon">Εκδότης</string>
+    <string name="content_description_issuer_logo_icon">Λογότυπο εκδότη</string>
+    <string name="content_description_menu_icon">Μενού</string>
+    <string name="content_description_signature_icon">Υπογραφή</string>
+    <string name="content_description_authenticate_icon">Ταυτότητες ταυτότητας ταυτότητας</string>
+    <string name="content_description_change_pin_icon">Μεταβολή του PIN</string>
+    <string name="content_description_check_icon">Ελεγχος</string>
+    <string name="content_description_open_in_browser_icon">Ανοίξτε στο πρόγραμμα περιήγησης</string>
+    <string name="content_description_settings_icon">Ρυθμίσεις</string>
+    <string name="content_description_eu_flag_icon">Σημαία της ΕΕ</string>
+    <string name="content_description_over_18_icon">Άνω των 18 ετών</string>
+    <string name="content_description_national_eid_icon">Εθνικός Eid</string>
+    <string name="content_description_eu_map_icon">Χάρτης της ΕΕ</string>
+    <string name="content_description_age_verification_icon">Λογότυπο επαλήθευσης ηλικίας</string>
+    <string name="content_description_telekom_logo_icon">Λογότυπο Telekom</string>
+    <string name="content_description_scytales_logo_icon">Λογότυπο Scytales</string>
+    <string name="content_description_date_range_icon">Επιλέξτε εύρος ημερομηνίας φίλτρου</string>
+
+
+    <string name="biometric_prompt_title">Βιομετρικός έλεγχος ταυτότητας</string>
+    <string name="biometric_prompt_subtitle">Πιστοποιήστε ταυτότητας χρησιμοποιώντας τα βιομετρικά σας</string>
+    <string name="biometric_login_title">Καλώς ήλθατε πίσω!</string>
+    <string name="biometric_login_biometrics_enabled_subtitle">Χρησιμοποιήστε τα βιομετρικά σας για να αποκτήσετε πρόσβαση στο πορτοφόλι επαλήθευσης ηλικίας.</string>
+    <string name="biometric_login_biometrics_not_enabled_subtitle">Για να αποκτήσετε πρόσβαση στο πορτοφόλι επαλήθευσης ηλικίας, εισαγάγετε το PIN σας.</string>
+    <string name="biometric_login_forgot_pin">Ξεχάσατε το PIN σας;</string>
+
+
+    <string name="biometric_no_hardware">Η συσκευή σας δεν υποστηρίζει τον βιομετρικό έλεγχο ταυτότητας</string>
+    <string name="biometric_unknown_error">Κάτι πήγε λάθος αρχικοποιώντας τον βιομετρικό έλεγχο ταυτότητας. Δοκιμάστε ξανά</string>
+    <string name="biometric_default_mode_text_above_pin_field">PIN</string>
+
+    <string name="biometric_setup_title">Βιομετρική πρόσβαση</string>
+    <string name="biometric_setup_description">Χρησιμοποιήστε το δακτυλικό αποτύπωμα ή την αναγνώριση προσώπου για να συνδεθείτε στο \"%1$s\" εφαρμογή.</string>
+    <string name="biometric_setup_enable">Εγκατάσταση εκκίνησης</string>
+    <string name="biometric_setup_skip">Παραλείπω</string>
+
+
+    <string name="document_success_header_description">Μοιράσατε με επιτυχία τις ακόλουθες πληροφορίες με</string>
+    <string name="document_success_header_description_when_error">Μοιράσατε με επιτυχία τις πληροφορίες με</string>
+    <string name="document_success_relying_party_default_name">@string/generic_default_relying_party_name</string>
+    <string name="document_success_collapsed_supporting_text">@string/generic_view_details</string>
+    <string name="document_success_sticky_button_text">@string/generic_close</string>
+
+
+    <string name="quick_pin_invalid_error">Μη έγκυρο PIN</string>
+    <string name="quick_pin_numerical_rule_invalid_error_message">Επιτρέπονται μόνο αριθμητικές τιμές</string>
+    <string name="quick_pin_non_match">Τα PIN δεν ταιριάζουν</string>
+    <string name="quick_pin_confirm_button">Επιβεβαίωση</string>
+    <string name="quick_pin_next_button">Επόμενο</string>
+
+
+    <string name="quick_pin_create_title">Επιλέξτε ένα PIN για πρόσβαση στην εφαρμογή</string>
+    <string name="quick_pin_create_reenter_title">Επιβεβαιώστε το PIN σας</string>
+    <string name="quick_pin_create_enter_subtitle">Το 6ψήφιο PIN σας</string>
+    <string name="quick_pin_create_reenter_subtitle">Επαναλάβετε το 6ψήφιο PIN σας</string>
+
+    <string name="quick_pin_change_title">Αλλαγή PIN</string>
+    <string name="quick_pin_change_validate_current_subtitle">Πληκτρολογήστε το τρέχον PIN σας</string>
+    <string name="quick_pin_change_enter_new_subtitle">@string/quick_pin_create_reenter_subtitle</string>
+    <string name="quick_pin_change_reenter_new_subtitle">@string/quick_pin_create_reenter_subtitle</string>
+
+    <string name="quick_pin_create_success_text">Το πορτοφόλι σας είναι ασφαλισμένο!</string>
+    <string name="quick_pin_change_success_text">@string/generic_success</string>
+    <string name="quick_pin_change_success_description">Αλλάξατε με επιτυχία το PIN</string>
+    <string name="quick_pin_change_success_btn">ΕΠΙΣΤΡΟΦΗ ΣΤΗΝ ΑΡΧΙΚΗ</string>
+
+    <string name="quick_pin_bottom_sheet_cancel_title">Ακύρωση αλλαγής PIN;</string>
+    <string name="quick_pin_bottom_sheet_cancel_subtitle">Η ακύρωση θα σας ανακατευθύνει πίσω στην αρχική οθόνη χωρίς να αλλάξετε το PIN</string>
+    <string name="quick_pin_bottom_sheet_cancel_primary_button_text">@string/generic_continue_capitalized</string>
+    <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">@string/generic_cancel_capitalized</string>
+
+
+    <string name="request_header_description">Η ακόλουθη συναλλαγή απαιτεί την άδειά σας και τον έλεγχο ταυτότητας.</string>
+    <string name="request_header_main_text">Αίτημα κοινής χρήσης δεδομένων</string>
+    <string name="request_relying_party_default_name">@string/generic_default_relying_party_name</string>
+    <string name="request_relying_party_description">ζητά τα παρακάτω</string>
+    <string name="request_warning_text">Ελέγξτε προσεκτικά πριν μοιραστείτε τα δεδομένα σας.</string>
+    <string name="request_collapsed_supporting_text">@string/generic_view_details</string>
+    <string name="request_no_data">Το ζητούμενο έγγραφο δεν είναι διαθέσιμο στο πορτοφόλι επαλήθευσης ηλικίας.
+        Επικοινωνήστε με τον εξουσιοδοτημένο εκδότη για περισσότερες πληροφορίες.</string>
+    <string name="request_sticky_button_text">Μερίδιο</string>
+    <string name="request_bottom_sheet_warning_title">Προειδοποίηση</string>
+    <string name="request_bottom_sheet_warning_subtitle">Η επιλογή να μην μοιραστείτε ορισμένα δεδομένα ενδέχεται να οδηγήσει σε αδυναμία έκδοσης του ζητούμενου εγγράφου.</string>
+    <string name="request_gender_male">Αρσενικός</string>
+    <string name="request_gender_female">Θηλυκός</string>
+    <string name="request_gender_not_known">Άγνωστος</string>
+    <string name="request_gender_not_applicable">Δεν ισχύει</string>
+    <string name="request_element_identifier_not_available">Μη διαθέσιμος</string>
+
+
+    <string name="loading_header_description">Περιμένετε…</string>
+    <string name="loading_biometry_biometrics_enabled_description">Χρησιμοποιήστε τα βιομετρικά σας για να εγκρίνετε τη συναλλαγή.</string>
+    <string name="loading_biometry_biometrics_not_enabled_description">Για να εγκρίνετε τη συναλλαγή που χρειάζεστε για να επαληθεύσετε την ταυτότητά σας.</string>
+
+
+    <string name="qr_scan_permission_not_granted">Η άδεια κάμερας δεν παρέχεται\nΑνοίξτε τις ρυθμίσεις εφαρμογής</string>
+    <string name="qr_scan_informative_text_presentation_flow">Αντιμετωπίζετε προβλήματα με τη σάρωση του κώδικα QR;\nΔοκιμάστε έναν εναλλακτικό τρόπο</string>
+    <string name="qr_scan_informative_text_issuance_flow">Αντιμετωπίζετε προβλήματα με τη σάρωση του κώδικα QR;\nΔοκιμάστε έναν εναλλακτικό τρόπο</string>
+    <string name="qr_scan_informative_text_signature_flow">Αντιμετωπίζετε προβλήματα με τη σάρωση του κώδικα QR;\nΔοκιμάστε έναν εναλλακτικό τρόπο</string>
+
+    <string name="document_details_boolean_item_true_readable_value">Ναί</string>
+    <string name="document_details_boolean_item_false_readable_value">Όχι</string>
+
+
+    <string name="consent_screen_title">Πρώτα χρειαζόμαστε τη συγκατάθεσή σας</string>
+    <string name="consent_screen_tos_checkbox">Δέχομαι τους όρους υπηρεσίας</string>
+    <string name="consent_screen_data_protection_checkbox">Δέχομαι τις πληροφορίες προστασίας δεδομένων</string>
+    <string name="consent_screen_tos_button">Όροι παροχής υπηρεσιών</string>
+    <string name="consent_screen_data_protection_button">Πληροφορίες προστασίας δεδομένων</string>
+    <string name="consent_screen_confirm_button">Επιβεβαιώνω</string>
+
+
+    <string name="presentation_qr_scan_title">Παρουσιάστε το έγγραφο στο διαδίκτυο</string>
+    <string name="presentation_qr_scan_subtitle">Σάρωση ενός κώδικα QR που παρέχεται από ένα συμβαλλόμενο μέρος για να παρουσιάσετε ένα ψηφιακό έγγραφο.</string>
+
+
+    <string name="issuance_add_document_title">Προσθήκη εγγράφου από τη λίστα</string>
+    <string name="issuance_add_document_subtitle">Επιλέξτε ένα ψηφιακό έγγραφο από την παρακάτω λίστα για να προσθέσετε στο πορτοφόλι σας.</string>
+    <string name="issuance_add_document_scan_qr_footer_text">@string/generic_or</string>
+    <string name="issuance_add_document_scan_qr_footer_button_text">@string/generic_scan_qr</string>
+    <string name="issuance_add_document_deferred_success_text">@string/generic_deferred_success_text</string>
+    <string name="issuance_add_document_deferred_success_description">Το έγγραφό σας έχει ζητηθεί. Θα ενημερωθείτε όταν έχει εκδοθεί στο πορτοφόλι σας.</string>
+    <string name="issuance_add_document_deferred_success_primary_button_text">@string/generic_ok</string>
+
+
+    <string name="issuance_success_header_description">Έχετε προσθέσει με επιτυχία τα ακόλουθα στο πορτοφόλι σας</string>
+    <string name="issuance_success_header_description_when_error">Έχετε προσθέσει με επιτυχία τα έγγραφα στο πορτοφόλι σας</string>
+    <string name="issuance_success_header_issuer_default_name">@string/generic_default_issuer_name</string>
+
+
+    <string name="issuance_qr_scan_title">Προσθήκη εγγράφου από QR</string>
+    <string name="issuance_qr_scan_subtitle">Σάρωση ενός κώδικα QR που παρέχεται από έναν εκδότη για να προσθέσετε ένα ψηφιακό έγγραφο στο πορτοφόλι σας.</string>
+
+
+    <string name="issuance_document_offer_primary_button_text_add">Προσθέτω</string>
+    <string name="issuance_document_offer_deferred_success_text">@string/generic_deferred_success_text</string>
+    <string name="issuance_document_offer_deferred_success_description">Τα έγγραφά σας από %1$s έχουν ζητηθεί. Θα ενημερωθείτε όταν έχουν εκδοθεί στο πορτοφόλι σας.</string>
+    <string name="issuance_document_offer_deferred_success_primary_button_text">@string/generic_ok</string>
+    <string name="issuance_document_offer_error_missing_pid_text">Το πορτοφόλι πρέπει να ενεργοποιηθεί πρώτα με εθνική ταυτότητα</string>
+    <string name="issuance_document_offer_error_invalid_txcode_format">Μη έγκυρη μορφή κωδικού συναλλαγής. Το μήκος πρέπει να είναι μεταξύ %1$d να %2$d Τα ψηφία και μόνο αριθμητικοί χαρακτήρες επιτρέπονται.</string>
+    <string name="issuance_document_offer_error_no_document">Δεν είναι δυνατή η παραγωγή και η επεξεργασία της προσφοράς διαπιστευτηρίων</string>
+
+    <string name="issuance_document_offer_description">Η ακόλουθη συναλλαγή απαιτεί την άδειά σας και τον έλεγχο ταυτότητας.</string>
+    <string name="issuance_document_offer_header_main_text">Αίτηση έκδοσης</string>
+    <string name="issuance_document_offer_relying_party_default_name">@string/generic_default_issuer_name</string>
+    <string name="issuance_document_offer_relying_party_description">θέλει να προσθέσει τα παρακάτω</string>
+
+
+    <string name="issuance_code_title">%1$s απαιτεί επαλήθευση</string>
+    <string name="issuance_code_caption">Πληκτρολογώ %1$d-Κωδικός συναλλαγής DIGIT που λάβατε.</string>
+
+
+    <string name="issuance_generic_error">Κάτι πήγε στραβά εκδίδοντας τα έγγραφά σας</string>
+
+
+    <string name="document_category_government">ΚΥΒΕΡΝΗΣΗ</string>
+    <string name="document_category_travel">ΤΑΞΙΔΙ</string>
+    <string name="document_category_finance">ΟΙΚΟΝΟΜΙΚΑ</string>
+    <string name="document_category_education">ΕΚΠΑΙΔΕΥΣΗ</string>
+    <string name="document_category_health">ΥΓΕΙΑ</string>
+    <string name="document_category_social_security">ΚΟΙΝΩΝΙΚΗ ΑΣΦΑΛΙΣΗ</string>
+    <string name="document_category_retail">ΛΙΑΝΙΚΗ ΠΩΛΗΣΗ</string>
+    <string name="document_category_other">ΑΛΛΟΣ</string>
+
+
+    <string name="landing_screen_title">Επαλήθευση ηλικίας</string>
+    <string name="landing_screen_subtitle">Με την απόδειξη της ηλικίας σας, μπορείτε να αποδείξετε σε υπηρεσίες που περιορίζονται σε ενήλικες ότι είστε αρκετά μεγάλοι για να έχετε πρόσβαση σε αυτές.\nΗ απόδειξη της ηλικίας δείχνει μόνο ότι είστε άνω των 18. Δεν περιέχει άλλα προσωπικά στοιχεία.</string>
+    <string name="landing_screen_card_eu_title">Ευρωπαϊκή\nΈνωση</string>
+    <string name="landing_screen_card_age_verification">Επαλήθευση ηλικίας</string>
+    <string name="landing_screen_card_certified">Επίσημο πιστοποιητικό με πιστοποίηση ΕΕ</string>
+    <string name="landing_screen_primary_button_label_scan">Σάρωση</string>
+    <string name="landing_screen_credential_details">Λεπτομέρειες πιστοποίησης</string>
+    <string name="landing_screen_no_age_credential_found">Δεν υπάρχουν διαθέσιμα διαπιστευτήρια ηλικίας</string>
+    <string name="landing_screen_credentials_left">%1$d απομένουν</string>
+    <string name="landing_screen_add_credentials">Προσθήκη περισσότερων</string>
+</resources>
