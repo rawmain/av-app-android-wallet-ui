@@ -16,6 +16,8 @@
 
 package eu.europa.ec.onboardingfeature.ui.consent
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,9 +28,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.resourceslogic.R
@@ -161,6 +165,7 @@ fun ConsentAndTosSection(
     tosCheckBoxData: CheckboxWithTextData,
     dataProtectionCheckBoxData: CheckboxWithTextData,
 ) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -183,7 +188,7 @@ fun ConsentAndTosSection(
 
         WrapLink(
             data = WrapLinkData(textId = R.string.consent_screen_tos_button, isExternal = true),
-            onClick = { /* Handle link click */ },
+            onClick = { openWebLink("https://www.example.com", context) },
         )
         VSpacer.Small()
         WrapLink(
@@ -191,11 +196,15 @@ fun ConsentAndTosSection(
                 textId = R.string.consent_screen_data_protection_button,
                 isExternal = true
             ),
-            onClick = { /* Handle link click */ },
+            onClick = { openWebLink("https://www.example.com", context) },
         )
     }
 }
 
+internal fun openWebLink(url: String, context: Context) {
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+    context.startActivity(intent)
+}
 
 @ThemeModePreviews
 @Composable
