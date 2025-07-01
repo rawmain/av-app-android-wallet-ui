@@ -606,8 +606,8 @@ class WalletCoreDocumentsControllerImpl(
                     event.resume(
                         eudiWallet.getDefaultCreateDocumentSettings(
                             offeredDocument = event.offeredDocument,
-                            numberOfCredentials = 30,
-                            credentialPolicy = CredentialPolicy.OneTimeUse
+                            numberOfCredentials = walletCoreConfig.credentialBatchSize,
+                            credentialPolicy = walletCoreConfig.credentialPolicy
                         )
                     )
                 }

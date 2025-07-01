@@ -313,23 +313,45 @@ This section describes configuring the application to interact with services uti
 
 ## Batch Document Issuance Configuration
 
-The app is configured to use batch document issuance by default, requesting a batch of 30
-one time use credentials at once and discarding the used one after a presentation.
-If you want to change the batch size, or credential usage policy (Rotate Use vs One Time Use)
-you can do so by modifying the `issuanceCallback` function in `WalletCoreDocumentController.kt`
-and updating the parameters passed to the wallet SDK. eg.
+The app is configured to use batch document issuance by default, requesting a batch of credentials
+at once and handling them according to a defined policy.
+
+You can configure the following aspects of batch document issuance:
+
+1. Batch size (how many credentials to request at once)
+2. Credential policy (whether to use each credential once or rotate through them)
+
+These settings are configured in your flavor's implementation of `WalletCoreConfigImpl`. For
+example, in the demo flavor:
 
 ```Kotlin
-is IssueEvent.DocumentRequiresCreateSettings -> {
-   event.resume(
-      eudiWallet.getDefaultCreateDocumentSettings(
-         offeredDocument = event.offeredDocument,
-         numberOfCredentials = 30, // Change the batch size here
-         credentialPolicy = CredentialPolicy.OneTimeUse // Change the credential usage policy here
-      )
-   )
+internal class WalletCoreConfigImpl(
+    private val context: Context
+) : WalletCoreConfig {
+
+    private companion object {
+        const val DEFAULT_CREDENTIAL_BATCH_SIZE = 30
+    }
+    
+    // ...other configuration...
+    
+    /**
+     * The number of credentials to request in a batch during document issuance.
+     */
+    override val credentialBatchSize: Int = DEFAULT_CREDENTIAL_BATCH_SIZE
+    
+    /**
+     * The credential usage policy for issued documents.
+     */
+    override val credentialPolicy: CredentialPolicy = CredentialPolicy.OneTimeUse
 }
 ```
+
+Note that the batch size will be limited by the issuer's metadata configuration, so you may not be
+able to request a batch larger than what the issuer allows. To understand the issuer's
+configuration, you can check the issuer's metadata endpoint, which is usually available at
+`https://<issuer-url>/.well-known/openid-configuration`. Specifically, look for the
+`credential_batch_size` field in the metadata response.
 
 Note that the batch size will be limited by the issuer's metadata configuration, so you may not be
 able to request a batch larger than what the issuer allows. to understand the issuer's

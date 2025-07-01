@@ -19,6 +19,7 @@ package eu.europa.ec.corelogic.config
 import android.content.Context
 import eu.europa.ec.corelogic.BuildConfig
 import eu.europa.ec.eudi.wallet.EudiWalletConfig
+import eu.europa.ec.eudi.wallet.document.CreateDocumentSettings.CredentialPolicy
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.ClientIdScheme
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.EncryptionAlgorithm
@@ -34,6 +35,7 @@ internal class WalletCoreConfigImpl(
         const val VCI_ISSUER_URL = "https://dev.issuer.eudiw.dev"
         const val VCI_CLIENT_ID = "wallet-dev"
         const val AUTHENTICATION_REQUIRED = false
+        const val DEFAULT_CREDENTIAL_BATCH_SIZE = 30
     }
 
     private var _config: EudiWalletConfig? = null
@@ -87,4 +89,14 @@ internal class WalletCoreConfigImpl(
             }
             return _config!!
         }
+
+    /**
+     * The number of credentials to request in a batch during document issuance.
+     */
+    override val credentialBatchSize: Int = DEFAULT_CREDENTIAL_BATCH_SIZE
+
+    /**
+     * The credential usage policy for issued documents.
+     */
+    override val credentialPolicy: CredentialPolicy = CredentialPolicy.OneTimeUse
 }
