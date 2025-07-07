@@ -99,3 +99,21 @@ fun Context.openIntentChooser(intent: Intent, title: String? = null) {
     } catch (_: Exception) {
     }
 }
+
+fun Context.getAppVersionName(): String {
+    return try {
+        val packageInfo = packageManager.getPackageInfo(packageName, 0)
+        packageInfo.versionName ?: "0.0.0"
+    } catch (e: Exception) {
+        "0.0.0"
+    }
+}
+
+fun Context.getAppVersionCode(): Long {
+    return try {
+        val packageInfo = packageManager.getPackageInfo(packageName, 0)
+        packageInfo.longVersionCode
+    } catch (e: Exception) {
+        0L
+    }
+}

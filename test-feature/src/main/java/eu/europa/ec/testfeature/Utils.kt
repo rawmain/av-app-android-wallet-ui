@@ -24,22 +24,6 @@ import org.mockito.kotlin.whenever
 @VisibleForTesting(otherwise = VisibleForTesting.NONE)
 object MockResourceProviderForStringCalls {
 
-    /**
-     * Mock the call of [eu.europa.ec.commonfeature.ui.document_details.transformer.DocumentDetailsTransformer.transformToUiItem]
-     */
-    fun mockTransformToUiItemCall(resourceProvider: ResourceProvider) {
-        mockTransformToDocumentDetailsUiCall(resourceProvider)
-    }
-
-    /**
-     * Mock the call of [eu.europa.ec.commonfeature.ui.document_details.transformer.transformToDocumentDetailsUi]
-     */
-    fun mockTransformToDocumentDetailsUiCall(resourceProvider: ResourceProvider) {
-        whenever(resourceProvider.getString(R.string.document_details_portrait_readable_identifier))
-            .thenReturn("Shown above")
-
-        mockGetKeyValueUiCall(resourceProvider)
-    }
 
     /**
      * Mock the call of [eu.europa.ec.commonfeature.util.getKeyValueUi]

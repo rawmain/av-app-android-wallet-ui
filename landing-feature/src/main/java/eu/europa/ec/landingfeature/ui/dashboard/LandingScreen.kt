@@ -257,18 +257,14 @@ private fun Content(
     ) {
         WrapText(
             text = stringResource(R.string.landing_screen_title),
-            textConfig = TextConfig(
-                style = MaterialTheme.typography.headlineLarge,
-                textAlign = TextAlign.Start,
-            )
+            textConfig = TextConfig(style = MaterialTheme.typography.headlineLarge)
         )
         VSpacer.Large()
         WrapText(
             text = stringResource(R.string.landing_screen_subtitle),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Start,
-                maxLines = 6
+                maxLines = Int.MAX_VALUE
             )
         )
         VSpacer.ExtraLarge()

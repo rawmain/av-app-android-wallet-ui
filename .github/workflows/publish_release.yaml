@@ -13,6 +13,10 @@ jobs:
   build-release:
     runs-on: github-runner-dune
     if: github.ref == 'refs/heads/main'
+    env:
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
     steps:
       - name: Checkout code
@@ -39,14 +43,17 @@ jobs:
           gradle-version: wrapper
           cache-read-only: false
 
+      - name: Decode and place keystore
+        if: env.KEYSTORE_BASE64 != ''
+        run: |
+          mkdir -p sign
+          echo "${{ env.KEYSTORE_BASE64 }}" | base64 --decode > sign/keystore.jks
+
       - name: Run lint check
         run: ./gradlew lint
 
       - name: Run unit tests
-        run: ./gradlew testDemoDebugUnitTest
-
-      - name: Build DEMO debug APK
-        run: ./gradlew assembleDemoDebug
+        run: ./gradlew testDemoReleaseUnitTest
 
       - name: Generate Next Tag with version
         run: |
@@ -54,6 +61,16 @@ jobs:
           NEXT_TAG=$(./.github/workflows/generate_next_tag.sh)
           echo "Next tag: $NEXT_TAG"
           echo "TAG_NAME=$NEXT_TAG" >> $GITHUB_ENV
+
+      - name: Update version.properties with tag
+        run: |
+          echo "VERSION_NAME=$TAG_NAME" > version.properties
+
+      - name: Build DEMO release APK
+        run: ./gradlew assembleDemoRelease
+
+      - name: Build DEMO release Bundle (AAB)
+        run: ./gradlew bundleDemoRelease
 
       - name: Create Tag
         run: |
@@ -73,13 +90,23 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload APK to Release
+      - name: Upload Release APK
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: app/build/outputs/apk/demo/debug/app-demo-debug.apk
-          asset_name: app-demo-debug.apk
+          asset_path: app/build/outputs/apk/demo/release/app-demo-release.apk
+          asset_name: app-demo-release.apk
+          asset_content_type: application/vnd.android.package-archive
+
+      - name: Upload Release AAB
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: app/build/outputs/bundle/demoRelease/app-demo-release.aab
+          asset_name: app-demo-release.aab
           asset_content_type: application/vnd.android.package-archive
 

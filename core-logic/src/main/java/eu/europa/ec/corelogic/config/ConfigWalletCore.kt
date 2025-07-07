@@ -20,6 +20,7 @@ import eu.europa.ec.corelogic.model.DocumentCategories
 import eu.europa.ec.corelogic.model.DocumentCategory
 import eu.europa.ec.corelogic.model.DocumentIdentifier
 import eu.europa.ec.eudi.wallet.EudiWalletConfig
+import eu.europa.ec.eudi.wallet.document.CreateDocumentSettings.CredentialPolicy
 import java.time.Duration
 
 interface WalletCoreConfig {
@@ -153,4 +154,20 @@ interface WalletCoreConfig {
      * It is currently set to 15 minutes.
      */
     val revocationInterval: Duration get() = Duration.ofMinutes(15)
+
+    /**
+     * The number of credentials to request in a batch during document issuance.
+     *
+     * This property defines the batch size for credential requests when using
+     * the batch document issuance feature.
+     */
+    val credentialBatchSize: Int
+
+    /**
+     * The credential usage policy for issued documents.
+     *
+     * This property defines whether credentials should be used once and discarded
+     * (OneTimeUse) or rotated through for multiple uses (RotateUse).
+     */
+    val credentialPolicy: CredentialPolicy
 }

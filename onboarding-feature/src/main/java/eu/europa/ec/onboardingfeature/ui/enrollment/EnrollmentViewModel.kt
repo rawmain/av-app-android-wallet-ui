@@ -39,7 +39,6 @@ import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.DashboardScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
 import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
@@ -306,7 +305,7 @@ class EnrollmentViewModel(
                                                 offerURI = it.link.toString(),
                                                 onSuccessNavigation = ConfigNavigation(
                                                     navigationType = NavigationType.PushScreen(
-                                                        screen = DashboardScreens.Dashboard,
+                                                        screen = LandingScreens.Landing,
                                                         popUpToScreen = IssuanceScreens.AddDocument
                                                     )
                                                 ),

@@ -37,7 +37,6 @@ import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
-import eu.europa.ec.uilogic.navigation.DashboardScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
 import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.PresentationScreens
@@ -215,7 +214,7 @@ class QrScanViewModel(
                                 RequestUriConfig(
                                     PresentationMode.OpenId4Vp(
                                         uri = scanResult,
-                                        initiatorRoute = DashboardScreens.Dashboard.screenRoute
+                                        initiatorRoute = LandingScreens.Landing.screenRoute
                                     )
                                 ),
                                 RequestUriConfig.Parser

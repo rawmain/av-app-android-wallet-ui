@@ -40,3 +40,9 @@ fun provideLandingPageInteractor(
         resourceProvider,
         uuidProvider
     )
+
+@Factory
+fun provideSettingsInteractor(
+    walletCoreDocumentsController: WalletCoreDocumentsController,
+): eu.europa.ec.landingfeature.interactor.SettingsInteractor =
+    eu.europa.ec.landingfeature.interactor.SettingsInteractorImpl(walletCoreDocumentsController)
