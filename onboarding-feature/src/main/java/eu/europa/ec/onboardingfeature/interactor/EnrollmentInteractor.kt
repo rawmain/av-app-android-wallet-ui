@@ -63,6 +63,8 @@ interface EnrollmentInteractor {
     )
 
     fun resumeOpenId4VciWithAuthorization(uri: String)
+
+    fun hasDocuments(): Boolean
 }
 
 class EnrollmentInteractorImpl(
@@ -201,4 +203,8 @@ class EnrollmentInteractorImpl(
             )
         )
     }
-} 
+
+    override fun hasDocuments(): Boolean {
+        return walletCoreDocumentsController.getAgeOver18IssuedDocument() != null
+    }
+}

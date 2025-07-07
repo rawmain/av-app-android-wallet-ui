@@ -20,7 +20,6 @@ import android.content.Context
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
-import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
 import eu.europa.ec.commonfeature.util.TestsData.mockedPrimaryButtonText
 import eu.europa.ec.commonfeature.util.TestsData.mockedScopedDocuments
@@ -34,7 +33,6 @@ import eu.europa.ec.corelogic.controller.IssueDocumentPartialState
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.resourceslogic.theme.values.ThemeColors
 import eu.europa.ec.testfeature.mockedDefaultLocale
 import eu.europa.ec.testfeature.mockedGenericErrorMessage
 import eu.europa.ec.testfeature.mockedNotifyOnAuthenticationFailure
@@ -44,7 +42,6 @@ import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.extension.toFlow
 import eu.europa.ec.testlogic.rule.CoroutineTestRule
 import eu.europa.ec.uilogic.component.AppIcons
-import eu.europa.ec.uilogic.component.utils.PERCENTAGE_25
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import junit.framework.TestCase.assertEquals
 import org.junit.After
@@ -345,24 +342,6 @@ class TestEnrollmentInteractor {
         whenever(resourceProvider.getString(R.string.issuance_add_document_deferred_success_description))
             .thenReturn(mockedSuccessDescription)
 
-    }
-    //endregion
-
-    //region mocked objects
-    private val mockedTripleObject by lazy {
-        Triple(
-            first = SuccessUIConfig.TextElementsConfig(
-                text = resourceProvider.getString(R.string.issuance_add_document_deferred_success_text),
-                description = resourceProvider.getString(R.string.issuance_add_document_deferred_success_description),
-                color = ThemeColors.pending
-            ),
-            second = SuccessUIConfig.ImageConfig(
-                type = SuccessUIConfig.ImageConfig.Type.Drawable(icon = AppIcons.InProgress),
-                tint = ThemeColors.primary,
-                screenPercentageSize = PERCENTAGE_25,
-            ),
-            third = resourceProvider.getString(R.string.issuance_add_document_deferred_success_primary_button_text)
-        )
     }
     //endregion
 } 

@@ -18,8 +18,10 @@ package eu.europa.ec.landingfeature.ui.dashboard
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -31,7 +33,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -48,28 +53,34 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
+import eu.europa.ec.uilogic.component.ListItemData
+import eu.europa.ec.uilogic.component.ListItemMainContentData
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.HSpacer
 import eu.europa.ec.uilogic.component.utils.LifecycleEffect
+import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_MEDIUM
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.utils.VSpacer
+import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
 import eu.europa.ec.uilogic.component.wrap.StickyBottomConfig
 import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapIcon
 import eu.europa.ec.uilogic.component.wrap.WrapIconButton
 import eu.europa.ec.uilogic.component.wrap.WrapImage
+import eu.europa.ec.uilogic.component.wrap.WrapListItems
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.extension.finish
@@ -104,39 +115,16 @@ fun LandingScreen(
                     type = StickyBottomType.Generic
                 )
             ) {
-                Column {
-                    FloatingActionButton(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        onClick = {
-                            viewModel.setEvent(Event.GoToScanQR)
-                        },
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        shape = CircleShape,
-                    ) {
-                        WrapIcon(
-                            modifier = Modifier.padding(SPACING_LARGE.dp),
-                            iconData = AppIcons.QrScanner
-                        )
-                    }
-                    VSpacer.ExtraSmall()
-                    WrapText(
-                        text = stringResource(R.string.landing_screen_primary_button_label_scan),
-                        textConfig = TextConfig(
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                    VSpacer.XXLarge()
-                }
+                ScanButton(onEventSend = { viewModel.setEvent(it) })
             }
         },
     ) { paddingValues ->
         Content(
             paddingValues = paddingValues,
+            documentClaims = state.documentClaims,
+            credentialCount = state.credentialCount,
+            onAddCredential = { viewModel.setEvent(Event.AddCredentials) }
         )
-
     }
 
     LifecycleEffect(
@@ -156,6 +144,39 @@ fun LandingScreen(
                 is Effect.Navigation -> handleNavigationEffect(effect, hostNavController, context)
             }
         }.collect()
+    }
+}
+
+@Composable
+private fun ScanButton(
+    onEventSend: (Event) -> Unit,
+) {
+    Column {
+        VSpacer.Small()
+        FloatingActionButton(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = {
+                onEventSend(Event.GoToScanQR)
+            },
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            shape = CircleShape,
+        ) {
+            WrapIcon(
+                modifier = Modifier.padding(SPACING_LARGE.dp),
+                iconData = AppIcons.QrScanner
+            )
+        }
+        VSpacer.ExtraSmall()
+        WrapText(
+            text = stringResource(R.string.landing_screen_primary_button_label_scan),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        VSpacer.Small()
     }
 }
 
@@ -217,6 +238,9 @@ private fun TopBar(
 @Composable
 private fun Content(
     paddingValues: PaddingValues,
+    documentClaims: List<ExpandableListItem>?,
+    credentialCount: Int?,
+    onAddCredential: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -228,115 +252,176 @@ private fun Content(
                     start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                     end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
                 )
-            ),
+            )
+            .verticalScroll(rememberScrollState()),
     ) {
-        VSpacer.XXLarge()
         WrapText(
             text = stringResource(R.string.landing_screen_title),
-            textConfig = TextConfig(
-                style = MaterialTheme.typography.headlineLarge,
-                textAlign = TextAlign.Start,
-            )
+            textConfig = TextConfig(style = MaterialTheme.typography.headlineLarge)
         )
         VSpacer.Large()
         WrapText(
             text = stringResource(R.string.landing_screen_subtitle),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Start,
-                maxLines = 6
+                maxLines = Int.MAX_VALUE
             )
         )
         VSpacer.ExtraLarge()
 
-        AgeVerificationCard()
+        AgeVerificationCard(credentialCount = credentialCount, onAddCredential = onAddCredential)
+
+        if (!documentClaims.isNullOrEmpty()) {
+            CredentialDetails(documentClaims)
+        }
 
         VSpacer.XXLarge()
     }
 }
 
 @Composable
-private fun AgeVerificationCard() {
-    Card(
-        modifier = Modifier
-            .height(130.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFEBF1FD),
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
+private fun CredentialDetails(documentClaims: List<ExpandableListItem>) {
+    VSpacer.ExtraLarge()
+
+    WrapText(
+        text = stringResource(R.string.landing_screen_credential_details),
+        textConfig = TextConfig(
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            textAlign = TextAlign.Start
         )
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
+    )
+
+    VSpacer.ExtraSmall()
+
+    WrapListItems(
+        modifier = Modifier.fillMaxWidth(),
+        items = documentClaims,
+        onItemClick = null,
+        mainContentVerticalPadding = 16.dp,
+        addDivider = true,
+        onExpandedChange = {}
+    )
+}
+
+@Composable
+private fun AgeVerificationCard(
+    credentialCount: Int?,
+    onAddCredential: () -> Unit,
+) {
+    Box {
+        if (credentialCount != null) {
+            CredentialCountBadge(credentialCount, onAddCredential)
+        }
+
+        Card(
+            modifier = Modifier
+                .height(130.dp)
+                .fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFEBF1FD),
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 4.dp
+            )
         ) {
-            // First stripe
-            Box(
-                modifier = Modifier
-                    .width(9.dp)
-                    .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.primary)
-            )
-            HSpacer.ExtraSmall()
-            // Second stripe
-            Box(
-                modifier = Modifier
-                    .width(5.dp)
-                    .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.primary)
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(SPACING_SMALL.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                // First stripe
+                Box(
+                    modifier = Modifier
+                        .width(9.dp)
+                        .fillMaxHeight()
+                        .background(MaterialTheme.colorScheme.primary)
+                )
+                HSpacer.ExtraSmall()
+                // Second stripe
+                Box(
+                    modifier = Modifier
+                        .width(5.dp)
+                        .fillMaxHeight()
+                        .background(MaterialTheme.colorScheme.primary)
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(SPACING_SMALL.dp)
                 ) {
-                    val labelSmallTextConfig = TextConfig(
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Top,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        val labelSmallTextConfig = TextConfig(
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            WrapImage(
+                                modifier = Modifier
+                                    .width(40.dp),
+                                iconData = AppIcons.EuFlag,
+                                contentScale = ContentScale.Fit
+                            )
+                            HSpacer.ExtraSmall()
+                            WrapText(
+                                text = stringResource(R.string.landing_screen_card_eu_title),
+                                textConfig = labelSmallTextConfig
+                            )
+                        }
+                    }
+                    VSpacer.Large()
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Absolute.Center
                     ) {
                         WrapImage(
-                            modifier = Modifier
-                                .width(40.dp),
-                            iconData = AppIcons.EuFlag,
+                            iconData = AppIcons.Over18,
                             contentScale = ContentScale.Fit
                         )
-                        HSpacer.ExtraSmall()
+                        HSpacer.Small()
                         WrapText(
-                            text = stringResource(R.string.landing_screen_card_eu_title),
-                            textConfig = labelSmallTextConfig
+                            text = stringResource(R.string.landing_screen_card_age_verification),
+                            textConfig = TextConfig(
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         )
                     }
                 }
-                VSpacer.Large()
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Absolute.Center
-                ) {
-                    WrapImage(
-                        iconData = AppIcons.Over18,
-                        contentScale = ContentScale.Fit
-                    )
-                    HSpacer.Small()
-                    WrapText(
-                        text = stringResource(R.string.landing_screen_card_age_verification),
-                        textConfig = TextConfig(
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    )
-                }
             }
         }
+    }
+}
+
+@Composable
+private fun BoxScope.CredentialCountBadge(credentialCount: Int, onAddCredential: () -> Unit) {
+    Badge(
+        modifier = Modifier.Companion
+            .align(Alignment.TopEnd)
+            .padding(top = SPACING_SMALL.dp, end = SPACING_SMALL.dp)
+            .zIndex(1f)
+            .clickable {
+                onAddCredential()
+            },
+        containerColor = if (credentialCount > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+    ) {
+        WrapText(
+            modifier = Modifier.padding(SPACING_EXTRA_SMALL.dp),
+            text = if (credentialCount > 0)
+                stringResource(
+                    R.string.landing_screen_credentials_left,
+                    credentialCount
+                ) else stringResource(R.string.landing_screen_add_credentials),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.labelSmall,
+                color = if (credentialCount > 0) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onError
+            )
+        )
     }
 }
 
@@ -355,7 +440,25 @@ private fun LandingScreenPreview() {
             },
         ) { paddingValues ->
             Content(
+                documentClaims = listOf(
+                    ExpandableListItem.SingleListItemData(
+                        header = ListItemData(
+                            itemId = "0",
+                            overlineText = "Age over 18",
+                            mainContentData = ListItemMainContentData.Text(text = "True"),
+                        )
+                    ),
+                    ExpandableListItem.SingleListItemData(
+                        header = ListItemData(
+                            itemId = "1",
+                            overlineText = "Expiration Date",
+                            mainContentData = ListItemMainContentData.Text(text = "30/12/2025"),
+                        )
+                    )
+                ),
                 paddingValues = paddingValues,
+                credentialCount = 3,
+                onAddCredential = { }
             )
         }
     }

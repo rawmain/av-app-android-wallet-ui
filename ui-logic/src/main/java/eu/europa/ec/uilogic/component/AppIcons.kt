@@ -22,7 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.Stable
@@ -88,18 +88,6 @@ object AppIcons {
         imageVector = null
     )
 
-    val ErrorFilled: IconData = IconData(
-        resourceId = null,
-        contentDescriptionId = R.string.content_description_error_icon,
-        imageVector = Icons.Default.Info
-    )
-
-    val Delete: IconData = IconData(
-        resourceId = R.drawable.ic_delete,
-        contentDescriptionId = R.string.content_description_delete_icon,
-        imageVector = null
-    )
-
     val TouchId: IconData = IconData(
         resourceId = R.drawable.ic_touch_id,
         contentDescriptionId = R.string.content_description_touch_id_icon,
@@ -112,12 +100,6 @@ object AppIcons {
         imageVector = null
     )
 
-    val NFC: IconData = IconData(
-        resourceId = R.drawable.ic_nfc,
-        contentDescriptionId = R.string.content_description_nfc_icon,
-        imageVector = null
-    )
-
     val User: IconData = IconData(
         resourceId = R.drawable.ic_user,
         contentDescriptionId = R.string.content_description_user_icon,
@@ -127,12 +109,6 @@ object AppIcons {
     val Id: IconData = IconData(
         resourceId = R.drawable.ic_id,
         contentDescriptionId = R.string.content_description_id_icon,
-        imageVector = null
-    )
-
-    val IdStroke: IconData = IconData(
-        resourceId = R.drawable.ic_id_stroke,
-        contentDescriptionId = R.string.content_description_id_stroke_icon,
         imageVector = null
     )
 
@@ -158,18 +134,6 @@ object AppIcons {
         resourceId = null,
         contentDescriptionId = R.string.content_description_arrow_up_icon,
         imageVector = Icons.Default.KeyboardArrowUp
-    )
-
-    val Visibility: IconData = IconData(
-        resourceId = R.drawable.ic_visibility_on,
-        contentDescriptionId = R.string.content_description_visibility_icon,
-        imageVector = null
-    )
-
-    val VisibilityOff: IconData = IconData(
-        resourceId = R.drawable.ic_visibility_off,
-        contentDescriptionId = R.string.content_description_visibility_off_icon,
-        imageVector = null
     )
 
     val Add: IconData = IconData(
@@ -244,39 +208,9 @@ object AppIcons {
         imageVector = null
     )
 
-    val PresentDocumentOnline: IconData = IconData(
-        resourceId = R.drawable.ic_present_document_cross_device,
-        contentDescriptionId = R.string.content_description_present_document_cross_device_icon,
-        imageVector = null
-    )
-
-    val AddDocumentFromList: IconData = IconData(
-        resourceId = R.drawable.ic_add_document_from_list,
-        contentDescriptionId = R.string.content_description_add_document_from_list_icon,
-        imageVector = null
-    )
-
     val AddDocumentFromQr: IconData = IconData(
         resourceId = R.drawable.ic_add_document_from_qr,
         contentDescriptionId = R.string.content_description_add_document_from_qr_icon,
-        imageVector = null
-    )
-
-    val Bookmark: IconData = IconData(
-        resourceId = R.drawable.ic_bookmark,
-        contentDescriptionId = R.string.content_description_bookmark_icon,
-        imageVector = null
-    )
-
-    val BookmarkFilled: IconData = IconData(
-        resourceId = R.drawable.ic_bookmark_filled,
-        contentDescriptionId = R.string.content_description_bookmark_filled_icon,
-        imageVector = null
-    )
-
-    val Certified: IconData = IconData(
-        resourceId = R.drawable.ic_certified,
-        contentDescriptionId = R.string.content_description_certified_icon,
         imageVector = null
     )
 
@@ -292,51 +226,15 @@ object AppIcons {
         imageVector = null
     )
 
-    val Download: IconData = IconData(
-        resourceId = R.drawable.ic_download,
-        contentDescriptionId = R.string.content_description_download_icon,
-        imageVector = null
-    )
-
     val Filters: IconData = IconData(
         resourceId = R.drawable.ic_filters,
         contentDescriptionId = R.string.content_description_filters_icon,
         imageVector = null
     )
 
-    val Home: IconData = IconData(
-        resourceId = R.drawable.ic_home,
-        contentDescriptionId = R.string.content_description_home_icon,
-        imageVector = null
-    )
-
-    val Menu: IconData = IconData(
-        resourceId = R.drawable.ic_menu,
-        contentDescriptionId = R.string.content_description_menu_icon,
-        imageVector = null
-    )
-
-    val Contract: IconData = IconData(
-        resourceId = R.drawable.ic_contract,
-        contentDescriptionId = R.string.content_description_signature_icon,
-        imageVector = null
-    )
-
     val InProgress: IconData = IconData(
         resourceId = R.drawable.ic_in_progress,
         contentDescriptionId = R.string.content_description_in_progress_icon,
-        imageVector = null
-    )
-
-    val Notifications: IconData = IconData(
-        resourceId = R.drawable.ic_notifications,
-        contentDescriptionId = R.string.content_description_notifications_icon,
-        imageVector = null
-    )
-
-    val Transactions: IconData = IconData(
-        resourceId = R.drawable.ic_transactions,
-        contentDescriptionId = R.string.content_description_transactions_icon,
         imageVector = null
     )
 
@@ -358,45 +256,10 @@ object AppIcons {
         imageVector = null
     )
 
-    val IssuerPlaceholder: IconData = IconData(
-        resourceId = R.drawable.issuer_placeholder,
-        contentDescriptionId = R.string.content_description_issuer_icon,
-        imageVector = null
-    )
-
-    val IdCards: IconData = IconData(
-        resourceId = R.drawable.ic_authenticate_id_cards,
-        contentDescriptionId = R.string.content_description_issuer_icon,
-        imageVector = null
-    )
-
-    val SignDocumentFromDevice: IconData = IconData(
-        resourceId = R.drawable.ic_sign_document_from_device,
-        contentDescriptionId = R.string.content_description_add_document_from_list_icon,
-        imageVector = null
-    )
-
-    val SignDocumentFromQr: IconData = IconData(
-        resourceId = R.drawable.ic_sign_document_from_qr,
-        contentDescriptionId = R.string.content_description_add_document_from_qr_icon,
-        imageVector = null
-    )
-
-    val ChangePin: IconData = IconData(
-        resourceId = R.drawable.ic_change_pin,
-        contentDescriptionId = R.string.content_description_change_pin_icon,
-        imageVector = null
-    )
 
     val Check: IconData = IconData(
         resourceId = R.drawable.ic_check,
         contentDescriptionId = R.string.content_description_check_icon,
-        imageVector = null
-    )
-
-    val OpenInBrowser: IconData = IconData(
-        resourceId = R.drawable.ic_open_in_browser,
-        contentDescriptionId = R.string.content_description_open_in_browser_icon,
         imageVector = null
     )
 
@@ -440,5 +303,11 @@ object AppIcons {
         resourceId = R.drawable.ic_scytales_logo,
         contentDescriptionId = R.string.content_description_scytales_logo_icon,
         imageVector = null
+    )
+
+    val DateRange: IconData = IconData(
+        resourceId = null,
+        contentDescriptionId = R.string.content_description_date_range_icon,
+        imageVector = Icons.Default.DateRange
     )
 }

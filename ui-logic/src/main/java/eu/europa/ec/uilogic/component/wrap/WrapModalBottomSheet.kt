@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,15 +38,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.theme.values.divider
 import eu.europa.ec.resourceslogic.theme.values.warning
 import eu.europa.ec.uilogic.component.AppIcons
@@ -55,9 +51,6 @@ import eu.europa.ec.uilogic.component.IconData
 import eu.europa.ec.uilogic.component.ModalOptionUi
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
-import eu.europa.ec.uilogic.component.utils.ALPHA_DISABLED
-import eu.europa.ec.uilogic.component.utils.ALPHA_ENABLED
-import eu.europa.ec.uilogic.component.utils.DEFAULT_BIG_ICON_SIZE
 import eu.europa.ec.uilogic.component.utils.DEFAULT_ICON_SIZE
 import eu.europa.ec.uilogic.component.utils.HSpacer
 import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
@@ -65,7 +58,6 @@ import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_MEDIUM
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
-import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.extension.throttledClickable
 import eu.europa.ec.uilogic.mvi.ViewEvent
 
@@ -74,13 +66,6 @@ private val defaultBottomSheetPadding: PaddingValues = PaddingValues(
     end = SPACING_LARGE.dp,
     top = 0.dp,
     bottom = SPACING_LARGE.dp
-)
-
-private val bottomSheetWithTwoBigIconsPadding: PaddingValues = PaddingValues(
-    start = SPACING_LARGE.dp,
-    end = SPACING_LARGE.dp,
-    top = 0.dp,
-    bottom = 0.dp
 )
 
 private val bottomSheetDefaultBackgroundColor: Color
@@ -129,39 +114,6 @@ fun WrapModalBottomSheet(
         dragHandle = dragHandle,
         content = sheetContent,
     )
-}
-
-/**
- * A generic composable function for creating a bottom sheet.
- *
- * This function provides a basic structure for a bottom sheet, including a title and body section.
- * You can customize the content of the title and body by providing composable functions.
- *
- * The bottom sheet is displayed with a default background color and padding.
- *
- * @param titleContent A composable function that provides the content for the title section of the bottom sheet.
- * This content is displayed at the top of the bottom sheet.
- * @param bodyContent A composable function that provides the content for the body section of the bottom sheet.
- * This content is displayed below the title, separated by a medium vertical spacer.
- */
-@Composable
-fun GenericBottomSheet(
-    titleContent: @Composable () -> Unit,
-    bodyContent: @Composable () -> Unit,
-    sheetBackgroundColor: Color = bottomSheetDefaultBackgroundColor,
-    sheetPadding: PaddingValues = defaultBottomSheetPadding,
-) {
-    Column(
-        modifier = Modifier
-            .wrapContentHeight()
-            .background(color = sheetBackgroundColor)
-            .fillMaxWidth()
-            .padding(sheetPadding)
-    ) {
-        titleContent()
-        VSpacer.Medium()
-        bodyContent()
-    }
 }
 
 /**
@@ -308,77 +260,6 @@ private fun BaseBottomSheet(
         bodyContent?.let { safeBodyContent ->
             safeBodyContent()
         }
-    }
-}
-
-@Composable
-fun <T : ViewEvent> BottomSheetWithTwoBigIcons(
-    textData: BottomSheetTextData,
-    options: List<ModalOptionUi<T>>,
-    onEventSent: (T) -> Unit,
-) {
-    if (options.size == 2) {
-        BaseBottomSheet(
-            textData = textData,
-            sheetPadding = bottomSheetWithTwoBigIconsPadding,
-            bodyContent = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    options.forEachIndexed { index, item ->
-                        if (index == 1) {
-                            Text(
-                                modifier = Modifier.align(Alignment.CenterVertically),
-                                text = stringResource(
-                                    R.string.documents_screen_add_document_option_or
-                                ),
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            )
-                        }
-
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(vertical = SPACING_MEDIUM.dp),
-                            verticalArrangement = Arrangement.spacedBy(SPACING_SMALL.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            item.leadingIcon?.let { safeLeadingIcon ->
-                                WrapImage(
-                                    modifier = Modifier
-                                        .size(DEFAULT_BIG_ICON_SIZE.dp)
-                                        .alpha(
-                                            alpha = ALPHA_ENABLED.takeIf { item.enabled }
-                                                ?: ALPHA_DISABLED
-                                        ),
-                                    iconData = safeLeadingIcon,
-                                )
-                            }
-                            WrapButton(
-                                modifier = Modifier.wrapContentWidth(),
-                                buttonConfig = ButtonConfig(
-                                    type = ButtonType.PRIMARY,
-                                    onClick = { onEventSent(item.event) },
-                                    enabled = item.enabled
-                                )
-                            ) {
-                                Text(
-                                    text = item.title,
-                                    style = MaterialTheme.typography.labelLarge.copy(
-                                        color = MaterialTheme.colorScheme.onPrimary
-                                    ),
-                                    textAlign = TextAlign.Center,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        )
     }
 }
 
@@ -591,74 +472,6 @@ private fun BottomSheetWithOptionsListPreview() {
                             trailingIcon = AppIcons.ClockTimer,
                             trailingIconTint = MaterialTheme.colorScheme.primary,
                             event = DummyEventForPreview,
-                        ),
-                    )
-                )
-            },
-            onEventSent = {}
-        )
-    }
-}
-
-@ThemeModePreviews
-@Composable
-private fun BottomSheetWithTwoBigIconsEvenTextPreview() {
-    PreviewTheme {
-        BottomSheetWithTwoBigIcons(
-            textData = BottomSheetTextData(
-                title = "Title",
-                message = "Message"
-            ),
-            options = buildList {
-                addAll(
-                    listOf(
-                        ModalOptionUi(
-                            title = "Enabled Option with leading icon",
-                            leadingIcon = AppIcons.PresentDocumentInPerson,
-                            leadingIconTint = MaterialTheme.colorScheme.primary,
-                            event = DummyEventForPreview,
-                            enabled = true,
-                        ),
-                        ModalOptionUi(
-                            title = "Disabled Option with leading icon",
-                            leadingIcon = AppIcons.PresentDocumentOnline,
-                            leadingIconTint = MaterialTheme.colorScheme.primary,
-                            event = DummyEventForPreview,
-                            enabled = false,
-                        ),
-                    )
-                )
-            },
-            onEventSent = {}
-        )
-    }
-}
-
-@ThemeModePreviews
-@Composable
-private fun BottomSheetWithTwoBigIconsUnevenTextPreview() {
-    PreviewTheme {
-        BottomSheetWithTwoBigIcons(
-            textData = BottomSheetTextData(
-                title = "Title",
-                message = "Message"
-            ),
-            options = buildList {
-                addAll(
-                    listOf(
-                        ModalOptionUi(
-                            title = "Enabled Option a lot of text",
-                            leadingIcon = AppIcons.PresentDocumentInPerson,
-                            leadingIconTint = MaterialTheme.colorScheme.primary,
-                            event = DummyEventForPreview,
-                            enabled = true,
-                        ),
-                        ModalOptionUi(
-                            title = "Enabled Option",
-                            leadingIcon = AppIcons.PresentDocumentOnline,
-                            leadingIconTint = MaterialTheme.colorScheme.primary,
-                            event = DummyEventForPreview,
-                            enabled = true,
                         ),
                     )
                 )

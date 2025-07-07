@@ -49,7 +49,7 @@ import eu.europa.ec.eudi.openid4vci.CredentialConfigurationIdentifier
 import eu.europa.ec.eudi.openid4vci.CredentialIssuerEndpoint
 import eu.europa.ec.eudi.openid4vci.CredentialIssuerId
 import eu.europa.ec.eudi.openid4vci.CredentialIssuerMetadata
-import eu.europa.ec.eudi.openid4vci.CredentialIssuerMetadata.Display
+import eu.europa.ec.eudi.openid4vci.Display
 import eu.europa.ec.eudi.openid4vci.MsoMdocCredential
 import eu.europa.ec.eudi.openid4vci.TxCode
 import eu.europa.ec.eudi.openid4vci.TxCodeInputMode
@@ -57,15 +57,19 @@ import eu.europa.ec.eudi.wallet.document.DocumentId
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
 import eu.europa.ec.eudi.wallet.document.format.MsoMdocFormat
 import eu.europa.ec.eudi.wallet.issue.openid4vci.Offer
-import eu.europa.ec.issuancefeature.ui.document.offer.model.DocumentOfferItemUi
+import eu.europa.ec.issuancefeature.interactor.DocumentOfferInteractor
+import eu.europa.ec.issuancefeature.interactor.DocumentOfferInteractorImpl
+import eu.europa.ec.issuancefeature.interactor.IssueDocumentsInteractorPartialState
+import eu.europa.ec.issuancefeature.interactor.ResolveDocumentOfferInteractorPartialState
+import eu.europa.ec.issuancefeature.ui.offer.model.DocumentOfferItemUi
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.resourceslogic.theme.values.ThemeColors
+import eu.europa.ec.testfeature.createMockedMainPid
 import eu.europa.ec.testfeature.mockedDefaultLocale
 import eu.europa.ec.testfeature.mockedExceptionWithMessage
 import eu.europa.ec.testfeature.mockedExceptionWithNoMessage
 import eu.europa.ec.testfeature.mockedGenericErrorMessage
-import eu.europa.ec.testfeature.mockedMainPid
 import eu.europa.ec.testfeature.mockedMdlDocName
 import eu.europa.ec.testfeature.mockedMdlDocType
 import eu.europa.ec.testfeature.mockedNotifyOnAuthenticationFailure
@@ -156,6 +160,8 @@ class TestDocumentOfferInteractor {
     fun `Given Case 1, When resolveDocumentOffer is called, Then Case 1 Expected Result is returned`() =
         coroutineRule.runTest {
             // Given
+            val mockedMainPid = createMockedMainPid()
+
             val mockedOffer = mockOffer(
                 issuerName = mockedIssuerName
             )
@@ -291,12 +297,13 @@ class TestDocumentOfferInteractor {
     fun `Given Case 4, When resolveDocumentOffer is called, Then Case 4 Expected Result is returned`() =
         coroutineRule.runTest {
             // Given
+            val mockedMainPid = createMockedMainPid()
             val mockedOffer = mockOffer(
                 issuerName = mockedIssuerName,
                 offeredDocuments = listOf(
                     mockOfferedDocument(
                         display = listOf(
-                            eu.europa.ec.eudi.openid4vci.Display(
+                            Display(
                                 name = mockedOfferedDocumentName,
                                 locale = Locale("es")
                             )
@@ -1098,7 +1105,7 @@ class TestDocumentOfferInteractor {
             display = listOf(
                 Display(
                     name = issuerName,
-                    locale = mockedDefaultLocale.language
+                    locale = mockedDefaultLocale
                 )
             )
         )
@@ -1107,8 +1114,8 @@ class TestDocumentOfferInteractor {
     private fun mockOfferedDocument(
         name: String = mockedOfferedDocumentName,
         docType: String = mockedOfferedDocumentDocType,
-        display: List<eu.europa.ec.eudi.openid4vci.Display> = listOf(
-            eu.europa.ec.eudi.openid4vci.Display(
+        display: List<Display> = listOf(
+            Display(
                 name = name,
                 locale = mockedDefaultLocale
             )

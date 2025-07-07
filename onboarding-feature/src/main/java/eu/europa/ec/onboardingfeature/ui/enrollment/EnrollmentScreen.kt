@@ -17,7 +17,6 @@
 package eu.europa.ec.onboardingfeature.ui.enrollment
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -42,8 +41,8 @@ import androidx.navigation.NavController
 import eu.europa.ec.corelogic.util.CoreActions
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
-import eu.europa.ec.uilogic.component.SystemBroadcastReceiver
 import eu.europa.ec.uilogic.component.TopStepBar
+import eu.europa.ec.uilogic.component.content.BroadcastAction
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -74,13 +73,32 @@ fun EnrollmentScreen(
         isLoading = state.isLoading,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.Pop) },
-        contentErrorConfig = state.error
+        contentErrorConfig = state.error,
+        broadcastAction = BroadcastAction(
+            intentFilters = listOf(
+                CoreActions.VCI_RESUME_ACTION,
+                CoreActions.VCI_DYNAMIC_PRESENTATION
+            ),
+            callback = {
+                when (it?.action) {
+                    CoreActions.VCI_RESUME_ACTION -> it.extras?.getString("uri")?.let { link ->
+                        viewModel.setEvent(Event.OnResumeIssuance(link))
+                    }
+
+                    CoreActions.VCI_DYNAMIC_PRESENTATION -> it.extras?.getString("uri")
+                        ?.let { link ->
+                            viewModel.setEvent(Event.OnDynamicPresentation(link))
+                        }
+                }
+            }
+        )
     ) { paddingValues ->
         Content(
             paddingValues = paddingValues,
             onMethodSelected = { method ->
                 viewModel.setEvent(Event.SelectEnrollmentMethod(method, context))
-            }
+            },
+            showStepBar = state.isOnboarding
         )
     }
 
@@ -102,15 +120,6 @@ fun EnrollmentScreen(
         lifecycleEvent = Lifecycle.Event.ON_RESUME
     ) {
         viewModel.setEvent(Event.Init(context.getPendingDeepLink()))
-    }
-
-    SystemBroadcastReceiver(
-        actions = listOf(
-            CoreActions.VCI_RESUME_ACTION,
-            CoreActions.VCI_DYNAMIC_PRESENTATION
-        )
-    ) { intent ->
-        handleBroadcastIntent(intent, viewModel)
     }
 }
 
@@ -137,31 +146,20 @@ private fun handleEffect(
     }
 }
 
-private const val URI = "uri"
-
-private fun handleBroadcastIntent(
-    intent: Intent?,
-    viewModel: EnrollmentViewModel,
-) {
-    val link = intent?.extras?.getString(URI) ?: return
-    when (intent.action) {
-        CoreActions.VCI_RESUME_ACTION -> viewModel.setEvent(Event.OnResumeIssuance(link))
-        CoreActions.VCI_DYNAMIC_PRESENTATION -> viewModel.setEvent(Event.OnDynamicPresentation(link))
-    }
-}
-
 @Composable
 private fun Content(
     paddingValues: PaddingValues,
     onMethodSelected: (EnrollmentMethod) -> Unit,
+    showStepBar: Boolean = true,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-        TopStepBar(currentStep = 3)
-
+        if (showStepBar) {
+            TopStepBar(currentStep = 3)
+        }
         VSpacer.ExtraLarge()
 
         WrapText(
@@ -170,8 +168,17 @@ private fun Content(
                 style = MaterialTheme.typography.titleLarge,
             ),
         )
+        VSpacer.Large()
 
-        VSpacer.ExtraLarge()
+        WrapText(
+            text = stringResource(R.string.onboarding_verification_description),
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 6
+            ),
+        )
+
+        VSpacer.Large()
 
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -268,8 +275,27 @@ private fun EnrollmentScreenPreview() {
         ) { paddingValues ->
             Content(
                 paddingValues = paddingValues,
-                onMethodSelected = {}
+                onMethodSelected = {},
+                showStepBar = true
             )
         }
     }
-} 
+}
+
+@ThemeModePreviews
+@Composable
+private fun EnrollmentScreenWithoutStepBarPreview() {
+    PreviewTheme {
+        ContentScreen(
+            isLoading = false,
+            navigatableAction = ScreenNavigateAction.NONE,
+            onBack = {},
+        ) { paddingValues ->
+            Content(
+                paddingValues = paddingValues,
+                onMethodSelected = {},
+                showStepBar = false
+            )
+        }
+    }
+}

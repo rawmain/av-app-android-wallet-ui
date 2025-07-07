@@ -16,9 +16,33 @@
 
 package eu.europa.ec.landingfeature.di
 
+import eu.europa.ec.businesslogic.provider.UuidProvider
+import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
+import eu.europa.ec.landingfeature.interactor.LandingPageInteractor
+import eu.europa.ec.landingfeature.interactor.LandingPageInteractorImpl
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
 
 @Module
 @ComponentScan("eu.europa.ec.landingfeature")
 class FeatureLandingModule
+
+@Factory
+fun provideLandingPageInteractor(
+    walletCoreDocumentsController: WalletCoreDocumentsController,
+    resourceProvider: ResourceProvider,
+    uuidProvider: UuidProvider,
+): LandingPageInteractor =
+    LandingPageInteractorImpl(
+        walletCoreDocumentsController,
+        resourceProvider,
+        uuidProvider
+    )
+
+@Factory
+fun provideSettingsInteractor(
+    walletCoreDocumentsController: WalletCoreDocumentsController,
+): eu.europa.ec.landingfeature.interactor.SettingsInteractor =
+    eu.europa.ec.landingfeature.interactor.SettingsInteractorImpl(walletCoreDocumentsController)

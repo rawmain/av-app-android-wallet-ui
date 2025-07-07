@@ -17,14 +17,20 @@
 package eu.europa.ec.landingfeature.ui.dashboard
 
 import android.net.Uri
+import androidx.lifecycle.viewModelScope
 import eu.europa.ec.commonfeature.config.OfferUiConfig
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.QrScanFlow
 import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.config.RequestUriConfig
+import eu.europa.ec.commonfeature.extension.toExpandableListItems
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
+import eu.europa.ec.landingfeature.interactor.LandingPageInteractor
+import eu.europa.ec.landingfeature.interactor.LandingPageInteractor.GetAgeCredentialPartialState
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
+import eu.europa.ec.uilogic.component.content.ContentErrorConfig
+import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.mvi.MviViewModel
@@ -32,30 +38,37 @@ import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.DashboardScreens
+import eu.europa.ec.uilogic.navigation.LandingScreens
+import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkAction
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkType
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.navigation.helper.hasDeepLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
+import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
 data class State(
     val isLoading: Boolean = false,
+    val error: ContentErrorConfig? = null,
+    val documentClaims: List<ExpandableListItem>? = null,
+    val credentialCount: Int? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
     data class Init(val deepLinkUri: Uri?) : Event()
     data object GoToSettings : Event()
     data object GoToScanQR : Event()
+    data object Finish : Event()
+    data object AddCredentials : Event()
 }
 
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data class SwitchScreen(
             val screenRoute: String,
-            val popUpToScreenRoute: String = DashboardScreens.Dashboard.screenRoute,
+            val popUpToScreenRoute: String = LandingScreens.Landing.screenRoute,
             val inclusive: Boolean = false,
         ) : Navigation()
 
@@ -66,6 +79,7 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class LandingViewModel(
+    private val landingPageInteractor: LandingPageInteractor,
     private val resourceProvider: ResourceProvider,
     private val uiSerializer: UiSerializer,
 ) : MviViewModel<Event, State, Effect>() {
@@ -78,15 +92,73 @@ class LandingViewModel(
         when (event) {
             is Event.Init -> {
                 handleDeepLink(event.deepLinkUri)
+                getAgeCredential(event)
             }
 
             is Event.GoToSettings -> {
-                // No effect for now
+                switchScreen(LandingScreens.Settings.screenRoute)
             }
 
             is Event.GoToScanQR -> {
                 navigateToQrScan()
             }
+
+            Event.Finish -> {
+                setEffect { Effect.Navigation.Pop }
+            }
+
+            Event.AddCredentials -> {
+                if (viewState.value.credentialCount == 0) {
+                    switchScreen(OnboardingScreens.Enrollment.screenRoute)
+                }
+            }
+        }
+    }
+
+    private fun switchScreen(route: String) {
+        setEffect {
+            Effect.Navigation.SwitchScreen(route)
+        }
+    }
+
+    private fun getAgeCredential(event: Event) {
+        setState {
+            copy(
+                isLoading = true,
+                error = null
+            )
+        }
+        viewModelScope.launch {
+            landingPageInteractor.getAgeCredential()
+                .collect { result ->
+                    when (result) {
+                        is GetAgeCredentialPartialState.Success -> {
+                            val listItems = result.ageCredentialUi.claims.map { domainClaim ->
+                                domainClaim.toExpandableListItems(docId = result.ageCredentialUi.docId)
+                            }
+                            setState {
+                                copy(
+                                    isLoading = false,
+                                    documentClaims = listItems,
+                                    credentialCount = result.ageCredentialUi.credentialCount
+                                )
+                            }
+                        }
+
+                        is GetAgeCredentialPartialState.Failure -> {
+                            setState {
+                                copy(
+                                    isLoading = false,
+                                    error = ContentErrorConfig(
+                                        onRetry = { setEvent(event) },
+                                        errorSubTitle = result.error,
+                                        onCancel = { setEvent(Event.Finish) }
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
         }
     }
 
@@ -140,7 +212,7 @@ class LandingViewModel(
                         offerURI = it.link.toString(),
                         onSuccessNavigation = ConfigNavigation(
                             navigationType = NavigationType.PopTo(
-                                screen = DashboardScreens.Dashboard
+                                screen = LandingScreens.Landing
                             )
                         ),
                         onCancelNavigation = ConfigNavigation(
@@ -160,7 +232,7 @@ class LandingViewModel(
                     RequestUriConfig(
                         PresentationMode.OpenId4Vp(
                             uri.toString(),
-                            DashboardScreens.Dashboard.screenRoute
+                            LandingScreens.Landing.screenRoute
                         )
                     ),
                     RequestUriConfig

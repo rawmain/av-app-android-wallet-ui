@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.resourceslogic.theme.values.divider
+import eu.europa.ec.uilogic.component.utils.HSpacer
 
 sealed interface StickyBottomType {
     data class OneButton(
@@ -50,7 +51,7 @@ data class StickyBottomConfig(
 fun WrapStickyBottomContent(
     stickyBottomModifier: Modifier = Modifier,
     stickyBottomConfig: StickyBottomConfig,
-    content: @Composable () -> Unit,
+    content: @Composable (ButtonConfig?) -> Unit,
 ) {
     when (val stickyBottomType = stickyBottomConfig.type) {
         is StickyBottomType.OneButton -> {
@@ -75,7 +76,7 @@ fun WrapStickyBottomContent(
                         modifier = Modifier.fillMaxWidth(),
                         buttonConfig = stickyBottomType.config,
                     ) {
-                        content()
+                        content(stickyBottomType.config)
                     }
                 }
             }
@@ -91,19 +92,20 @@ fun WrapStickyBottomContent(
                     modifier = Modifier.weight(1f),
                     buttonConfig = stickyBottomType.primaryButtonConfig
                 ) {
-                    content()
+                    content(stickyBottomType.primaryButtonConfig)
                 }
+                HSpacer.Small()
                 WrapButton(
                     modifier = Modifier.weight(1f),
                     buttonConfig = stickyBottomType.secondaryButtonConfig
                 ) {
-                    content()
+                    content(stickyBottomType.secondaryButtonConfig)
                 }
             }
         }
 
         is StickyBottomType.Generic -> {
-            content()
+            content(null)
         }
     }
 }

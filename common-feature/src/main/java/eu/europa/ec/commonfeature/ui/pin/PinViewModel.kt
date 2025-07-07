@@ -36,9 +36,8 @@ import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.CommonScreens
+import eu.europa.ec.uilogic.navigation.CommonScreens.BiometricSetup
 import eu.europa.ec.uilogic.navigation.LandingScreens
-import eu.europa.ec.uilogic.navigation.ModuleRoute
-import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
@@ -103,9 +102,7 @@ sealed class Event : ViewEvent {
 
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
-        data class SwitchModule(val moduleRoute: ModuleRoute) : Navigation()
         data class SwitchScreen(val screen: String) : Navigation()
-
         data object Pop : Navigation()
     }
 
@@ -364,15 +361,10 @@ class PinViewModel(
     }
 
     private fun getNextScreenRoute(): String {
-
-        val navigationAfterUpdate = ConfigNavigation(
-            navigationType = NavigationType.PopTo(LandingScreens.Landing),
-        )
-
         return when (pinFlow) {
             PinFlow.CREATE -> {
                 generateComposableNavigationLink(
-                    screen = OnboardingScreens.Enrollment,
+                    screen = BiometricSetup,
                     arguments = generateComposableArguments(emptyMap<String, String>()),
                 )
             }
@@ -381,31 +373,40 @@ class PinViewModel(
                 generateComposableNavigationLink(
                     screen = CommonScreens.Success,
                     arguments = generateComposableArguments(
-                        mapOf(
-                            SuccessUIConfig.serializedKeyName to uiSerializer.toBase64(
-                                SuccessUIConfig(
-                                    textElementsConfig = SuccessUIConfig.TextElementsConfig(
-                                        text = resourceProvider.getString(R.string.quick_pin_change_success_text),
-                                        description = resourceProvider.getString(R.string.quick_pin_change_success_description)
-                                    ),
-                                    imageConfig = SuccessUIConfig.ImageConfig(),
-                                    buttonConfig = listOf(
-                                        SuccessUIConfig.ButtonConfig(
-                                            text = resourceProvider.getString(R.string.quick_pin_change_success_btn),
-                                            style = SuccessUIConfig.ButtonConfig.Style.PRIMARY,
-                                            navigation = navigationAfterUpdate
-                                        )
-                                    ),
-                                    onBackScreenToNavigate = navigationAfterUpdate,
-                                ),
-                                SuccessUIConfig.Parser
-                            ).orEmpty()
+                        getArgumentsForSuccessScreen(
+                            ConfigNavigation(
+                                navigationType = NavigationType.PopTo(LandingScreens.Landing),
+                            )
                         )
                     )
                 )
             }
         }
     }
+
+    private fun getArgumentsForSuccessScreen(navigationAfterUpdate: ConfigNavigation) = mapOf(
+        SuccessUIConfig.serializedKeyName to uiSerializer.toBase64(
+            getSuccessUiConfig(navigationAfterUpdate),
+            SuccessUIConfig
+        ).orEmpty()
+    )
+
+    private fun getSuccessUiConfig(navigationAfterUpdate: ConfigNavigation) =
+        SuccessUIConfig(
+            textElementsConfig = SuccessUIConfig.TextElementsConfig(
+                text = resourceProvider.getString(R.string.quick_pin_change_success_text),
+                description = resourceProvider.getString(R.string.quick_pin_change_success_description)
+            ),
+            imageConfig = SuccessUIConfig.ImageConfig(),
+            buttonConfig = listOf(
+                SuccessUIConfig.ButtonConfig(
+                    text = resourceProvider.getString(R.string.quick_pin_change_success_btn),
+                    style = SuccessUIConfig.ButtonConfig.Style.PRIMARY,
+                    navigation = navigationAfterUpdate
+                )
+            ),
+            onBackScreenToNavigate = navigationAfterUpdate,
+        )
 
     private fun showBottomSheet() {
         setEffect {

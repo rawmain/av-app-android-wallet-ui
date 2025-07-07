@@ -16,6 +16,7 @@
 
 package eu.europa.ec.presentationfeature.interactor
 
+import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.commonfeature.config.toDomainConfig
@@ -30,11 +31,11 @@ import eu.europa.ec.corelogic.controller.WalletCorePresentationController
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.testfeature.MockResourceProviderForStringCalls.mockTransformToUiItemsCall
+import eu.europa.ec.testfeature.createMockedMdlWithBasicFields
+import eu.europa.ec.testfeature.createMockedPidWithBasicFields
 import eu.europa.ec.testfeature.mockedExceptionWithMessage
 import eu.europa.ec.testfeature.mockedExceptionWithNoMessage
 import eu.europa.ec.testfeature.mockedGenericErrorMessage
-import eu.europa.ec.testfeature.mockedMdlWithBasicFields
-import eu.europa.ec.testfeature.mockedPidWithBasicFields
 import eu.europa.ec.testfeature.mockedPlainFailureMessage
 import eu.europa.ec.testfeature.mockedVerifierIsTrusted
 import eu.europa.ec.testlogic.extension.expectNoEvents
@@ -52,6 +53,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -71,6 +73,9 @@ class TestPresentationRequestInteractor {
     @Mock
     private lateinit var walletCoreDocumentsController: WalletCoreDocumentsController
 
+    @Mock
+    private lateinit var uuidProvider: UuidProvider
+
     private lateinit var interactor: PresentationRequestInteractor
 
     private lateinit var closeable: AutoCloseable
@@ -82,7 +87,8 @@ class TestPresentationRequestInteractor {
         interactor = PresentationRequestInteractorImpl(
             resourceProvider = resourceProvider,
             walletCorePresentationController = walletCorePresentationController,
-            walletCoreDocumentsController = walletCoreDocumentsController
+            walletCoreDocumentsController = walletCoreDocumentsController,
+            uuidProvider = uuidProvider
         )
 
         whenever(resourceProvider.genericErrorMessage()).thenReturn(mockedGenericErrorMessage)
@@ -233,12 +239,15 @@ class TestPresentationRequestInteractor {
     fun `Given Case 5, When getRequestDocuments is called, Then Case 5 expected result is returned`() =
         coroutineRule.runTest {
             // Given
+            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
+            val mockedMdlWithBasicFields = createMockedMdlWithBasicFields()
             mockGetAllIssuedDocumentsCall(
                 response = listOf(
                     mockedPidWithBasicFields,
                     mockedMdlWithBasicFields
                 )
             )
+            mockIsDocumentRevoked(isRevoked = false)
             mockTransformToUiItemsCall(
                 resourceProvider = resourceProvider,
                 notAvailableString = mockedRequestElementIdentifierNotAvailable
@@ -266,7 +275,8 @@ class TestPresentationRequestInteractor {
                             mockedValidPidWithBasicFieldsRequestDocument,
                             mockedValidMdlWithBasicFieldsRequestDocument
                         ),
-                        resourceProvider = resourceProvider
+                        resourceProvider = resourceProvider,
+                        uuidProvider = uuidProvider
                     )
 
                     val expectedResult = PresentationRequestInteractorPartialState.Success(
@@ -436,6 +446,10 @@ class TestPresentationRequestInteractor {
     private fun mockGetAllIssuedDocumentsCall(response: List<IssuedDocument>) {
         whenever(walletCoreDocumentsController.getAllIssuedDocuments())
             .thenReturn(response)
+    }
+
+    private suspend fun mockIsDocumentRevoked(isRevoked: Boolean) {
+        whenever(walletCoreDocumentsController.isDocumentRevoked(any())).thenReturn(isRevoked)
     }
     //endregion
 

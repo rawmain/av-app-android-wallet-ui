@@ -16,7 +16,6 @@
 
 package eu.europa.ec.uilogic.component
 
-import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -52,11 +51,13 @@ import eu.europa.ec.uilogic.component.utils.SPACING_MEDIUM
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.wrap.CheckboxData
 import eu.europa.ec.uilogic.component.wrap.RadioButtonData
+import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapAsyncImage
 import eu.europa.ec.uilogic.component.wrap.WrapCheckbox
 import eu.europa.ec.uilogic.component.wrap.WrapIcon
 import eu.europa.ec.uilogic.component.wrap.WrapIconButton
 import eu.europa.ec.uilogic.component.wrap.WrapRadioButton
+import eu.europa.ec.uilogic.component.wrap.WrapText
 
 /**
  * Represents the data displayed within a single item in a list.
@@ -155,6 +156,8 @@ sealed class ListItemTrailingContentData {
     data class Icon(val iconData: IconData, val tint: Color? = null) : ListItemTrailingContentData()
     data class Checkbox(val checkboxData: CheckboxData) : ListItemTrailingContentData()
     data class RadioButton(val radioButtonData: RadioButtonData) : ListItemTrailingContentData()
+    data class TextWithIcon(val text: String, val iconData: IconData, val tint: Color? = null) :
+        ListItemTrailingContentData()
 }
 
 /**
@@ -219,10 +222,8 @@ fun ListItem(
         color = MaterialTheme.colorScheme.onSurface
     )
 
-    // API check
-    val supportsBlur = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-    val blurModifier = remember(supportsBlur, hideSensitiveContent) {
-        if (supportsBlur && hideSensitiveContent) {
+    val blurModifier = remember(hideSensitiveContent) {
+        if (hideSensitiveContent) {
             Modifier.blur(10.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
         } else {
             Modifier
@@ -242,7 +243,7 @@ fun ListItem(
             else null
 
         is ListItemTrailingContentData.Icon -> onItemClick
-
+        is ListItemTrailingContentData.TextWithIcon -> onItemClick
         null -> onItemClick
     }
 
@@ -261,34 +262,32 @@ fun ListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Leading Content
-            if (!hideSensitiveContent || supportsBlur) {
-                leadingContentData?.let { safeLeadingContentData ->
-                    val leadingContentModifier = Modifier
-                        .padding(end = SIZE_MEDIUM.dp)
-                        .size(safeLeadingContentData.size.dp)
-                        .then(blurModifier)
+            leadingContentData?.let { safeLeadingContentData ->
+                val leadingContentModifier = Modifier
+                    .padding(end = SIZE_MEDIUM.dp)
+                    .size(safeLeadingContentData.size.dp)
+                    .then(blurModifier)
 
-                    when (safeLeadingContentData) {
-                        is ListItemLeadingContentData.Icon -> WrapIcon(
-                            modifier = leadingContentModifier,
-                            iconData = safeLeadingContentData.iconData,
-                            customTint = safeLeadingContentData.tint
-                                ?: MaterialTheme.colorScheme.primary,
-                        )
+                when (safeLeadingContentData) {
+                    is ListItemLeadingContentData.Icon -> WrapIcon(
+                        modifier = leadingContentModifier,
+                        iconData = safeLeadingContentData.iconData,
+                        customTint = safeLeadingContentData.tint
+                            ?: MaterialTheme.colorScheme.primary,
+                    )
 
-                        is ListItemLeadingContentData.UserImage -> ImageOrPlaceholder(
-                            modifier = leadingContentModifier,
-                            base64Image = safeLeadingContentData.userBase64Image,
-                        )
+                    is ListItemLeadingContentData.UserImage -> ImageOrPlaceholder(
+                        modifier = leadingContentModifier,
+                        base64Image = safeLeadingContentData.userBase64Image,
+                    )
 
-                        is ListItemLeadingContentData.AsyncImage -> WrapAsyncImage(
-                            modifier = leadingContentModifier,
-                            source = safeLeadingContentData.imageUrl,
-                            error = safeLeadingContentData.errorImage,
-                            placeholder = safeLeadingContentData.placeholderImage,
-                            contentDescription = stringResource(R.string.content_description_issuer_logo_icon)
-                        )
-                    }
+                    is ListItemLeadingContentData.AsyncImage -> WrapAsyncImage(
+                        modifier = leadingContentModifier,
+                        source = safeLeadingContentData.imageUrl,
+                        error = safeLeadingContentData.errorImage,
+                        placeholder = safeLeadingContentData.placeholderImage,
+                        contentDescription = stringResource(R.string.content_description_issuer_logo_icon)
+                    )
                 }
             }
 
@@ -303,36 +302,34 @@ fun ListItem(
                 overlineText?.let { safeOverlineText ->
                     Text(
                         text = safeOverlineText,
-                        style = if (hideSensitiveContent && !supportsBlur) mainTextStyle else overlineTextStyle,
+                        style = overlineTextStyle,
                     )
                 }
 
                 // Main Content
-                if (!hideSensitiveContent || supportsBlur) {
-                    when (mainContentData) {
-                        is ListItemMainContentData.Image -> ImageOrPlaceholder(
-                            modifier = Modifier
-                                .wrapContentWidth()
-                                .padding(top = SPACING_SMALL.dp)
-                                .then(blurModifier),
-                            base64Image = mainContentData.base64Image,
-                            contentScale = ContentScale.Fit,
-                        )
+                when (mainContentData) {
+                    is ListItemMainContentData.Image -> ImageOrPlaceholder(
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = SPACING_SMALL.dp)
+                            .then(blurModifier),
+                        base64Image = mainContentData.base64Image,
+                        contentScale = ContentScale.Fit,
+                    )
 
-                        is ListItemMainContentData.Text -> Text(
-                            modifier = blurModifier,
-                            text = mainContentData.text,
-                            style = mainTextStyle,
-                            overflow = textOverflow,
-                        )
+                    is ListItemMainContentData.Text -> Text(
+                        modifier = blurModifier,
+                        text = mainContentData.text,
+                        style = mainTextStyle,
+                        overflow = textOverflow,
+                    )
 
-                        is ListItemMainContentData.Actionable<*> -> Text(
-                            modifier = blurModifier,
-                            text = mainContentData.text,
-                            style = mainTextStyle,
-                            overflow = textOverflow,
-                        )
-                    }
+                    is ListItemMainContentData.Actionable<*> -> Text(
+                        modifier = blurModifier,
+                        text = mainContentData.text,
+                        style = mainTextStyle,
+                        overflow = textOverflow,
+                    )
                 }
 
                 // Supporting Text
@@ -382,6 +379,31 @@ fun ListItem(
                         ),
                         modifier = Modifier.padding(start = SIZE_MEDIUM.dp),
                     )
+
+                    is ListItemTrailingContentData.TextWithIcon ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            WrapText(
+                                modifier = Modifier.padding(start = SPACING_SMALL.dp),
+                                text = safeTrailingContentData.text,
+                                textConfig = TextConfig(
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            )
+
+                            WrapIconButton(
+                                modifier = Modifier
+                                    .padding(start = SPACING_SMALL.dp)
+                                    .size(DEFAULT_ICON_SIZE.dp),
+                                iconData = safeTrailingContentData.iconData,
+                                customTint = safeTrailingContentData.tint
+                                    ?: MaterialTheme.colorScheme.primary,
+                                onClick = if (clickableAreas.contains(TRAILING_CONTENT)) {
+                                    { onItemClick?.invoke(item) }
+                                } else null,
+                                throttleClicks = false,
+                            )
+                        }
                 }
             }
         }

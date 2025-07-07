@@ -19,6 +19,7 @@ package eu.europa.ec.corelogic.config
 import android.content.Context
 import eu.europa.ec.corelogic.BuildConfig
 import eu.europa.ec.eudi.wallet.EudiWalletConfig
+import eu.europa.ec.eudi.wallet.document.CreateDocumentSettings.CredentialPolicy
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.ClientIdScheme
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.EncryptionAlgorithm
@@ -31,9 +32,10 @@ internal class WalletCoreConfigImpl(
 ) : WalletCoreConfig {
 
     private companion object {
-        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev"
+        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev" // Avoid adding / at the end
         const val VCI_CLIENT_ID = "wallet-dev"
         const val AUTHENTICATION_REQUIRED = false
+        const val DEFAULT_CREDENTIAL_BATCH_SIZE = 30
     }
 
     private var _config: EudiWalletConfig? = null
@@ -57,13 +59,19 @@ internal class WalletCoreConfigImpl(
                         )
 
                         withClientIdSchemes(
-                            listOf(ClientIdScheme.X509SanDns)
+                            listOf(
+                                ClientIdScheme.X509SanDns,
+                                ClientIdScheme.RedirectUri
+                            )
                         )
                         withSchemes(
                             listOf(
+                                // Add your new scheme here and to DeepLinkHelper/DeepLinkType to solve "Not supported scheme" error
                                 BuildConfig.OPENID4VP_SCHEME,
                                 BuildConfig.EUDI_OPENID4VP_SCHEME,
-                                BuildConfig.MDOC_OPENID4VP_SCHEME
+                                BuildConfig.MDOC_OPENID4VP_SCHEME,
+                                BuildConfig.AVSP_SCHEME,
+                                BuildConfig.AV_SCHEME
                             )
                         )
                         withFormats(
@@ -81,10 +89,27 @@ internal class WalletCoreConfigImpl(
 
                     configureReaderTrustStore(
                         context,
-                        R.raw.av_issuer_ca01
+                        R.raw.av_issuer_ca01,
+                        R.raw.pidissuerca02_cz,
+                        R.raw.pidissuerca02_ee,
+                        R.raw.pidissuerca02_eu,
+                        R.raw.pidissuerca02_lu,
+                        R.raw.pidissuerca02_nl,
+                        R.raw.pidissuerca02_pt,
+                        R.raw.pidissuerca02_ut
                     )
                 }
             }
             return _config!!
         }
+
+    /**
+     * The number of credentials to request in a batch during document issuance.
+     */
+    override val credentialBatchSize: Int = DEFAULT_CREDENTIAL_BATCH_SIZE
+
+    /**
+     * The credential usage policy for issued documents.
+     */
+    override val credentialPolicy: CredentialPolicy = CredentialPolicy.OneTimeUse
 }

@@ -22,6 +22,13 @@ private const val KOIN = "*.ksp.*"
 private const val BUILD_CONFIG = "*BuildConfig*"
 private const val SCREEN_COMPOSABLES = "*Screen*"
 private const val MODELS = "eu.europa.ec.*.model"
+private const val DOMAIN_MODELS = "eu.europa.ec.*.domain"
+private const val EXTENSIONS = "eu.europa.ec.*.extension"
+private const val CONFIGS = "eu.europa.ec.*.config"
+private const val TRANSFORMERS = "eu.europa.ec.*.transformer"
+private const val COMPONENTS = "eu.europa.ec.*.component"
+private const val UTILS = "eu.europa.ec.*.util"
+private const val PROVIDERS = "eu.europa.ec.*.provider"
 private const val DI = "eu.europa.ec.*.di"
 private const val ROUTER_GRAPH = "eu.europa.ec.*.router"
 
@@ -30,9 +37,7 @@ val koverModules: Map<LibraryModule, KoverExclusionRules> = mapOf(
     LibraryModule.UiLogic to KoverExclusionRules.UiLogic,
     LibraryModule.CommonFeature to KoverExclusionRules.CommonFeature,
     LibraryModule.StartupFeature to KoverExclusionRules.StartupFeature,
-    LibraryModule.DashboardFeature to KoverExclusionRules.DashboardFeature,
     LibraryModule.PresentationFeature to KoverExclusionRules.PresentationFeature,
-    LibraryModule.ProximityFeature to KoverExclusionRules.ProximityFeature,
     LibraryModule.IssuanceFeature to KoverExclusionRules.IssuanceFeature,
     LibraryModule.LandingFeature to KoverExclusionRules.LandingFeature,
 )
@@ -41,7 +46,7 @@ sealed interface KoverExclusionRules {
     val commonClasses: List<String>
         get() = listOf(
             BUILD_CONFIG,
-            SCREEN_COMPOSABLES,
+            SCREEN_COMPOSABLES
         )
 
     val commonPackages: List<String>
@@ -49,7 +54,14 @@ sealed interface KoverExclusionRules {
             KOIN,
             DI,
             MODELS,
+            DOMAIN_MODELS,
             ROUTER_GRAPH,
+            EXTENSIONS,
+            CONFIGS,
+            TRANSFORMERS,
+            UTILS,
+            COMPONENTS,
+            PROVIDERS
         )
 
     val classes: List<String>
@@ -70,23 +82,10 @@ sealed interface KoverExclusionRules {
 
     object BusinessLogic : LogicModule {
         override val classes: List<String>
-            get() = commonClasses + listOf(
-                "eu.europa.ec.businesslogic.controller.security.AntiHookController",
-                "eu.europa.ec.businesslogic.controller.security.RootController",
-                "eu.europa.ec.businesslogic.controller.security.AndroidInstaller",
-                "eu.europa.ec.businesslogic.controller.security.AndroidPackageController*",
-                "eu.europa.ec.businesslogic.controller.security.AntiHookController*",
-                "eu.europa.ec.businesslogic.controller.security.RootControllerImpl",
-                "eu.europa.ec.businesslogic.controller.security.SecurityErrorCode",
-                "eu.europa.ec.businesslogic.controller.security.SecurityValidation",
-                "eu.europa.ec.businesslogic.extension.FlowExtensions*",
-                "eu.europa.ec.businesslogic.util.EudiWalletListenerWrapper",
-                "eu.europa.ec.businesslogic.util.SafeLet*",
-            )
+            get() = commonClasses
 
         override val packages: List<String>
             get() = commonPackages + listOf(
-                "eu.europa.ec.businesslogic.config",
                 "eu.europa.ec.businesslogic.controller.crypto",
                 "eu.europa.ec.businesslogic.controller.log",
                 "eu.europa.ec.businesslogic.controller.storage"
@@ -95,21 +94,14 @@ sealed interface KoverExclusionRules {
 
     object UiLogic : LogicModule {
         override val classes: List<String>
-            get() = commonClasses + listOf(
-                "eu.europa.ec.uilogic.navigation.*Screen*",
-                "eu.europa.ec.uilogic.navigation.ModuleRoute*",
-                "eu.europa.ec.uilogic.navigation.RouterHost*",
-                "eu.europa.ec.uilogic.serializer.UiSerializableParser*",
-                "eu.europa.ec.uilogic.serializer.UiSerializerImpl",
-            )
+            get() = commonClasses
 
         override val packages: List<String>
             get() = commonPackages + listOf(
-                "eu.europa.ec.uilogic.component",
-                "eu.europa.ec.uilogic.config",
                 "eu.europa.ec.uilogic.container",
-                "eu.europa.ec.uilogic.extension",
                 "eu.europa.ec.uilogic.mvi",
+                "eu.europa.ec.uilogic.navigation",
+                "eu.europa.ec.uilogic.serializer",
             )
     }
 
@@ -125,15 +117,10 @@ sealed interface KoverExclusionRules {
 
     object CommonFeature : FeatureModule {
         override val classes: List<String>
-            get() = commonClasses + listOf(
-                "eu.europa.ec.commonfeature.ui.document_details.DetailsContent*",
-            )
+            get() = commonClasses
 
         override val packages: List<String>
-            get() = commonPackages + listOf(
-                "eu.europa.ec.commonfeature.config",
-                "eu.europa.ec.commonfeature.ui.*.model",
-            )
+            get() = commonPackages
     }
 
     object StartupFeature : FeatureModule {
@@ -155,9 +142,7 @@ sealed interface KoverExclusionRules {
             get() = commonClasses
 
         override val packages: List<String>
-            get() = commonPackages + listOf(
-                "eu.europa.ec.dashboardfeature.ui.scanner.component",
-            )
+            get() = commonPackages
     }
 
     object PresentationFeature : FeatureModule {
@@ -166,16 +151,6 @@ sealed interface KoverExclusionRules {
 
         override val packages: List<String>
             get() = commonPackages
-    }
-
-    object ProximityFeature : FeatureModule {
-        override val classes: List<String>
-            get() = commonClasses
-
-        override val packages: List<String>
-            get() = commonPackages + listOf(
-                "eu.europa.ec.proximityfeature.ui.qr.component",
-            )
     }
 
     object IssuanceFeature : FeatureModule {

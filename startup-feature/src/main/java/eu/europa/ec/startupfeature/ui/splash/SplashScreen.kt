@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,8 @@ import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapImage
 import eu.europa.ec.uilogic.component.wrap.WrapText
+import eu.europa.ec.uilogic.extension.getAppVersionCode
+import eu.europa.ec.uilogic.extension.getAppVersionName
 import eu.europa.ec.uilogic.navigation.ModuleRoute
 import eu.europa.ec.uilogic.navigation.StartupScreens
 import kotlinx.coroutines.channels.Channel
@@ -64,8 +67,14 @@ fun SplashScreen(
     navController: NavController,
     viewModel: SplashViewModel,
 ) {
+    val context = LocalContext.current
+    val versionCode = context.getAppVersionCode()
+    val versionName = context.getAppVersionName()
+
     Content(
         effectFlow = viewModel.effect,
+        versionName = versionName,
+        versionCode = versionCode,
         onNavigationRequested = { navigationEffect ->
             handleNavigationEffects(navigationEffect, navController)
         }
@@ -98,6 +107,8 @@ private fun handleNavigationEffects(
 @Composable
 private fun Content(
     effectFlow: Flow<Effect>,
+    versionName: String,
+    versionCode: Long,
     onNavigationRequested: (navigationEffect: Effect.Navigation) -> Unit,
 ) {
 
@@ -109,6 +120,7 @@ private fun Content(
         Spacer(modifier = Modifier.weight(0.3f))
         MapTitleAndLogo()
         Spacer(modifier = Modifier.weight(1f))
+        VersionInfo(versionName, versionCode)
         Footer()
     }
 
@@ -143,28 +155,21 @@ private fun MapTitleAndLogo() {
                 contentScale = ContentScale.FillHeight
             )
             VSpacer.ExtraLarge()
-            val gradientTextConfig = TextConfig(
-                style = MaterialTheme.typography.displaySmall.copy(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            Color(0xFF0A215F),
-                        ),
-                    )
-                ),
-                textAlign = TextAlign.Center
-            )
             WrapText(
                 modifier = Modifier
                     .fillMaxWidth(),
-                text = stringResource(R.string.splash_screen_title_line_1),
-                textConfig = gradientTextConfig,
-            )
-            WrapText(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                text = stringResource(R.string.splash_screen_title_line_2),
-                textConfig = gradientTextConfig,
+                text = stringResource(R.string.splash_screen_title),
+                textConfig = TextConfig(
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                Color(0xFF0A215F),
+                            ),
+                        )
+                    ),
+                    textAlign = TextAlign.Center
+                )
             )
         }
     }
@@ -208,12 +213,29 @@ private fun Footer() {
     }
 }
 
+@Composable
+private fun VersionInfo(versionName: String, versionCode: Long) {
+    WrapText(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        text = "$versionName($versionCode)",
+        textConfig = TextConfig(
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.primary
+        )
+    )
+}
+
 @ThemeModePreviews
 @Composable
 private fun SplashScreenPreview() {
     PreviewTheme {
         Content(
             effectFlow = Channel<Effect>().receiveAsFlow(),
+            versionName = "1.0.0",
+            versionCode = 5,
             onNavigationRequested = {}
         )
     }

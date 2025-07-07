@@ -30,7 +30,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {
-            url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+            url = uri("https://central.sonatype.com/repository/maven-snapshots/")
             mavenContent { snapshotsOnly() }
         }
         maven {
@@ -52,9 +52,7 @@ include(":test-logic")
 include(":test-feature")
 include(":common-feature")
 include(":onboarding-feature")
-include(":dashboard-feature")
 include(":presentation-feature")
-include(":proximity-feature")
 include(":issuance-feature")
 include(":analytics-logic")
 include(":baseline-profile")

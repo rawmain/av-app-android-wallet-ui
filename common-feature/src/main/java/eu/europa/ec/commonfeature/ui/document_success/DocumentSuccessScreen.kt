@@ -37,14 +37,22 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.resourceslogic.R
+import eu.europa.ec.uilogic.component.AppIconAndTextData
+import eu.europa.ec.uilogic.component.ListItemData
+import eu.europa.ec.uilogic.component.ListItemMainContentData
+import eu.europa.ec.uilogic.component.RelyingPartyData
 import eu.europa.ec.uilogic.component.content.ContentHeader
+import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
+import eu.europa.ec.uilogic.component.preview.PreviewTheme
+import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
 import eu.europa.ec.uilogic.component.utils.SPACING_MEDIUM
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.wrap.ButtonConfig
 import eu.europa.ec.uilogic.component.wrap.ButtonType
+import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
 import eu.europa.ec.uilogic.component.wrap.StickyBottomConfig
 import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.WrapExpandableListItem
@@ -52,6 +60,7 @@ import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.extension.cacheDeepLink
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 
 @Composable
@@ -87,7 +96,6 @@ fun DocumentSuccessScreen(
         Content(
             state = state,
             effectFlow = viewModel.effect,
-            onEventSend = { event -> viewModel.setEvent(event) },
             onNavigationRequested = { navigationEffect ->
                 when (navigationEffect) {
                     is Effect.Navigation.SwitchScreen -> {
@@ -133,7 +141,6 @@ fun DocumentSuccessScreen(
 private fun Content(
     state: State,
     effectFlow: Flow<Effect>,
-    onEventSend: (Event) -> Unit,
     onNavigationRequested: (Effect.Navigation) -> Unit,
     paddingValues: PaddingValues,
 ) {
@@ -160,10 +167,8 @@ private fun Content(
                     header = successItem.header,
                     data = successItem.nestedItems,
                     onItemClick = null,
-                    onExpandedChange = { expandedItem ->
-                        onEventSend(Event.ExpandOrCollapseSuccessDocumentItem(itemId = expandedItem.itemId))
-                    },
-                    isExpanded = successItem.isExpanded,
+                    onExpandedChange = { },
+                    isExpanded = true,
                     throttleClicks = false,
                     hideSensitiveContent = false,
                     collapsedMainContentVerticalPadding = SPACING_MEDIUM.dp,
@@ -182,5 +187,50 @@ private fun Content(
                 is Effect.Navigation -> onNavigationRequested(effect)
             }
         }.collect()
+    }
+}
+
+@ThemeModePreviews
+@Composable
+fun DocumentSuccessScreenPreview() {
+    PreviewTheme {
+        Content(
+            state = State(
+                isLoading = false,
+                headerConfig = ContentHeaderConfig(
+                    appIconAndTextData = AppIconAndTextData(),
+                    description = null,
+                    descriptionTextConfig = null,
+                    mainText = stringResource(R.string.issuance_success_header_description),
+                    mainTextConfig = null,
+                    relyingPartyData = RelyingPartyData(
+                        logo = null,
+                        isVerified = true,
+                        name = "Test Issuer",
+                        nameTextConfig = null,
+                        description = null,
+                        descriptionTextConfig = null
+                    )
+                ),
+                items = listOf(
+                    ExpandableListItem.NestedListItemData(
+                        header = ListItemData(
+                            itemId = "1",
+                            mainContentData = ListItemMainContentData.Text(
+                                text = "True"
+                            ),
+                            overlineText = "Age over 18",
+                            leadingContentData = null,
+                            trailingContentData = null
+                        ),
+                        nestedItems = emptyList(),
+                        isExpanded = true
+                    )
+                )
+            ),
+            effectFlow = flowOf(),
+            onNavigationRequested = {},
+            paddingValues = PaddingValues(16.dp)
+        )
     }
 }

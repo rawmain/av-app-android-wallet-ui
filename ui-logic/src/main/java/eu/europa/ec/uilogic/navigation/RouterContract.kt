@@ -40,6 +40,8 @@ sealed class CommonScreens {
         parameters = "?biometricConfig={biometricConfig}"
     )
 
+    data object BiometricSetup : Screen("BIOMETRIC_SETUP")
+
     data object QuickPin :
         Screen(name = "QUICK_PIN", parameters = "?pinFlow={pinFlow}")
 
@@ -47,12 +49,6 @@ sealed class CommonScreens {
         name = "QR_SCAN",
         parameters = "?qrScanConfig={qrScanConfig}"
     )
-}
-
-sealed class DashboardScreens {
-    data object Dashboard : Screen(name = "DASHBOARD")
-    data object SignDocument :
-        Screen(name = "SIGN_DOCUMENT")
 }
 
 sealed class PresentationScreens {
@@ -66,31 +62,10 @@ sealed class PresentationScreens {
     data object PresentationSuccess : Screen(name = "PRESENTATION_SUCCESS")
 }
 
-sealed class ProximityScreens {
-    data object QR : Screen(
-        name = "PROXIMITY_QR",
-        parameters = "?requestUriConfig={requestUriConfig}"
-    )
-
-    data object Request : Screen(
-        name = "PROXIMITY_REQUEST",
-        parameters = "?requestUriConfig={requestUriConfig}"
-    )
-
-    data object Loading : Screen(name = "PROXIMITY_LOADING")
-
-    data object Success : Screen(name = "PROXIMITY_SUCCESS")
-}
-
 sealed class IssuanceScreens {
     data object AddDocument : Screen(
         name = "ISSUANCE_ADD_DOCUMENT",
         parameters = "?flowType={flowType}"
-    )
-
-    data object DocumentDetails : Screen(
-        name = "ISSUANCE_DOCUMENT_DETAILS",
-        parameters = "?documentId={documentId}"
     )
 
     data object DocumentOffer : Screen(
@@ -110,6 +85,7 @@ sealed class IssuanceScreens {
 }
 
 sealed class LandingScreens {
+    data object Settings : Screen(name = "SETTINGS")
     data object Landing : Screen(name = "LANDING")
 }
 
@@ -118,7 +94,6 @@ sealed class ModuleRoute(val route: String) : NavigatableItem {
     data object CommonModule : ModuleRoute("COMMON_MODULE")
     data object DashboardModule : ModuleRoute("DASHBOARD_MODULE")
     data object PresentationModule : ModuleRoute("PRESENTATION_MODULE")
-    data object ProximityModule : ModuleRoute("PROXIMITY_MODULE")
     data object IssuanceModule : ModuleRoute("ISSUANCE_MODULE")
     data object LandingModule : ModuleRoute("LANDING_MODULE")
     data object OnboardingModule : ModuleRoute("ONBOARDING_MODULE")
