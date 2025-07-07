@@ -169,6 +169,8 @@ interface WalletCoreDocumentsController {
 
     fun deleteAllDocuments(mainPidDocumentId: String): Flow<DeleteAllDocumentsPartialState>
 
+    fun deleteAllAgeDocuments(): Flow<DeleteAllDocumentsPartialState>
+
     fun resolveDocumentOffer(offerUri: String): Flow<ResolveDocumentOfferPartialState>
 
     fun issueDeferredDocument(docId: DocumentId): Flow<IssueDeferredDocumentPartialState>
@@ -378,6 +380,40 @@ class WalletCoreDocumentsControllerImpl(
             errorMessage = it.localizedMessage ?: genericErrorMessage
         )
     }
+
+    override fun deleteAllAgeDocuments() : Flow<DeleteAllDocumentsPartialState> = flow {
+        val allDocuments = getAllDocuments()
+        val ageDocumentIds = listOf(
+            DocumentIdentifier.AVAgeOver18,
+            DocumentIdentifier.MdocEUDIAgeOver18
+        )
+        val ageDocuments = allDocuments.filter { document ->
+             ageDocumentIds.contains(document.toDocumentIdentifier())
+        }
+
+        var allDeleted = true
+        var failureReason = ""
+
+        ageDocuments.forEach { document ->
+            deleteDocument(documentId = document.id).collect { deleteDocumentPartialState ->
+                when (deleteDocumentPartialState) {
+                    is DeleteDocumentPartialState.Failure -> {
+                        allDeleted = false
+                        failureReason = deleteDocumentPartialState.errorMessage
+                    }
+                    is DeleteDocumentPartialState.Success -> { /* continue */ }
+                }
+            }
+        }
+
+        val state = if (allDeleted) {
+            DeleteAllDocumentsPartialState.Success
+        } else {
+            DeleteAllDocumentsPartialState.Failure(errorMessage = failureReason)
+        }
+        emit(state)
+    }
+
 
     override fun deleteAllDocuments(mainPidDocumentId: String): Flow<DeleteAllDocumentsPartialState> =
         flow {

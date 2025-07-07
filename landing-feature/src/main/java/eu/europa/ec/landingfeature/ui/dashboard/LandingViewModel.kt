@@ -96,7 +96,7 @@ class LandingViewModel(
             }
 
             is Event.GoToSettings -> {
-                // No effect for now
+                switchScreen(LandingScreens.Settings.screenRoute)
             }
 
             is Event.GoToScanQR -> {
@@ -109,11 +109,15 @@ class LandingViewModel(
 
             Event.AddCredentials -> {
                 if (viewState.value.credentialCount == 0) {
-                    setEffect {
-                        Effect.Navigation.SwitchScreen(OnboardingScreens.Enrollment.screenRoute)
-                    }
+                    switchScreen(OnboardingScreens.Enrollment.screenRoute)
                 }
             }
+        }
+    }
+
+    private fun switchScreen(route: String) {
+        setEffect {
+            Effect.Navigation.SwitchScreen(route)
         }
     }
 

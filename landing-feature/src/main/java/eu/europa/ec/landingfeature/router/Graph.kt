@@ -23,6 +23,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 import eu.europa.ec.landingfeature.BuildConfig
 import eu.europa.ec.landingfeature.ui.dashboard.LandingScreen
+import eu.europa.ec.landingfeature.ui.settings.SettingsScreen
 import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.ModuleRoute
 import org.koin.androidx.compose.koinViewModel
@@ -43,6 +44,20 @@ fun NavGraphBuilder.featureLandingGraph(navController: NavController) {
         ) {
             LandingScreen(
                 hostNavController = navController,
+                viewModel = koinViewModel(),
+            )
+        }
+        composable(
+            route = LandingScreens.Settings.screenRoute,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern =
+                        BuildConfig.DEEPLINK + LandingScreens.Settings.screenRoute
+                }
+            )
+        ) {
+            SettingsScreen(
+                navController = navController,
                 viewModel = koinViewModel(),
             )
         }

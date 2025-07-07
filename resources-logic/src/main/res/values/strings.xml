@@ -284,6 +284,14 @@
     <string name="document_category_retail">RETAIL</string>
     <string name="document_category_other">OTHER</string>
 
+    <!--    Settings screen-->
+    <string name="settings_screen_title">Settings</string>
+    <string name="settings_screen_credentials">Credentials</string>
+    <string name="settings_screen_delete_proofs">Delete all proofs of age attestations</string>
+    <string name="confirm_doc_removal_dialog_title">Confirm documents deletion</string>
+    <string name="confirm_doc_removal_dialog_text">Are you sure you want to delete all the stored proofs?</string>
+    <string name="confirm_doc_removal_dialog_delete">Yes, delete</string>
+    
     <!-- Landing Screen -->
     <string name="landing_screen_title">Age Verification</string>
     <string name="landing_screen_subtitle">With your proof of age, you can prove to services restricted to adults that you are old enough to access them.\nThe proof of age shows only that you are older than 18. It contains no other personal information."</string>
@@ -295,4 +303,7 @@
     <string name="landing_screen_no_age_credential_found">There are no age credentials available</string>
     <string name="landing_screen_credentials_left">%1$d left</string>
     <string name="landing_screen_add_credentials">Add more</string>
+    <string name="settings_screen_version">Version</string>
+    <string name="settings_screen_app_info">App Information</string>
+
 </resources>

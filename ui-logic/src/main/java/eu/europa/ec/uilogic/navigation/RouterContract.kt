@@ -85,6 +85,7 @@ sealed class IssuanceScreens {
 }
 
 sealed class LandingScreens {
+    data object Settings : Screen(name = "SETTINGS")
     data object Landing : Screen(name = "LANDING")
 }
 
