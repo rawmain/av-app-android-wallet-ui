@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.1.0-beta05 - 2025-07-07
+
+### Added
+
+- Settings screen with app version display and option to delete all documents
+- Show app version in splash screen
+- Added ToS and data privacy sample link opening action
+
+### Changed
+
+- Customizable batch size and credential policy from WalletCoreConfig
+- Show all text lines in landing page
+- Updated build and release pipelines for demo APK and AAB distribution
+- Update version with tag before build
+- Bumped EUDI Wallet Core dependency to 0.18.0-SNAPSHOT
+
+### Removed
+
+- All translations (cleanup)
+- Transaction Log related code, cleaned up proximity and dashboard feature modules, icons, strings,
+  and image resources
+
+### Fixed
+
+- N/A
+
 ## v0.1.0-beta04 - 2025-06-26
 
 ### Changed
@@ -35,7 +61,7 @@
 
 ### Changed
 
-- Updated EUDI Wallet Core dependency to version 0.17.0-SNAPSHOT
+- Updated EUDI Wallet Core dependency to version 0.17.0
 - Updated document creation settings to request 30 credentials and use OneTimeUse policy
 - Modified document metadata API usage (DocumentMetaData → IssuerMetadata)
 - Updated BiometricCrypto implementation
@@ -56,7 +82,7 @@
 
 ### Changed
 
-- Updated app version name to `0.1.0-beta01`
+- Updated app version name to 0.1.0-beta01
 - Updated app icons and other UI assets
 - Updated QR scan flow configuration to use NO_DOCUMENT for issuance
 - Updated issuer URLs and document identifiers for age verification

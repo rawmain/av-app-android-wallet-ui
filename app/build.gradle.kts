@@ -28,7 +28,7 @@ android {
     signingConfigs {
         create("release") {
 
-            storeFile = file("${rootProject.projectDir}/sign")
+            storeFile = file("${rootProject.projectDir}/sign/keystore.jks")
 
             keyAlias = getProperty("androidKeyAlias") ?: System.getenv("ANDROID_KEY_ALIAS")
             keyPassword = getProperty("androidKeyPassword") ?: System.getenv("ANDROID_KEY_PASSWORD")
@@ -40,8 +40,9 @@ android {
     }
 
     defaultConfig {
-        applicationId = "eu.europa.ec.av"
-        versionCode = 1
+        applicationId = "com.scytales.av"
+        val ciBuildNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1
+        versionCode = ciBuildNumber + 4 // last build in store was 4
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

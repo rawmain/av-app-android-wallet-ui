@@ -11,6 +11,10 @@ on:
 jobs:
   build:
     runs-on: github-runner-dune
+    env:
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
     steps:
       - name: Checkout code
@@ -36,6 +40,12 @@ jobs:
           gradle-version: wrapper
           cache-read-only: false
 
+      - name: Decode and place keystore
+        if: env.KEYSTORE_BASE64 != ''
+        run: |
+          mkdir -p sign
+          echo "${{ env.KEYSTORE_BASE64 }}" | base64 --decode > sign/keystore.jks
+
       - name: Run lint check
         run: ./gradlew lint
 
@@ -48,6 +58,16 @@ jobs:
       - name: Upload DEMO debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
+          name: demo-debug-apk
           path: app/build/outputs/apk/demo/debug/*.apk
+          retention-days: 90
+
+      - name: Build DEMO release APK
+        run: ./gradlew assembleDemoRelease
+
+      - name: Upload DEMO release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-release-apk
+          path: app/build/outputs/apk/demo/release/*.apk
           retention-days: 90

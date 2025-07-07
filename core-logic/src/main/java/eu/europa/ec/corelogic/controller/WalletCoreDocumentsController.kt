@@ -21,15 +21,11 @@ import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.extension.getLocalizedDisplayName
-import eu.europa.ec.corelogic.extension.parseTransactionLog
-import eu.europa.ec.corelogic.extension.toCoreTransactionLog
-import eu.europa.ec.corelogic.extension.toTransactionLogData
 import eu.europa.ec.corelogic.model.DeferredDocumentData
 import eu.europa.ec.corelogic.model.DocumentCategories
 import eu.europa.ec.corelogic.model.DocumentIdentifier
 import eu.europa.ec.corelogic.model.FormatType
 import eu.europa.ec.corelogic.model.ScopedDocument
-import eu.europa.ec.corelogic.model.TransactionLogData
 import eu.europa.ec.corelogic.model.toDocumentIdentifier
 import eu.europa.ec.eudi.openid4vci.MsoMdocCredential
 import eu.europa.ec.eudi.openid4vci.SdJwtVcCredential
@@ -173,6 +169,8 @@ interface WalletCoreDocumentsController {
 
     fun deleteAllDocuments(mainPidDocumentId: String): Flow<DeleteAllDocumentsPartialState>
 
+    fun deleteAllAgeDocuments(): Flow<DeleteAllDocumentsPartialState>
+
     fun resolveDocumentOffer(offerUri: String): Flow<ResolveDocumentOfferPartialState>
 
     fun issueDeferredDocument(docId: DocumentId): Flow<IssueDeferredDocumentPartialState>
@@ -190,10 +188,6 @@ interface WalletCoreDocumentsController {
     suspend fun isDocumentRevoked(id: String): Boolean
 
     suspend fun resolveDocumentStatus(document: IssuedDocument): Result<Status>
-
-    suspend fun getTransactionLogs(): List<TransactionLogData>
-
-    suspend fun getTransactionLog(id: String): TransactionLogData?
 
     suspend fun isDocumentBookmarked(documentId: DocumentId): Boolean
 
@@ -387,6 +381,40 @@ class WalletCoreDocumentsControllerImpl(
         )
     }
 
+    override fun deleteAllAgeDocuments() : Flow<DeleteAllDocumentsPartialState> = flow {
+        val allDocuments = getAllDocuments()
+        val ageDocumentIds = listOf(
+            DocumentIdentifier.AVAgeOver18,
+            DocumentIdentifier.MdocEUDIAgeOver18
+        )
+        val ageDocuments = allDocuments.filter { document ->
+             ageDocumentIds.contains(document.toDocumentIdentifier())
+        }
+
+        var allDeleted = true
+        var failureReason = ""
+
+        ageDocuments.forEach { document ->
+            deleteDocument(documentId = document.id).collect { deleteDocumentPartialState ->
+                when (deleteDocumentPartialState) {
+                    is DeleteDocumentPartialState.Failure -> {
+                        allDeleted = false
+                        failureReason = deleteDocumentPartialState.errorMessage
+                    }
+                    is DeleteDocumentPartialState.Success -> { /* continue */ }
+                }
+            }
+        }
+
+        val state = if (allDeleted) {
+            DeleteAllDocumentsPartialState.Success
+        } else {
+            DeleteAllDocumentsPartialState.Failure(errorMessage = failureReason)
+        }
+        emit(state)
+    }
+
+
     override fun deleteAllDocuments(mainPidDocumentId: String): Flow<DeleteAllDocumentsPartialState> =
         flow {
 
@@ -563,25 +591,6 @@ class WalletCoreDocumentsControllerImpl(
             }
     }
 
-    override suspend fun getTransactionLogs(): List<TransactionLogData> =
-        withContext(dispatcher) {
-            transactionLogDao.retrieveAll()
-                .mapNotNull { transactionLog ->
-                    transactionLog
-                        .toCoreTransactionLog()
-                        ?.parseTransactionLog()
-                        ?.toTransactionLogData(transactionLog.identifier)
-                }
-        }
-
-    override suspend fun getTransactionLog(id: String): TransactionLogData? =
-        withContext(dispatcher) {
-            transactionLogDao.retrieve(id)
-                ?.toCoreTransactionLog()
-                ?.parseTransactionLog()
-                ?.toTransactionLogData(id)
-        }
-
     override suspend fun isDocumentBookmarked(documentId: DocumentId): Boolean =
         bookmarkDao.retrieve(documentId) != null
 
@@ -633,8 +642,8 @@ class WalletCoreDocumentsControllerImpl(
                     event.resume(
                         eudiWallet.getDefaultCreateDocumentSettings(
                             offeredDocument = event.offeredDocument,
-                            numberOfCredentials = 30,
-                            credentialPolicy = CredentialPolicy.OneTimeUse
+                            numberOfCredentials = walletCoreConfig.credentialBatchSize,
+                            credentialPolicy = walletCoreConfig.credentialPolicy
                         )
                     )
                 }

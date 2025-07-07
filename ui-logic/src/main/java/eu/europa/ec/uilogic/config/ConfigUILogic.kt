@@ -19,10 +19,6 @@ package eu.europa.ec.uilogic.config
 import eu.europa.ec.uilogic.navigation.Screen
 
 interface ConfigUILogic {
-    /*
-       Define the dashboard identifier
-    */
-    val dashboardScreenIdentifier: Screen
 
     /*
    Define the issuance identifier

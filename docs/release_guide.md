@@ -1,10 +1,10 @@
 # Release Guide
 
-This document describes the neccessary steps to publish the Android Age Verification app to the Google Play Store and make it available for production use, follow these steps:
+This document describes the necessary steps to publish the Android Age Verification app to the Google Play Store and make it available for production use, follow these steps:
 
 **0. Customization (Optional)**
 * Add additional features.
-* Update the data privacy declaration and terms and conditions in the app folder.
+* Update the Data Privacy declaration and Terms and Conditions links (see `ConsentScreen`).
 * Update the branding scheme of the app. 
 
 **1. Prepare Your App for Release**
