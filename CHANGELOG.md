@@ -1,5 +1,54 @@
 # Changelog
 
+## v0.1.0-beta05 - 2025-07-07
+
+### Added
+
+- Settings screen with app version display and option to delete all documents
+- Show app version in splash screen
+- Added ToS and data privacy sample link opening action
+
+### Changed
+
+- Customizable batch size and credential policy from WalletCoreConfig
+- Show all text lines in landing page
+- Updated build and release pipelines for demo APK and AAB distribution
+- Update version with tag before build
+- Bumped EUDI Wallet Core dependency to 0.18.0-SNAPSHOT
+
+### Removed
+
+- All translations (cleanup)
+- Transaction Log related code, cleaned up proximity and dashboard feature modules, icons, strings,
+  and image resources
+
+### Fixed
+
+- N/A
+
+## v0.1.0-beta04 - 2025-06-26
+
+### Changed
+
+- Fixes same device presentation
+
+### Removed
+
+- Android Studio module templates
+
+## v0.1.0-beta03 - 2025-06-24
+
+### Added
+
+- Added `av://` URI scheme handling to support deep linking
+
+### Changed
+
+- Updated app version name to `0.1.0-beta03`
+- Updated Age Verification document identifier to versioned `eu.europa.ec.av.1`
+- Updated issuance and presentation flows videos
+- Updated EUDI Wallet Core dependency to stable version 0.17.0
+
 ## v0.1.0-beta02 - 2025-06-18
 
 ### Added
