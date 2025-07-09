@@ -21,7 +21,6 @@ import eu.europa.ec.commonfeature.util.TestsData
 import eu.europa.ec.commonfeature.util.TestsData.mockedErrorDescription
 import eu.europa.ec.commonfeature.util.TestsData.mockedIssuerName
 import eu.europa.ec.commonfeature.util.TestsData.mockedPidId
-import eu.europa.ec.commonfeature.util.TestsData.mockedRequestElementIdentifierNotAvailable
 import eu.europa.ec.commonfeature.util.TestsData.mockedSuccessDescription
 import eu.europa.ec.commonfeature.util.TestsData.mockedSuccessText
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
@@ -91,7 +90,6 @@ class TestDocumentIssuanceSuccessInteractor {
         mockIssuerName(resourceProvider = resourceProvider, name = mockedIssuerName)
         mockTransformToUiItemsCall(
             resourceProvider = resourceProvider,
-            notAvailableString = mockedRequestElementIdentifierNotAvailable
         )
     }
 
