@@ -33,7 +33,7 @@
     <string name="generic_close">Close</string>
     <string name="generic_ok">OK</string>
     <string name="generic_dash">-</string>
-    <string name="generic_default_relying_party_name">Relying Party</string>
+    <string name="generic_default_relying_party_name">Verifier</string>
     <string name="generic_default_issuer_name">Issuer</string>
     <string name="generic_view_details">Credential details</string>
     <string name="generic_deferred_success_text">In progress!</string>
