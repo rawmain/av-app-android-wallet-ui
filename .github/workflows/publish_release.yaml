@@ -1,9 +1,7 @@
 name: Publish Release and add tag
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
