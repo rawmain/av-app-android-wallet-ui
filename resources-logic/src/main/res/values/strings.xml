@@ -24,31 +24,16 @@
     <string name="generic_error_retry">Please try again</string>
     <string name="generic_cancel">Cancel</string>
     <string name="generic_cancel_capitalized" tools:ignore="ButtonCase">CANCEL</string>
-    <string name="generic_next_capitalized" tools:ignore="ButtonCase">NEXT</string>
-    <string name="generic_confirm_capitalized" tools:ignore="ButtonCase">CONFIRM</string>
-    <string name="generic_continue">Continue</string>
     <string name="generic_continue_capitalized" tools:ignore="ButtonCase">CONTINUE</string>
-    <string name="generic_enable_capitalized" tools:ignore="ButtonCase">ENABLE</string>
     <string name="generic_success">Success</string>
     <string name="generic_close">Close</string>
     <string name="generic_ok">OK</string>
-    <string name="generic_dash">-</string>
-    <string name="generic_default_relying_party_name">Relying Party</string>
+    <string name="generic_default_relying_party_name">Verifier</string>
     <string name="generic_default_issuer_name">Issuer</string>
     <string name="generic_view_details">Credential details</string>
     <string name="generic_deferred_success_text">In progress!</string>
-    <string name="generic_bottom_sheet_delete_title">Delete document?</string>
-    <string name="generic_bottom_sheet_delete_subtitle">This document will be permanently deleted from your wallet and may affect access to services.</string>
-    <string name="generic_bottom_sheet_delete_primary_button_text">Delete</string>
-    <string name="generic_bottom_sheet_delete_secondary_button_text">Cancel</string>
     <string name="generic_scan_qr">Scan QR</string>
     <string name="generic_or">OR</string>
-    <string name="generic_filters_apply">Apply</string>
-    <string name="generic_filters_reset">Reset all</string>
-    <string name="generic_filters_title">Filter</string>
-    <string name="generic_filters_sort_by">Sort by</string>
-    <string name="generic_filters_ascending">Ascending</string>
-    <string name="generic_filters_descending">Descending</string>
 
     <string name="onboarding_step_1_title">Welcome</string>
     <string name="onboarding_step_2_title">Consent</string>
@@ -64,8 +49,6 @@
     <string name="onboarding_verification_description">This verification is needed to create a proof of age that you are over 18. The eID details will not be shared with online services you access.</string>
     <string name="onboarding_verification_national_id">National eID / National idP</string>
     <string name="onboarding_verification_national_id_description">Identify online using your eID</string>
-    <string name="onboarding_verification_token">Token / QR-Code</string>
-    <string name="onboarding_verification_token_description">Scan a provided QR Code</string>
 
     <string name="welcome_page_1">Using this app you can securely prove you are over 18 when accessing services restricted to adults.</string>
     <string name="welcome_page_2">Verify that you are over 18 once, use this proof to securely access many services restricted to adults.</string>
@@ -107,33 +90,19 @@
     <string name="content_description_present_document_same_device_icon">Present document in person</string>
     <string name="content_description_add_document_from_qr_icon">Add document from QR</string>
 
-    <string name="content_description_bookmark_icon">Bookmark</string>
-    <string name="content_description_bookmark_filled_icon">Bookmark filled</string>
-    <string name="content_description_certified_icon">Certified</string>
     <string name="content_description_documents_icon">Documents</string>
-    <string name="content_description_download_icon">Download</string>
     <string name="content_description_filters_icon">Filters</string>
-    <string name="content_description_home_icon">Home</string>
     <string name="content_description_in_progress_icon">In progress</string>
-    <string name="content_description_notifications_icon">Notifications</string>
-    <string name="content_description_transactions_icon">Transactions</string>
     <string name="content_description_wallet_activated_icon">Wallet activated</string>
     <string name="content_description_wallet_secured_icon">Wallet secured</string>
     <string name="content_description_info_icon">Info</string>
-    <string name="content_description_issuer_icon">Issuer</string>
     <string name="content_description_issuer_logo_icon">Issuer logo</string>
-    <string name="content_description_menu_icon">Menu</string>
-    <string name="content_description_signature_icon">Signature</string>
-    <string name="content_description_authenticate_icon">Authentication ID cards</string>
-    <string name="content_description_change_pin_icon">Change PIN</string>
     <string name="content_description_check_icon">Check</string>
-    <string name="content_description_open_in_browser_icon">Open in browser</string>
     <string name="content_description_settings_icon">Settings</string>
     <string name="content_description_eu_flag_icon">EU Flag</string>
     <string name="content_description_over_18_icon">Over 18</string>
     <string name="content_description_national_eid_icon">National eID</string>
     <string name="content_description_eu_map_icon">Eu Map</string>
-    <string name="content_description_age_verification_icon">Age Verification Logo</string>
     <string name="content_description_telekom_logo_icon">Telekom Logo</string>
     <string name="content_description_scytales_logo_icon">Scytales Logo</string>
     <string name="content_description_date_range_icon">Select filter date range</string>
@@ -181,7 +150,6 @@
     <string name="quick_pin_change_enter_new_subtitle">@string/quick_pin_create_reenter_subtitle</string>
     <string name="quick_pin_change_reenter_new_subtitle">@string/quick_pin_create_reenter_subtitle</string>
 
-    <string name="quick_pin_create_success_text">Your wallet is secured!</string>
     <string name="quick_pin_change_success_text">@string/generic_success</string>
     <string name="quick_pin_change_success_description">You successfully changed the quick pin</string>
     <string name="quick_pin_change_success_btn">BACK TO HOME</string>
@@ -207,7 +175,6 @@
     <string name="request_gender_female">Female</string>
     <string name="request_gender_not_known">Not known</string>
     <string name="request_gender_not_applicable">Not applicable</string>
-    <string name="request_element_identifier_not_available">Not available</string>
 
     <!-- Loading Screen -->
     <string name="loading_header_description">Please wait…</string>
@@ -297,7 +264,6 @@
     <string name="landing_screen_subtitle">With your proof of age, you can prove to services restricted to adults that you are old enough to access them.\nThe proof of age shows only that you are older than 18. It contains no other personal information."</string>
     <string name="landing_screen_card_eu_title">European\nUnion</string>
     <string name="landing_screen_card_age_verification">Age Verification</string>
-    <string name="landing_screen_card_certified">EU certified official credential</string>
     <string name="landing_screen_primary_button_label_scan">Scan</string>
     <string name="landing_screen_credential_details">Credential Details</string>
     <string name="landing_screen_no_age_credential_found">There are no age credentials available</string>

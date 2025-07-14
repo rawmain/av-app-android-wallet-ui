@@ -21,7 +21,6 @@ import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.commonfeature.config.toDomainConfig
 import eu.europa.ec.commonfeature.ui.request.transformer.RequestTransformer
-import eu.europa.ec.commonfeature.util.TestsData.mockedRequestElementIdentifierNotAvailable
 import eu.europa.ec.commonfeature.util.TestsData.mockedValidMdlWithBasicFieldsRequestDocument
 import eu.europa.ec.commonfeature.util.TestsData.mockedValidPidWithBasicFieldsRequestDocument
 import eu.europa.ec.commonfeature.util.TestsData.mockedVerifierName
@@ -249,8 +248,7 @@ class TestPresentationRequestInteractor {
             )
             mockIsDocumentRevoked(isRevoked = false)
             mockTransformToUiItemsCall(
-                resourceProvider = resourceProvider,
-                notAvailableString = mockedRequestElementIdentifierNotAvailable
+                resourceProvider = resourceProvider
             )
             mockWalletCorePresentationControllerEventEmission(
                 event = TransferEventPartialState.RequestReceived(
