@@ -62,7 +62,6 @@ object TestsData {
     const val mockedDocumentHasExpired = false
     const val mockedVerifierName = "EUDIW Verifier"
     const val mockedIssuerName = "EUDIW Issuer"
-    const val mockedRequestElementIdentifierNotAvailable = "Not available"
     const val mockedOfferedDocumentName = "Offered Document"
     const val mockedOfferedDocumentDocType = "mocked_offered_document_doc_type"
     const val mockedTxCodeFourDigits = 4
