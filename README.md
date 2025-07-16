@@ -28,7 +28,7 @@ SPDX-License-Identifier: Apache-2.0
 
 ## About
 
-The Age Verification (AV) android app is part of the Age Verification Solution Toolbox and serves as a component that can be used by memberstates, if necessary, to develop a national solution and build upon the building blocks of the toolbox.
+The Age Verification (AV) android app is part of the Age Verification Solution Toolbox and serves as a component that can be used by Member States, if necessary, to develop a national solution and build upon the building blocks of the toolbox.
 
 This android app is forked from [EUDI Android Wallet reference application](https://github.com/eu-digital-identity-wallet/eudi-app-android-wallet-ui), which is built based on the [Architecture Reference Framework](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/architecture-and-reference-framework-main.md) and aims to showcase a robust and interoperable platform for digital identification, authentication, and electronic signatures based on common standards across the European Union.
 
@@ -41,7 +41,7 @@ The AV Android is the application that allows users to:
 
 ## Disclaimer
 
-This is an initial version of the software, developed solely for the purpose of demonstrating the business flow of the solution. It is not intended for production use, and does not yet include the full set of functional, security, or integration features required for a live deployment.
+This is the first release of the software, developed solely for the purpose of demonstrating the business flow of the solution. It is not intended for production use, and does not yet include the full set of functional, security, or integration features required for a live deployment.
 
 **Important:** App hardening (such as code obfuscation, anti-tampering, anti-debugging, and other
 protections) is **not included** in this release. The application is not protected against reverse
@@ -54,11 +54,11 @@ The current release provides only basic functionality, with several key features
 
 These planned features align with the requirements and methods described in the Age Verification Profile.
 
-This version should be considered a foundational prototype to support early testing, feedback, and integration discussions.
-- The initial development release may be changed substantially over time and might introduce new features but also may change or remove existing ones, potentially breaking compatibility with your existing code.
-- The initial development release may contain errors or design flaws and other problems that could cause system or other failures and data loss.
-- The initial development release has reduced security, privacy, availability, and reliability standards relative to future releases. This could make the software slower, less reliable, or more vulnerable to attacks than mature software.
-- The initial development release is not yet comprehensively documented.
+This release should be considered a foundational prototype to support early testing, feedback, and integration discussions.
+- The release may be changed substantially over time and might introduce new features but also may change or remove existing ones, potentially breaking compatibility with your existing code.
+- The release may contain errors or design flaws and other problems that could cause system or other failures and data loss.
+- The release has reduced security, privacy, availability, and reliability standards relative to future releases. This could make the software slower, less reliable, or more vulnerable to attacks than mature software.
+- The release is not yet comprehensively documented.
 - Users of the software must perform sufficient engineering and additional testing to properly evaluate their application and determine whether any of the open-sourced components are suitable for use in that application.
 - We strongly recommend not putting this version of the software into production use.
 - Only the latest version of the software will be supported
@@ -69,7 +69,7 @@ This version should be considered a foundational prototype to support early test
 
 The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.com/eu-digital-identity-wallet/eudi-lib-android-wallet-core) and a list of available libraries to facilitate remote presentation and issuing test/demo functionality following partially the specification of the [ARF](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework), including:
 
-- OpenID4VP - draft 25 (remote presentation)
+- OpenID4VP - draft 24 (remote presentation)
 
 - OpenID4VCI draft 15 (issuing)
   
