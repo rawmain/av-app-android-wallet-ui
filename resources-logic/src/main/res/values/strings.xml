@@ -28,7 +28,7 @@
     <string name="generic_success">Success</string>
     <string name="generic_close">Close</string>
     <string name="generic_ok">OK</string>
-    <string name="generic_default_relying_party_name">Verifier</string>
+    <string name="generic_default_relying_party_name">Online service</string>
     <string name="generic_default_issuer_name">Issuer</string>
     <string name="generic_view_details">Credential details</string>
     <string name="generic_deferred_success_text">In progress!</string>
@@ -46,7 +46,7 @@
 
     <!-- Enrollment Screen -->
     <string name="onboarding_verification_title">Choose your age verification method</string>
-    <string name="onboarding_verification_description">This verification is needed to create a proof of age that you are over 18. The eID details will not be shared with online services you access.</string>
+    <string name="onboarding_verification_description">This verification is needed to create a proof that you are over 18. The eID details will not be shared with online services you access.</string>
     <string name="onboarding_verification_national_id">National eID / National idP</string>
     <string name="onboarding_verification_national_id_description">Identify online using your eID</string>
 
@@ -68,11 +68,11 @@
     <string name="content_description_close_icon">Close</string>
     <string name="content_description_warning_icon">Warning</string>
     <string name="content_description_error_icon">Error</string>
-    <string name="content_description_touch_id_icon">Touch id</string>
+    <string name="content_description_touch_id_icon">Touch ID</string>
     <string name="content_description_qr_icon">QR</string>
     <string name="content_description_qr_scanner_icon">QR Scanner</string>
     <string name="content_description_user_icon">User</string>
-    <string name="content_description_id_icon">Id</string>
+    <string name="content_description_id_icon">ID</string>
     <string name="content_description_logo_plain_icon">Plain Logo icon</string>
     <string name="content_description_logo_text_icon">Text Logo icon</string>
     <string name="content_description_arrow_up_icon">Arrow up</string>
@@ -93,8 +93,8 @@
     <string name="content_description_documents_icon">Documents</string>
     <string name="content_description_filters_icon">Filters</string>
     <string name="content_description_in_progress_icon">In progress</string>
-    <string name="content_description_wallet_activated_icon">Wallet activated</string>
-    <string name="content_description_wallet_secured_icon">Wallet secured</string>
+    <string name="content_description_wallet_activated_icon">Application activated</string>
+    <string name="content_description_wallet_secured_icon">Application secured</string>
     <string name="content_description_info_icon">Info</string>
     <string name="content_description_issuer_logo_icon">Issuer logo</string>
     <string name="content_description_check_icon">Check</string>
@@ -111,31 +111,28 @@
     <string name="biometric_prompt_title">Biometric authentication</string>
     <string name="biometric_prompt_subtitle">Authenticate using your biometrics</string>
     <string name="biometric_login_title">Welcome Back!</string>
-    <string name="biometric_login_biometrics_enabled_subtitle">Use your biometrics to access the Age Verification Wallet.</string>
-    <string name="biometric_login_biometrics_not_enabled_subtitle">To access the Age Verification Wallet, please enter your PIN.</string>
+    <string name="biometric_login_biometrics_enabled_subtitle">Use your biometrics to access the Age Verification Application.</string>
+    <string name="biometric_login_biometrics_not_enabled_subtitle">To access the Age Verification Application, please enter your PIN.</string>
     <string name="biometric_login_forgot_pin">Forgot your PIN?</string>
 
     <!-- Biometrics -->
     <string name="biometric_no_hardware">Your device does not support biometric authentication</string>
     <string name="biometric_unknown_error">Something went wrong initializing biometric authentication. Please try again</string>
-    <string name="biometric_default_mode_text_above_pin_field">PIN</string>">
+    <string name="biometric_default_mode_text_above_pin_field">PIN</string>
 
     <string name="biometric_setup_title">Biometric access</string>
-    <string name="biometric_setup_description">Use your fingerprint or face recognition to log in to the \"%1$s\" app.</string>
+    <string name="biometric_setup_description">Use your fingerprint or face recognition to log in to the \&quot;%1$s\&quot; app.</string>
     <string name="biometric_setup_enable">Start setup</string>
     <string name="biometric_setup_skip">Skip</string>
-
-    <!-- Document Success -->
     <string name="document_success_header_description">You successfully shared the following information with</string>
     <string name="document_success_header_description_when_error">You successfully shared the information with</string>
     <string name="document_success_relying_party_default_name">@string/generic_default_relying_party_name</string>
     <string name="document_success_collapsed_supporting_text">@string/generic_view_details</string>
     <string name="document_success_sticky_button_text">@string/generic_close</string>
-
     <!-- Quick Pin -->
-    <string name="quick_pin_invalid_error">Invalid quick pin</string>
+    <string name="quick_pin_invalid_error">Invalid PIN</string>
     <string name="quick_pin_numerical_rule_invalid_error_message">Only numerical values are allowed</string>
-    <string name="quick_pin_non_match">Pins do not match</string>
+    <string name="quick_pin_non_match">PINs do not match</string>
     <string name="quick_pin_confirm_button">Confirm</string>
     <string name="quick_pin_next_button">Next</string>
 
@@ -145,20 +142,6 @@
     <string name="quick_pin_create_enter_subtitle">Your 6-digit PIN</string>
     <string name="quick_pin_create_reenter_subtitle">Repeat your 6-digit PIN</string>
 
-    <string name="quick_pin_change_title">Change quick pin</string>
-    <string name="quick_pin_change_validate_current_subtitle">Type your current pin</string>
-    <string name="quick_pin_change_enter_new_subtitle">@string/quick_pin_create_reenter_subtitle</string>
-    <string name="quick_pin_change_reenter_new_subtitle">@string/quick_pin_create_reenter_subtitle</string>
-
-    <string name="quick_pin_change_success_text">@string/generic_success</string>
-    <string name="quick_pin_change_success_description">You successfully changed the quick pin</string>
-    <string name="quick_pin_change_success_btn">BACK TO HOME</string>
-
-    <string name="quick_pin_bottom_sheet_cancel_title">Cancel quick pin changing?</string>
-    <string name="quick_pin_bottom_sheet_cancel_subtitle">Cancel will redirect you back to the home without changing the quick pin</string>
-    <string name="quick_pin_bottom_sheet_cancel_primary_button_text">@string/generic_continue_capitalized</string>
-    <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">@string/generic_cancel_capitalized</string>
-
     <!-- Request Screen -->
     <string name="request_header_description">The following transaction requires your permission and authentication.</string>
     <string name="request_header_main_text">DATA SHARING REQUEST</string>
@@ -166,8 +149,7 @@
     <string name="request_relying_party_description">requests the following</string>
     <string name="request_warning_text">Please review carefully before sharing your data.</string>
     <string name="request_collapsed_supporting_text">@string/generic_view_details</string>
-    <string name="request_no_data">The requested document is not available in your Age Verification Wallet.
-        Please contact the authorised issuer for further information.</string>
+    <string name="request_no_data">The requested document is not available in your Age Verification Application. Please contact the authorised issuer for further information.</string>
     <string name="request_sticky_button_text">Share</string>
     <string name="request_bottom_sheet_warning_title">Warning</string>
     <string name="request_bottom_sheet_warning_subtitle">Choosing not to share certain data may result in failure to issue the requested document.</string>
@@ -200,32 +182,30 @@
 
     <!-- Presentation Qr Scan -->
     <string name="presentation_qr_scan_title">Present document online</string>
-    <string name="presentation_qr_scan_subtitle">Scan a QR code provided from a Relying Party to present a digital document.</string>
+    <string name="presentation_qr_scan_subtitle">Scan a QR code provided by the online service to present the proof of age.</string>
 
     <!-- Issuance Add Document Screen -->
     <string name="issuance_add_document_title">Add document from list</string>
-    <string name="issuance_add_document_subtitle">Choose a digital document from the list below to add to your wallet.</string>
+    <string name="issuance_add_document_subtitle">Choose a digital document from the list below to add to your application.</string>
     <string name="issuance_add_document_scan_qr_footer_text">@string/generic_or</string>
     <string name="issuance_add_document_scan_qr_footer_button_text">@string/generic_scan_qr</string>
     <string name="issuance_add_document_deferred_success_text">@string/generic_deferred_success_text</string>
-    <string name="issuance_add_document_deferred_success_description">Your document has been requested. You will be notified when it has been issued to your wallet.</string>
+    <string name="issuance_add_document_deferred_success_description">Your document has been requested. You will be notified when it has been issued to your application.</string>
     <string name="issuance_add_document_deferred_success_primary_button_text">@string/generic_ok</string>
-
     <!-- Issuance Success Screen -->
-    <string name="issuance_success_header_description">You have successfully added the following to your wallet</string>
-    <string name="issuance_success_header_description_when_error">You have successfully added the document(s) to your wallet</string>
+    <string name="issuance_success_header_description">You have successfully added the following to your application</string>
+    <string name="issuance_success_header_description_when_error">You have successfully added the document(s) to your application</string>
     <string name="issuance_success_header_issuer_default_name">@string/generic_default_issuer_name</string>
 
     <!-- Issuance Qr Scan -->
     <string name="issuance_qr_scan_title">Add document from QR</string>
-    <string name="issuance_qr_scan_subtitle">Scan a QR code provided from an issuer to add a digital document to your wallet.</string>
-
     <!-- Issuance Document Offer -->
+    <string name="issuance_qr_scan_subtitle">Scan a QR code provided from an issuer to add a digital document to your application.</string>
     <string name="issuance_document_offer_primary_button_text_add">Add</string>
     <string name="issuance_document_offer_deferred_success_text">@string/generic_deferred_success_text</string>
-    <string name="issuance_document_offer_deferred_success_description">Your documents from %1$s have been requested. You will be notified when they have been issued to your wallet.</string>
+    <string name="issuance_document_offer_deferred_success_description">Your documents from %1$s have been requested. You will be notified when they have been issued to your application.</string>
     <string name="issuance_document_offer_deferred_success_primary_button_text">@string/generic_ok</string>
-    <string name="issuance_document_offer_error_missing_pid_text">Wallet needs to be activated first with a National ID</string>
+    <string name="issuance_document_offer_error_missing_pid_text">Application needs to be activated first with a National ID</string>
     <string name="issuance_document_offer_error_invalid_txcode_format">Invalid transaction code format. Length should be between %1$d to %2$d digits and only numeric characters are allowed.</string>
     <string name="issuance_document_offer_error_no_document">Unable to fetch and process the credential offer</string>
 
@@ -254,14 +234,14 @@
     <!--    Settings screen-->
     <string name="settings_screen_title">Settings</string>
     <string name="settings_screen_credentials">Credentials</string>
-    <string name="settings_screen_delete_proofs">Delete all proofs of age attestations</string>
+    <string name="settings_screen_delete_proofs">Delete all proof of age attestations</string>
     <string name="confirm_doc_removal_dialog_title">Confirm documents deletion</string>
     <string name="confirm_doc_removal_dialog_text">Are you sure you want to delete all the stored proofs?</string>
     <string name="confirm_doc_removal_dialog_delete">Yes, delete</string>
     
     <!-- Landing Screen -->
     <string name="landing_screen_title">Age Verification</string>
-    <string name="landing_screen_subtitle">With your proof of age, you can prove to services restricted to adults that you are old enough to access them.\nThe proof of age shows only that you are older than 18. It contains no other personal information."</string>
+    <string name="landing_screen_subtitle">You can share your proof of age with services restricted to adults. This proof confirms that you are over 18 without revealing any other personal information.</string>
     <string name="landing_screen_card_eu_title">European\nUnion</string>
     <string name="landing_screen_card_age_verification">Age Verification</string>
     <string name="landing_screen_primary_button_label_scan">Scan</string>
@@ -271,5 +251,4 @@
     <string name="landing_screen_add_credentials">Add more</string>
     <string name="settings_screen_version">Version</string>
     <string name="settings_screen_app_info">App Information</string>
-
 </resources>
