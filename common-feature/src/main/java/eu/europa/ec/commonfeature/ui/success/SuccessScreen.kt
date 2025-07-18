@@ -260,7 +260,7 @@ private fun SuccessDefaultPreview() {
                 successConfig = SuccessUIConfig(
                     textElementsConfig = SuccessUIConfig.TextElementsConfig(
                         text = stringResource(R.string.generic_success),
-                        description = stringResource(R.string.quick_pin_change_success_description),
+                        description = stringResource(R.string.generic_success),
                     ),
                     imageConfig = SuccessUIConfig.ImageConfig(),
                     buttonConfig = listOf(
