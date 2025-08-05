@@ -17,6 +17,7 @@
 package eu.europa.ec.commonfeature.interactor
 
 import eu.europa.ec.authenticationlogic.controller.storage.PinStorageController
+import eu.europa.ec.authenticationlogic.controller.storage.PinValidationResult
 import eu.europa.ec.businesslogic.validator.FormValidator
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
@@ -325,13 +326,13 @@ class TestQuickPinInteractor {
     //region isCurrentPinValid
 
     // Case 1:
-    // pinStorageController.isPinValid() == pin is true.
+    // pinStorageController.isPinValid() returns Success.
     @Test
     fun `Given Case 1, When isCurrentPinValid is called, Then it returns Success`() {
         coroutineRule.runTest {
             // Given
             whenever(pinStorageController.isPinValid(anyString()))
-                .thenReturn(true)
+                .thenReturn(PinValidationResult.Success)
 
             // When
             interactor.isCurrentPinValid(
@@ -347,15 +348,15 @@ class TestQuickPinInteractor {
     }
 
     // Case 2:
-    // pinStorageController.isPinValid() == pin is false.
+    // pinStorageController.validatePinWithAttemptTracking() returns Failed.
     @Test
     fun `Given Case 2, When isCurrentPinValid is called, Then it returns Failed with the appropriate error message`() {
         coroutineRule.runTest {
             // Given
             whenever(pinStorageController.isPinValid(anyString()))
-                .thenReturn(false)
+                .thenReturn(PinValidationResult.Failed(attemptsRemaining = 2))
 
-            whenever(resourceProvider.getString(R.string.quick_pin_invalid_error))
+            whenever(resourceProvider.getString(R.string.quick_pin_invalid_with_attempts, 2))
                 .thenReturn(mockedInvalidPinMessage)
 
             // When
@@ -365,19 +366,20 @@ class TestQuickPinInteractor {
                 // Then
                 assertEquals(
                     QuickPinInteractorPinValidPartialState.Failed(
-                        errorMessage = mockedInvalidPinMessage
+                        errorMessage = mockedInvalidPinMessage,
+                        attemptsRemaining = 2
                     ),
                     awaitItem()
                 )
 
                 verify(resourceProvider, times(1))
-                    .getString(R.string.quick_pin_invalid_error)
+                    .getString(R.string.quick_pin_invalid_with_attempts, 2)
             }
         }
     }
 
     // Case 3:
-    // pinStorageController.isPinValid() throws an exception with a message.
+    // pinStorageController.validatePinWithAttemptTracking() throws an exception with a message.
     @Test
     fun `Given Case 3, When isCurrentPinValid is called, Then it returns Failed with exception's localized message`() {
         coroutineRule.runTest {
@@ -392,7 +394,8 @@ class TestQuickPinInteractor {
                 // Then
                 assertEquals(
                     QuickPinInteractorPinValidPartialState.Failed(
-                        errorMessage = mockedExceptionWithMessage.localizedMessage!!
+                        errorMessage = mockedExceptionWithMessage.localizedMessage!!,
+                        attemptsRemaining = 0
                     ),
                     awaitItem()
                 )
@@ -416,7 +419,8 @@ class TestQuickPinInteractor {
                 // Then
                 assertEquals(
                     QuickPinInteractorPinValidPartialState.Failed(
-                        errorMessage = mockedGenericErrorMessage
+                        errorMessage = mockedGenericErrorMessage,
+                        attemptsRemaining = 0
                     ),
                     awaitItem()
                 )

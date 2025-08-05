@@ -162,7 +162,9 @@ private fun Content(
         VSpacer.Large()
 
         PinFieldLayout(
-            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
             state = state,
             onPinInput = { quickPin ->
                 onEventSend(Event.OnQuickPinEntered(quickPin))

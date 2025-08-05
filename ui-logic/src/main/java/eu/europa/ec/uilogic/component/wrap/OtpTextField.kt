@@ -62,6 +62,7 @@ fun OtpTextField(
     hasError: Boolean = false,
     errorMessage: String? = null,
     focusOnCreate: Boolean = false,
+    enabled: Boolean = true,
 ) {
     LaunchedEffect(Unit) {
         if (otpText.length > length) {
@@ -76,11 +77,13 @@ fun OtpTextField(
             modifier = Modifier.focusRequester(focusRequester),
             value = TextFieldValue(otpText, selection = TextRange(otpText.length)),
             onValueChange = {
+                if (!enabled) return@BasicTextField
                 if (it.text.length > length) {
                     return@BasicTextField
                 }
                 onUpdate.invoke(it.text)
             },
+            enabled = enabled,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             visualTransformation = visualTransformation,
             decorationBox = {
@@ -95,6 +98,7 @@ fun OtpTextField(
                             text = visualTransformation.filter(AnnotatedString(otpText)).text.text,
                             pinWidth = pinWidth,
                             hasError = hasError,
+                            enabled = enabled,
                         )
 
                     }
@@ -110,7 +114,7 @@ fun OtpTextField(
             )
         }
         OneTimeLaunchedEffect {
-            if (focusOnCreate) {
+            if (focusOnCreate && enabled) {
                 focusRequester.requestFocus()
             }
         }
@@ -133,6 +137,7 @@ private fun CharView(
     text: String,
     pinWidth: Dp = 40.dp,
     hasError: Boolean = false,
+    enabled: Boolean = true,
 ) {
     val isFocused = text.length == index
     val char = when {
@@ -142,16 +147,30 @@ private fun CharView(
 
     val borderColor = when {
         hasError -> MaterialTheme.colorScheme.error
-        isFocused -> MaterialTheme.colorScheme.primary
+        isFocused && enabled -> MaterialTheme.colorScheme.primary
+        !enabled -> MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.3f)
         else -> MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.5f)
     }
 
+    val backgroundColor = if (enabled) {
+        MaterialTheme.colorScheme.onPrimary
+    } else {
+        MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.1f)
+    }
+
+    val textColor = if (enabled) {
+        MaterialTheme.colorScheme.onSurface
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    }
+
     val borderWidth = when {
-        isFocused -> 2.dp
+        isFocused && enabled -> 2.dp
         else -> 1.dp
     }
     Text(
-        style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.headlineMedium.copy(color = textColor),
+        textAlign = TextAlign.Center,
         text = char,
         modifier = Modifier
             .width(pinWidth)
@@ -160,8 +179,7 @@ private fun CharView(
                 color = borderColor,
                 shape = RoundedCornerShape(SIZE_EXTRA_SMALL.dp)
             )
-            .background(MaterialTheme.colorScheme.onPrimary)
-
+            .background(backgroundColor)
             .padding(vertical = SIZE_SMALL.dp)
     )
 
@@ -173,7 +191,6 @@ private fun CharView(
 private fun PreviewOtpTextField() {
     PreviewTheme {
         Column {
-            PinHintText(pinHintText = "Enter the PIN")
             OtpTextField(
                 modifier = Modifier.wrapContentSize(),
                 onUpdate = {},

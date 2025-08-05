@@ -16,18 +16,23 @@
 
 package eu.europa.ec.commonfeature.ui.biometric
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -70,11 +75,13 @@ import eu.europa.ec.uilogic.extension.setBackStackFlowCancelled
 import eu.europa.ec.uilogic.extension.setBackStackFlowSuccess
 import eu.europa.ec.uilogic.navigation.CommonScreens
 import eu.europa.ec.uilogic.navigation.helper.handleDeepLinkAction
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 @Composable
 fun BiometricScreen(
@@ -262,9 +269,14 @@ private fun LoginOnAppStartup(
     state: State,
     onEventSent: (event: Event) -> Unit
 ) {
+    val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .imePadding()
+            .verticalScroll(scrollState),
     ) {
         VSpacer.Custom(80)
 
@@ -303,6 +315,22 @@ private fun LoginOnAppStartup(
         }
     }
 
+    AutoScrollToBottom(state, coroutineScope, scrollState)
+}
+
+@Composable
+private fun AutoScrollToBottom(
+    state: State,
+    coroutineScope: CoroutineScope,
+    scrollState: ScrollState,
+) {
+    LaunchedEffect(state.quickPinError, state.quickPin) {
+        if (state.quickPin.isNotEmpty() || !state.quickPinError.isNullOrEmpty()) {
+            coroutineScope.launch {
+                scrollState.scrollTo(scrollState.maxValue)
+            }
+        }
+    }
 }
 
 @Composable
@@ -311,38 +339,55 @@ private fun VerifyIdentity(
     mode: BiometricMode.Default,
     onEventSent: (event: Event) -> Unit
 ) {
+    val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+    
     val description = if (state.userBiometricsAreEnabled) {
         mode.descriptionWhenBiometricsEnabled
     } else {
         mode.descriptionWhenBiometricsNotEnabled
     }
-    ContentHeader(
-        modifier = Modifier.fillMaxWidth(),
-        config = ContentHeaderConfig(description = description)
-    )
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = SPACING_SMALL.dp)
+            .imePadding()
+            .verticalScroll(scrollState)
     ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = SPACING_SMALL.dp),
-            text = mode.textAbovePin,
-            style = MaterialTheme.typography.titleMedium.copy(
-                color = MaterialTheme.colorScheme.onSurface
-            )
+        ContentHeader(
+            modifier = Modifier.fillMaxWidth(),
+            config = ContentHeaderConfig(description = description)
         )
 
-        PinFieldLayout(
-            state = state,
-            onPinInput = { quickPin ->
-                onEventSent(Event.OnQuickPinEntered(quickPin))
-            }
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = SPACING_SMALL.dp)
+        ) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = SPACING_SMALL.dp),
+                text = mode.textAbovePin,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            )
+
+            PinFieldLayout(
+                state = state,
+                onPinInput = { quickPin ->
+                    onEventSent(Event.OnQuickPinEntered(quickPin))
+                }
+            )
+        }
     }
+
+    AutoScrollToBottom(
+        state = state,
+        coroutineScope = coroutineScope,
+        scrollState = scrollState
+    )
 }
 
 @Composable
@@ -365,7 +410,8 @@ private fun PinFieldLayout(
         visualTransformation = PasswordVisualTransformation(),
         pinWidth = 42.dp,
         focusOnCreate = !state.userBiometricsAreEnabled,
-        otpText = state.quickPin
+        otpText = state.quickPin,
+        enabled = !state.isLockedOut
     )
 }
 

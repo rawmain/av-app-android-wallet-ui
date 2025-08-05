@@ -105,6 +105,11 @@
     <string name="quick_pin_create_reenter_title">Conferma il tuo PIN</string>
     <string name="quick_pin_create_enter_subtitle">Il tuo PIN a 6 cifre</string>
     <string name="quick_pin_create_reenter_subtitle">Ripeti il tuo PIN a 6 cifre</string>
+    <string name="quick_pin_invalid_with_attempts">PIN non valido. %d tentativi rimanenti.</string>
+    <string name="quick_pin_invalid_last_attempt">PIN non valido. Questo è il tuo ultimo tentativo prima del blocco.</string>
+    <string name="quick_pin_locked_out">Troppi tentativi non riusciti. Attendi prima di riprovare.</string>
+    <string name="quick_pin_lockout_countdown_minutes" formatted="false">Account bloccato. Riprova tra %d:%02d</string>
+    <string name="quick_pin_lockout_countdown_seconds">Account bloccato. Riprova tra %d secondi</string>
     <string name="request_header_description">La seguente transazione richiede la tua autorizzazione e autenticazione</string>
     <string name="request_header_main_text">RICHIESTA DI CONDIVISIONE DEI DATI</string>
     <string name="request_relying_party_default_name">@string/generic_default_relying_party_name</string>

@@ -207,6 +207,14 @@ class PinViewModel(
                     QuickPinInteractorPinValidPartialState.Success -> {
                         setupEnterPhase()
                     }
+
+                    is QuickPinInteractorPinValidPartialState.LockedOut -> {
+                        setState {
+                            copy(
+                                quickPinError = resourceProvider.getString(R.string.quick_pin_locked_out)
+                            )
+                        }
+                    }
                 }
             }
         }

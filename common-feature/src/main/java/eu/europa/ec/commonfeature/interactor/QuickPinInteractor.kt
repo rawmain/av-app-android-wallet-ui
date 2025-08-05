@@ -17,6 +17,7 @@
 package eu.europa.ec.commonfeature.interactor
 
 import eu.europa.ec.authenticationlogic.controller.storage.PinStorageController
+import eu.europa.ec.authenticationlogic.controller.storage.PinValidationResult
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.businesslogic.validator.FormValidator
 import eu.europa.ec.resourceslogic.R
@@ -69,6 +70,14 @@ class QuickPinInteractorImpl(
                         pinStorageController.setPin(newPin)
                         emit(QuickPinInteractorSetPinPartialState.Success)
                     }
+
+                    is QuickPinInteractorPinValidPartialState.LockedOut -> {
+                        emit(
+                            QuickPinInteractorSetPinPartialState.Failed(
+                                resourceProvider.getString(R.string.quick_pin_locked_out)
+                            )
+                        )
+                    }
                 }
             }
         }.safeAsync {
@@ -91,16 +100,36 @@ class QuickPinInteractorImpl(
 
     override fun isCurrentPinValid(pin: String): Flow<QuickPinInteractorPinValidPartialState> =
         flow {
-            if (pinStorageController.isPinValid(pin)) {
-                emit(QuickPinInteractorPinValidPartialState.Success)
-            } else {
-                emit(
-                    QuickPinInteractorPinValidPartialState.Failed(
+            when (val result = pinStorageController.isPinValid(pin)) {
+                is PinValidationResult.Success -> {
+                    emit(QuickPinInteractorPinValidPartialState.Success)
+                }
+
+                is PinValidationResult.Failed -> {
+                    val errorMessage = if (result.attemptsRemaining > 1) {
                         resourceProvider.getString(
-                            R.string.quick_pin_invalid_error
+                            R.string.quick_pin_invalid_with_attempts,
+                            result.attemptsRemaining
+                        )
+                    } else {
+                        resourceProvider.getString(R.string.quick_pin_invalid_last_attempt)
+                    }
+                    emit(
+                        QuickPinInteractorPinValidPartialState.Failed(
+                            errorMessage = errorMessage,
+                            attemptsRemaining = result.attemptsRemaining
                         )
                     )
-                )
+                }
+
+                is PinValidationResult.LockedOut -> {
+                    emit(
+                        QuickPinInteractorPinValidPartialState.LockedOut(
+                            lockoutEndTime = result.lockoutEndTimeMillis,
+                            attemptsUsed = result.attemptsUsed
+                        )
+                    )
+                }
             }
         }.safeAsync {
             QuickPinInteractorPinValidPartialState.Failed(
@@ -138,5 +167,11 @@ sealed class QuickPinInteractorSetPinPartialState {
 
 sealed class QuickPinInteractorPinValidPartialState {
     data object Success : QuickPinInteractorPinValidPartialState()
-    data class Failed(val errorMessage: String) : QuickPinInteractorPinValidPartialState()
+    data class Failed(val errorMessage: String, val attemptsRemaining: Int = 0) :
+        QuickPinInteractorPinValidPartialState()
+
+    data class LockedOut(
+        val lockoutEndTime: Long,
+        val attemptsUsed: Int,
+    ) : QuickPinInteractorPinValidPartialState()
 }

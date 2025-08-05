@@ -20,4 +20,12 @@ interface PinStorageProvider {
     fun retrievePin(): String
     fun setPin(pin: String)
     fun isPinValid(pin: String): Boolean
+
+    fun getFailedAttempts(): Int
+    fun incrementFailedAttempts(): Int
+    fun resetFailedAttempts()
+
+    fun setLockoutUntil(timestampMillis: Long)
+    fun getLockoutUntil(): Long
+    fun isCurrentlyLockedOut(): Boolean
 }

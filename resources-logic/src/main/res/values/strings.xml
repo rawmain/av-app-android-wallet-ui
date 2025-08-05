@@ -141,6 +141,11 @@
     <string name="quick_pin_create_reenter_title">Confirm your PIN</string>
     <string name="quick_pin_create_enter_subtitle">Your 6-digit PIN</string>
     <string name="quick_pin_create_reenter_subtitle">Repeat your 6-digit PIN</string>
+    <string name="quick_pin_invalid_with_attempts">Invalid PIN. %d attempts remaining.</string>
+    <string name="quick_pin_invalid_last_attempt">Invalid PIN. This is your last attempt before lockout.</string>
+    <string name="quick_pin_locked_out">Too many failed attempts. Please wait before trying again.</string>
+    <string name="quick_pin_lockout_countdown_minutes" formatted="false">Account locked. Try again in %d:%02d</string>
+    <string name="quick_pin_lockout_countdown_seconds">Account locked. Try again in %d seconds</string>
 
     <!-- Request Screen -->
     <string name="request_header_description">The following transaction requires your permission and authentication.</string>

@@ -25,6 +25,8 @@ import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
 import eu.europa.ec.commonfeature.interactor.BiometricInteractor
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractorPinValidPartialState
+import eu.europa.ec.resourceslogic.R
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.FlowCompletion
@@ -37,8 +39,11 @@ import eu.europa.ec.uilogic.navigation.CommonScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
+import kotlin.time.Duration.Companion.seconds
 
 sealed class Event : ViewEvent {
     data class OnBiometricsClicked(
@@ -62,7 +67,9 @@ data class State(
     val userBiometricsAreEnabled: Boolean = false,
     val isBackable: Boolean = false,
     val notifyOnAuthenticationFailure: Boolean = true,
-    val quickPinSize: Int = 6
+    val quickPinSize: Int = 6,
+    val isLockedOut: Boolean = false,
+    val lockoutEndTime: Long = 0L,
 ) : ViewState
 
 sealed class Effect : ViewSideEffect {
@@ -95,11 +102,14 @@ sealed class Effect : ViewSideEffect {
 class BiometricViewModel(
     private val biometricInteractor: BiometricInteractor,
     private val uiSerializer: UiSerializer,
-    private val biometricConfig: String
+    private val resourceProvider: ResourceProvider,
+    private val biometricConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
     private val biometricUiConfig
         get() = viewState.value.config
+
+    private var lockoutCountdownJob: Job? = null
 
     override fun setInitialState(): State {
         val config = uiSerializer.fromBase64(
@@ -178,6 +188,10 @@ class BiometricViewModel(
             }
 
             is Event.OnQuickPinEntered -> {
+                // Don't process PIN input during lockout
+                if (viewState.value.isLockedOut) {
+                    return
+                }
                 setState {
                     copy(quickPin = event.quickPin, quickPinError = null)
                 }
@@ -199,13 +213,30 @@ class BiometricViewModel(
                         is QuickPinInteractorPinValidPartialState.Failed -> {
                             setState {
                                 copy(
-                                    quickPinError = it.errorMessage
+                                    quickPinError = it.errorMessage,
+                                    isLockedOut = false,
                                 )
                             }
                         }
 
                         is QuickPinInteractorPinValidPartialState.Success -> {
+                            setState {
+                                copy(
+                                    isLockedOut = false,
+                                    quickPinError = null
+                                )
+                            }
                             authenticationSuccess()
+                        }
+
+                        is QuickPinInteractorPinValidPartialState.LockedOut -> {
+                            setState {
+                                copy(
+                                    isLockedOut = true,
+                                    lockoutEndTime = it.lockoutEndTime
+                                )
+                            }
+                            startLockoutCountdown()
                         }
                     }
                 }
@@ -291,5 +322,58 @@ class BiometricViewModel(
         setEffect {
             navigationEffect
         }
+    }
+
+    private fun startLockoutCountdown() {
+        lockoutCountdownJob?.cancel()
+        lockoutCountdownJob = viewModelScope.launch {
+            while (viewState.value.isLockedOut) {
+                val currentTime = System.currentTimeMillis()
+                val lockoutEndTime = viewState.value.lockoutEndTime
+
+                if (currentTime >= lockoutEndTime) {
+                    // Lockout has expired
+                    setState {
+                        copy(
+                            isLockedOut = false,
+                            quickPinError = null,
+                            lockoutEndTime = 0L
+                        )
+                    }
+                    break
+                } else {
+                    // Update lockout message with remaining time
+                    val remainingSeconds = (lockoutEndTime - currentTime) / 1000
+                    val minutes = remainingSeconds / 60
+                    val seconds = remainingSeconds % 60
+
+                    val timeMessage = if (minutes > 0) {
+                        resourceProvider.getString(
+                            R.string.quick_pin_lockout_countdown_minutes,
+                            minutes,
+                            seconds
+                        )
+                    } else {
+                        resourceProvider.getString(
+                            R.string.quick_pin_lockout_countdown_seconds,
+                            seconds
+                        )
+                    }
+
+                    setState {
+                        copy(
+                            quickPinError = timeMessage
+                        )
+                    }
+
+                    delay(1.seconds)
+                }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        lockoutCountdownJob?.cancel()
     }
 }
