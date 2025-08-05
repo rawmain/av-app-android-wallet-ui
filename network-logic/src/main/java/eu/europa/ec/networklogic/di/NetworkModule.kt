@@ -16,13 +16,13 @@
 
 package eu.europa.ec.networklogic.di
 
-import eu.europa.ec.businesslogic.config.AppBuildType
 import eu.europa.ec.businesslogic.config.ConfigLogic
 import eu.europa.ec.networklogic.api.Api
 import eu.europa.ec.networklogic.api.ApiClient
 import eu.europa.ec.networklogic.api.ApiClientImpl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.logging.HttpLoggingInterceptor.Level
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
@@ -38,9 +38,10 @@ class LogicNetworkModule
 @Factory
 fun providesHttpLoggingInterceptor(configLogic: ConfigLogic) = HttpLoggingInterceptor()
     .apply {
-        level = when (configLogic.appBuildType) {
-            AppBuildType.DEBUG -> HttpLoggingInterceptor.Level.BODY
-            AppBuildType.RELEASE -> HttpLoggingInterceptor.Level.NONE
+        level = if (configLogic.isBuildTypeDebug()) {
+            Level.BODY
+        } else {
+            Level.NONE
         }
     }
 
