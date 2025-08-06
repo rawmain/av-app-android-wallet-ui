@@ -58,6 +58,11 @@ interface ConfigLogic {
      *   changelog is maintained for development builds.
      */
     val changelogUrl: String?
+
+    /**
+     * Checks if the current build type is [AppBuildType.DEBUG].
+     */
+    fun isBuildTypeDebug() = appBuildType == AppBuildType.DEBUG
 }
 
 enum class AppFlavor {
