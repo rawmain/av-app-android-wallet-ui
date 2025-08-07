@@ -138,9 +138,23 @@
 
 
     <string name="quick_pin_create_title">Choose a PIN to access the app</string>
+    <string name="quick_pin_change_title">Change PIN</string>
     <string name="quick_pin_create_reenter_title">Confirm your PIN</string>
     <string name="quick_pin_create_enter_subtitle">Your 6-digit PIN</string>
+    <string name="quick_pin_change_enter_new_subtitle">Choose your new PIN</string>
+    <string name="quick_pin_change_reenter_new_subtitle">Reenter your new PIN</string>
+    <string name="quick_pin_change_validate_current_subtitle">Your current 6-digit PIN</string>
     <string name="quick_pin_create_reenter_subtitle">Repeat your 6-digit PIN</string>
+    <string name="quick_pin_change_success_text">Success!</string>
+    <string name="quick_pin_change_success_description">You successfully changed the pin</string>
+    <string name="quick_pin_change_success_btn">Okay</string>
+    <string name="quick_pin_bottom_sheet_cancel_title">Cancel the PIN change?</string>
+    <string name="quick_pin_bottom_sheet_cancel_subtitle">Are you sure you wanna cancel the PIN change?</string>
+    <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Yes, cancel</string>
+    <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">No</string>
+    <string name="quick_pin_change_lockout_countdown_minutes" formatted="false">Change PIN blocked. Try again in %d:%02d</string>
+    <string name="quick_pin_change_lockout_countdown_seconds">Change PIN blocked. Try again in %d seconds</string>
+
     <string name="quick_pin_invalid_with_attempts">Invalid PIN. %d attempts remaining.</string>
     <string name="quick_pin_invalid_last_attempt">Invalid PIN. This is your last attempt before lockout.</string>
     <string name="quick_pin_locked_out">Too many failed attempts. Please wait before trying again.</string>
@@ -240,6 +254,8 @@
     <string name="settings_screen_title">Settings</string>
     <string name="settings_screen_credentials">Credentials</string>
     <string name="settings_screen_delete_proofs">Delete all proof of age attestations</string>
+    <string name="settings_screen_security">Security</string>
+    <string name="settings_screen_change_pin">Change PIN</string>
     <string name="confirm_doc_removal_dialog_title">Confirm documents deletion</string>
     <string name="confirm_doc_removal_dialog_text">Are you sure you want to delete all the stored proofs?</string>
     <string name="confirm_doc_removal_dialog_delete">Yes, delete</string>

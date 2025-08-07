@@ -23,6 +23,7 @@ import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAuth
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
+import eu.europa.ec.commonfeature.countdown.LockoutCountdownManager
 import eu.europa.ec.commonfeature.interactor.BiometricInteractor
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractorPinValidPartialState
 import eu.europa.ec.resourceslogic.R
@@ -39,11 +40,8 @@ import eu.europa.ec.uilogic.navigation.CommonScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
-import kotlin.time.Duration.Companion.seconds
 
 sealed class Event : ViewEvent {
     data class OnBiometricsClicked(
@@ -109,7 +107,25 @@ class BiometricViewModel(
     private val biometricUiConfig
         get() = viewState.value.config
 
-    private var lockoutCountdownJob: Job? = null
+    private val lockoutCountdownManager = LockoutCountdownManager(
+        coroutineScope = viewModelScope,
+        getIsLockedOut = { viewState.value.isLockedOut },
+        getLockoutEndTime = { viewState.value.lockoutEndTime },
+        onCountdownUpdate = { message -> setState { copy(quickPinError = message) } },
+        onLockoutEnd = {
+            setState { copy(isLockedOut = false, quickPinError = null, lockoutEndTime = 0L) }
+        },
+        getTimeMessage = { minutes, seconds ->
+            if (minutes > 0)
+                resourceProvider.getString(
+                    R.string.quick_pin_lockout_countdown_minutes,
+                    minutes,
+                    seconds
+                )
+            else
+                resourceProvider.getString(R.string.quick_pin_lockout_countdown_seconds, seconds)
+        }
+    )
 
     override fun setInitialState(): State {
         val config = uiSerializer.fromBase64(
@@ -236,7 +252,7 @@ class BiometricViewModel(
                                     lockoutEndTime = it.lockoutEndTime
                                 )
                             }
-                            startLockoutCountdown()
+                            lockoutCountdownManager.start()
                         }
                     }
                 }
@@ -324,56 +340,8 @@ class BiometricViewModel(
         }
     }
 
-    private fun startLockoutCountdown() {
-        lockoutCountdownJob?.cancel()
-        lockoutCountdownJob = viewModelScope.launch {
-            while (viewState.value.isLockedOut) {
-                val currentTime = System.currentTimeMillis()
-                val lockoutEndTime = viewState.value.lockoutEndTime
-
-                if (currentTime >= lockoutEndTime) {
-                    // Lockout has expired
-                    setState {
-                        copy(
-                            isLockedOut = false,
-                            quickPinError = null,
-                            lockoutEndTime = 0L
-                        )
-                    }
-                    break
-                } else {
-                    // Update lockout message with remaining time
-                    val remainingSeconds = (lockoutEndTime - currentTime) / 1000
-                    val minutes = remainingSeconds / 60
-                    val seconds = remainingSeconds % 60
-
-                    val timeMessage = if (minutes > 0) {
-                        resourceProvider.getString(
-                            R.string.quick_pin_lockout_countdown_minutes,
-                            minutes,
-                            seconds
-                        )
-                    } else {
-                        resourceProvider.getString(
-                            R.string.quick_pin_lockout_countdown_seconds,
-                            seconds
-                        )
-                    }
-
-                    setState {
-                        copy(
-                            quickPinError = timeMessage
-                        )
-                    }
-
-                    delay(1.seconds)
-                }
-            }
-        }
-    }
-
     override fun onCleared() {
         super.onCleared()
-        lockoutCountdownJob?.cancel()
+        lockoutCountdownManager.cancel()
     }
 }

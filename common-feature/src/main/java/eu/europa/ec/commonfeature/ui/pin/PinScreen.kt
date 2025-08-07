@@ -32,23 +32,28 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.commonfeature.model.PinFlow
+import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.VSpacer
+import eu.europa.ec.uilogic.component.wrap.BottomSheetTextData
 import eu.europa.ec.uilogic.component.wrap.ButtonConfig
 import eu.europa.ec.uilogic.component.wrap.ButtonType
+import eu.europa.ec.uilogic.component.wrap.DialogBottomSheet
 import eu.europa.ec.uilogic.component.wrap.OtpTextField
 import eu.europa.ec.uilogic.component.wrap.PinHintText
 import eu.europa.ec.uilogic.component.wrap.StickyBottomConfig
 import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
+import eu.europa.ec.uilogic.component.wrap.WrapModalBottomSheet
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.navigation.CommonScreens
@@ -68,6 +73,7 @@ fun PinScreen(
 ) {
     val state: State by viewModel.viewState.collectAsStateWithLifecycle()
 
+    val isBottomSheetOpen = state.isBottomSheetOpen
     val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
@@ -87,7 +93,7 @@ fun PinScreen(
                     type = StickyBottomType.OneButton(
                         config = ButtonConfig(
                             type = ButtonType.PRIMARY,
-                            enabled = state.isButtonEnabled,
+                            enabled = state.isButtonEnabled && !state.isLockedOut,
                             onClick = {
                                 viewModel.setEvent(Event.NextButtonPressed(pin = state.pin))
                             }
@@ -114,6 +120,25 @@ fun PinScreen(
             coroutineScope = scope,
             modalBottomSheetState = bottomSheetState,
         )
+
+        if (isBottomSheetOpen) {
+            WrapModalBottomSheet(
+                onDismissRequest = {
+                    viewModel.setEvent(
+                        Event.BottomSheet.UpdateBottomSheetState(
+                            isOpen = false
+                        )
+                    )
+                },
+                sheetState = bottomSheetState
+            ) {
+                SheetContent(
+                    onEventSent = {
+                        viewModel.setEvent(it)
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -196,6 +221,22 @@ private fun Content(
 }
 
 @Composable
+private fun SheetContent(
+    onEventSent: (event: Event) -> Unit
+) {
+    DialogBottomSheet(
+        textData = BottomSheetTextData(
+            title = stringResource(id = R.string.quick_pin_bottom_sheet_cancel_title),
+            message = stringResource(id = R.string.quick_pin_bottom_sheet_cancel_subtitle),
+            positiveButtonText = stringResource(id = R.string.quick_pin_bottom_sheet_cancel_primary_button_text),
+            negativeButtonText = stringResource(id = R.string.quick_pin_bottom_sheet_cancel_secondary_button_text),
+        ),
+        onPositiveClick = { onEventSent(Event.BottomSheet.Cancel.ConfirmCancelPressed) },
+        onNegativeClick = { onEventSent(Event.BottomSheet.Cancel.DiscardPressed) }
+    )
+}
+
+@Composable
 private fun PinFieldLayout(
     modifier: Modifier = Modifier,
     state: State,
@@ -214,14 +255,15 @@ private fun PinFieldLayout(
         errorMessage = state.quickPinError,
         visualTransformation = PasswordVisualTransformation(),
         pinWidth = 42.dp,
-        focusOnCreate = true
+        focusOnCreate = true,
+        enabled = !state.isLockedOut
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @ThemeModePreviews
 @Composable
-private fun PinScreenEmptyPreview() {
+private fun PinScreenCreateEmptyPreview() {
     PreviewTheme {
         Content(
             state = State(
@@ -237,6 +279,39 @@ private fun PinScreenEmptyPreview() {
             paddingValues = PaddingValues(10.dp),
             coroutineScope = rememberCoroutineScope(),
             modalBottomSheetState = rememberModalBottomSheetState(),
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@ThemeModePreviews
+@Composable
+private fun PinScreenUpdateEmptyPreview() {
+    PreviewTheme {
+        Content(
+            state = State(
+                pinFlow = PinFlow.UPDATE,
+                pinState = PinValidationState.ENTER,
+                title = "Title",
+                subtitle = "Subtitle",
+
+                ),
+            effectFlow = Channel<Effect>().receiveAsFlow(),
+            onEventSend = {},
+            onNavigationRequested = {},
+            paddingValues = PaddingValues(10.dp),
+            coroutineScope = rememberCoroutineScope(),
+            modalBottomSheetState = rememberModalBottomSheetState(),
+        )
+    }
+}
+
+@ThemeModePreviews
+@Composable
+private fun SheetContentCancelPreview() {
+    PreviewTheme {
+        SheetContent(
+            onEventSent = {}
         )
     }
 }

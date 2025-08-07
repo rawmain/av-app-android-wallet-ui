@@ -18,13 +18,17 @@ package eu.europa.ec.landingfeature.ui.settings
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import eu.europa.ec.commonfeature.model.PinFlow
 import eu.europa.ec.landingfeature.interactor.DeleteAgeDocumentsPartialState
 import eu.europa.ec.landingfeature.interactor.SettingsInteractor
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
+import eu.europa.ec.uilogic.navigation.CommonScreens
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
+import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
+import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
@@ -36,6 +40,7 @@ data class State(
 
 sealed class Event : ViewEvent {
     data object DeleteProofsClicked : Event()
+    data object ChangePinClicked : Event()
     data object GoBack : Event()
     sealed class BottomSheetEvent : Event() {
         data object DeleteProofsConfirmed : BottomSheetEvent()
@@ -77,6 +82,10 @@ class SettingsViewModel(
             Event.BottomSheetEvent.DeleteProofsDismissed -> {
                 setState { copy(showDeleteProofsDialog = false) }
             }
+
+            Event.ChangePinClicked -> {
+                setEffect { Effect.Navigation.SwitchScreen(getPinChangeRoute()) }
+            }
         }
     }
 
@@ -115,4 +124,10 @@ class SettingsViewModel(
         setState { copy(isLoading = false, showDeleteProofsDialog = false) }
     }
 
+    private fun getPinChangeRoute(): String {
+        return generateComposableNavigationLink(
+            screen = CommonScreens.QuickPin,
+            arguments = generateComposableArguments(mapOf("pinFlow" to PinFlow.UPDATE))
+        )
+    }
 }

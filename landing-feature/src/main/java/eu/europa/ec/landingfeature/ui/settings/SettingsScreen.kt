@@ -160,6 +160,8 @@ fun SettingsSection(onEvent: (Event) -> Unit) {
 
         AppInfo()
         CredentialsSettings(onEvent)
+        VSpacer.Large()
+        SecuritySettings(onEvent)
 
     }
 }
@@ -229,6 +231,29 @@ private fun CredentialsSettings(onEvent: (Event) -> Unit) {
         textConfig = TextConfig(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.error,
+        )
+    )
+}
+@Composable
+private fun SecuritySettings(onEvent: (Event) -> Unit) {
+    WrapText(
+        modifier = Modifier
+            .fillMaxWidth(),
+        text = stringResource(R.string.settings_screen_security),
+        textConfig = TextConfig(
+            style = MaterialTheme.typography.titleMedium,
+        )
+    )
+    WrapText(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onEvent(Event.ChangePinClicked)
+            }
+            .padding(vertical = SIZE_SMALL.dp),
+        text = stringResource(R.string.settings_screen_change_pin),
+        textConfig = TextConfig(
+            style = MaterialTheme.typography.bodyMedium,
         )
     )
 }

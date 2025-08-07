@@ -34,7 +34,7 @@ interface PinStorageController {
 class PinStorageControllerImpl(private val storageConfig: StorageConfig) : PinStorageController {
 
     companion object {
-        private const val MAX_ATTEMPTS = 3
+        private const val MAX_ATTEMPTS = 4
         private const val BASE_LOCKOUT_DURATION_MS = 60 * 1000L // 1 minute
     }
 
