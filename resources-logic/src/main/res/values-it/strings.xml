@@ -97,6 +97,7 @@
     <string name="document_success_collapsed_supporting_text">@string/generic_view_details</string>
     <string name="document_success_sticky_button_text">@string/generic_close</string>
     <string name="quick_pin_invalid_error">PIN  non valido</string>
+    <string name="quick_pin_invalid_generic_error">"Questo PIN è troppo comune, per favore scegline uno più sicuro.  "</string>
     <string name="quick_pin_numerical_rule_invalid_error_message">Sono consentiti solo valori numerici</string>
     <string name="quick_pin_non_match">I PIN non corrispondono</string>
     <string name="quick_pin_confirm_button">Conferma</string>

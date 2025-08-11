@@ -129,8 +129,10 @@
     <string name="document_success_relying_party_default_name">@string/generic_default_relying_party_name</string>
     <string name="document_success_collapsed_supporting_text">@string/generic_view_details</string>
     <string name="document_success_sticky_button_text">@string/generic_close</string>
+
     <!-- Quick Pin -->
     <string name="quick_pin_invalid_error">Invalid PIN</string>
+    <string name="quick_pin_invalid_generic_error">This PIN is too common, please choose a more secure one.</string>
     <string name="quick_pin_numerical_rule_invalid_error_message">Only numerical values are allowed</string>
     <string name="quick_pin_non_match">PINs do not match</string>
     <string name="quick_pin_confirm_button">Confirm</string>

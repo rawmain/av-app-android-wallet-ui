@@ -350,6 +350,17 @@ class PinViewModel(
                     Rule.ValidateRegex(
                         "-?\\d+(\\.\\d+)?".toRegex(),
                         resourceProvider.getString(R.string.quick_pin_numerical_rule_invalid_error_message)
+                    ),
+                    Rule.ValidateDuplicateCharacterNotInConsecutiveOrder(
+                        maxTimesOfConsecutiveOrder = viewState.value.quickPinSize,
+                        errorMessage = resourceProvider.getString(R.string.quick_pin_invalid_generic_error)
+                    ),
+                    Rule.ValidateNumericNotInConsecutiveSequenceOrder(
+                        minLength = viewState.value.quickPinSize,
+                        errorMessage = resourceProvider.getString(R.string.quick_pin_invalid_generic_error)
+                    ),
+                    Rule.ValidateNotPalindrome(
+                        errorMessage = resourceProvider.getString(R.string.quick_pin_invalid_generic_error)
                     )
                 ) to pin
             )

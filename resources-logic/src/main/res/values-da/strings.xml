@@ -97,6 +97,7 @@
     <string name="document_success_collapsed_supporting_text">@string/generic_view_details</string>
     <string name="document_success_sticky_button_text">@string/generic_close</string>
     <string name="quick_pin_invalid_error">Ugyldig PIN</string>
+    <string name="quick_pin_invalid_generic_error">Denne PIN-kode er for almindelig, vælg venligst en mere sikker én.</string>
     <string name="quick_pin_numerical_rule_invalid_error_message">Kun numeriske værdier er tilladt</string>
     <string name="quick_pin_non_match">PIN stemmer ikke overens</string>
     <string name="quick_pin_confirm_button">Bekræft</string>
