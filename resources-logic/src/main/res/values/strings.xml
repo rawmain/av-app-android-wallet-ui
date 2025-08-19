@@ -188,7 +188,6 @@
     <string name="qr_scan_permission_not_granted">Camera permission not provided\nOpen App Settings</string>
     <string name="qr_scan_informative_text_presentation_flow">Having trouble scanning the QR Code?\nPlease try an alternative way</string>
     <string name="qr_scan_informative_text_issuance_flow">Having trouble scanning the QR Code?\nPlease try an alternative way</string>
-    <string name="qr_scan_informative_text_signature_flow">Having trouble scanning the QR Code?\nPlease try an alternative way</string>
 
     <string name="document_details_boolean_item_true_readable_value">yes</string>
     <string name="document_details_boolean_item_false_readable_value">no</string>

@@ -149,8 +149,6 @@ Apri le impostazioni dell\'app</string>
 Prova con un metodo alternativo</string>
     <string name="qr_scan_informative_text_issuance_flow">Non riesci a scansionare il codice QR?
 Prova con un metodo alternativo</string>
-    <string name="qr_scan_informative_text_signature_flow">Non riesci a scansionare il codice QR?
-Prova con un metodo alternativo</string>
     <string name="document_details_boolean_item_true_readable_value">sì</string>
     <string name="document_details_boolean_item_false_readable_value">no</string>
     <string name="consent_screen_title">Per prima cosa abbiamo bisogno del tuo consenso</string>

@@ -150,8 +150,6 @@ Ouvrir les paramètres de l\'application</string>
 Veuillez essayer une autre méthode</string>
     <string name="qr_scan_informative_text_issuance_flow">La lecture du code QR ne fonctionne pas ?
 Veuillez essayer une autre méthode</string>
-    <string name="qr_scan_informative_text_signature_flow">La lecture du code QR ne fonctionne pas ?
-Veuillez essayer une autre méthode</string>
     <string name="document_details_boolean_item_true_readable_value">Oui</string>
     <string name="document_details_boolean_item_false_readable_value">Non</string>
     <string name="consent_screen_title">Nous avons d\'abord besoin de votre consentement</string>

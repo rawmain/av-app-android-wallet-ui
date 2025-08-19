@@ -149,8 +149,6 @@ Kontakt den autoriserede udsteder for yderligere information.</string>
 Prøv en alternativ måde</string>
     <string name="qr_scan_informative_text_issuance_flow">Har du problemer med at scanne QR -koden?
 Prøv en alternativ måde</string>
-    <string name="qr_scan_informative_text_signature_flow">Har du problemer med at scanne QR -koden?
-Prøv en alternativ måde</string>
     <string name="document_details_boolean_item_true_readable_value">ja</string>
     <string name="document_details_boolean_item_false_readable_value">nej</string>
     <string name="consent_screen_title">Vi skal bruge dit samtykke først</string>

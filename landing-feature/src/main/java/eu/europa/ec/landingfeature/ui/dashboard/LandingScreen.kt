@@ -66,11 +66,11 @@ import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
+import eu.europa.ec.uilogic.component.utils.DEFAULT_BIG_ICON_SIZE
 import eu.europa.ec.uilogic.component.utils.HSpacer
 import eu.europa.ec.uilogic.component.utils.LifecycleEffect
 import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
-import eu.europa.ec.uilogic.component.utils.SPACING_MEDIUM
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
@@ -206,32 +206,29 @@ private fun handleNavigationEffect(
 }
 
 @Composable
-private fun TopBar(
-    onEventSend: (Event) -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = SPACING_SMALL.dp,
-                vertical = SPACING_MEDIUM.dp
-            )
-    ) {
-        WrapImage(
-            modifier = Modifier
-                .height(40.dp)
-                .align(Alignment.Center),
-            iconData = AppIcons.LogoPlain,
-            contentScale = ContentScale.Fit,
+private fun TopBar(onEventSend: (Event) -> Unit) = Box(
+    modifier = Modifier
+        .fillMaxWidth()
+        .padding(
+            end = SPACING_SMALL.dp,
+            bottom = SPACING_LARGE.dp,
+            top = DEFAULT_BIG_ICON_SIZE.dp
         )
+) {
+    WrapImage(
+        modifier = Modifier
+            .height(40.dp)
+            .align(Alignment.Center),
+        iconData = AppIcons.LogoPlain,
+        contentScale = ContentScale.Fit,
+    )
 
-        WrapIconButton(
-            modifier = Modifier.align(Alignment.CenterEnd),
-            iconData = AppIcons.Settings,
-            customTint = MaterialTheme.colorScheme.onSurfaceVariant,
-        ) {
-            onEventSend(Event.GoToSettings)
-        }
+    WrapIconButton(
+        modifier = Modifier.align(Alignment.CenterEnd),
+        iconData = AppIcons.Settings,
+        customTint = MaterialTheme.colorScheme.onSurfaceVariant,
+    ) {
+        onEventSend(Event.GoToSettings)
     }
 }
 

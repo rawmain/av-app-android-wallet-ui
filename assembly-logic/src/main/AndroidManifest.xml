@@ -172,29 +172,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="${rqesHost}"
-                    android:path="${rqesPath}"
-                    android:scheme="${rqesScheme}" />
-
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="${rqesDocRetrievalHost}"
-                    android:scheme="${rqesDocRetrievalScheme}" />
-
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
                     android:host="${avspHost}"
                     android:scheme="${avspScheme}" />
 
