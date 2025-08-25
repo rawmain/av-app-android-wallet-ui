@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -70,7 +71,7 @@ data class ToolbarAction(
 
 data class ToolbarConfig(
     val title: String = "",
-    val actions: List<ToolbarAction> = listOf()
+    val actions: List<ToolbarAction> = listOf(),
 )
 
 enum class ScreenNavigateAction {
@@ -93,7 +94,7 @@ fun ContentScreen(
     snackbarHost: @Composable () -> Unit = {},
     contentErrorConfig: ContentErrorConfig? = null,
     broadcastAction: BroadcastAction? = null,
-    bodyContent: @Composable (PaddingValues) -> Unit
+    bodyContent: @Composable (PaddingValues) -> Unit,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -133,7 +134,11 @@ fun ContentScreen(
                     paddingValues = screenPaddings(padding)
                 )
             } else {
-                Column(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .navigationBarsPadding()
+                ) {
 
                     Box(modifier = Modifier.weight(1f)) {
                         bodyContent(screenPaddings(padding, topSpacing))
@@ -220,7 +225,7 @@ private fun DefaultToolBar(
 
 @Composable
 internal fun ToolBarActions(
-    toolBarActions: List<ToolbarAction>?
+    toolBarActions: List<ToolbarAction>?,
 ) {
     toolBarActions?.let { actions ->
 
