@@ -21,6 +21,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.addOrReplace
+import eu.europa.ec.businesslogic.extension.ifEmptyOrNull
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.corelogic.di.WalletPresentationScope
@@ -32,6 +33,7 @@ import eu.europa.ec.eudi.iso18013.transfer.response.RequestProcessor
 import eu.europa.ec.eudi.iso18013.transfer.response.RequestedDocument
 import eu.europa.ec.eudi.iso18013.transfer.toKotlinResult
 import eu.europa.ec.eudi.wallet.EudiWallet
+import eu.europa.ec.eudi.wallet.dcapi.DCAPIException
 import eu.europa.ec.eudi.wallet.document.DocumentExtensions.getDefaultKeyUnlockData
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import kotlinx.coroutines.CoroutineDispatcher
@@ -256,13 +258,21 @@ class WalletCorePresentationControllerImpl(
                     TransferEventPartialState.Disconnected
                 )
             },
-            onError = { errorMessage ->
-                Log.e("WalletCorePresentationController", "errorMessage: $errorMessage")
-
+            onError = { error ->
+                Log.e("WalletCorePresentationController", "error: $error")
                 trySendBlocking(
-                    TransferEventPartialState.Error(
-                        error = errorMessage.ifEmpty { genericErrorMessage }
-                    )
+
+                    if (error is DCAPIException) {
+                        Log.e(
+                            "WalletCorePresentationController",
+                            "DCAPIException, continue as IntentToSent"
+                        )
+                        TransferEventPartialState.IntentToSent(error.toIntent())
+                    } else {
+                        TransferEventPartialState.Error(
+                            error = error.message.ifEmptyOrNull(genericErrorMessage)
+                        )
+                    }
                 )
             },
             onRequestReceived = { requestedDocumentData ->

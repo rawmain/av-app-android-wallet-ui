@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.1.0-beta06
+
+### Added
+
+- Initial support for Digital Credentials API (DCAPI) for presentation of org-iso-mdoc with protocol W3C 18013-7 Annex C
+
+### Changed
+
+
 ## v0.1.0-beta05 - 2025-07-07
 
 ### Added
