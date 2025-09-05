@@ -38,6 +38,7 @@ sealed class PresentationLoadingObserveResponsePartialState {
     data object Success : PresentationLoadingObserveResponsePartialState()
     data class Redirect(val uri: URI) : PresentationLoadingObserveResponsePartialState()
     data object RequestReadyToBeSent : PresentationLoadingObserveResponsePartialState()
+    data class IntentToSent(val intent: android.content.Intent) : PresentationLoadingObserveResponsePartialState()
 }
 
 sealed class PresentationLoadingSendRequestedDocumentPartialState {
@@ -83,6 +84,8 @@ class PresentationLoadingInteractorImpl(
                 }
 
                 is WalletCorePartialState.RequestIsReadyToBeSent -> PresentationLoadingObserveResponsePartialState.RequestReadyToBeSent
+
+                is WalletCorePartialState.IntentToSent -> PresentationLoadingObserveResponsePartialState.IntentToSent(response.intent)
             }
         }
 

@@ -14,19 +14,25 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.presentationfeature.ui.request
+package eu.europa.ec.presentationfeature.ui.dcapirequest
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
+import eu.europa.ec.commonfeature.ui.request.Event
 import eu.europa.ec.commonfeature.ui.request.RequestScreen
+import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
 
 @Composable
-fun PresentationRequestScreen(
+fun DcApiPresentationRequestScreen(
     navController: NavController,
-    viewModel: PresentationRequestViewModel
+    viewModel: DcApiPresentationRequestViewModel
 ) {
     RequestScreen(
         navController = navController,
         viewModel = viewModel
     )
+
+    OneTimeLaunchedEffect {
+        viewModel.setEvent(Event.Init)
+    }
 }

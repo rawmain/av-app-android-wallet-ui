@@ -85,7 +85,9 @@ import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.extension.finish
 import eu.europa.ec.uilogic.extension.getPendingDeepLink
+import eu.europa.ec.uilogic.extension.getPendingIntentAction
 import eu.europa.ec.uilogic.navigation.helper.handleDeepLinkAction
+import eu.europa.ec.uilogic.navigation.helper.handleIntentAction
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -133,7 +135,8 @@ fun LandingScreen(
     ) {
         viewModel.setEvent(
             Event.Init(
-                deepLinkUri = context.getPendingDeepLink()
+                deepLinkUri = context.getPendingDeepLink(),
+                intentAction = context.getPendingIntentAction()
             )
         )
     }
@@ -202,6 +205,10 @@ private fun handleNavigationEffect(
                 navigationEffect.arguments
             )
         }
+
+        is Effect.Navigation.OpenIntentAction -> handleIntentAction(
+            navController, navigationEffect.intentAction
+        )
     }
 }
 

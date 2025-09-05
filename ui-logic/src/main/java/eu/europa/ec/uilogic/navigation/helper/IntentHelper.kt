@@ -14,19 +14,33 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.presentationfeature.ui.request
+package eu.europa.ec.uilogic.navigation.helper
 
-import androidx.compose.runtime.Composable
+import android.content.Intent
+import android.util.Log
 import androidx.navigation.NavController
-import eu.europa.ec.commonfeature.ui.request.RequestScreen
+import eu.europa.ec.uilogic.navigation.PresentationScreens
+import eu.europa.ec.uilogic.navigation.Screen
 
-@Composable
-fun PresentationRequestScreen(
+data class IntentAction(val intent: Intent, val type: IntentType)
+
+enum class IntentType {
+    DC_API_PRESENTATION
+}
+
+fun handleIntentAction(
     navController: NavController,
-    viewModel: PresentationRequestViewModel
+    action: IntentAction
 ) {
-    RequestScreen(
-        navController = navController,
-        viewModel = viewModel
-    )
+    val screen: Screen
+
+    when (action.type) {
+        IntentType.DC_API_PRESENTATION -> {
+            screen = PresentationScreens.DcApiPresentationRequest
+        }
+    }
+
+    Log.d("Intent handling", "Navigating to: ${screen.screenName} with intent")
+    navController.currentBackStackEntry?.savedStateHandle?.set("intentToHandle", action.intent)
+    navController.navigate("${screen.screenRoute}")
 }

@@ -16,6 +16,7 @@
 
 package eu.europa.ec.presentationfeature.router
 
+import android.content.Intent
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -24,7 +25,9 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import eu.europa.ec.commonfeature.config.RequestUriConfig
+import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
 import eu.europa.ec.presentationfeature.BuildConfig
+import eu.europa.ec.presentationfeature.ui.dcapirequest.DcApiPresentationRequestScreen
 import eu.europa.ec.presentationfeature.ui.loading.PresentationLoadingScreen
 import eu.europa.ec.presentationfeature.ui.request.PresentationRequestScreen
 import eu.europa.ec.presentationfeature.ui.success.PresentationSuccessScreen
@@ -61,6 +64,35 @@ fun NavGraphBuilder.presentationGraph(navController: NavController) {
                             it.arguments?.getString(RequestUriConfig.serializedKeyName).orEmpty()
                         )
                     }
+                )
+            )
+        }
+
+        composable(
+            route = PresentationScreens.DcApiPresentationRequest.screenRoute,
+            arguments = listOf(
+                navArgument("intentAction") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("intentData") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("intentExtras") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) {
+            getOrCreatePresentationScope()
+
+            val intent: Intent? = navController.previousBackStackEntry?.savedStateHandle?.get("intentToHandle")
+
+            DcApiPresentationRequestScreen(
+                navController,
+                koinViewModel(
+                    parameters = { parametersOf(intent) }
                 )
             )
         }

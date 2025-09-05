@@ -16,6 +16,7 @@
 
 package eu.europa.ec.presentationfeature.ui.loading
 
+import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
@@ -111,6 +112,13 @@ class PresentationLoadingViewModel(
                                 sendRequestedDocuments(Event.DoWork(context))
                             }
                         )
+                    }
+
+                    is PresentationLoadingObserveResponsePartialState.IntentToSent -> {
+                        if (context is Activity) {
+                            context.setResult(Activity.RESULT_OK, it.intent)
+                            context.finish()
+                        }
                     }
                 }
             }

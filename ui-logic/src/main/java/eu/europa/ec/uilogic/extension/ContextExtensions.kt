@@ -24,6 +24,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import eu.europa.ec.uilogic.container.EudiComponentActivity
+import eu.europa.ec.uilogic.navigation.helper.IntentAction
 
 fun Context.openDeepLink(deepLink: Uri) {
     val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -40,6 +41,13 @@ fun Context.getPendingDeepLink(): Uri? {
     return (this as? EudiComponentActivity)?.pendingDeepLink?.let { deepLink ->
         clearPendingDeepLink()
         deepLink
+    }
+}
+
+fun Context.getPendingIntentAction(): IntentAction? {
+    return (this as? EudiComponentActivity)?.pendingIntentAction?.let { action ->
+        clearPendingIntent()
+        action
     }
 }
 
@@ -65,6 +73,10 @@ fun Context.findActivity(): ComponentActivity {
 
 private fun Context.clearPendingDeepLink() {
     (this as? EudiComponentActivity)?.pendingDeepLink = null
+}
+
+private fun Context.clearPendingIntent() {
+    (this as? EudiComponentActivity)?.pendingIntentAction = null
 }
 
 /**

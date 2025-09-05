@@ -16,10 +16,13 @@
 
 package eu.europa.ec.presentationfeature.interactor
 
+import android.content.Intent
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.commonfeature.config.toDomainConfig
+import eu.europa.ec.commonfeature.interactor.PresentationRequestInteractor
+import eu.europa.ec.commonfeature.interactor.PresentationRequestInteractorPartialState
 import eu.europa.ec.commonfeature.ui.request.model.RequestDocumentItemUi
 import eu.europa.ec.commonfeature.ui.request.transformer.RequestTransformer
 import eu.europa.ec.corelogic.controller.TransferEventPartialState
@@ -28,29 +31,6 @@ import eu.europa.ec.corelogic.controller.WalletCorePresentationController
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
-
-sealed class PresentationRequestInteractorPartialState {
-    data class Success(
-        val verifierName: String?,
-        val verifierIsTrusted: Boolean,
-        val requestDocuments: List<RequestDocumentItemUi>
-    ) : PresentationRequestInteractorPartialState()
-
-    data class NoData(
-        val verifierName: String?,
-        val verifierIsTrusted: Boolean,
-    ) : PresentationRequestInteractorPartialState()
-
-    data class Failure(val error: String) : PresentationRequestInteractorPartialState()
-    data object Disconnect : PresentationRequestInteractorPartialState()
-}
-
-interface PresentationRequestInteractor {
-    fun getRequestDocuments(): Flow<PresentationRequestInteractorPartialState>
-    fun stopPresentation()
-    fun updateRequestedDocuments(items: List<RequestDocumentItemUi>)
-    fun setConfig(config: RequestUriConfig)
-}
 
 class PresentationRequestInteractorImpl(
     private val resourceProvider: ResourceProvider,
@@ -64,6 +44,10 @@ class PresentationRequestInteractorImpl(
 
     override fun setConfig(config: RequestUriConfig) {
         walletCorePresentationController.setConfig(config.toDomainConfig())
+    }
+
+    override fun startDCAPIPresentation(intent: Intent) {
+        walletCorePresentationController.startDCAPIPresentation(intent)
     }
 
     override fun getRequestDocuments(): Flow<PresentationRequestInteractorPartialState> =
