@@ -49,6 +49,23 @@
     <string name="onboarding_verification_description">This verification is needed to create a proof that you are over 18. The eID details will not be shared with online services you access.</string>
     <string name="onboarding_verification_national_id">National eID / National idP</string>
     <string name="onboarding_verification_national_id_description">Identify online using your eID</string>
+    <string name="onboarding_verification_passport_id_card">Passport or ID Card</string>
+    <string name="onboarding_verification_passport_id_card_description">Scan your passport or ID card for verification</string>
+
+    <!-- Passport Scan Intro Screen -->
+    <string name="passport_scan_intro_enrollment_method">Age Verification Enrollment Method</string>
+    <string name="passport_scan_intro_title">Passport or ID Card</string>
+    <string name="passport_scan_intro_description">The Passport method is quick and secure! Scan your ID, take a photo, and record a short video—three steps for maximum safety and fraud protection.</string>
+    <string name="passport_scan_intro_back_button">Back</string>
+    <string name="passport_scan_intro_start_button">Start</string>
+    <string name="passport_scan_intro_step_1_title">Take a Photo of the Passport</string>
+    <string name="passport_scan_intro_step_1_description">Capture a clear image of your Passport.</string>
+    <string name="passport_scan_intro_step_2_title">Read in your Passport</string>
+    <string name="passport_scan_intro_step_2_description">Place your Passport on your smartphone to read the data.</string>
+    <string name="passport_scan_intro_step_3_title">Record a video of yourself</string>
+    <string name="passport_scan_intro_step_3_description">Film yourself for identity verification.</string>
+    <string name="passport_scan_intro_step_4_title">Consent</string>
+    <string name="passport_scan_intro_step_5_title">Issuing of the Proof of Age Attestation</string>
 
     <string name="welcome_page_1">Using this app you can securely prove you are over 18 when accessing services restricted to adults.</string>
     <string name="welcome_page_2">Verify that you are over 18 once, use this proof to securely access many services restricted to adults.</string>

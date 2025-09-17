@@ -31,6 +31,7 @@ sealed class OnboardingScreens {
     data object Welcome : Screen(name = "WELCOME")
     data object Consent : Screen(name = "CONSENT")
     data object Enrollment : Screen(name = "ENROLLMENT")
+    data object PassportScanIntro : Screen(name = "PASSPORT_SCAN_INTRO")
 }
 
 sealed class CommonScreens {

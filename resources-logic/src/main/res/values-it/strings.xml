@@ -27,6 +27,23 @@
     <string name="onboarding_verification_description">Questa verifica è necessaria per creare un\'attestazione che dimostri che hai più di 18 anni. I dettagli eID non saranno condivisi con i servizi online a cui accedi.</string>
     <string name="onboarding_verification_national_id">eID nazionale / IdP nazionale</string>
     <string name="onboarding_verification_national_id_description">Identificati online usando il tuo eID</string>
+    <string name="onboarding_verification_passport_id_card">Passaporto o Carta d\'identità</string>
+    <string name="onboarding_verification_passport_id_card_description">Scansiona il tuo passaporto o carta d\'identità per la verifica</string>
+
+    <!-- Passport Scan Intro Screen -->
+    <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>
+    <string name="passport_scan_intro_title">Passaporto o Carta d\'identità</string>
+    <string name="passport_scan_intro_description">Il metodo passaporto è veloce e sicuro! Scansiona il tuo documento, scatta una foto e registra un breve video—tre passaggi per la massima sicurezza e protezione dalle frodi.</string>
+    <string name="passport_scan_intro_back_button">Indietro</string>
+    <string name="passport_scan_intro_start_button">Inizia</string>
+    <string name="passport_scan_intro_step_1_title">Scatta una foto del passaporto</string>
+    <string name="passport_scan_intro_step_1_description">Cattura un\'immagine chiara del tuo passaporto.</string>
+    <string name="passport_scan_intro_step_2_title">Leggi il tuo passaporto</string>
+    <string name="passport_scan_intro_step_2_description">Posiziona il tuo passaporto sullo smartphone per leggere i dati.</string>
+    <string name="passport_scan_intro_step_3_title">Registra un video di te stesso</string>
+    <string name="passport_scan_intro_step_3_description">Filmati per la verifica dell\'identità.</string>
+    <string name="passport_scan_intro_step_4_title">Consenso</string>
+    <string name="passport_scan_intro_step_5_title">Emissione dell\'attestazione di verifica dell\'età</string>
     <string name="welcome_page_1">Utilizzando quest\'app, puoi dimostrare in modo sicuro di avere almeno 18 anni quando accedi ai servizi riservati agli adulti.</string>
     <string name="welcome_page_2">Verifica di avere almeno 18 anni, e usa questa attestazione per accedere in modo sicuro a molti servizi riservati agli adulti.</string>
     <string name="welcome_page_3">Mantieni il controllo dei tuoi dati: solo l\'attestazione della tua maggiore età verrà condivisa. Nessun altro dettaglio personale sarà archiviato o condiviso con i servizi online.</string>

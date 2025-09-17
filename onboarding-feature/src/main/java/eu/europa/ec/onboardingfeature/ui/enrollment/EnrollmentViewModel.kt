@@ -78,6 +78,7 @@ sealed class Effect : ViewSideEffect {
 
 enum class EnrollmentMethod {
     NATIONAL_ID,
+    PASSPORT_ID_CARD,
 //    TOKEN_QR,
 }
 
@@ -110,6 +111,10 @@ class EnrollmentViewModel(
                 when (event.method) {
                     EnrollmentMethod.NATIONAL_ID -> {
                         issueNationalEID(event.context)
+                    }
+
+                    EnrollmentMethod.PASSPORT_ID_CARD -> {
+                        navigateToPassportScanIntro()
                     }
 
 //                    EnrollmentMethod.TOKEN_QR -> {
@@ -263,6 +268,15 @@ class EnrollmentViewModel(
             Effect.Navigation.SwitchScreen(
                 screenRoute = route,
                 inclusive = true
+            )
+        }
+    }
+
+    private fun navigateToPassportScanIntro() {
+        setEffect {
+            Effect.Navigation.SwitchScreen(
+                screenRoute = OnboardingScreens.PassportScanIntro.screenRoute,
+                inclusive = false
             )
         }
     }

@@ -22,6 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import eu.europa.ec.onboardingfeature.ui.consent.ConsentScreen
 import eu.europa.ec.onboardingfeature.ui.enrollment.EnrollmentScreen
+import eu.europa.ec.onboardingfeature.ui.passportscanintro.PassportScanIntroScreen
 import eu.europa.ec.onboardingfeature.ui.welcome.WelcomeScreen
 import eu.europa.ec.uilogic.navigation.ModuleRoute
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
@@ -41,6 +42,9 @@ fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
         }
         composable(route = OnboardingScreens.Enrollment.screenRoute) {
             EnrollmentScreen(navController, koinViewModel())
+        }
+        composable(route = OnboardingScreens.PassportScanIntro.screenRoute) {
+            PassportScanIntroScreen(navController, koinViewModel())
         }
     }
 }
