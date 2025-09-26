@@ -22,7 +22,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import eu.europa.ec.onboardingfeature.ui.consent.ConsentScreen
 import eu.europa.ec.onboardingfeature.ui.enrollment.EnrollmentScreen
-import eu.europa.ec.onboardingfeature.ui.passportscanintro.PassportScanIntroScreen
+import eu.europa.ec.onboardingfeature.ui.passport.passportbiometrics.PassportBiometricScreen
+import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.PassportIdentificationScreen
+import eu.europa.ec.onboardingfeature.ui.passport.passportscanintro.PassportScanIntroScreen
+import eu.europa.ec.onboardingfeature.ui.qrscanintro.QRScanIntroScreen
 import eu.europa.ec.onboardingfeature.ui.welcome.WelcomeScreen
 import eu.europa.ec.uilogic.navigation.ModuleRoute
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
@@ -37,14 +40,29 @@ fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
         composable(route = OnboardingScreens.Welcome.screenRoute) {
             WelcomeScreen(navController, koinViewModel())
         }
+
         composable(route = OnboardingScreens.Consent.screenRoute) {
             ConsentScreen(navController, koinViewModel())
         }
+
         composable(route = OnboardingScreens.Enrollment.screenRoute) {
             EnrollmentScreen(navController, koinViewModel())
         }
+
         composable(route = OnboardingScreens.PassportScanIntro.screenRoute) {
             PassportScanIntroScreen(navController, koinViewModel())
+        }
+
+        composable(route = OnboardingScreens.PassportIdentification.screenRoute) {
+            PassportIdentificationScreen(navController, koinViewModel())
+        }
+
+        composable(route = OnboardingScreens.PassportBiometrics.screenRoute) {
+            PassportBiometricScreen(navController, koinViewModel())
+        }
+
+        composable(route = OnboardingScreens.QRScanIntro.screenRoute) {
+            QRScanIntroScreen(navController, koinViewModel())
         }
     }
 }

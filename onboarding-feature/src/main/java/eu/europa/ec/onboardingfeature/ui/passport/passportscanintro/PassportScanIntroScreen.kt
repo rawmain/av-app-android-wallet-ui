@@ -14,7 +14,7 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.onboardingfeature.ui.passportscanintro
+package eu.europa.ec.onboardingfeature.ui.passport.passportscanintro
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -119,13 +119,14 @@ private fun ActionButtons(
     }
 }
 
-private fun handleEffect(
-    effect: Effect,
-    hostNavController: NavController,
-) {
+private fun handleEffect(effect: Effect, hostNavController: NavController) {
     when (effect) {
         is Effect.Navigation.GoBack -> {
             hostNavController.popBackStack()
+        }
+
+        is Effect.Navigation.SwitchScreen -> {
+            hostNavController.navigate(effect.screenRoute)
         }
     }
 }

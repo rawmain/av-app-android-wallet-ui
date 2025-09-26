@@ -14,50 +14,52 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.onboardingfeature.ui.passportscanintro
+package eu.europa.ec.onboardingfeature.ui.passport.passportbiometrics
 
+import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
+import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.android.annotation.KoinViewModel
+
+private const val TAG = "PassportBiometricViewModel"
 
 data class State(
     val isLoading: Boolean = false,
 ) : ViewState
 
 sealed class Event : ViewEvent {
-    data object Init : Event()
+    data object OnInitEvent : Event()
     data object OnBackPressed : Event()
-    data object OnStartProcedure : Event()
+    data object OnNextPressed : Event()
+    data object OnLinkPressed : Event()
 }
 
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
+        data class SwitchScreen(val screenRoute: String, val inclusive: Boolean) : Navigation()
     }
 }
 
 @KoinViewModel
-class PassportScanIntroViewModel : MviViewModel<Event, State, Effect>() {
+class PassportBiometricViewModel(
+    private val resourceProvider: ResourceProvider,
+    private val uiSerializer: UiSerializer,
+    private val logController: LogController
+) : MviViewModel<Event, State, Effect>() {
 
-    override fun setInitialState(): State {
-        return State()
-    }
+    override fun setInitialState(): State = State()
 
     override fun handleEvents(event: Event) {
-        when (event) {
-            is Event.Init -> {
-                // Nothing to do for now
-            }
-
-            is Event.OnBackPressed -> {
-                setEffect { Effect.Navigation.GoBack }
-            }
-
-            is Event.OnStartProcedure -> {
-                // Nothing to do for now
-            }
+        when(event) {
+            Event.OnInitEvent -> logController.i(TAG) { "OnInitEvent -- PassportBiometricViewModel" }
+            Event.OnBackPressed -> setEffect { Effect.Navigation.GoBack }
+            Event.OnLinkPressed -> Unit // FIXME: Handle the navigation from link
+            Event.OnNextPressed -> Unit // FIXME: Implement the ops
         }
     }
 }

@@ -61,6 +61,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import eu.europa.ec.commonfeature.config.QrScanFlow
+import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.ui.qr_scan.component.QrCodeAnalyzer
 import eu.europa.ec.commonfeature.ui.qr_scan.component.qrBorderCanvas
 import eu.europa.ec.resourceslogic.R
@@ -83,6 +85,7 @@ import eu.europa.ec.uilogic.extension.throttledClickable
 import eu.europa.ec.uilogic.navigation.CommonScreens
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 
 @Composable
@@ -326,8 +329,18 @@ private fun InformativeText(text: String) {
 @Composable
 private fun InformativeTextPreview() {
     PreviewTheme {
-        InformativeText(
-            text = stringResource(R.string.qr_scan_informative_text_presentation_flow)
+        Content(
+            context = LocalContext.current,
+            state = State(
+                qrScannedConfig = QrScanUiConfig(
+                    "", "", QrScanFlow.Presentation
+                ),
+                informativeText = ""
+            ),
+            effectFlow = flowOf(),
+            onEventSend = {},
+            onNavigationRequested = {},
+            paddingValues = PaddingValues()
         )
     }
 }

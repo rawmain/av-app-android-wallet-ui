@@ -51,6 +51,18 @@
     <string name="onboarding_verification_national_id_description">Identify online using your eID</string>
     <string name="onboarding_verification_passport_id_card">Passport or ID Card</string>
     <string name="onboarding_verification_passport_id_card_description">Scan your passport or ID card for verification</string>
+    <string name="onboarding_verification_qr_code">Token / QR-Code</string>
+    <string name="onboarding_verification_qr_code_description">Description</string>
+
+    <!-- QR Scan Introduction Screen -->
+    <string name="qr_scan_intro_enrollment_method">Age Verification Enrollment Method</string>
+    <string name="qr_scan_intro_title">Token / QR-Code</string>
+    <string name="qr_scan_intro_description">The token/QR code method is a secure on-site process: </string>
+    <string name="qr_scan_intro_hyperlink">Do you need Help?</string>
+    <string name="qr_scan_intro_back_button">Back</string>
+    <string name="qr_scan_intro_scan_button">Scan</string>
+    <string name="qr_scan_intro_step_first">You show your ID to an authorized person and receive a QR code</string>
+    <string name="qr_scan_intro_step_second">Scan this QR code it with your Wallet to get your 18+ credential.</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="passport_scan_intro_enrollment_method">Age Verification Enrollment Method</string>
@@ -66,6 +78,28 @@
     <string name="passport_scan_intro_step_3_description">Film yourself for identity verification.</string>
     <string name="passport_scan_intro_step_4_title">Consent</string>
     <string name="passport_scan_intro_step_5_title">Issuing of the Proof of Age Attestation</string>
+
+    <!-- Passport Scan Intro Screen -->
+    <string name="passport_identification_title">Take a Photo of your Passport</string>
+    <string name="passport_identification_description">For this step, simply capture a clear photo of your passport. Make sure:</string>
+    <string name="passport_identification_step_first">The entire passport is visible and well-lit.</string>
+    <string name="passport_identification_step_second">No reflections or blurriness obscure the details.</string>
+    <string name="passport_identification_footer">We take an identification code from this passport to get access to the machine readable part of the passport.</string>
+    <string name="passport_identification_back">Back</string>
+    <string name="passport_identification_capture">Take a Photo</string>
+
+    <!-- Passport verification steps procedures -->
+    <string name="passport_identification">Identification</string>
+    <string name="passport_biometrics">Biometrics</string>
+    <string name="passport_live_video">Live Video</string>
+
+    <!-- Passport verification Biometrics -->
+    <string name="passport_biometrics_back">Back</string>
+    <string name="passport_biometrics_next">Next</string>
+    <string name="passport_biometrics_content_description">Content Description</string>
+    <string name="passport_biometrics_first_header">Read in your Passport</string>
+    <string name="passport_biometrics_first_description">Place your Passport directly on the back of the smartphone, usually at the top.</string>
+    <string name="passport_biometrics_first_link">Do you need Help?</string>
 
     <string name="welcome_page_1">Using this app you can securely prove you are over 18 when accessing services restricted to adults.</string>
     <string name="welcome_page_2">Verify that you are over 18 once, use this proof to securely access many services restricted to adults.</string>

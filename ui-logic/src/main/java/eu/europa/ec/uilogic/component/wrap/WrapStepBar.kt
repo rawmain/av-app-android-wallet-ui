@@ -34,23 +34,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
+import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_SMALL
-import eu.europa.ec.uilogic.component.utils.SPACING_SMALL_PLUS
-import kotlinx.coroutines.launch
-import androidx.compose.ui.text.TextMeasurer
-import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.tooling.preview.Preview
-import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
+import eu.europa.ec.uilogic.component.utils.SPACING_SMALL_PLUS
 import eu.europa.ec.uilogic.component.utils.measureTextWidthInPx
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 private val horizontalLabelPaddingDp = SPACING_SMALL_PLUS.dp
 private val paddingValues = PaddingValues(
@@ -84,7 +83,7 @@ fun WrapStepBar(currentStep: Int, steps: List<String>, modifier: Modifier = Modi
                 .fillMaxWidth()
                 .clipToBounds(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             userScrollEnabled = true
         ) {
             itemsIndexed(steps) { index, text ->
