@@ -24,8 +24,7 @@ import eu.europa.ec.passportscanner.parser.types.MrzFormat
 import eu.europa.ec.passportscanner.parser.types.MrzFormat.Companion.get
 import eu.europa.ec.passportscanner.parser.types.MrzSex
 import eu.europa.ec.passportscanner.parser.types.MrzSex.Companion.fromMrz
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import timber.log.Timber
 import java.text.Normalizer
 import java.util.Locale
 
@@ -308,10 +307,10 @@ class MrzParser(mrz: String) {
             year = rawValue(r).toInt()
         } catch (ex: NumberFormatException) {
             year = -1
-            log.debug("Failed to parse MRZ date year " + rawValue(range) + ": " + ex, mrz, r)
+            Timber.d("Failed to parse MRZ date year " + rawValue(range) + ": " + ex, mrz, r)
         }
         if (year < 0 || year > 99) {
-            log.debug("Invalid year value " + year + ": must be 0..99")
+            Timber.d("Invalid year value " + year + ": must be 0..99")
         }
         r = MrzRange(range.column + 2, range.column + 4, range.row)
         var month: Int
@@ -319,10 +318,10 @@ class MrzParser(mrz: String) {
             month = rawValue(r).toInt()
         } catch (ex: NumberFormatException) {
             month = -1
-            log.debug("Failed to parse MRZ date month " + rawValue(range) + ": " + ex, mrz, r)
+            Timber.d("Failed to parse MRZ date month " + rawValue(range) + ": " + ex, mrz, r)
         }
         if (month < 1 || month > 12) {
-            log.debug("Invalid month value " + month + ": must be 1..12")
+            Timber.d("Invalid month value " + month + ": must be 1..12")
         }
         r = MrzRange(range.column + 4, range.column + 6, range.row)
         var day: Int
@@ -330,10 +329,10 @@ class MrzParser(mrz: String) {
             day = rawValue(r).toInt()
         } catch (ex: NumberFormatException) {
             day = -1
-            log.debug("Failed to parse MRZ date month " + rawValue(range) + ": " + ex, mrz, r)
+            Timber.d("Failed to parse MRZ date month " + rawValue(range) + ": " + ex, mrz, r)
         }
         if (day < 1 || day > 31) {
-            log.debug("Invalid day value " + day + ": must be 1..31")
+            Timber.d("Invalid day value " + day + ": must be 1..31")
         }
         return MrzDate(year, month, day)
     }
@@ -359,7 +358,7 @@ class MrzParser(mrz: String) {
     }
 
     companion object {
-        private val log: Logger = LoggerFactory.getLogger(MrzParser::class.java)
+        // Using Timber for logging
 
         private val MRZ_WEIGHTS = intArrayOf(7, 3, 1)
 

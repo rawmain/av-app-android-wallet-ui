@@ -18,8 +18,7 @@
  */
 package eu.europa.ec.passportscanner.parser.types
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import timber.log.Timber
 import java.io.Serializable
 
 /**
@@ -70,15 +69,15 @@ class MrzDate : Serializable, Comparable<MrzDate?> {
 
     private fun check(): Boolean {
         if (year < 0 || year > 99) {
-            log.debug("Parameter year: invalid value " + year + ": must be 0..99")
+            Timber.d("Parameter year: invalid value " + year + ": must be 0..99")
             return false
         }
         if (month < 1 || month > 12) {
-            log.debug("Parameter month: invalid value " + month + ": must be 1..12")
+            Timber.d("Parameter month: invalid value " + month + ": must be 1..12")
             return false
         }
         if (day < 1 || day > 31) {
-            log.debug("Parameter day: invalid value " + day + ": must be 1..31")
+            Timber.d("Parameter day: invalid value " + day + ": must be 1..31")
             return false
         }
 
@@ -120,6 +119,6 @@ class MrzDate : Serializable, Comparable<MrzDate?> {
     companion object {
         private const val serialVersionUID = 1L
 
-        private val log: Logger = LoggerFactory.getLogger(MrzDate::class.java)
+        // Using Timber for logging
     }
 }

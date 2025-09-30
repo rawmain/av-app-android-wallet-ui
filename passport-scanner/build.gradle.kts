@@ -82,8 +82,8 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
 
-    // MRZ
-    implementation("org.slf4j:slf4j-android:1.7.36")
+    // MRZ (logging replaced slf4j with Timber)
+    implementation(libs.timber)
 
     // JSON processing
     implementation(libs.gson)

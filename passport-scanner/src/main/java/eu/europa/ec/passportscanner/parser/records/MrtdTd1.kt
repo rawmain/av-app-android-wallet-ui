@@ -22,7 +22,7 @@ import eu.europa.ec.passportscanner.parser.MrzParser
 import eu.europa.ec.passportscanner.parser.MrzRange
 import eu.europa.ec.passportscanner.parser.MrzRecord
 import eu.europa.ec.passportscanner.parser.types.MrzFormat
-import org.slf4j.LoggerFactory
+import timber.log.Timber
 
 
 /**
@@ -44,7 +44,7 @@ class MrtdTd1 : MrzRecord(MrzFormat.MRTD_TD1) {
     var optional2: String? = null
 
     override fun fromMrz(mrz: String) {
-        val log = LoggerFactory.getLogger(MrzParser::class.java)
+        // Using Timber for logging
         super.fromMrz(mrz)
         val p = MrzParser(mrz)
         documentNumber = p.parseString(MrzRange(5, 14, 0))
@@ -74,7 +74,7 @@ class MrtdTd1 : MrzRecord(MrzFormat.MRTD_TD1) {
             ),
             "mrz"
         )
-        log.debug(
+        Timber.d(
             p.rawValue(
                 MrzRange(5, 30, 0),
                 MrzRange(0, 7, 1),
