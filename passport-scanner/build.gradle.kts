@@ -67,27 +67,26 @@ dependencies {
     implementation(files("libs/jj2000_imageutil.jar"))
 
     // Core Android dependencies
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation(libs.material)
 
     // ML Kit dependencies
     implementation("com.google.mlkit:text-recognition:16.0.1")
 
     // CameraX
-    val cameraxVersion = "1.4.2"
-    implementation("androidx.camera:camera-core:$cameraxVersion")
-    implementation("androidx.camera:camera-camera2:$cameraxVersion")
-    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
-    implementation("androidx.camera:camera-view:$cameraxVersion")
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 
     // MRZ
     implementation("org.slf4j:slf4j-android:1.7.36")
 
     // JSON processing
-    implementation("com.google.code.gson:gson:2.13.2")
+    implementation(libs.gson)
     implementation("com.jayway.jsonpath:json-path:2.9.0")
     implementation("com.github.wnameless.json:json-flattener:0.17.3")
 
@@ -113,9 +112,7 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
 
     // WorkManager
-    val workVersion = "2.10.5"
-    implementation("androidx.work:work-runtime:$workVersion")
-    implementation("androidx.work:work-runtime-ktx:$workVersion")
+    implementation(libs.androidx.work.ktx)
 
     // JWT
     api("io.jsonwebtoken:jjwt-api:0.13.0")

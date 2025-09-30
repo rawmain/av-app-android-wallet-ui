@@ -33,7 +33,8 @@
       "Bash(find /Users/A200311941/Projects/EUDI/av-app-android-wallet-ui/passport-scanner/src/main/java/eu/europa/ec/passportscanner -type f ( -name \"*.kt\" -o -name \"*.java\" ) -exec sed -i '' 's/import org\\.idpass\\.smartscanner\\.parser\\.records/import eu.europa.ec.passportscanner.parser.records/g' {} ;)",
       "Bash(find /Users/A200311941/Projects/EUDI/av-app-android-wallet-ui/passport-scanner/src/main/java/eu/europa/ec/passportscanner -type f ( -name \"*.kt\" -o -name \"*.java\" ) -exec sed -i '' 's/import org\\.idpass\\.smartscanner\\.parser\\.types/import eu.europa.ec.passportscanner.parser.types/g' {} ;)",
       "Bash(find /Users/A200311941/Projects/EUDI/av-app-android-wallet-ui/passport-scanner/src/main/java/eu/europa/ec/passportscanner -type f ( -name \"*.kt\" -o -name \"*.java\" ) -exec sed -i '' 's/import org\\.idpass\\.smartscanner\\.parser\\./import eu.europa.ec.passportscanner.parser./g' {} ;)",
-      "Bash(find /Users/A200311941/Projects/EUDI/av-app-android-wallet-ui/passport-scanner/src/main/java/eu/europa/ec/passportscanner -type f ( -name \"*.kt\" -o -name \"*.java\" ) -exec sed -i '' 's/import org\\.idpass\\.smartscanner\\.api\\./import eu.europa.ec.passportscanner.api./g' {} ;)"
+      "Bash(find /Users/A200311941/Projects/EUDI/av-app-android-wallet-ui/passport-scanner/src/main/java/eu/europa/ec/passportscanner -type f ( -name \"*.kt\" -o -name \"*.java\" ) -exec sed -i '' 's/import org\\.idpass\\.smartscanner\\.api\\./import eu.europa.ec.passportscanner.api./g' {} ;)",
+      "Bash(./gradlew :passport-scanner:compileDebugKotlin)"
     ],
     "deny": [],
     "ask": []
