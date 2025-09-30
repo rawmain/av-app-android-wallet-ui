@@ -1,0 +1,49 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.NFC" />
+
+    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <application
+        android:theme="@style/AppTheme"
+        android:hardwareAccelerated="true"
+        android:supportsRtl="true"
+        tools:ignore="UnusedAttribute">
+        <activity
+            android:name="SmartScannerActivity"
+            android:configChanges="screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:resizeableActivity="false"
+            android:exported="true"
+            android:screenOrientation="nosensor"
+            android:keepScreenOn="true">
+            <intent-filter>
+                <!--Bundle intent-->
+                <action android:name="eu.europa.ec.passportscanner.BARCODE_SCAN" />
+                <action android:name="eu.europa.ec.passportscanner.IDPASS_LITE_SCAN" />
+                <action android:name="eu.europa.ec.passportscanner.MRZ_SCAN" />
+                <action android:name="eu.europa.ec.passportscanner.NFC_SCAN" />
+                <action android:name="eu.europa.ec.passportscanner.QRCODE_SCAN" />
+                <action android:name="eu.europa.ec.passportscanner.OCR_SCAN" />
+                <!--ODK bundle intent-->
+                <action android:name="eu.europa.ec.passportscanner.odk.BARCODE_SCAN" />
+                <action android:name="eu.europa.ec.passportscanner.odk.IDPASS_LITE_SCAN" />
+                <action android:name="eu.europa.ec.passportscanner.odk.MRZ_SCAN" />
+                <action android:name="eu.europa.ec.passportscanner.odk.NFC_SCAN" />
+                <action android:name="eu.europa.ec.passportscanner.odk.QRCODE_SCAN" />
+                <action android:name="eu.europa.ec.passportscanner.odk.OCR_SCAN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".nfc.NFCActivity"
+            android:screenOrientation="nosensor"
+            android:launchMode="singleInstance"
+            android:keepScreenOn="true"/>
+    </application>
+</manifest>

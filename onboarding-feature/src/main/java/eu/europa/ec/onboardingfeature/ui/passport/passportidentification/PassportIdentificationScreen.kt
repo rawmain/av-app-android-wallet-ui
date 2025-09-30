@@ -61,7 +61,7 @@ fun PassportIdentificationScreen(controller : NavController, viewModel : Passpor
         stickyBottom = { paddingValues ->
             ActionButtons(
                 onBack = { viewModel.setEvent(Event.OnBackPressed) },
-                onCapture = { viewModel.setEvent(Event.OnPhotoCapture) },
+                onCapture = { viewModel.setEvent(Event.OnStartPassportScan) },
                 paddings = paddingValues
             )
         }

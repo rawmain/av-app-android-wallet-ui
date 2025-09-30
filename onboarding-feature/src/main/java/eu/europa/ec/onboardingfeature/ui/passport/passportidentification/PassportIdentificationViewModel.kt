@@ -38,7 +38,7 @@ data class State(
 sealed class Event : ViewEvent {
     data object Init : Event()
     data object OnBackPressed : Event()
-    data object OnPhotoCapture : Event()
+    data object OnStartPassportScan : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -63,7 +63,7 @@ class PassportIdentificationViewModel(
             Event.Init -> logController.i { "Init -- PassportIdentificationViewModel " }
             Event.OnBackPressed -> setEffect { Effect.Navigation.GoBack }
 
-            Event.OnPhotoCapture -> {
+            Event.OnStartPassportScan -> {
                 setEffect {
                     Effect.Navigation.SwitchScreen(
                         screenRoute = generateComposableNavigationLink(
