@@ -69,12 +69,12 @@ dependencies {
     // Core Android dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
 
     // ML Kit dependencies
-    implementation("com.google.mlkit:text-recognition:16.0.1")
+    implementation(libs.mlkit.text.recognition)
 
     // CameraX
     implementation(libs.androidx.camera.core)
@@ -87,22 +87,22 @@ dependencies {
 
     // JSON processing
     implementation(libs.gson)
-    implementation("com.jayway.jsonpath:json-path:2.9.0")
-    implementation("com.github.wnameless.json:json-flattener:0.17.3")
+    implementation(libs.json.path)
+    implementation(libs.json.flattener)
 
     // Image processing
-    implementation("com.github.bumptech.glide:glide:5.0.4")
-    implementation("jp.wasabeef:glide-transformations:4.3.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:5.0.5")
+    implementation(libs.glide)
+    implementation(libs.glide.transformations)
+    annotationProcessor(libs.glide.compiler)
 
     // NFC dependencies
-    implementation("org.jmrtd:jmrtd:0.8.3")
-    implementation("com.madgag.spongycastle:prov:1.58.0.0")
-    implementation("net.sf.scuba:scuba-sc-android:0.0.26")
-    implementation(group = "org.ejbca.cvc", name = "cert-cvc", version = "1.4.13")
+    implementation(libs.jmrtd)
+    implementation(libs.spongycastle.prov)
+    implementation(libs.scuba.sc.android)
+    implementation(libs.cert.cvc)
 
     // WSQ
-    implementation("com.github.mhshams:jnbis:2.1.2")
+    implementation(libs.jnbis)
 
     // Utilities
     implementation("commons-codec:commons-codec:1.19.0")
