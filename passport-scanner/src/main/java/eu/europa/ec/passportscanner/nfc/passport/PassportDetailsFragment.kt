@@ -40,7 +40,7 @@ import org.jmrtd.FeatureStatus
 import org.jmrtd.VerificationStatus
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 import javax.security.auth.x500.X500Principal
 
 
@@ -212,7 +212,7 @@ class PassportDetailsFragment : androidx.fragment.app.Fragment() {
                 binding.valueDocumentSigningCertificateSignatureAlgorithm.text = docSigningCertificate.sigAlgName
 
                 try {
-                    binding.valueDocumentSigningCertificateThumbprint.text = (MessageDigest.getInstance("SHA-1").digest(docSigningCertificate.encoded)).bytesToHex().toUpperCase(Locale.ROOT)
+                    binding.valueDocumentSigningCertificateThumbprint.text = (MessageDigest.getInstance("SHA-1").digest(docSigningCertificate.encoded)).bytesToHex().uppercase(Locale.ROOT)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

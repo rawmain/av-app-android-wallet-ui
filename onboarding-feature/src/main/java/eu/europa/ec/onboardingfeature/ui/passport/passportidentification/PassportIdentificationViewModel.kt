@@ -16,19 +16,19 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportidentification
 
+import android.content.Context
+import android.content.Intent
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.commonfeature.config.IssuanceFlowUiConfig
-import eu.europa.ec.commonfeature.config.QrScanFlow
-import eu.europa.ec.commonfeature.config.QrScanUiConfig
+import eu.europa.ec.passportscanner.SmartScannerActivity
+import eu.europa.ec.passportscanner.scanner.config.CaptureOptions
+import eu.europa.ec.passportscanner.scanner.config.CaptureType
+import eu.europa.ec.passportscanner.scanner.config.Config
+import eu.europa.ec.passportscanner.scanner.config.ScannerOptions
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
-import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
-import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
-import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.android.annotation.KoinViewModel
 
 data class State(
@@ -45,14 +45,15 @@ sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
         data class SwitchScreen(val screenRoute: String, val inclusive: Boolean) : Navigation()
+        data class StartMRZScanner(val intent: Intent) : Navigation()
     }
 }
 
 @KoinViewModel
 class PassportIdentificationViewModel(
     private val resourceProvider: ResourceProvider,
-    private val uiSerializer: UiSerializer,
-    private val logController: LogController
+    private val logController: LogController,
+    private val context: Context
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State = State()
@@ -64,26 +65,26 @@ class PassportIdentificationViewModel(
             Event.OnBackPressed -> setEffect { Effect.Navigation.GoBack }
 
             Event.OnStartPassportScan -> {
-                setEffect {
-                    Effect.Navigation.SwitchScreen(
-                        screenRoute = generateComposableNavigationLink(
-                            screen = CommonScreens.QrScan,
-                            arguments = generateComposableArguments(
-                                mapOf(
-                                    QrScanUiConfig.serializedKeyName to uiSerializer.toBase64(
-                                        QrScanUiConfig(
-                                            title = "",
-                                            subTitle = "",
-                                            qrScanFlow = QrScanFlow.Issuance(IssuanceFlowUiConfig.NO_DOCUMENT)
-                                        ),
-                                        QrScanUiConfig.Parser
-                                    )
-                                )
-                            )
+                val intent = Intent(context, SmartScannerActivity::class.java)
+                intent.putExtra(
+                    SmartScannerActivity.SCANNER_OPTIONS,
+                    ScannerOptions(
+                        config = Config(
+                            header = resourceProvider.getString(eu.europa.ec.resourceslogic.R.string.passport_identification_capture),
+                            subHeader = resourceProvider.getString(eu.europa.ec.resourceslogic.R.string.passport_identification_title),
+                            isManualCapture = false,
+                            branding = true,
+                            showGuide = true,
+                            showSettings = false
                         ),
-                        inclusive = false
+                        captureOptions = CaptureOptions(
+                            type = CaptureType.DOCUMENT.value,
+                            height = 180,
+                            width = 285
+                        )
                     )
-                }
+                )
+                setEffect { Effect.Navigation.StartMRZScanner(intent) }
             }
         }
     }

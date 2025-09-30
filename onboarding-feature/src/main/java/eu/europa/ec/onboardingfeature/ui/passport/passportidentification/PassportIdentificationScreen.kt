@@ -16,6 +16,8 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportidentification
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,6 +56,14 @@ import eu.europa.ec.uilogic.component.wrap.WrapText
 fun PassportIdentificationScreen(controller : NavController, viewModel : PassportIdentificationViewModel) {
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    val mrzScannerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        // Handle MRZ scanner result here
+        // You can process the result.data and result.resultCode
+    }
 
     ContentScreen(
         isLoading = state.isLoading,
@@ -69,7 +80,7 @@ fun PassportIdentificationScreen(controller : NavController, viewModel : Passpor
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
-            handleEffect(effect, controller)
+            handleEffect(effect, controller, mrzScannerLauncher)
         }
     }
 
@@ -105,10 +116,15 @@ private fun ActionButtons(onBack: () -> Unit = {}, onCapture: () -> Unit = {}, p
     }
 }
 
-private fun handleEffect(effect: Effect, hostNavController: NavController) {
+private fun handleEffect(
+    effect: Effect,
+    hostNavController: NavController,
+    mrzScannerLauncher: androidx.activity.compose.ManagedActivityResultLauncher<android.content.Intent, androidx.activity.result.ActivityResult>
+) {
     when (effect) {
         is Effect.Navigation.GoBack -> hostNavController.popBackStack()
         is Effect.Navigation.SwitchScreen -> hostNavController.navigate(effect.screenRoute)
+        is Effect.Navigation.StartMRZScanner -> mrzScannerLauncher.launch(effect.intent)
     }
 }
 
