@@ -8,6 +8,10 @@
 - Brute force protection for PIN entry
 - Prevent insecure PINs (e.g., 1234, 1111)
 
+### Changed
+
+- Updated EUDI Wallet Core dependency to stable 0.19.0
+
 ### Removed
 
 - RQES related code / support
