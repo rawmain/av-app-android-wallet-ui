@@ -17,7 +17,6 @@
 package eu.europa.ec.businesslogic.config
 
 import eu.europa.ec.businesslogic.BuildConfig
-import eu.europa.ec.eudi.rqesui.infrastructure.config.EudiRQESUiConfig
 
 interface ConfigLogic {
 
@@ -42,11 +41,6 @@ interface ConfigLogic {
     val appVersion: String get() = BuildConfig.APP_VERSION
 
     /**
-     * RQES Config.
-     */
-    val rqesConfig: EudiRQESUiConfig
-
-    /**
      * The URL to the changelog for this specific version of the application.
      *
      * This property provides a link where users can find detailed information about
@@ -58,6 +52,11 @@ interface ConfigLogic {
      *   changelog is maintained for development builds.
      */
     val changelogUrl: String?
+
+    /**
+     * Checks if the current build type is [AppBuildType.DEBUG].
+     */
+    fun isBuildTypeDebug() = appBuildType == AppBuildType.DEBUG
 }
 
 enum class AppFlavor {

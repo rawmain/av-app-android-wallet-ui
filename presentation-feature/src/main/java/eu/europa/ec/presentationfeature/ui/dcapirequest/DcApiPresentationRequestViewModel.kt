@@ -14,8 +14,10 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.presentationfeature.ui.request
+package eu.europa.ec.presentationfeature.ui.dcapirequest
 
+import android.content.Intent
+import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.commonfeature.interactor.PresentationRequestInteractor
 import eu.europa.ec.commonfeature.ui.request.RequestViewModel
@@ -26,23 +28,25 @@ import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 
 @KoinViewModel
-class PresentationRequestViewModel(
+class DcApiPresentationRequestViewModel(
     interactor: PresentationRequestInteractor,
     resourceProvider: ResourceProvider,
     uiSerializer: UiSerializer,
-    @InjectedParam private val requestUriConfigRaw: String
+    @InjectedParam private val intent: Intent
 ) : RequestViewModel(interactor, resourceProvider, uiSerializer) {
 
-    override fun getNextScreen(): String {
-        return createBiometricScreen(PresentationScreens.PresentationRequest)
+    override fun init() {
+        handleIntent(intent)
     }
 
+    override fun getNextScreen(): String {
+        return createBiometricScreen(PresentationScreens.DcApiPresentationRequest)
+    }
     override fun requestUriConfig(): RequestUriConfig {
-        val requestUriConfig = uiSerializer.fromBase64(
-            requestUriConfigRaw,
-            RequestUriConfig::class.java,
-            RequestUriConfig.Parser
-        ) ?: throw RuntimeException("RequestUriConfig:: is Missing or invalid")
-        return requestUriConfig
+        return RequestUriConfig(mode = PresentationMode.DcApi)
+    }
+
+    fun handleIntent(intent: Intent) {
+        interactor.startDCAPIPresentation(intent)
     }
 }

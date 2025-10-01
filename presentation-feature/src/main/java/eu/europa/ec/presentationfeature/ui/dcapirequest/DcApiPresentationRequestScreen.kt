@@ -14,26 +14,25 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.commonfeature.interactor
+package eu.europa.ec.presentationfeature.ui.dcapirequest
 
-import android.content.Context
-import android.net.Uri
-import eu.europa.ec.businesslogic.validator.FormValidator
-import eu.europa.ec.eudi.rqesui.infrastructure.EudiRQESUi
-import eu.europa.ec.eudi.rqesui.infrastructure.RemoteUri
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
+import eu.europa.ec.commonfeature.ui.request.Event
+import eu.europa.ec.commonfeature.ui.request.RequestScreen
+import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
 
-interface QrScanInteractor : FormValidator {
-    fun launchRqesSdk(context: Context, uri: Uri)
-}
+@Composable
+fun DcApiPresentationRequestScreen(
+    navController: NavController,
+    viewModel: DcApiPresentationRequestViewModel
+) {
+    RequestScreen(
+        navController = navController,
+        viewModel = viewModel
+    )
 
-class QrScanInteractorImpl(
-    private val formValidator: FormValidator
-) : FormValidator by formValidator, QrScanInteractor {
-
-    override fun launchRqesSdk(context: Context, uri: Uri) {
-        EudiRQESUi.initiate(
-            context = context,
-            remoteUri = RemoteUri(uri)
-        )
+    OneTimeLaunchedEffect {
+        viewModel.setEvent(Event.Init)
     }
 }

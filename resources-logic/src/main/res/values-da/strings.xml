@@ -97,6 +97,7 @@
     <string name="document_success_collapsed_supporting_text">@string/generic_view_details</string>
     <string name="document_success_sticky_button_text">@string/generic_close</string>
     <string name="quick_pin_invalid_error">Ugyldig PIN</string>
+    <string name="quick_pin_invalid_generic_error">Denne PIN-kode er for almindelig, vælg venligst en mere sikker én.</string>
     <string name="quick_pin_numerical_rule_invalid_error_message">Kun numeriske værdier er tilladt</string>
     <string name="quick_pin_non_match">PIN stemmer ikke overens</string>
     <string name="quick_pin_confirm_button">Bekræft</string>
@@ -105,6 +106,25 @@
     <string name="quick_pin_create_reenter_title">Bekræft din PIN</string>
     <string name="quick_pin_create_enter_subtitle">Din 6-cifrede PIN</string>
     <string name="quick_pin_create_reenter_subtitle">Gentag din 6-cifrede PIN</string>
+    <string name="quick_pin_invalid_with_attempts">Ugyldig PIN-kode. %d forsøg tilbage.</string>
+    <string name="quick_pin_invalid_last_attempt">Ugyldig PIN-kode. Dette er dit sidste forsøg, inden du bliver låst ude.</string>
+    <string name="quick_pin_locked_out">For mange mislykkede forsøg. Vent venligst, før du prøver igen.</string>
+    <string name="quick_pin_lockout_countdown_minutes" formatted="false">Kontoen er låst. Prøv igen om %d:%02d</string>
+    <string name="quick_pin_lockout_countdown_seconds">Kontoen er låst. Prøv igen om %d sekunder</string>
+    <string name="quick_pin_change_title">Skift PIN</string>
+    <string name="quick_pin_change_enter_new_subtitle">Vælg din nye PIN</string>
+    <string name="quick_pin_change_reenter_new_subtitle">Indtast din nye PIN igen</string>
+    <string name="quick_pin_change_validate_current_subtitle">Din nuværende 6-cifrede PIN</string>
+    <string name="quick_pin_change_success_text">Succes!</string>
+    <string name="quick_pin_change_success_description">Du har ændret din PIN</string>
+    <string name="quick_pin_change_success_btn">Okay</string>
+    <string name="quick_pin_bottom_sheet_cancel_title">Annuller PIN-ændring?</string>
+    <string name="quick_pin_bottom_sheet_cancel_subtitle">Er du sikker på, at du vil annullere ændringen af PIN?</string>
+    <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Ja, annuller</string>
+    <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">Nej</string>
+    <string name="quick_pin_change_lockout_countdown_minutes" formatted="false">PIN-ændring blokeret. Prøv igen om %d:%02d</string>
+    <string name="quick_pin_change_lockout_countdown_seconds">PIN-ændring blokeret. Prøv igen om %d sekunder</string>
+
     <string name="request_header_description">Følgende transaktion kræver din tilladelse og godkendelse.</string>
     <string name="request_header_main_text">ANMODNING OM DATADELING</string>
     <string name="request_relying_party_default_name">@string/generic_default_relying_party_name</string>
@@ -128,8 +148,6 @@ Kontakt den autoriserede udsteder for yderligere information.</string>
     <string name="qr_scan_informative_text_presentation_flow">Har du problemer med at scanne QR -koden?
 Prøv en alternativ måde</string>
     <string name="qr_scan_informative_text_issuance_flow">Har du problemer med at scanne QR -koden?
-Prøv en alternativ måde</string>
-    <string name="qr_scan_informative_text_signature_flow">Har du problemer med at scanne QR -koden?
 Prøv en alternativ måde</string>
     <string name="document_details_boolean_item_true_readable_value">ja</string>
     <string name="document_details_boolean_item_false_readable_value">nej</string>
@@ -175,9 +193,13 @@ Prøv en alternativ måde</string>
     <string name="document_category_social_security">SOCIAL SIKRING</string>
     <string name="document_category_retail">DETAILHANDEL</string>
     <string name="document_category_other">ANDET</string>
+
     <string name="settings_screen_title">Indstillinger</string>
     <string name="settings_screen_credentials">Aldersbeviser</string>
     <string name="settings_screen_delete_proofs">Slet alle certifikater med aldersbevis</string>
+    <string name="settings_screen_security">Sikkerhed</string>
+    <string name="settings_screen_change_pin">Skift PIN</string>
+
     <string name="confirm_doc_removal_dialog_title">Bekræft sletning af dokumenter</string>
     <string name="confirm_doc_removal_dialog_text">Er du sikker på, at du vil slette alle gemte beviser?</string>
     <string name="confirm_doc_removal_dialog_delete">Ja, slet</string>

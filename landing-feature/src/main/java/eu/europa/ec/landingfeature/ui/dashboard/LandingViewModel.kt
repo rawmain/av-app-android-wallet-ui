@@ -42,6 +42,7 @@ import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkAction
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkType
+import eu.europa.ec.uilogic.navigation.helper.IntentAction
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.navigation.helper.hasDeepLink
@@ -57,7 +58,7 @@ data class State(
 ) : ViewState
 
 sealed class Event : ViewEvent {
-    data class Init(val deepLinkUri: Uri?) : Event()
+    data class Init(val deepLinkUri: Uri?, val intentAction: IntentAction?) : Event()
     data object GoToSettings : Event()
     data object GoToScanQR : Event()
     data object Finish : Event()
@@ -74,6 +75,8 @@ sealed class Effect : ViewSideEffect {
 
         data object Pop : Navigation()
         data class OpenDeepLinkAction(val deepLinkUri: Uri, val arguments: String?) : Navigation()
+
+        data class OpenIntentAction(val intentAction: IntentAction, ) : Navigation()
     }
 }
 
@@ -92,6 +95,7 @@ class LandingViewModel(
         when (event) {
             is Event.Init -> {
                 handleDeepLink(event.deepLinkUri)
+                handleIntentAction(event.intentAction)
                 getAgeCredential(event)
             }
 
@@ -200,6 +204,14 @@ class LandingViewModel(
                         arguments = arguments
                     )
                 }
+            }
+        }
+    }
+
+    private fun handleIntentAction(intentAction: IntentAction?) {
+        intentAction?.let { intentAction ->
+            setEffect {
+                Effect.Navigation.OpenIntentAction(intentAction)
             }
         }
     }

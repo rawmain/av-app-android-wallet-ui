@@ -23,8 +23,11 @@ import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAuth
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
+import eu.europa.ec.commonfeature.countdown.LockoutCountdownManager
 import eu.europa.ec.commonfeature.interactor.BiometricInteractor
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractorPinValidPartialState
+import eu.europa.ec.resourceslogic.R
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.FlowCompletion
@@ -62,7 +65,9 @@ data class State(
     val userBiometricsAreEnabled: Boolean = false,
     val isBackable: Boolean = false,
     val notifyOnAuthenticationFailure: Boolean = true,
-    val quickPinSize: Int = 6
+    val quickPinSize: Int = 6,
+    val isLockedOut: Boolean = false,
+    val lockoutEndTime: Long = 0L,
 ) : ViewState
 
 sealed class Effect : ViewSideEffect {
@@ -95,11 +100,32 @@ sealed class Effect : ViewSideEffect {
 class BiometricViewModel(
     private val biometricInteractor: BiometricInteractor,
     private val uiSerializer: UiSerializer,
-    private val biometricConfig: String
+    private val resourceProvider: ResourceProvider,
+    private val biometricConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
     private val biometricUiConfig
         get() = viewState.value.config
+
+    private val lockoutCountdownManager = LockoutCountdownManager(
+        coroutineScope = viewModelScope,
+        getIsLockedOut = { viewState.value.isLockedOut },
+        getLockoutEndTime = { viewState.value.lockoutEndTime },
+        onCountdownUpdate = { message -> setState { copy(quickPinError = message) } },
+        onLockoutEnd = {
+            setState { copy(isLockedOut = false, quickPinError = null, lockoutEndTime = 0L) }
+        },
+        getTimeMessage = { minutes, seconds ->
+            if (minutes > 0)
+                resourceProvider.getString(
+                    R.string.quick_pin_lockout_countdown_minutes,
+                    minutes,
+                    seconds
+                )
+            else
+                resourceProvider.getString(R.string.quick_pin_lockout_countdown_seconds, seconds)
+        }
+    )
 
     override fun setInitialState(): State {
         val config = uiSerializer.fromBase64(
@@ -178,6 +204,10 @@ class BiometricViewModel(
             }
 
             is Event.OnQuickPinEntered -> {
+                // Don't process PIN input during lockout
+                if (viewState.value.isLockedOut) {
+                    return
+                }
                 setState {
                     copy(quickPin = event.quickPin, quickPinError = null)
                 }
@@ -199,13 +229,30 @@ class BiometricViewModel(
                         is QuickPinInteractorPinValidPartialState.Failed -> {
                             setState {
                                 copy(
-                                    quickPinError = it.errorMessage
+                                    quickPinError = it.errorMessage,
+                                    isLockedOut = false,
                                 )
                             }
                         }
 
                         is QuickPinInteractorPinValidPartialState.Success -> {
+                            setState {
+                                copy(
+                                    isLockedOut = false,
+                                    quickPinError = null
+                                )
+                            }
                             authenticationSuccess()
+                        }
+
+                        is QuickPinInteractorPinValidPartialState.LockedOut -> {
+                            setState {
+                                copy(
+                                    isLockedOut = true,
+                                    lockoutEndTime = it.lockoutEndTime
+                                )
+                            }
+                            lockoutCountdownManager.start()
                         }
                     }
                 }
@@ -291,5 +338,10 @@ class BiometricViewModel(
         setEffect {
             navigationEffect
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        lockoutCountdownManager.cancel()
     }
 }

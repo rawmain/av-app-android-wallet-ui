@@ -19,6 +19,7 @@ package eu.europa.ec.commonfeature.config
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import eu.europa.ec.corelogic.controller.PresentationControllerConfig
+import eu.europa.ec.uilogic.navigation.PresentationScreens
 import eu.europa.ec.uilogic.serializer.UiSerializable
 import eu.europa.ec.uilogic.serializer.UiSerializableParser
 import eu.europa.ec.uilogic.serializer.adapter.SerializableTypeAdapter
@@ -26,6 +27,7 @@ import eu.europa.ec.uilogic.serializer.adapter.SerializableTypeAdapter
 sealed interface PresentationMode {
     data class OpenId4Vp(val uri: String, val initiatorRoute: String) : PresentationMode
     data class Ble(val initiatorRoute: String) : PresentationMode
+    data object DcApi : PresentationMode
 }
 
 data class RequestUriConfig(
@@ -51,5 +53,6 @@ fun RequestUriConfig.toDomainConfig(): PresentationControllerConfig {
             mode.uri,
             mode.initiatorRoute
         )
+        is PresentationMode.DcApi -> PresentationControllerConfig.DcApi( PresentationScreens.DcApiPresentationRequest.screenRoute)
     }
 }

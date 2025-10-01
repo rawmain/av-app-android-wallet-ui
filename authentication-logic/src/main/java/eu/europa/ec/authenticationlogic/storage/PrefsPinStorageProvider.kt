@@ -23,13 +23,48 @@ class PrefsPinStorageProvider(
     private val prefsController: PrefsController
 ) : PinStorageProvider {
 
+    companion object {
+        private const val KEY_DEVICE_PIN = "DevicePin"
+        private const val KEY_FAILED_ATTEMPTS = "PinFailedAttempts"
+        private const val KEY_LOCKOUT_UNTIL = "PinLockoutUntil"
+    }
+
     override fun retrievePin(): String {
-        return prefsController.getString("DevicePin", "")
+        return prefsController.getString(KEY_DEVICE_PIN, "")
     }
 
     override fun setPin(pin: String) {
-        prefsController.setString("DevicePin", pin)
+        prefsController.setString(KEY_DEVICE_PIN, pin)
+        resetFailedAttempts()
     }
 
     override fun isPinValid(pin: String): Boolean = retrievePin() == pin
+
+    override fun getFailedAttempts(): Int {
+        return prefsController.getInt(KEY_FAILED_ATTEMPTS, 0)
+    }
+
+    override fun incrementFailedAttempts(): Int {
+        val currentAttempts = getFailedAttempts() + 1
+        prefsController.setInt(KEY_FAILED_ATTEMPTS, currentAttempts)
+        return currentAttempts
+    }
+
+    override fun resetFailedAttempts() {
+        prefsController.setInt(KEY_FAILED_ATTEMPTS, 0)
+        prefsController.setLong(KEY_LOCKOUT_UNTIL, 0L)
+    }
+
+    override fun setLockoutUntil(timestampMillis: Long) {
+        prefsController.setLong(KEY_LOCKOUT_UNTIL, timestampMillis)
+    }
+
+    override fun getLockoutUntil(): Long {
+        return prefsController.getLong(KEY_LOCKOUT_UNTIL, 0L)
+    }
+
+    override fun isCurrentlyLockedOut(): Boolean {
+        val lockoutUntil = getLockoutUntil()
+        return lockoutUntil > 0L && System.currentTimeMillis() < lockoutUntil
+    }
 }

@@ -97,6 +97,7 @@
     <string name="document_success_collapsed_supporting_text">@string/generic_view_details</string>
     <string name="document_success_sticky_button_text">@string/generic_close</string>
     <string name="quick_pin_invalid_error">PIN non valide</string>
+    <string name="quick_pin_invalid_generic_error">Ce code PIN est trop courant, veuillez en choisir un plus sécurisé.</string>
     <string name="quick_pin_numerical_rule_invalid_error_message">Seules les valeurs numériques sont autorisées</string>
     <string name="quick_pin_non_match">Les codes PIN ne coïncident pas</string>
     <string name="quick_pin_confirm_button">Confirmer</string>
@@ -105,6 +106,26 @@
     <string name="quick_pin_create_reenter_title">Confirmez votre code PIN</string>
     <string name="quick_pin_create_enter_subtitle">Votre code PIN à 6 chiffres</string>
     <string name="quick_pin_create_reenter_subtitle">Répétez votre code PIN à 6 chiffres</string>
+    <string name="quick_pin_invalid_with_attempts">Code PIN invalide. Il vous reste %d tentative(s).</string>
+    <string name="quick_pin_invalid_last_attempt">Code PIN invalide. C’est votre dernière tentative avant le verrouillage.</string>
+    <string name="quick_pin_locked_out">Trop de tentatives échouées. Veuillez patienter avant de réessayer.</string>
+    <string name="quick_pin_lockout_countdown_minutes" formatted="false">Compte verrouillé. Réessayez dans %d:%02d</string>
+    <string name="quick_pin_lockout_countdown_seconds">Compte verrouillé. Réessayez dans %d secondes</string>
+    <string name="quick_pin_change_title">Changer le code PIN</string>
+    <string name="quick_pin_change_enter_new_subtitle">Choisissez un nouveau code PIN</string>
+    <string name="quick_pin_change_reenter_new_subtitle">Saisissez à nouveau le nouveau code PIN</string>
+    <string name="quick_pin_change_validate_current_subtitle">Votre code PIN actuel à 6 chiffres</string>
+    <string name="quick_pin_change_success_text">Succès !</string>
+    <string name="quick_pin_change_success_description">Votre code PIN a été changé avec succès</string>
+    <string name="quick_pin_change_success_btn">D\'accord</string>
+    <string name="quick_pin_bottom_sheet_cancel_title">Annuler le changement de code PIN ?</string>
+    <string name="quick_pin_bottom_sheet_cancel_subtitle">Êtes-vous sûr de vouloir annuler le changement de code PIN ?</string>
+    <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Oui, annuler</string>
+    <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">Non</string>
+    <string name="quick_pin_change_lockout_countdown_minutes" formatted="false">Changement de code PIN bloqué. Réessayez dans %d:%02d</string>
+    <string name="quick_pin_change_lockout_countdown_seconds">Changement de code PIN bloqué. Réessayez dans %d secondes</string>
+
+
     <string name="request_header_description">La transaction suivante nécessite votre autorisation et votre authentification.</string>
     <string name="request_header_main_text">DEMANDE DE PARTAGE DE DONNÉES</string>
     <string name="request_relying_party_default_name">@string/generic_default_relying_party_name</string>
@@ -128,8 +149,6 @@ Ouvrir les paramètres de l\'application</string>
     <string name="qr_scan_informative_text_presentation_flow">La lecture du code QR ne fonctionne pas ?
 Veuillez essayer une autre méthode</string>
     <string name="qr_scan_informative_text_issuance_flow">La lecture du code QR ne fonctionne pas ?
-Veuillez essayer une autre méthode</string>
-    <string name="qr_scan_informative_text_signature_flow">La lecture du code QR ne fonctionne pas ?
 Veuillez essayer une autre méthode</string>
     <string name="document_details_boolean_item_true_readable_value">Oui</string>
     <string name="document_details_boolean_item_false_readable_value">Non</string>
@@ -178,6 +197,8 @@ Veuillez essayer une autre méthode</string>
     <string name="settings_screen_title">Paramètres</string>
     <string name="settings_screen_credentials">"Attestation d\\'âge "</string>
     <string name="settings_screen_delete_proofs">Supprimer toutes les preuves d\'attestation d\'âge</string>
+    <string name="settings_screen_security">Sécurité</string>
+    <string name="settings_screen_change_pin">Changer le code PIN</string>
     <string name="confirm_doc_removal_dialog_title">Confirmer la suppression des documents</string>
     <string name="confirm_doc_removal_dialog_text">Voulez-vous vraiment supprimer toutes les preuves enregistrées ?</string>
     <string name="confirm_doc_removal_dialog_delete">Oui, supprimer.</string>

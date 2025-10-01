@@ -22,7 +22,7 @@ SPDX-License-Identifier: Apache-2.0
 
 ## About
 
-The Age Verification (AV) android app is part of the Age Verification Solution Toolbox and serves as a component that can be used by memberstates, if necessary, to develop a national solution and build upon the building blocks of the toolbox.
+The Age Verification (AV) android app is part of the Age Verification Solution Toolbox and serves as a component that can be used by Member States, if necessary, to develop a national solution and build upon the building blocks of the toolbox.
 
 This android app is forked from [EUDI Android Wallet reference application](https://github.com/eu-digital-identity-wallet/eudi-app-android-wallet-ui), which is built based on the [Architecture Reference Framework](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/architecture-and-reference-framework-main.md) and aims to showcase a robust and interoperable platform for digital identification, authentication, and electronic signatures based on common standards across the European Union.
 
@@ -42,6 +42,11 @@ The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.c
 - OpenID4VP - draft 24 (remote presentation)
 
 - OpenID4VCI draft 15 (issuing)
+
+As an experimental feature the app has support for [Digital Credential API](https://w3c-fedid.github.io/digital-credentials/) (DCAPI) for presentation of org-iso-mdoc with protocol [W3C 18013-7 Annex C](https://www.iso.org/standard/91154.html). This feature could
+be tested against https://dc-openwallet-verifier-backend-gmfrdchkavechkbj.westeurope-01.azurewebsites.net/ which is our version of multipaz verifier supporting document type `eu.europa.ec.av.1`. Enable the DCAPI flag in Chrome browser `chrome://flags/#web-identity-digital-credentials`. 
+On the verifier webpage choose "EU Personal ID (mdoc)" and from the protocol dropdown choose "W3C 18013-7 Annex C", then click "Age Over 18" to start the DCAPI flow.
+
   
 ### Build
 

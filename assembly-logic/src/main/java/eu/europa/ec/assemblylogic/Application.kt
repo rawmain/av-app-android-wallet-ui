@@ -25,7 +25,6 @@ import eu.europa.ec.assemblylogic.di.setupKoin
 import eu.europa.ec.businesslogic.config.ConfigLogic
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.worker.RevocationWorkManager
-import eu.europa.ec.eudi.rqesui.infrastructure.EudiRQESUi
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinApplication
 
@@ -37,17 +36,9 @@ class Application : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        initializeKoin().initializeRqes()
+        initializeKoin()
         initializeReporting()
         initializeRevocationWorkManager()
-    }
-
-    private fun KoinApplication.initializeRqes() {
-        EudiRQESUi.setup(
-            application = this@Application,
-            config = configLogic.rqesConfig,
-            koinApplication = this@initializeRqes
-        )
     }
 
     private fun initializeKoin(): KoinApplication {
