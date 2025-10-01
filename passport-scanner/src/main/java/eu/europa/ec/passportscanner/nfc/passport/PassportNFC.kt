@@ -18,34 +18,61 @@
 package eu.europa.ec.passportscanner.nfc.passport
 
 import android.util.Log
-import com.google.android.gms.common.util.IOUtils
-import net.sf.scuba.smartcards.CardFileInputStream
 import net.sf.scuba.smartcards.CardServiceException
-import org.bouncycastle.asn1.ASN1Encodable
-import org.bouncycastle.asn1.ASN1Integer
-import org.bouncycastle.asn1.DERSequence
-import org.jmrtd.*
+import org.jmrtd.BACKey
+import org.jmrtd.FeatureStatus
+import org.jmrtd.JMRTDSecurityProvider
+import org.jmrtd.MRTDTrustStore
+import org.jmrtd.PACEKeySpec
+import org.jmrtd.PassportService
+import org.jmrtd.VerificationStatus
 import org.jmrtd.cert.CardVerifiableCertificate
-import org.jmrtd.lds.*
-import org.jmrtd.lds.icao.*
+import org.jmrtd.lds.AbstractTaggedLDSFile
+import org.jmrtd.lds.CVCAFile
+import org.jmrtd.lds.CardAccessFile
+import org.jmrtd.lds.ChipAuthenticationInfo
+import org.jmrtd.lds.ChipAuthenticationPublicKeyInfo
+import org.jmrtd.lds.LDSFileUtil
+import org.jmrtd.lds.PACEInfo
+import org.jmrtd.lds.SODFile
+import org.jmrtd.lds.SecurityInfo
+import org.jmrtd.lds.icao.COMFile
+import org.jmrtd.lds.icao.DG11File
+import org.jmrtd.lds.icao.DG12File
+import org.jmrtd.lds.icao.DG14File
+import org.jmrtd.lds.icao.DG15File
+import org.jmrtd.lds.icao.DG1File
+import org.jmrtd.lds.icao.DG2File
+import org.jmrtd.lds.icao.DG3File
+import org.jmrtd.lds.icao.DG5File
+import org.jmrtd.lds.icao.DG7File
+import org.jmrtd.lds.icao.MRZInfo
 import org.jmrtd.protocol.BACResult
 import org.jmrtd.protocol.EACCAResult
 import org.jmrtd.protocol.EACTAResult
 import org.jmrtd.protocol.PACEResult
-import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.math.BigInteger
-import java.security.*
+import java.security.GeneralSecurityException
+import java.security.KeyStore
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.security.PrivateKey
+import java.security.PublicKey
+import java.security.SecureRandom
+import java.security.Security
+import java.security.Signature
 import java.security.cert.Certificate
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
-import java.security.interfaces.ECPublicKey
-import java.security.interfaces.RSAPublicKey
 import java.security.spec.MGF1ParameterSpec
 import java.security.spec.PSSParameterSpec
-import java.util.*
-import javax.crypto.Cipher
+import java.util.Arrays
+import java.util.Collections
+import java.util.Random
+import java.util.TreeMap
+import java.util.TreeSet
 import javax.security.auth.x500.X500Principal
 
 
@@ -415,7 +442,7 @@ private constructor() {
             dg11File = getDG11File(ps)
         } catch (e: Exception) {
             val dg11Failmsg = "DG11 fail read"
-                Log.e(TAG, dg11Failmsg)
+            Log.e(TAG, dg11Failmsg)
             e.printStackTrace()
         }
 

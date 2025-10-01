@@ -18,6 +18,8 @@
 package eu.europa.ec.passportscanner.utils
 
 import android.graphics.Bitmap
+import android.graphics.Bitmap.Config
+import android.graphics.Bitmap.createBitmap
 import android.graphics.BitmapFactory
 import org.jnbis.internal.WsqDecoder
 import timber.log.Timber
@@ -36,40 +38,59 @@ object ImageUtils {
     @Throws(IOException::class)
     fun decodeImage(inputStream: InputStream, imageLength: Int, mimeType: String): Bitmap {
         Timber.d("decodeImage of type $mimeType and length $imageLength")
-        var byteInputStream = inputStream
-        synchronized(byteInputStream) {
-            val dataIn = DataInputStream(byteInputStream)
-            val bytes = ByteArray(imageLength)
-            dataIn.readFully(bytes)
-            byteInputStream = ByteArrayInputStream(bytes)
-        }
-        if (JPEG2000_MIME_TYPE.equals(mimeType, ignoreCase = true) || JPEG2000_ALT_MIME_TYPE.equals(mimeType, ignoreCase = true)) {
-            val bitmap = org.jmrtd.jj2000.JJ2000Decoder.decode(byteInputStream)
-            return toAndroidBitmap(bitmap)
-        } else if (WSQ_MIME_TYPE.equals(mimeType, ignoreCase = true)) {
-            val wsqDecoder = WsqDecoder()
-            val bitmap = wsqDecoder.decode(byteInputStream.readBytes())
-            val byteData = bitmap.pixels
-            val intData = IntArray(byteData.size)
-            for (j in byteData.indices) {
-                intData[j] = -0x1000000 or ((byteData[j].toInt() and 0xFF) shl 16) or ((byteData[j].toInt() and 0xFF) shl 8) or (byteData[j].toInt() and 0xFF)
+        return when {
+            JPEG2000_MIME_TYPE.equals(mimeType, ignoreCase = true) || JPEG2000_ALT_MIME_TYPE.equals(mimeType, ignoreCase = true) -> {
+                decodeJPEG2000(inputStream, imageLength)
             }
-            return Bitmap.createBitmap(intData, 0, bitmap.width, bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
-        } else {
-            inputStream.reset()
-            try {
-                return BitmapFactory.decodeStream(inputStream)
+            WSQ_MIME_TYPE.equals(mimeType, ignoreCase = true) -> {
+                decodeWSQ(inputStream, imageLength)
             }
-            catch ( e: Exception) {
-                Timber.e(e, "Failed to decode image using BitmapFactory, trying to read as JPEG2000")
-                inputStream.reset()
-                return decodeImage(inputStream, imageLength, JPEG2000_MIME_TYPE)
+            else -> {
+                decodeDefault(inputStream, imageLength)
             }
         }
     }
 
-    private fun toAndroidBitmap(bitmap: org.jmrtd.jj2000.Bitmap): Bitmap {
-        val intData = bitmap.pixels
-        return Bitmap.createBitmap(intData, 0, bitmap.width, bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+    @Throws(IOException::class)
+    private fun readInputStreamToByteArray(inputStream: InputStream, imageLength: Int): ByteArrayInputStream {
+        return synchronized(inputStream) {
+            val bytes = ByteArray(imageLength)
+            DataInputStream(inputStream).readFully(bytes)
+            ByteArrayInputStream(bytes)
+        }
     }
+
+    @Throws(IOException::class)
+    private fun decodeJPEG2000(inputStream: InputStream, imageLength: Int): Bitmap {
+        val byteInputStream = readInputStreamToByteArray(inputStream, imageLength)
+        val bitmap = org.jmrtd.jj2000.JJ2000Decoder.decode(byteInputStream)
+        val intData = bitmap.pixels
+        return createBitmap(intData, 0, bitmap.width, bitmap.width, bitmap.height, Config.ARGB_8888)
+    }
+
+    @Throws(IOException::class)
+    private fun decodeWSQ(inputStream: InputStream, imageLength: Int): Bitmap {
+        val byteInputStream = readInputStreamToByteArray(inputStream, imageLength)
+        val wsqDecoder = WsqDecoder()
+        val bitmap = wsqDecoder.decode(byteInputStream.readBytes())
+        val byteData = bitmap.pixels
+        val intData = IntArray(byteData.size)
+        for (j in byteData.indices) {
+            intData[j] = -0x1000000 or ((byteData[j].toInt() and 0xFF) shl 16) or ((byteData[j].toInt() and 0xFF) shl 8) or (byteData[j].toInt() and 0xFF)
+        }
+        return createBitmap(intData, 0, bitmap.width, bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+    }
+
+    @Throws(IOException::class)
+    private fun decodeDefault(inputStream: InputStream, imageLength: Int): Bitmap {
+        inputStream.reset()
+        try {
+            return BitmapFactory.decodeStream(inputStream)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to decode using BitmapFactory, try to read as JP2")
+            inputStream.reset()
+            return decodeJPEG2000(inputStream, imageLength)
+        }
+    }
+
 }
