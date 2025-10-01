@@ -65,6 +65,21 @@ timber = "5.0.1"
 treessence = "1.1.2"
 androidxRoom = "2.7.2"
 
+# Passport reading dependencies
+jsonPath = "2.9.0"
+jsonFlattener = "0.17.3"
+glide = "5.0.4"
+glideTransformations = "4.3.0"
+glideCompiler = "5.0.5"
+jmrtd = "0.8.3"
+spongycastle = "1.58.0.0"
+scubaScAndroid = "0.0.26"
+certCvc = "1.4.13"
+legacySupportV4 = "1.0.0"
+constraintlayout = "2.1.4"
+mlkitTextRecognition = "16.0.1"
+jnbis = "2.1.2"
+
 [libraries]
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
 accompanist-testharness = { group = "com.google.accompanist", name = "accompanist-testharness", version.ref = "accompanist" }
@@ -149,6 +164,21 @@ timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "tim
 treessence = { group = "com.github.bastienpaulfr", name = "Treessence", version.ref = "treessence" }
 androidx-room = { group = "androidx.room", name = "room-runtime", version.ref = "androidxRoom" }
 androidx-room-ksp = { group = "androidx.room", name = "room-compiler", version.ref = "androidxRoom" }
+
+# Passport reading libraries
+json-path = { group = "com.jayway.jsonpath", name = "json-path", version.ref = "jsonPath" }
+json-flattener = { group = "com.github.wnameless.json", name = "json-flattener", version.ref = "jsonFlattener" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+glide-transformations = { group = "jp.wasabeef", name = "glide-transformations", version.ref = "glideTransformations" }
+glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glideCompiler" }
+jmrtd = { group = "org.jmrtd", name = "jmrtd", version.ref = "jmrtd" }
+spongycastle-prov = { group = "com.madgag.spongycastle", name = "prov", version.ref = "spongycastle" }
+scuba-sc-android = { group = "net.sf.scuba", name = "scuba-sc-android", version.ref = "scubaScAndroid" }
+cert-cvc = { group = "org.ejbca.cvc", name = "cert-cvc", version.ref = "certCvc" }
+androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacySupportV4" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+mlkit-text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mlkitTextRecognition" }
+jnbis = { group = "com.github.mhshams", name = "jnbis", version.ref = "jnbis" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

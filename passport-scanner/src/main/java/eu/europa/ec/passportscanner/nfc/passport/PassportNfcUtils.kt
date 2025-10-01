@@ -39,22 +39,32 @@ import java.security.GeneralSecurityException
 import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.Security
-import java.security.cert.*
-import java.util.*
+import java.security.cert.CertPathBuilder
+import java.security.cert.CertPathBuilderException
+import java.security.cert.CertStore
+import java.security.cert.Certificate
+import java.security.cert.CollectionCertStoreParameters
+import java.security.cert.PKIXBuilderParameters
+import java.security.cert.PKIXCertPathBuilderResult
+import java.security.cert.TrustAnchor
+import java.security.cert.X509CertSelector
+import java.security.cert.X509Certificate
+import java.util.Arrays
+import java.util.Collections
 import javax.security.auth.x500.X500Principal
 
 object PassportNfcUtils {
 
     private val TAG = PassportNfcUtils::class.java.simpleName
 
-    private val IS_PKIX_REVOCATION_CHECING_ENABLED = false
+    private const val IS_PKIX_REVOCATION_CHECKING_ENABLED = false
 
     init {
         Security.addProvider(BouncyCastleProvider())
     }
 
     @Throws(IOException::class)
-    fun retrieveFaceImage(context: Context, dg2File: DG2File): Bitmap {
+    fun retrieveFaceImage(dg2File: DG2File): Bitmap {
         val allFaceImageInfos = ArrayList<FaceImageInfo>()
         val faceInfos = dg2File.faceInfos
         for (faceInfo in faceInfos) {
@@ -65,27 +75,27 @@ object PassportNfcUtils {
             val faceImageInfo = allFaceImageInfos.iterator().next()
             return toBitmap(faceImageInfo.imageLength, faceImageInfo.imageInputStream, faceImageInfo.mimeType)
         }
-        throw IOException("Unable to decodeImage Image")
+        throw IOException("Unable to decodeImage FaceImage")
     }
 
     @Throws(IOException::class)
-    fun retrievePortraitImage(context: Context, dg5File: DG5File): Bitmap {
+    fun retrievePortraitImage(dg5File: DG5File): Bitmap {
         val faceInfos = dg5File.images
         if (!faceInfos.isEmpty()) {
             val faceImageInfo = faceInfos.iterator().next()
             return toBitmap(faceImageInfo.imageLength, faceImageInfo.imageInputStream, faceImageInfo.mimeType)
         }
-        throw IOException("Unable to decodeImage Image")
+        throw IOException("Unable to decodeImage PortraitImage")
     }
 
     @Throws(IOException::class)
-    fun retrieveSignatureImage(context: Context, dg7File: DG7File): Bitmap {
+    fun retrieveSignatureImage(dg7File: DG7File): Bitmap {
         val displayedImageInfos = dg7File.images
         if (!displayedImageInfos.isEmpty()) {
             val displayedImageInfo = displayedImageInfos.iterator().next()
             return toBitmap(displayedImageInfo.imageLength, displayedImageInfo.imageInputStream, displayedImageInfo.mimeType)
         }
-        throw IOException("Unable to decodeImage Image")
+        throw IOException("Unable to decodeImage SignatureImage")
     }
 
     @Throws(IOException::class)
@@ -221,7 +231,7 @@ object PassportNfcUtils {
             for (trustStore in cscaStores) {
                 buildParams.addCertStore(trustStore)
             }
-            buildParams.isRevocationEnabled = IS_PKIX_REVOCATION_CHECING_ENABLED /* NOTE: set to false for checking disabled. */
+            buildParams.isRevocationEnabled = IS_PKIX_REVOCATION_CHECKING_ENABLED /* NOTE: set to false for checking disabled. */
 
             var result: PKIXCertPathBuilderResult? = null
 
