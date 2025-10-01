@@ -5,8 +5,12 @@
 ### Added
 
 - Initial support for Digital Credentials API (DCAPI) for presentation of org-iso-mdoc with protocol W3C 18013-7 Annex C
+- Brute force protection for PIN entry
+- Prevent insecure PINs (e.g., 1234, 1111)
 
-### Changed
+### Removed
+
+- RQES related code / support
 
 
 ## v0.1.0-beta05 - 2025-07-07
