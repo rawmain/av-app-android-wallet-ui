@@ -100,6 +100,11 @@
     <string name="passport_biometrics_first_header">Read in your Passport</string>
     <string name="passport_biometrics_first_description">Place your Passport directly on the back of the smartphone, usually at the top.</string>
     <string name="passport_biometrics_first_link">Do you need Help?</string>
+    <string name="passport_biometrics_verify_data">Please verify your data</string>
+    <string name="passport_biometrics_try_again">Try Again</string>
+    <string name="passport_biometrics_passport">Passport</string>
+    <string name="passport_biometrics_dob">Date of Birth</string>
+    <string name="passport_biometrics_doe">Date of expiry</string>
 
     <!-- Passport live video instructions -->
     <string name="passport_live_video_header">Record a quick Video of yourself</string>

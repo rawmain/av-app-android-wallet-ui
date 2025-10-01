@@ -61,6 +61,11 @@
     <string name="passport_biometrics_first_header">Læs dit pas</string>
     <string name="passport_biometrics_first_description">Placér dit pas direkte på bagsiden af smartphonen, som regel øverst.</string>
     <string name="passport_biometrics_first_link">Har du brug for hjælp?</string>
+    <string name="passport_biometrics_verify_data">Bekræft venligst dine oplysninger</string>
+    <string name="passport_biometrics_try_again">Prøv igen</string>
+    <string name="passport_biometrics_passport">Pas</string>
+    <string name="passport_biometrics_dob">Fødselsdato</string>
+    <string name="passport_biometrics_doe">Udløbsdato</string>
 
     <!-- Passport live video instructions - Danish (da) -->
     <string name="passport_live_video_header">Optag en hurtig video af dig selv</string>

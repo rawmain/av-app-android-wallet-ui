@@ -61,6 +61,11 @@
     <string name="passport_biometrics_first_header">Lisez votre passeport</string>
     <string name="passport_biometrics_first_description">Placez votre passeport directement à larrière du smartphone, généralement en haut.</string>
     <string name="passport_biometrics_first_link">Besoin d’aide ?</string>
+    <string name="passport_biometrics_verify_data">Veuillez vérifier vos données</string>
+    <string name="passport_biometrics_try_again">Réessayer</string>
+    <string name="passport_biometrics_passport">Passeport</string>
+    <string name="passport_biometrics_dob">Date de naissance</string>
+    <string name="passport_biometrics_doe">Date de expiration</string>
 
     <!-- Passport live video instructions - French (fr) -->
     <string name="passport_live_video_header">Enregistrez une courte vidéo de vous-même</string>

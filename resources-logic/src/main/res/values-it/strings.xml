@@ -71,6 +71,11 @@
     <string name="passport_biometrics_first_header">Leggi il tuo passaporto</string>
     <string name="passport_biometrics_first_description">Posiziona il passaporto direttamente sul retro dello smartphone, di solito nella parte superiore.</string>
     <string name="passport_biometrics_first_link">Hai bisogno di aiuto?</string>
+    <string name="passport_biometrics_verify_data">Si prega di verificare i dati</string>
+    <string name="passport_biometrics_try_again">Riprova</string>
+    <string name="passport_biometrics_passport">Passaporto</string>
+    <string name="passport_biometrics_dob">Data di nascita</string>
+    <string name="passport_biometrics_doe">Data di scadenza</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Token / Codice QR</string>

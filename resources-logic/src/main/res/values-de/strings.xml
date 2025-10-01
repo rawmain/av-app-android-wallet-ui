@@ -61,6 +61,11 @@
     <string name="passport_biometrics_first_header">Lese deinen Reisepass ein</string>
     <string name="passport_biometrics_first_description">Lege deinen Reisepass direkt auf die Rückseite des Smartphones, normalerweise oben.</string>
     <string name="passport_biometrics_first_link">Brauchst du Hilfe?</string>
+    <string name="passport_biometrics_verify_data">Bitte überprüfen Sie Ihre Daten</string>
+    <string name="passport_biometrics_try_again">Erneut versuchen</string>
+    <string name="passport_biometrics_passport">Reisepass</string>
+    <string name="passport_biometrics_dob">Geburtsdatum</string>
+    <string name="passport_biometrics_doe">Ablaufdatum</string>
 
     <!-- Passport live video instructions - German (de) -->
     <string name="passport_live_video_header">Nehmen Sie ein kurzes Video von sich auf</string>
