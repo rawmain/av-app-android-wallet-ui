@@ -49,6 +49,16 @@
     <string name="passport_identification_back">Indietro</string>
     <string name="passport_identification_capture">Scatta una foto</string>
 
+    <!-- Passport live video instructions - Italian (it) -->
+    <string name="passport_live_video_header">Registra un breve video di te stesso</string>
+    <string name="passport_live_video_description">In questo passaggio, registrerai un breve video di te stesso per confermare la tua identità. Assicurati di:</string>
+    <string name="passport_live_video_step_first">Guardare direttamente la fotocamera con una buona illuminazione.</string>
+    <string name="passport_live_video_step_second">Seguire le istruzioni sullo schermo (ad esempio, battere le palpebre o girare la testa).</string>
+    <string name="passport_live_video_step_third">Evitare filtri, maschere o ostacoli.</string>
+    <string name="passport_live_video_footer">Questo passaggio garantisce che tu sia il legittimo proprietario del passaporto e previene le frodi.</string>
+    <string name="passport_live_video_back">Indietro</string>
+    <string name="passport_live_video_live_capture">Avvia video live</string>
+
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identificazione</string>
     <string name="passport_biometrics">Biometria</string>

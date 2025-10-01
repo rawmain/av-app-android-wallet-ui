@@ -101,6 +101,16 @@
     <string name="passport_biometrics_first_description">Place your Passport directly on the back of the smartphone, usually at the top.</string>
     <string name="passport_biometrics_first_link">Do you need Help?</string>
 
+    <!-- Passport live video instructions -->
+    <string name="passport_live_video_header">Record a quick Video of yourself</string>
+    <string name="passport_live_video_description">In this step, you will record a short video of yourself to confirm your identity. Make sure to:</string>
+    <string name="passport_live_video_step_first">Face the camera directly in good lighting.</string>
+    <string name="passport_live_video_step_second">Follow the on-screen instructions (e.g., blink or turn your head).</string>
+    <string name="passport_live_video_step_third">Avoid filters, masks, or obstructions.</string>
+    <string name="passport_live_video_footer">This step ensures that you are the rightful owner of the Passport and prevents fraud.</string>
+    <string name="passport_live_video_back">Back</string>
+    <string name="passport_live_video_live_capture">Start Live Video</string>
+
     <string name="welcome_page_1">Using this app you can securely prove you are over 18 when accessing services restricted to adults.</string>
     <string name="welcome_page_2">Verify that you are over 18 once, use this proof to securely access many services restricted to adults.</string>
     <string name="welcome_page_3">You stay in control of your data: only the proof that you are over 18 is shared. No other personal details are stored or shared with online services.</string>
