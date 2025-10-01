@@ -11,19 +11,13 @@ SPDX-License-Identifier: Apache-2.0
 </h1>
 
 <p align="center">
-    <a href="/../../commits/" title="Last Commit"><img src="https://img.shields.io/github/last-commit/eu-digital-identity-wallet/av-app-android-wallet-ui?style=flat"></a>
-    <a href="/../../issues" title="Open Issues"><img src="https://img.shields.io/github/issues/eu-digital-identity-wallet/av-app-android-wallet-ui?style=flat"></a>
-    <a href="./LICENSE" title="License"><img src="https://img.shields.io/badge/License-Apache%202.0-green.svg?style=flat"></a>
-</p>
-
-<p align="center">
   <a href="#about">About</a> •
-  <a href="#disclaimer">Disclaimer</a> •
   <a href="#development">Development</a> •
   <a href="#documentation">Documentation</a> •
   <a href="#support-and-feedback">Support</a> •
+  <a href="#important-note">Important note</a> •
   <a href="#code-of-conduct">Code of Conduct</a> •
-  <a href="#licensing">Licensing</a>
+  <a href="#license">Licensing</a>
 </p>
 
 ## About
@@ -38,30 +32,6 @@ The AV Android is the application that allows users to:
 
 1. Obtain, store, and present an age verification attestation.
 2. Share the proof of age attestation with online services to gain access.
-
-## Disclaimer
-
-This is the first release of the software, developed solely for the purpose of demonstrating the business flow of the solution. It is not intended for production use, and does not yet include the full set of functional, security, or integration features required for a live deployment.
-
-**Important:** App hardening (such as code obfuscation, anti-tampering, anti-debugging, and other
-protections) is **not included** in this release. The application is not protected against reverse
-engineering or other attacks. Production deployments must implement appropriate app hardening
-measures.
-
-The current release provides only basic functionality, with several key features to be introduced in future versions, including:
- - App and device verification based on Google Play Integrity API and Apple App Attestation
- - Additional issuance methods beyond the currently implemented eID based method. 
-
-These planned features align with the requirements and methods described in the Age Verification Profile.
-
-This release should be considered a foundational prototype to support early testing, feedback, and integration discussions.
-- The release may be changed substantially over time and might introduce new features but also may change or remove existing ones, potentially breaking compatibility with your existing code.
-- The release may contain errors or design flaws and other problems that could cause system or other failures and data loss.
-- The release has reduced security, privacy, availability, and reliability standards relative to future releases. This could make the software slower, less reliable, or more vulnerable to attacks than mature software.
-- The release is not yet comprehensively documented.
-- Users of the software must perform sufficient engineering and additional testing to properly evaluate their application and determine whether any of the open-sourced components are suitable for use in that application.
-- We strongly recommend not putting this version of the software into production use.
-- Only the latest version of the software will be supported
 
 ## Development
 
@@ -95,6 +65,16 @@ To test the app, there is an issuer and verifier service available online. This 
  
 - **Relying Party functionality:** To support development and testing, one can access a test/demo service for remote presentation at: [Age Verification Verifier](https://verifier.ageverification.dev/)
 
+### Videos
+
+#### Issuance Flow
+
+https://github.com/user-attachments/assets/893cdf19-982a-4646-ab70-3b1b186d706e
+
+#### Presentation Flow
+
+https://github.com/user-attachments/assets/e4701cbc-df0e-4bb2-9c34-3fa682630b6a
+
 ### How to release the app
 
 To publish the app on the Google Play Store, several steps must be completed. A detailed description can be found [here](./docs/release_guide.md):
@@ -124,7 +104,14 @@ The following channels are available for discussions, feedback, and support requ
 | Type                     | Channel                                                |
 | ------------------------ | ------------------------------------------------------ |
 | **Issues**    | <a href="/../../issues" title="Open Issues"><img src="https://img.shields.io/github/issues/eu-digital-identity-wallet/av-verifier-ui?style=flat"></a>  |
+| **Discussion**    | <a href="https://github.com/eu-digital-identity-wallet/av-doc-technical-specification/discussions" title="Discussion"><img src="https://img.shields.io/github/discussions/eu-digital-identity-wallet/av-doc-technical-specification"></a>  |
 | **Other requests**    | <a href="mailto:av-tscy@scytales.com" title="Email AVS Team"><img src="https://img.shields.io/badge/email-AVS%20team-green?logo=mail.ru&style=flat-square&logoColor=white"></a>   |
+
+## Important note
+
+This white-label application is a reference implementation of the Age Verification solution that should be customised before publishing it. The current version is not feature complete and will require further integration work before production deployment. In particular, any national-specific enrolment procedures must be implemented by the respective Member States or publishing parties.
+
+Please note that this application is still under active development. It is regularly updated and new features and improvements are continuously being added.
 
 ## Code of Conduct
 
