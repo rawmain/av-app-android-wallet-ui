@@ -31,14 +31,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
-import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.R
 import eu.europa.ec.passportscanner.SmartScannerActivity
+import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.nfc.details.IntentData
 import eu.europa.ec.passportscanner.nfc.passport.Passport
 import eu.europa.ec.passportscanner.nfc.passport.PassportDetailsFragment
 import eu.europa.ec.passportscanner.nfc.passport.PassportPhotoFragment
-import eu.europa.ec.passportscanner.scanner.config.Modes
 import org.jmrtd.lds.icao.MRZInfo
 
 
@@ -171,6 +170,10 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
         val action = intent.getStringExtra(ScannerConstants.NFC_ACTION)
         val nfcResult = NFCResult.formatResult(passport = passport, locale = locale, mrzInfo = mrzInfo, mrzImage = mrzImage)
 
+        Log.d(TAG, "NFC_ACTION from intent: '$action'")
+        Log.d(TAG, "Expected IDPASS_SMARTSCANNER_NFC_INTENT: '${ScannerConstants.IDPASS_SMARTSCANNER_NFC_INTENT}'")
+        Log.d(TAG, "Expected IDPASS_SMARTSCANNER_ODK_NFC_INTENT: '${ScannerConstants.IDPASS_SMARTSCANNER_ODK_NFC_INTENT}'")
+
         if (action == ScannerConstants.IDPASS_SMARTSCANNER_NFC_INTENT ||
                 action == ScannerConstants.IDPASS_SMARTSCANNER_ODK_NFC_INTENT) {
             // Send NFC Results via Bundle
@@ -180,26 +183,18 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
             if (intent.action == ScannerConstants.IDPASS_SMARTSCANNER_ODK_NFC_INTENT) {
                 bundle.putString(ScannerConstants.IDPASS_ODK_INTENT_DATA, nfcResult.documentNumber)
             }
-            bundle.putString(ScannerConstants.NFC_GIVEN_NAMES, nfcResult.givenNames)
-            bundle.putString(ScannerConstants.NFC_SURNAME, nfcResult.surname)
-            bundle.putString(ScannerConstants.NFC_NAME_OF_HOLDER, nfcResult.nameOfHolder)
-            bundle.putString(ScannerConstants.NFC_GENDER, nfcResult.gender)
-            bundle.putString(ScannerConstants.NFC_DOCUMENT_NUMBER, nfcResult.documentNumber)
+
+            // Add only the required fields: expiry date, date of birth, and face image
             bundle.putString(ScannerConstants.NFC_EXPIRY_DATE, nfcResult.dateOfExpiry)
-            bundle.putString(ScannerConstants.NFC_ISSUING_STATE, nfcResult.issuingState)
-            bundle.putString(ScannerConstants.NFC_NATIONALITY, nfcResult.nationality)
-            bundle.putString(ScannerConstants.NFC_OTHER_NAMES, nfcResult.otherNames)
             bundle.putString(ScannerConstants.NFC_DATE_OF_BIRTH, nfcResult.dateOfBirth)
-            bundle.putString(ScannerConstants.NFC_CUSTODY_INFO, nfcResult.custodyInformation)
-            bundle.putString(ScannerConstants.NFC_PROFESSION, nfcResult.profession)
-            bundle.putString(ScannerConstants.NFC_TELEPHONE, nfcResult.telephone)
-            bundle.putString(ScannerConstants.NFC_TITLE, nfcResult.title)
-            bundle.putString(ScannerConstants.NFC_DATE_TIME_PERSONALIZATION, nfcResult.dateAndTimeOfPersonalization)
-            bundle.putString(ScannerConstants.NFC_DATE_OF_ISSUE, nfcResult.dateOfIssue)
-            bundle.putString(ScannerConstants.NFC_ENDORSEMENTS_AND_OBSERVATIONS, nfcResult.endorsementsAndObservations)
-            bundle.putString(ScannerConstants.NFC_ISSUING_AUTHORITY, nfcResult.issuingAuthority)
-            bundle.putString(ScannerConstants.NFC_PERSONAL_SYSTEM_SERIAL_NUMBER, nfcResult.personalizationSystemSerialNumber)
-            bundle.putString(ScannerConstants.NFC_TAX_EXIT_REQUIREMENTS, nfcResult.taxOrExitRequirements)
+
+            // Add raw face image data to bundle
+            passport?.rawFaceImageData?.let { rawImageData ->
+                bundle.putByteArray(ScannerConstants.NFC_FACE_IMAGE, rawImageData.imageBytes)
+                bundle.putString(ScannerConstants.NFC_FACE_IMAGE_MIME_TYPE, rawImageData.mimeType)
+                bundle.putInt(ScannerConstants.NFC_FACE_IMAGE_LENGTH, rawImageData.imageLength)
+            }
+
             val result = Intent()
             val prefix = if (intent.hasExtra(ScannerConstants.IDPASS_ODK_PREFIX_EXTRA)) {
                 intent.getStringExtra(ScannerConstants.IDPASS_ODK_PREFIX_EXTRA)
@@ -207,7 +202,11 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
             result.putExtra(ScannerConstants.RESULT, bundle)
             // Copy all the values in the intent result to be compatible with other implementations than commcare
             for (key in bundle.keySet()) {
-                result.putExtra(prefix + key, bundle.getString(key))
+                when (val value = bundle.get(key)) {
+                    is String -> result.putExtra(prefix + key, value)
+                    is ByteArray -> result.putExtra(prefix + key, value)
+                    is Int -> result.putExtra(prefix + key, value)
+                }
             }
             setResult(Activity.RESULT_OK, result)
             finish()
@@ -220,6 +219,23 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
                 Log.d(TAG, "Success from NFC -- RESULT")
                 Log.d(TAG, "value: $nfcResult")
                 data.putExtra(SmartScannerActivity.SCANNER_RESULT, Gson().toJson(nfcResult))
+
+                // Also add raw face image data for our custom handling
+                Log.d(TAG, "passport object: $passport")
+                Log.d(TAG, "passport.face: ${passport?.face}")
+                Log.d(TAG, "passport.rawFaceImageData: ${passport?.rawFaceImageData}")
+
+                passport?.rawFaceImageData?.let { rawImageData ->
+                    Log.d(TAG, "Adding face image data - mime: ${rawImageData.mimeType}, length: ${rawImageData.imageLength}")
+                    data.putExtra(ScannerConstants.NFC_FACE_IMAGE, rawImageData.imageBytes)
+                    data.putExtra(ScannerConstants.NFC_FACE_IMAGE_MIME_TYPE, rawImageData.mimeType)
+                    data.putExtra(ScannerConstants.NFC_FACE_IMAGE_LENGTH, rawImageData.imageLength)
+                } ?: run {
+                    Log.w(TAG, "No rawFaceImageData found in passport")
+                }
+                data.putExtra(ScannerConstants.NFC_EXPIRY_DATE, nfcResult.dateOfExpiry)
+                data.putExtra(ScannerConstants.NFC_DATE_OF_BIRTH, nfcResult.dateOfBirth)
+
                 setResult(Activity.RESULT_OK, data)
                 finish()
             }

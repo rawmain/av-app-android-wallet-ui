@@ -16,8 +16,10 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportidentification
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -50,11 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation
-import eu.europa.ec.passportscanner.SmartScannerActivity
-import eu.europa.ec.passportscanner.scanner.config.CaptureOptions
-import eu.europa.ec.passportscanner.scanner.config.CaptureType
-import eu.europa.ec.passportscanner.scanner.config.Config
-import eu.europa.ec.passportscanner.scanner.config.ScannerOptions
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.theme.values.elevated
 import eu.europa.ec.uilogic.component.BulletHolder
@@ -77,23 +74,48 @@ import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.navigation.OnboardingScreens.PassportLiveVideo
 
 @Composable
-fun PassportIdentificationScreen(controller: NavController, viewModel: PassportIdentificationViewModel) {
+fun PassportIdentificationScreen(
+    controller: NavController,
+    viewModel: PassportIdentificationViewModel
+) {
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    // TODO Handle MRZ scanner result here - Passport should be in bundle
-    // You can process the result.data and result.resultCode
     val mrzScannerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
-    ) { result -> viewModel.setEvent(Event.OnPassportScanSuccessful("passportPicture")) }
+    ) { result ->
+        when (result.resultCode) {
+            Activity.RESULT_OK -> {
+                result.data?.let { intent ->
+                    val passportData =
+                        PassportScannerIntentHelper.extractPassportDataFromIntent(intent)
+                    if (passportData.dateOfBirth != null || passportData.expiryDate != null) {
+                        handlePassportResult(passportData, viewModel)
+                    } else {
+                        Log.e("PassportScan", "No passport data received")
+                    }
+                }
+            }
+
+            Activity.RESULT_CANCELED -> {
+                Log.d("PassportScan", "Passport scan was cancelled")
+                // Handle cancellation if needed
+            }
+
+            else -> {
+                Log.e("PassportScan", "Unknown error occurred during passport scan")
+            }
+        }
+    }
 
     ContentScreen(
         isLoading = state.isLoading,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.OnBackPressed) },
         stickyBottom = { paddingValues ->
-            ActionButtons(state = state,
+            ActionButtons(
+                state = state,
                 onBack = { viewModel.setEvent(Event.OnBackPressed) },
                 onCapture = { viewModel.setEvent(Event.OnStartPassportScan) },
                 onTryAgain = { viewModel.setEvent(Event.OnProcessRestartRequest) },
@@ -119,10 +141,10 @@ fun PassportIdentificationScreen(controller: NavController, viewModel: PassportI
 @Composable
 private fun ActionButtons(
     state: State,
-    onNext : () -> Unit = {},
+    onNext: () -> Unit = {},
     onBack: () -> Unit = {},
     onCapture: () -> Unit = {},
-    onTryAgain : () -> Unit = {},
+    onTryAgain: () -> Unit = {},
     paddings: PaddingValues,
 ) {
 
@@ -137,15 +159,20 @@ private fun ActionButtons(
         )
     )
 
-    WrapStickyBottomContent(stickyBottomModifier = Modifier.fillMaxWidth().padding(paddings),
+    WrapStickyBottomContent(
+        stickyBottomModifier = Modifier
+            .fillMaxWidth()
+            .padding(paddings),
         stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)
     ) { buttonConfigs ->
         buttonConfigs?.let { buttonConfig ->
             when (buttonConfig.type) {
                 ButtonType.PRIMARY -> Text(stringResource(R.string.passport_identification_capture))
                 ButtonType.SECONDARY -> {
-                    Text(if (state.scanComplete) stringResource(R.string.passport_biometrics_try_again)
-                    else stringResource(R.string.passport_identification_back))
+                    Text(
+                        if (state.scanComplete) stringResource(R.string.passport_biometrics_try_again)
+                        else stringResource(R.string.passport_identification_back)
+                    )
                 }
             }
         }
@@ -160,31 +187,16 @@ private fun handleEffect(
 ) {
     when (effect) {
         is Navigation.GoBack -> hostNavController.popBackStack()
-        is Navigation.StartMRZScanner -> mrzScannerLauncher.launch(createMrzScannerIntent(context))
+        is Navigation.StartMRZScanner -> mrzScannerLauncher.launch(
+            PassportScannerIntentHelper.createMrzScannerIntent(
+                context
+            )
+        )
+
         is Navigation.StartPassportLiveCheck -> hostNavController.navigate(PassportLiveVideo.screenRoute)
     }
 }
 
-private fun createMrzScannerIntent(context: Context): Intent =
-    Intent(context, SmartScannerActivity::class.java).apply {
-        putExtra(
-            SmartScannerActivity.SCANNER_OPTIONS,
-            ScannerOptions(
-                config = Config(
-                    header = context.getString(R.string.passport_identification_capture),
-                    subHeader = context.getString(R.string.passport_identification_title),
-                    isManualCapture = false,
-                    showGuide = true,
-                    showSettings = false
-                ),
-                captureOptions = CaptureOptions(
-                    type = CaptureType.DOCUMENT.value,
-                    height = 180,
-                    width = 285
-                )
-            )
-        )
-    }
 
 @Composable
 private fun Content(paddingValues: PaddingValues) {
@@ -233,6 +245,24 @@ private fun Content(paddingValues: PaddingValues) {
     }
 }
 
+
+private fun handlePassportResult(
+    passportData: PassportData,
+    viewModel: PassportIdentificationViewModel
+) {
+    Log.d("PassportScan", "Passport scanned successfully")
+    Log.d("PassportScan", "Date of Birth: ${passportData.dateOfBirth}")
+    Log.d("PassportScan", "Expiry Date: ${passportData.expiryDate}")
+    Log.d(
+        "PassportScan",
+        "Face Image: ${if (passportData.faceImage != null) "Available" else "Not available"}"
+    )
+
+    // For now, just pass a dummy string since the Event expects String
+    // You can modify the Event class later to accept PassportData if needed
+    viewModel.setEvent(Event.OnPassportScanSuccessful("Passport scan completed"))
+}
+
 @Composable
 fun VerifyYourDataContent(state: State, paddingValues: PaddingValues) {
 
@@ -256,10 +286,12 @@ fun VerifyYourDataContent(state: State, paddingValues: PaddingValues) {
         )
 
         VSpacer.Large()
-        ElevatedCard(modifier = Modifier.fillMaxWidth(),
+        ElevatedCard(
+            modifier = Modifier.fillMaxWidth(),
             elevation = CardDefaults.cardElevation(defaultElevation = SPACING_EXTRA_SMALL.dp),
             colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.elevated),
-            shape = RoundedCornerShape(size = SPACING_SMALL.dp)) {
+            shape = RoundedCornerShape(size = SPACING_SMALL.dp)
+        ) {
 
             Column(modifier = Modifier.padding(all = SPACING_LARGE.dp)) {
 
@@ -280,7 +312,10 @@ fun VerifyYourDataContent(state: State, paddingValues: PaddingValues) {
                 Image(
                     painter = painterResource(R.drawable.ic_logo_plain), // BitmapPainter(bitmap.asImageBitmap()),,
                     contentDescription = "Bitmap Image",
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).size(150.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .size(150.dp),
                     contentScale = ContentScale.Fit
                 )
 

@@ -91,6 +91,11 @@ object ScannerConstants {
     const val NFC_PERSONAL_SYSTEM_SERIAL_NUMBER = "personal_system_serialNumber"
     const val NFC_TAX_EXIT_REQUIREMENTS = "tax_or_exit_requirements"
 
+    // Face Image
+    const val NFC_FACE_IMAGE = "face_image"
+    const val NFC_FACE_IMAGE_MIME_TYPE = "face_image_mime_type"
+    const val NFC_FACE_IMAGE_LENGTH = "face_image_length"
+
     // QR CODE GZIP/JSON
     const val GZIPPED_ENABLED = "gzipped"
     const val JSON_ENABLED = "json"

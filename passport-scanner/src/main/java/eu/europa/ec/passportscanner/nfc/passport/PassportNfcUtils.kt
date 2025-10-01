@@ -78,6 +78,35 @@ object PassportNfcUtils {
         throw IOException("Unable to decodeImage FaceImage")
     }
 
+    data class RawImageData(
+        val imageBytes: ByteArray,
+        val mimeType: String,
+        val imageLength: Int
+    )
+
+    @Throws(IOException::class)
+    fun retrieveFaceImageRaw(dg2File: DG2File): RawImageData {
+        val allFaceImageInfos = ArrayList<FaceImageInfo>()
+        val faceInfos = dg2File.faceInfos
+        for (faceInfo in faceInfos) {
+            allFaceImageInfos.addAll(faceInfo.faceImageInfos)
+        }
+
+        if (!allFaceImageInfos.isEmpty()) {
+            val faceImageInfo = allFaceImageInfos.iterator().next()
+            val dataInputStream = DataInputStream(faceImageInfo.imageInputStream)
+            val buffer = ByteArray(faceImageInfo.imageLength)
+            dataInputStream.readFully(buffer, 0, faceImageInfo.imageLength)
+
+            return RawImageData(
+                imageBytes = buffer,
+                mimeType = faceImageInfo.mimeType,
+                imageLength = faceImageInfo.imageLength
+            )
+        }
+        throw IOException("Unable to retrieve raw FaceImage")
+    }
+
     @Throws(IOException::class)
     fun retrievePortraitImage(dg5File: DG5File): Bitmap {
         val faceInfos = dg5File.images

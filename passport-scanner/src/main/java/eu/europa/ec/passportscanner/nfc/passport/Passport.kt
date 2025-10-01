@@ -34,6 +34,7 @@ class Passport : Parcelable {
     var face: Bitmap? = null
     var portrait: Bitmap? = null
     var signature: Bitmap? = null
+    var rawFaceImageData: PassportNfcUtils.RawImageData? = null
     var fingerprints: List<Bitmap>? = null
     var personDetails: PersonDetails? = null
     var additionalPersonDetails: AdditionalPersonDetails? = null

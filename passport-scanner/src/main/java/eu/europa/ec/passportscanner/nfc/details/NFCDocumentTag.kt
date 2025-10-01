@@ -111,6 +111,10 @@ class NFCDocumentTag(val readDG2: Boolean = true) {
                         val faceImage =
                             PassportNfcUtils.retrieveFaceImage(passportNFC.dg2File!!)
                         passport.face = faceImage
+
+                        // Also get the raw image data
+                        val rawFaceImageData = PassportNfcUtils.retrieveFaceImageRaw(passportNFC.dg2File!!)
+                        passport.rawFaceImageData = rawFaceImageData
                     } catch (e: Exception) {
                         //Don't do anything
                         e.printStackTrace()
