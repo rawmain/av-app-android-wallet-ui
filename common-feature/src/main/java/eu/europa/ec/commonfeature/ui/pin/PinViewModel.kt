@@ -22,6 +22,7 @@ import eu.europa.ec.businesslogic.validator.Form
 import eu.europa.ec.businesslogic.validator.FormValidationResult
 import eu.europa.ec.businesslogic.validator.Rule
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
+import eu.europa.ec.commonfeature.countdown.LockoutCountdownManager
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractor
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractorPinValidPartialState
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractorSetPinPartialState
@@ -67,6 +68,8 @@ data class State(
     val pinState: PinValidationState,
     val isBottomSheetOpen: Boolean = false,
     val quickPinSize: Int = 6,
+    val isLockedOut: Boolean = false,
+    val lockoutEndTime: Long = 0L,
 ) : ViewState {
     val action: ScreenNavigateAction
         get() {
@@ -94,8 +97,8 @@ sealed class Event : ViewEvent {
         data class UpdateBottomSheetState(val isOpen: Boolean) : BottomSheet()
 
         sealed class Cancel : BottomSheet() {
-            data object PrimaryButtonPressed : Cancel()
-            data object SecondaryButtonPressed : Cancel()
+            data object DiscardPressed : Cancel()
+            data object ConfirmCancelPressed : Cancel()
         }
     }
 }
@@ -117,6 +120,32 @@ class PinViewModel(
     private val uiSerializer: UiSerializer,
     @InjectedParam private val pinFlow: PinFlow,
 ) : MviViewModel<Event, State, Effect>() {
+
+    private val lockoutCountdownManager = LockoutCountdownManager(
+        coroutineScope = viewModelScope,
+        getIsLockedOut = { viewState.value.isLockedOut },
+        getLockoutEndTime = { viewState.value.lockoutEndTime },
+        onCountdownUpdate = { message ->
+            setState {
+                copy(
+                    quickPinError = message,
+                )
+            }
+        },
+        onLockoutEnd = {
+            setState { copy(isLockedOut = false, quickPinError = null, lockoutEndTime = 0L) }
+        },
+        getTimeMessage = { minutes, seconds ->
+            if (minutes > 0)
+                resourceProvider.getString(
+                    R.string.quick_pin_change_lockout_countdown_minutes,
+                    minutes,
+                    seconds
+                )
+            else
+                resourceProvider.getString(R.string.quick_pin_change_lockout_countdown_seconds, seconds)
+        }
+    )
 
     override fun setInitialState(): State {
         val title: String
@@ -152,10 +181,12 @@ class PinViewModel(
     }
 
     override fun handleEvents(event: Event) {
-        Log.i("PIN", "Event received: $event")
-
         when (event) {
             is Event.OnQuickPinEntered -> {
+                // Don't process PIN input during lockout
+                if (viewState.value.isLockedOut) {
+                    return
+                }
                 validateForm(event.quickPin)
             }
 
@@ -189,11 +220,11 @@ class PinViewModel(
                 }
             }
 
-            is Event.BottomSheet.Cancel.PrimaryButtonPressed -> {
+            is Event.BottomSheet.Cancel.DiscardPressed -> {
                 hideBottomSheet()
             }
 
-            is Event.BottomSheet.Cancel.SecondaryButtonPressed -> {
+            is Event.BottomSheet.Cancel.ConfirmCancelPressed -> {
                 viewModelScope.launch {
                     hideBottomSheet()
                     delay(200L)
@@ -214,13 +245,25 @@ class PinViewModel(
                     is QuickPinInteractorPinValidPartialState.Failed -> {
                         setState {
                             copy(
-                                quickPinError = it.errorMessage
+                                quickPinError = it.errorMessage,
+                                isLockedOut = false,
                             )
                         }
                     }
 
                     QuickPinInteractorPinValidPartialState.Success -> {
                         setupEnterPhase()
+                    }
+
+                    is QuickPinInteractorPinValidPartialState.LockedOut -> {
+                        setState {
+                            copy(
+                                isLockedOut = true,
+                                lockoutEndTime = it.lockoutEndTime,
+                                quickPinError = resourceProvider.getString(R.string.quick_pin_locked_out)
+                            )
+                        }
+                        lockoutCountdownManager.start()
                     }
                 }
             }
@@ -237,8 +280,10 @@ class PinViewModel(
                 pinState = newPinState,
                 buttonText = calculateButtonText(newPinState),
                 pin = "",
+                isButtonEnabled = false,
                 resetPin = true,
-                subtitle = calculateSubtitle(newPinState)
+                subtitle = calculateSubtitle(newPinState),
+                isLockedOut = false,
             )
         }
     }
@@ -253,6 +298,7 @@ class PinViewModel(
                 pinState = PinValidationState.REENTER,
                 buttonText = calculateButtonText(newPinState),
                 pin = "",
+                isButtonEnabled = false,
                 resetPin = true,
                 subtitle = calculateSubtitle(newPinState),
                 title = calculateTitle(newPinState)
@@ -304,6 +350,17 @@ class PinViewModel(
                     Rule.ValidateRegex(
                         "-?\\d+(\\.\\d+)?".toRegex(),
                         resourceProvider.getString(R.string.quick_pin_numerical_rule_invalid_error_message)
+                    ),
+                    Rule.ValidateDuplicateCharacterNotInConsecutiveOrder(
+                        maxTimesOfConsecutiveOrder = viewState.value.quickPinSize,
+                        errorMessage = resourceProvider.getString(R.string.quick_pin_invalid_generic_error)
+                    ),
+                    Rule.ValidateNumericNotInConsecutiveSequenceOrder(
+                        minLength = viewState.value.quickPinSize,
+                        errorMessage = resourceProvider.getString(R.string.quick_pin_invalid_generic_error)
+                    ),
+                    Rule.ValidateNotPalindrome(
+                        errorMessage = resourceProvider.getString(R.string.quick_pin_invalid_generic_error)
                     )
                 ) to pin
             )
@@ -418,5 +475,10 @@ class PinViewModel(
         setEffect {
             Effect.CloseBottomSheet
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        lockoutCountdownManager.cancel()
     }
 }

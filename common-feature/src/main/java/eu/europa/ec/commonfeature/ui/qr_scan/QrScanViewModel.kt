@@ -19,6 +19,7 @@ package eu.europa.ec.commonfeature.ui.qr_scan
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.validator.Form
+import eu.europa.ec.businesslogic.validator.FormValidator
 import eu.europa.ec.businesslogic.validator.Rule
 import eu.europa.ec.commonfeature.config.IssuanceFlowUiConfig
 import eu.europa.ec.commonfeature.config.OfferUiConfig
@@ -26,9 +27,7 @@ import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.QrScanFlow
 import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.config.RequestUriConfig
-import eu.europa.ec.commonfeature.interactor.QrScanInteractor
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
-import eu.europa.ec.eudi.rqesui.domain.extension.toUriOrEmpty
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.config.ConfigNavigation
@@ -78,7 +77,7 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class QrScanViewModel(
-    private val interactor: QrScanInteractor,
+    private val formValidator: FormValidator,
     private val uiSerializer: UiSerializer,
     private val resourceProvider: ResourceProvider,
     @InjectedParam private val qrScannedConfig: String,
@@ -151,7 +150,6 @@ class QrScanViewModel(
             // Handle valid QR code
             if (urlIsValid) {
                 calculateNextStep(
-                    context = context,
                     qrScanFlow = currentState.qrScannedConfig.qrScanFlow,
                     scanResult = scannedQr
                 )
@@ -172,21 +170,19 @@ class QrScanViewModel(
     }
 
     private suspend fun validateForm(form: Form): Boolean {
-        val validationResult = interactor.validateForm(
+        val validationResult = formValidator.validateForm(
             form = form,
         )
         return validationResult.isValid
     }
 
     private fun calculateNextStep(
-        context: Context,
         qrScanFlow: QrScanFlow,
         scanResult: String,
     ) {
         when (qrScanFlow) {
             is QrScanFlow.Presentation -> navigateToPresentationRequest(scanResult)
             is QrScanFlow.Issuance -> navigateToDocumentOffer(scanResult, qrScanFlow.issuanceFlow)
-            is QrScanFlow.Signature -> navigateToRqesSdk(context, scanResult)
         }
     }
 
@@ -197,7 +193,6 @@ class QrScanViewModel(
             when (qrScanFlow) {
                 is QrScanFlow.Presentation -> getString(R.string.qr_scan_informative_text_presentation_flow)
                 is QrScanFlow.Issuance -> getString(R.string.qr_scan_informative_text_issuance_flow)
-                is QrScanFlow.Signature -> getString(R.string.qr_scan_informative_text_signature_flow)
             }
         }
     }
@@ -245,16 +240,6 @@ class QrScanViewModel(
                     )
                 )
             )
-        }
-    }
-
-    private fun navigateToRqesSdk(context: Context, scanResult: String) {
-        interactor.launchRqesSdk(
-            context = context,
-            uri = scanResult.toUriOrEmpty()
-        )
-        setEffect {
-            Effect.Navigation.Pop
         }
     }
 

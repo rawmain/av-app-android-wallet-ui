@@ -25,6 +25,8 @@ plugins {
 
 android {
 
+    ndkVersion = "28.0.0"
+
     signingConfigs {
         create("release") {
 

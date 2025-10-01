@@ -64,14 +64,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             val openId4VciAuthorizationScheme = "eu.europa.ec.av"
             val openId4VciAuthorizationHost = "authorization"
 
-            val rqesScheme = "rqes"
-            val rqesHost = "oauth"
-            val rqesPath = "/callback"
-
-            // TODO This is temporary until proper value
-            val rqesDocRetrievalScheme = "eudi-rqes"
-            val rqesDocRetrievalHost = "*"
-
             with(pluginManager) {
                 apply("com.android.library")
                 apply("project.android.library.kover")
@@ -104,10 +96,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                         "ISSUE_AUTHORIZATION_DEEPLINK",
                         "$openId4VciAuthorizationScheme://$openId4VciAuthorizationHost"
                     )
-                    addConfigField("RQES_SCHEME", rqesScheme)
-                    addConfigField("RQES_HOST", rqesHost)
-                    addConfigField("RQES_DEEPLINK", "$rqesScheme://$rqesHost$rqesPath")
-                    addConfigField("RQES_DOC_RETRIEVAL_SCHEME", rqesDocRetrievalScheme)
 
                     // Manifest placeholders for Wallet deepLink
                     manifestPlaceholders["deepLinkScheme"] = walletScheme
@@ -135,14 +123,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     manifestPlaceholders["openId4VciAuthorizationHost"] =
                         openId4VciAuthorizationHost
 
-                    // Manifest placeholders used for RQES
-                    manifestPlaceholders["rqesHost"] = rqesHost
-                    manifestPlaceholders["rqesScheme"] = rqesScheme
-                    manifestPlaceholders["rqesPath"] = rqesPath
-
-                    // Manifest placeholders used for RQES Document Retrieval
-                    manifestPlaceholders["rqesDocRetrievalScheme"] = rqesDocRetrievalScheme
-                    manifestPlaceholders["rqesDocRetrievalHost"] = rqesDocRetrievalHost
                 }
                 configureFlavors(this)
                 configureGradleManagedDevices(this)

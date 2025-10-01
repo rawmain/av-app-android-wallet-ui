@@ -25,8 +25,6 @@ import eu.europa.ec.commonfeature.interactor.BiometricInteractor
 import eu.europa.ec.commonfeature.interactor.BiometricInteractorImpl
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractorImpl
-import eu.europa.ec.commonfeature.interactor.QrScanInteractor
-import eu.europa.ec.commonfeature.interactor.QrScanInteractorImpl
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractor
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractorImpl
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
@@ -65,11 +63,4 @@ fun provideDeviceAuthenticationInteractor(
     deviceAuthenticationController: DeviceAuthenticationController
 ): DeviceAuthenticationInteractor {
     return DeviceAuthenticationInteractorImpl(deviceAuthenticationController)
-}
-
-@Factory
-fun provideQrScanInteractor(
-    formValidator: FormValidator
-): QrScanInteractor {
-    return QrScanInteractorImpl(formValidator)
 }

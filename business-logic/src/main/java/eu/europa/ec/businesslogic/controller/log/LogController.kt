@@ -57,12 +57,15 @@ class LogControllerImpl(
         .withDir(logsDir)
         .withSizeLimit(FILE_SIZE_LIMIT)
         .withFileLimit(FILE_LIMIT)
-        .withMinPriority(Log.DEBUG)
+        .withMinPriority(if (configLogic.isBuildTypeDebug()) {Log.DEBUG} else {Log.INFO})
         .appendToFile(true)
         .build()
 
     init {
-        Timber.plant(Timber.DebugTree(), fileLoggerTree)
+        if (configLogic.isBuildTypeDebug()) {
+            Timber.plant(Timber.DebugTree())
+        }
+        Timber.plant(fileLoggerTree)
     }
 
     private val tag: String = "AV Wallet ${configLogic.appFlavor}-${configLogic.appBuildType}"

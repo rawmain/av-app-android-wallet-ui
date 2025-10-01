@@ -112,10 +112,6 @@ gradlePlugin {
             id = "project.android.base.profile"
             implementationClass = "AndroidBaseLineProfilePlugin"
         }
-        register("eudiRqes") {
-            id = "project.rqes.sdk"
-            implementationClass = "EudiRqesPlugin"
-        }
         register("androidxRoom") {
             id = "project.androidx.room"
             implementationClass = "RoomPlugin"

@@ -52,6 +52,8 @@ sealed class CommonScreens {
 }
 
 sealed class PresentationScreens {
+    data object DcApiPresentationRequest : Screen(name = "DC_API_PRESENTATION_REQUEST")
+
     data object PresentationRequest : Screen(
         name = "PRESENTATION_REQUEST",
         parameters = "?requestUriConfig={requestUriConfig}"

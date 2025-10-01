@@ -100,6 +100,13 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter> <!--Required for DCAPI -->
+                <action android:name="androidx.credentials.registry.provider.action.GET_CREDENTIAL" />
+                <action android:name="androidx.identitycredentials.action.GET_CREDENTIALS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -163,29 +170,6 @@
                 <data
                     android:host="${openId4VciAuthorizationHost}"
                     android:scheme="${openId4VciAuthorizationScheme}" />
-
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="${rqesHost}"
-                    android:path="${rqesPath}"
-                    android:scheme="${rqesScheme}" />
-
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="${rqesDocRetrievalHost}"
-                    android:scheme="${rqesDocRetrievalScheme}" />
 
             </intent-filter>
             <intent-filter>

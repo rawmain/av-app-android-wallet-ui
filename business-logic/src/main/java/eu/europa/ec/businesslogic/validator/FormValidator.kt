@@ -177,6 +177,11 @@ class FormValidatorImpl(
                 isFileNameValid(value),
                 rule.errorMessage
             )
+
+            is Rule.ValidateNotPalindrome -> checkValidationResult(
+                checkIfNotPalindrome(value),
+                errorMessage = rule.errorMessage
+            )
         }
     }
 
@@ -338,6 +343,11 @@ class FormValidatorImpl(
         ) { max, current ->
             current <= max
         } ?: false
+
+    private fun checkIfNotPalindrome(value: String): Boolean {
+        val safeParser = value.lowercase().filter { it.isLetterOrDigit() }
+        return safeParser != safeParser.reversed()
+    }
 }
 
 data class Form(val inputs: Map<List<Rule>, String>)
@@ -400,6 +410,10 @@ sealed class Rule(val errorMsg: String) {
 
     data class ValidateNumericNotInConsecutiveSequenceOrder(
         val minLength: Int,
+        val errorMessage: String
+    ) : Rule(errorMessage)
+
+    data class ValidateNotPalindrome(
         val errorMessage: String
     ) : Rule(errorMessage)
 

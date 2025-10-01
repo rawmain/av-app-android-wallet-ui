@@ -55,16 +55,11 @@ jobs:
       - name: Run unit tests
         run: ./gradlew testDemoReleaseUnitTest
 
-      - name: Generate Next Tag with version
+      - name: Read version from version file and set as TAG_NAME
         run: |
-          chmod +x ./.github/workflows/generate_next_tag.sh
-          NEXT_TAG=$(./.github/workflows/generate_next_tag.sh)
-          echo "Next tag: $NEXT_TAG"
-          echo "TAG_NAME=$NEXT_TAG" >> $GITHUB_ENV
-
-      - name: Update version.properties with tag
-        run: |
-          echo "VERSION_NAME=$TAG_NAME" > version.properties
+          TAG_NAME=$(grep '^VERSION_NAME=' version.properties | cut -d'=' -f2-)
+          echo "TAG_NAME=$TAG_NAME"
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
       - name: Build DEMO release APK
         run: ./gradlew assembleDemoRelease
@@ -72,7 +67,7 @@ jobs:
       - name: Build DEMO release Bundle (AAB)
         run: ./gradlew bundleDemoRelease
 
-      - name: Create Tag
+      - name: Create Tag with version
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"

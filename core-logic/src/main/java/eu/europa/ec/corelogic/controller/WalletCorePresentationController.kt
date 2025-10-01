@@ -16,9 +16,12 @@
 
 package eu.europa.ec.corelogic.controller
 
+import android.content.Intent
+import android.util.Log
 import androidx.activity.ComponentActivity
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.addOrReplace
+import eu.europa.ec.businesslogic.extension.ifEmptyOrNull
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.corelogic.di.WalletPresentationScope
@@ -30,6 +33,7 @@ import eu.europa.ec.eudi.iso18013.transfer.response.RequestProcessor
 import eu.europa.ec.eudi.iso18013.transfer.response.RequestedDocument
 import eu.europa.ec.eudi.iso18013.transfer.toKotlinResult
 import eu.europa.ec.eudi.wallet.EudiWallet
+import eu.europa.ec.eudi.wallet.dcapi.DCAPIException
 import eu.europa.ec.eudi.wallet.document.DocumentExtensions.getDefaultKeyUnlockData
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import kotlinx.coroutines.CoroutineDispatcher
@@ -57,6 +61,7 @@ sealed class PresentationControllerConfig(val initiatorRoute: String) {
         PresentationControllerConfig(initiator)
 
     data class Ble(val initiator: String) : PresentationControllerConfig(initiator)
+    data class DcApi(val initiator: String) : PresentationControllerConfig(initiator)
 }
 
 sealed class TransferEventPartialState {
@@ -73,6 +78,7 @@ sealed class TransferEventPartialState {
 
     data object ResponseSent : TransferEventPartialState()
     data class Redirect(val uri: URI) : TransferEventPartialState()
+    data class IntentToSent(val intent: Intent) : TransferEventPartialState()
 }
 
 sealed class CheckKeyUnlockPartialState {
@@ -93,6 +99,7 @@ sealed class ResponseReceivedPartialState {
     data object Success : ResponseReceivedPartialState()
     data class Redirect(val uri: URI) : ResponseReceivedPartialState()
     data class Failure(val error: String) : ResponseReceivedPartialState()
+    data class IntentToSent(val intent: Intent) : ResponseReceivedPartialState()
 }
 
 sealed class WalletCorePartialState {
@@ -104,6 +111,7 @@ sealed class WalletCorePartialState {
     data object Success : WalletCorePartialState()
     data class Redirect(val uri: URI) : WalletCorePartialState()
     data object RequestIsReadyToBeSent : WalletCorePartialState()
+    data class IntentToSent(val intent: Intent) : WalletCorePartialState()
 }
 
 /**
@@ -191,6 +199,7 @@ interface WalletCorePresentationController {
      * @return flow that emits the create, sent, receive states
      * */
     fun observeSentDocumentsRequest(): Flow<WalletCorePartialState>
+    fun startDCAPIPresentation(intent: Intent)
 }
 
 @Scope(WalletPresentationScope::class)
@@ -249,17 +258,26 @@ class WalletCorePresentationControllerImpl(
                     TransferEventPartialState.Disconnected
                 )
             },
-            onError = { errorMessage ->
+            onError = { error ->
+                Log.e("WalletCorePresentationController", "error: $error")
                 trySendBlocking(
-                    TransferEventPartialState.Error(
-                        error = errorMessage.ifEmpty { genericErrorMessage }
-                    )
+
+                    if (error is DCAPIException) {
+                        Log.e(
+                            "WalletCorePresentationController",
+                            "DCAPIException, continue as IntentToSent"
+                        )
+                        TransferEventPartialState.IntentToSent(error.toIntent())
+                    } else {
+                        TransferEventPartialState.Error(
+                            error = error.message.ifEmptyOrNull(genericErrorMessage)
+                        )
+                    }
                 )
             },
             onRequestReceived = { requestedDocumentData ->
                 trySendBlocking(
                     requestedDocumentData.getOrNull()?.let { requestedDocuments ->
-
                         processedRequest = requestedDocuments
 
                         verifierName = requestedDocuments.requestedDocuments
@@ -289,6 +307,11 @@ class WalletCorePresentationControllerImpl(
                     TransferEventPartialState.Redirect(
                         uri = uri
                     )
+                )
+            },
+            onIntentToSend = { intent ->
+                trySendBlocking(
+                    TransferEventPartialState.IntentToSent(intent)
                 )
             }
         )
@@ -411,6 +434,8 @@ class WalletCorePresentationControllerImpl(
 
                 is TransferEventPartialState.ResponseSent -> ResponseReceivedPartialState.Success
 
+                is TransferEventPartialState.IntentToSent -> ResponseReceivedPartialState.IntentToSent(response.intent)
+
                 else -> null
             }
         }.safeAsync {
@@ -440,6 +465,9 @@ class WalletCorePresentationControllerImpl(
                         uri = it.uri
                     )
                 }
+                is ResponseReceivedPartialState.IntentToSent-> {
+                    WalletCorePartialState.IntentToSent(it.intent)
+                }
 
                 is CheckKeyUnlockPartialState.RequestIsReadyToBeSent -> {
                     WalletCorePartialState.RequestIsReadyToBeSent
@@ -464,6 +492,10 @@ class WalletCorePresentationControllerImpl(
         CoroutineScope(dispatcher).launch {
             eudiWallet.stopProximityPresentation()
         }
+    }
+
+    override fun startDCAPIPresentation(intent: Intent) {
+        eudiWallet.startDCAPIPresentation(intent)
     }
 
     private fun addListener(listener: EudiWalletListenerWrapper) {

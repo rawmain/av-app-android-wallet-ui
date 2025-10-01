@@ -32,7 +32,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -73,7 +72,6 @@ fun PinScreen(
     viewModel: PinViewModel,
 ) {
     val state: State by viewModel.viewState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     val isBottomSheetOpen = state.isBottomSheetOpen
     val scope = rememberCoroutineScope()
@@ -95,7 +93,7 @@ fun PinScreen(
                     type = StickyBottomType.OneButton(
                         config = ButtonConfig(
                             type = ButtonType.PRIMARY,
-                            enabled = state.isButtonEnabled,
+                            enabled = state.isButtonEnabled && !state.isLockedOut,
                             onClick = {
                                 viewModel.setEvent(Event.NextButtonPressed(pin = state.pin))
                             }
@@ -189,7 +187,9 @@ private fun Content(
         VSpacer.Large()
 
         PinFieldLayout(
-            modifier = Modifier.fillMaxWidth().wrapContentHeight(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
             state = state,
             onPinInput = { quickPin ->
                 onEventSend(Event.OnQuickPinEntered(quickPin))
@@ -231,8 +231,8 @@ private fun SheetContent(
             positiveButtonText = stringResource(id = R.string.quick_pin_bottom_sheet_cancel_primary_button_text),
             negativeButtonText = stringResource(id = R.string.quick_pin_bottom_sheet_cancel_secondary_button_text),
         ),
-        onPositiveClick = { onEventSent(Event.BottomSheet.Cancel.PrimaryButtonPressed) },
-        onNegativeClick = { onEventSent(Event.BottomSheet.Cancel.SecondaryButtonPressed) }
+        onPositiveClick = { onEventSent(Event.BottomSheet.Cancel.ConfirmCancelPressed) },
+        onNegativeClick = { onEventSent(Event.BottomSheet.Cancel.DiscardPressed) }
     )
 }
 
@@ -255,18 +255,42 @@ private fun PinFieldLayout(
         errorMessage = state.quickPinError,
         visualTransformation = PasswordVisualTransformation(),
         pinWidth = 42.dp,
-        focusOnCreate = true
+        focusOnCreate = true,
+        enabled = !state.isLockedOut
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @ThemeModePreviews
 @Composable
-private fun PinScreenEmptyPreview() {
+private fun PinScreenCreateEmptyPreview() {
     PreviewTheme {
         Content(
             state = State(
                 pinFlow = PinFlow.CREATE,
+                pinState = PinValidationState.ENTER,
+                title = "Title",
+                subtitle = "Subtitle",
+
+                ),
+            effectFlow = Channel<Effect>().receiveAsFlow(),
+            onEventSend = {},
+            onNavigationRequested = {},
+            paddingValues = PaddingValues(10.dp),
+            coroutineScope = rememberCoroutineScope(),
+            modalBottomSheetState = rememberModalBottomSheetState(),
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@ThemeModePreviews
+@Composable
+private fun PinScreenUpdateEmptyPreview() {
+    PreviewTheme {
+        Content(
+            state = State(
+                pinFlow = PinFlow.UPDATE,
                 pinState = PinValidationState.ENTER,
                 title = "Title",
                 subtitle = "Subtitle",
