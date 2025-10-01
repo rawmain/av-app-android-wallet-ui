@@ -16,15 +16,10 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportidentification
 
-import android.content.Context
-import android.content.Intent
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.passportscanner.SmartScannerActivity
-import eu.europa.ec.passportscanner.scanner.config.CaptureOptions
-import eu.europa.ec.passportscanner.scanner.config.CaptureType
-import eu.europa.ec.passportscanner.scanner.config.Config
-import eu.europa.ec.passportscanner.scanner.config.ScannerOptions
-import eu.europa.ec.resourceslogic.provider.ResourceProvider
+import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.GoBack
+import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.StartMRZScanner
+import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.StartPassportLiveCheck
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -39,52 +34,31 @@ sealed class Event : ViewEvent {
     data object Init : Event()
     data object OnBackPressed : Event()
     data object OnStartPassportScan : Event()
+    data class OnPassportScanSuccessful(val dummyData: String) : Event()
 }
 
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
-        data class SwitchScreen(val screenRoute: String, val inclusive: Boolean) : Navigation()
-        data class StartMRZScanner(val intent: Intent) : Navigation()
+        data object StartMRZScanner : Navigation()
+        data class StartPassportLiveCheck(val dummyData: String) : Navigation()
     }
 }
 
 @KoinViewModel
 class PassportIdentificationViewModel(
-    private val resourceProvider: ResourceProvider,
     private val logController: LogController,
-    private val context: Context
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State = State()
 
     override fun handleEvents(event: Event) {
-        when(event) {
-
+        when (event) {
             Event.Init -> logController.i { "Init -- PassportIdentificationViewModel " }
-            Event.OnBackPressed -> setEffect { Effect.Navigation.GoBack }
-
-            Event.OnStartPassportScan -> {
-                val intent = Intent(context, SmartScannerActivity::class.java)
-                intent.putExtra(
-                    SmartScannerActivity.SCANNER_OPTIONS,
-                    ScannerOptions(
-                        config = Config(
-                            header = resourceProvider.getString(eu.europa.ec.resourceslogic.R.string.passport_identification_capture),
-                            subHeader = resourceProvider.getString(eu.europa.ec.resourceslogic.R.string.passport_identification_title),
-                            isManualCapture = false,
-                            showGuide = true,
-                            showSettings = false
-                        ),
-                        captureOptions = CaptureOptions(
-                            type = CaptureType.DOCUMENT.value,
-                            height = 180,
-                            width = 285
-                        )
-                    )
-                )
-                setEffect { Effect.Navigation.StartMRZScanner(intent) }
-            }
+            Event.OnBackPressed -> setEffect { GoBack }
+            Event.OnStartPassportScan -> setEffect { StartMRZScanner }
+            // add TODO passport information as a param, which contains passport picture and birthday
+            is Event.OnPassportScanSuccessful -> setEffect { StartPassportLiveCheck(event.dummyData) }
         }
     }
 }

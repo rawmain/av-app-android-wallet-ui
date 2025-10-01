@@ -16,7 +16,11 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportidentification
 
+import android.content.Context
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -36,6 +40,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation
+import eu.europa.ec.passportscanner.SmartScannerActivity
+import eu.europa.ec.passportscanner.scanner.config.CaptureOptions
+import eu.europa.ec.passportscanner.scanner.config.CaptureType
+import eu.europa.ec.passportscanner.scanner.config.Config
+import eu.europa.ec.passportscanner.scanner.config.ScannerOptions
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.BulletHolder
 import eu.europa.ec.uilogic.component.PassportVerificationStepBar
@@ -51,9 +61,13 @@ import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
+import eu.europa.ec.uilogic.navigation.OnboardingScreens.PassportLiveVideo
 
 @Composable
-fun PassportIdentificationScreen(controller : NavController, viewModel : PassportIdentificationViewModel) {
+fun PassportIdentificationScreen(
+    controller: NavController,
+    viewModel: PassportIdentificationViewModel
+) {
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -61,8 +75,9 @@ fun PassportIdentificationScreen(controller : NavController, viewModel : Passpor
     val mrzScannerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        // Handle MRZ scanner result here
+        // TODO Handle MRZ scanner result here - Passport should be in bundle
         // You can process the result.data and result.resultCode
+        viewModel.setEvent(Event.OnPassportScanSuccessful("passportPicture"))
     }
 
     ContentScreen(
@@ -80,7 +95,7 @@ fun PassportIdentificationScreen(controller : NavController, viewModel : Passpor
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
-            handleEffect(effect, controller, mrzScannerLauncher)
+            handleEffect(effect, controller, context, mrzScannerLauncher)
         }
     }
 
@@ -90,7 +105,11 @@ fun PassportIdentificationScreen(controller : NavController, viewModel : Passpor
 }
 
 @Composable
-private fun ActionButtons(onBack: () -> Unit = {}, onCapture: () -> Unit = {}, paddings: PaddingValues) {
+private fun ActionButtons(
+    onBack: () -> Unit = {},
+    onCapture: () -> Unit = {},
+    paddings: PaddingValues
+) {
 
     val buttons = StickyBottomType.TwoButtons(
         primaryButtonConfig = ButtonConfig(
@@ -104,11 +123,13 @@ private fun ActionButtons(onBack: () -> Unit = {}, onCapture: () -> Unit = {}, p
     )
 
     WrapStickyBottomContent(
-        stickyBottomModifier = Modifier.fillMaxWidth().padding(paddings),
+        stickyBottomModifier = Modifier
+            .fillMaxWidth()
+            .padding(paddings),
         stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)
     ) { buttonConfigs ->
         buttonConfigs?.let { buttonConfig ->
-            when(buttonConfig.type) {
+            when (buttonConfig.type) {
                 ButtonType.PRIMARY -> Text(stringResource(R.string.passport_identification_capture))
                 ButtonType.SECONDARY -> Text(stringResource(R.string.passport_identification_back))
             }
@@ -119,14 +140,36 @@ private fun ActionButtons(onBack: () -> Unit = {}, onCapture: () -> Unit = {}, p
 private fun handleEffect(
     effect: Effect,
     hostNavController: NavController,
-    mrzScannerLauncher: androidx.activity.compose.ManagedActivityResultLauncher<android.content.Intent, androidx.activity.result.ActivityResult>
+    context: Context,
+    mrzScannerLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>
 ) {
     when (effect) {
-        is Effect.Navigation.GoBack -> hostNavController.popBackStack()
-        is Effect.Navigation.SwitchScreen -> hostNavController.navigate(effect.screenRoute)
-        is Effect.Navigation.StartMRZScanner -> mrzScannerLauncher.launch(effect.intent)
+        is Navigation.GoBack -> hostNavController.popBackStack()
+        is Navigation.StartMRZScanner -> mrzScannerLauncher.launch(createMrzScannerIntent(context))
+        is Navigation.StartPassportLiveCheck -> hostNavController.navigate(PassportLiveVideo.screenRoute)
     }
 }
+
+private fun createMrzScannerIntent(context: Context): Intent =
+    Intent(context, SmartScannerActivity::class.java).apply {
+        putExtra(
+            SmartScannerActivity.SCANNER_OPTIONS,
+            ScannerOptions(
+                config = Config(
+                    header = context.getString(R.string.passport_identification_capture),
+                    subHeader = context.getString(R.string.passport_identification_title),
+                    isManualCapture = false,
+                    showGuide = true,
+                    showSettings = false
+                ),
+                captureOptions = CaptureOptions(
+                    type = CaptureType.DOCUMENT.value,
+                    height = 180,
+                    width = 285
+                )
+            )
+        )
+    }
 
 @Composable
 private fun Content(paddingValues: PaddingValues) {
