@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.1.0-beta06
+## v1.0.0 - 2025.10-1
 
 ### Added
 
