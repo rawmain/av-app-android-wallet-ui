@@ -125,17 +125,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/branding_image"
-        android:layout_width="64dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="16dp"
-        android:textColor="@color/white"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_layout"
-        app:srcCompat="@drawable/ic_id_pass_logo_greyed" />
-
     <TextView
         android:id="@+id/capture_label_text"
         android:layout_width="0dp"
@@ -150,7 +139,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/branding_image"
+        app:layout_constraintTop_toBottomOf="@+id/view_layout"
         tools:text="capture text" />
 
     <androidx.appcompat.widget.AppCompatImageButton
