@@ -29,6 +29,7 @@ import org.koin.android.annotation.KoinViewModel
 data class State(
     val isLoading: Boolean = false,
     val scanComplete : Boolean = false,
+    val passportData: PassportData? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -37,7 +38,8 @@ sealed class Event : ViewEvent {
     data object OnStartPassportScan : Event()
     data object OnProcessRestartRequest : Event()
     data object OnPassportVerificationCompletion : Event()
-    data class OnPassportScanSuccessful(val dummyData: String) : Event()
+    data class OnPassportScanSuccessful(val passportData: PassportData) : Event()
+    data class OnPassportScanFailed(val errorMessage: String) : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -62,7 +64,11 @@ class PassportIdentificationViewModel(
             Event.OnStartPassportScan -> setEffect { StartMRZScanner }
             Event.OnPassportVerificationCompletion -> setEffect { StartPassportLiveCheck }
             Event.OnProcessRestartRequest -> setEffect { GoBack }
-            is Event.OnPassportScanSuccessful -> setState { copy(scanComplete = true) }
+            is Event.OnPassportScanSuccessful -> setState { copy(scanComplete = true, passportData = event.passportData) }
+            is Event.OnPassportScanFailed -> {
+                logController.e { "Passport scan failed: ${event.errorMessage}" }
+                setState { copy(scanComplete = false, passportData = null) }
+            }
         }
     }
 }

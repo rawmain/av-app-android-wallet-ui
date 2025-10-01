@@ -19,7 +19,6 @@ package eu.europa.ec.onboardingfeature.ui.passport.passportidentification
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -43,6 +42,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation
+import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Event.OnPassportScanSuccessful
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.theme.values.elevated
 import eu.europa.ec.uilogic.component.BulletHolder
@@ -91,20 +93,19 @@ fun PassportIdentificationScreen(
                     val passportData =
                         PassportScannerIntentHelper.extractPassportDataFromIntent(intent)
                     if (passportData.dateOfBirth != null || passportData.expiryDate != null) {
-                        handlePassportResult(passportData, viewModel)
+                        viewModel.setEvent(OnPassportScanSuccessful(passportData))
                     } else {
-                        Log.e("PassportScan", "No passport data received")
+                        viewModel.setEvent(Event.OnPassportScanFailed("No passport data received"))
                     }
                 }
             }
 
             Activity.RESULT_CANCELED -> {
-                Log.d("PassportScan", "Passport scan was cancelled")
-                // Handle cancellation if needed
+                viewModel.setEvent(Event.OnPassportScanFailed("Passport scan was cancelled"))
             }
 
             else -> {
-                Log.e("PassportScan", "Unknown error occurred during passport scan")
+                viewModel.setEvent(Event.OnPassportScanFailed("Unknown error occurred during passport scan"))
             }
         }
     }
@@ -124,7 +125,11 @@ fun PassportIdentificationScreen(
             )
         }
     ) { paddingValues ->
-        Content(paddingValues = paddingValues)
+        if (state.scanComplete) {
+            VerifyYourDataContent(passportData = state.passportData!!, paddingValues = paddingValues)
+        } else {
+            Content(paddingValues = paddingValues)
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -150,14 +155,28 @@ private fun ActionButtons(
 
     val buttons = StickyBottomType.TwoButtons(
         primaryButtonConfig = ButtonConfig(
-            type = ButtonType.SECONDARY,
-            onClick = { if (state.scanComplete) onTryAgain() else onBack() }
-        ),
+        type = ButtonType.SECONDARY,
+        onClick = {
+            if (state.scanComplete && state.passportData == null)
+                onTryAgain()
+            else
+                onBack()
+        }),
         secondaryButtonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
-            onClick = { if (state.scanComplete) onNext() else onCapture() }
-        )
-    )
+            onClick = { if (state.scanComplete) onNext() else onCapture() }))
+
+    val primaryButtonText = if (state.scanComplete) {
+        R.string.passport_biometrics_next
+    } else {
+        R.string.passport_identification_capture
+    }
+
+    val secondaryButtonText = if (state.scanComplete && state.passportData == null) {
+        R.string.passport_biometrics_try_again
+    } else {
+        R.string.passport_identification_back
+    }
 
     WrapStickyBottomContent(
         stickyBottomModifier = Modifier
@@ -167,13 +186,8 @@ private fun ActionButtons(
     ) { buttonConfigs ->
         buttonConfigs?.let { buttonConfig ->
             when (buttonConfig.type) {
-                ButtonType.PRIMARY -> Text(stringResource(R.string.passport_identification_capture))
-                ButtonType.SECONDARY -> {
-                    Text(
-                        if (state.scanComplete) stringResource(R.string.passport_biometrics_try_again)
-                        else stringResource(R.string.passport_identification_back)
-                    )
-                }
+                ButtonType.PRIMARY -> Text(stringResource(primaryButtonText))
+                ButtonType.SECONDARY -> Text(stringResource (secondaryButtonText))
             }
         }
     }
@@ -246,25 +260,8 @@ private fun Content(paddingValues: PaddingValues) {
 }
 
 
-private fun handlePassportResult(
-    passportData: PassportData,
-    viewModel: PassportIdentificationViewModel
-) {
-    Log.d("PassportScan", "Passport scanned successfully")
-    Log.d("PassportScan", "Date of Birth: ${passportData.dateOfBirth}")
-    Log.d("PassportScan", "Expiry Date: ${passportData.expiryDate}")
-    Log.d(
-        "PassportScan",
-        "Face Image: ${if (passportData.faceImage != null) "Available" else "Not available"}"
-    )
-
-    // For now, just pass a dummy string since the Event expects String
-    // You can modify the Event class later to accept PassportData if needed
-    viewModel.setEvent(Event.OnPassportScanSuccessful("Passport scan completed"))
-}
-
 @Composable
-fun VerifyYourDataContent(state: State, paddingValues: PaddingValues) {
+fun VerifyYourDataContent(passportData: PassportData, paddingValues: PaddingValues) {
 
     Column(
         modifier = Modifier
@@ -273,7 +270,7 @@ fun VerifyYourDataContent(state: State, paddingValues: PaddingValues) {
             .verticalScroll(rememberScrollState())
     ) {
 
-        PassportVerificationStepBar(0)
+        PassportVerificationStepBar(1)
 
         VSpacer.ExtraLarge()
         WrapText(
@@ -304,59 +301,66 @@ fun VerifyYourDataContent(state: State, paddingValues: PaddingValues) {
                     ),
                 )
 
-                //If your bitmap comes from a ByteArray
-                //val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-                //BitmapImage(bitmap)
+                VSpacer.ExtraLarge()
+
+                PassportImageOrFallback(passportData)
 
                 VSpacer.ExtraLarge()
-                Image(
-                    painter = painterResource(R.drawable.ic_logo_plain), // BitmapPainter(bitmap.asImageBitmap()),,
-                    contentDescription = "Bitmap Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .size(150.dp),
-                    contentScale = ContentScale.Fit
-                )
+                val labelId = R.string.passport_biometrics_dob
+                PassportInfoWithLabel(labelId, passportData?.dateOfBirth)
 
                 VSpacer.ExtraLarge()
-                WrapText(
-                    text = stringResource(R.string.passport_biometrics_dob),
-                    textConfig = TextConfig(
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                )
-
-                VSpacer.Small()
-                WrapText(
-                    text = "13 May 2001",
-                    textConfig = TextConfig(
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    )
-                )
-
-                VSpacer.ExtraLarge()
-                WrapText(
-                    text = stringResource(R.string.passport_biometrics_doe),
-                    textConfig = TextConfig(
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                )
-
-                VSpacer.Small()
-                WrapText(
-                    text = "8 May 2031",
-                    textConfig = TextConfig(
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    )
-                )
+                val labelExpiry = R.string.passport_biometrics_doe
+                PassportInfoWithLabel(labelExpiry, passportData?.expiryDate)
             }
         }
     }
+}
+
+@Composable
+private fun PassportInfoWithLabel(
+    labelId: Int,
+    text: String?
+) {
+    WrapText(
+        text = stringResource(labelId),
+        textConfig = TextConfig(
+            style = MaterialTheme.typography.bodyMedium
+        )
+    )
+
+    VSpacer.Small()
+    WrapText(
+        text = text ?: "Not available",
+        textConfig = TextConfig(
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.SemiBold
+            )
+        )
+    )
+}
+
+@Composable
+private fun PassportImageOrFallback(passportData: PassportData) {
+    passportData?.faceImage?.let { faceImage ->
+        Image(
+            painter = BitmapPainter(faceImage.asImageBitmap()),
+            contentDescription = "Passport Face Image",
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .size(150.dp),
+            contentScale = ContentScale.Fit
+        )
+    } ?: Image(
+        painter = painterResource(R.drawable.ic_logo_plain),
+        contentDescription = "Placeholder Image",
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .size(150.dp),
+        contentScale = ContentScale.Fit
+    )
 }
 
 @Composable
@@ -390,7 +394,7 @@ fun VerifyYourDataContentPreview() {
                 )
             }
         ) { paddingValues ->
-            VerifyYourDataContent(state = State(), paddingValues = paddingValues)
+            VerifyYourDataContent(passportData = PassportData("10/28/1983", "1/31/2033", null), paddingValues = paddingValues)
         }
     }
 }
