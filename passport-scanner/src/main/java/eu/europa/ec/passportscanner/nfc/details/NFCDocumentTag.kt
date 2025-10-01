@@ -22,16 +22,21 @@ import android.graphics.BitmapFactory
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import android.util.Log
+import eu.europa.ec.passportscanner.nfc.passport.Passport
+import eu.europa.ec.passportscanner.nfc.passport.PassportNFC
+import eu.europa.ec.passportscanner.nfc.passport.PassportNfcUtils
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import net.sf.scuba.smartcards.CardService
 import net.sf.scuba.smartcards.CardServiceException
-import eu.europa.ec.passportscanner.nfc.passport.Passport
-import eu.europa.ec.passportscanner.nfc.passport.PassportNFC
-import eu.europa.ec.passportscanner.nfc.passport.PassportNfcUtils
-import org.jmrtd.*
+import org.jmrtd.AccessDeniedException
+import org.jmrtd.BACDeniedException
+import org.jmrtd.MRTDTrustStore
+import org.jmrtd.PACEException
+import org.jmrtd.PassportService
+import org.jmrtd.VerificationStatus
 import org.jmrtd.lds.icao.DG1File
 import org.jmrtd.lds.icao.MRZInfo
 import java.security.Security
@@ -104,7 +109,7 @@ class NFCDocumentTag(val readDG2: Boolean = true) {
                     //Get the picture
                     try {
                         val faceImage =
-                            PassportNfcUtils.retrieveFaceImage(context, passportNFC.dg2File!!)
+                            PassportNfcUtils.retrieveFaceImage(passportNFC.dg2File!!)
                         passport.face = faceImage
                     } catch (e: Exception) {
                         //Don't do anything
@@ -119,7 +124,7 @@ class NFCDocumentTag(val readDG2: Boolean = true) {
                     //Get the picture
                     try {
                         val faceImage =
-                            PassportNfcUtils.retrievePortraitImage(context, passportNFC.dg5File!!)
+                            PassportNfcUtils.retrievePortraitImage(passportNFC.dg5File!!)
                         passport.portrait = faceImage
                     } catch (e: Exception) {
                         //Don't do anything
@@ -183,7 +188,7 @@ class NFCDocumentTag(val readDG2: Boolean = true) {
                     //Get the picture
                     try {
                         val bitmap =
-                            PassportNfcUtils.retrieveSignatureImage(context, passportNFC.dg7File!!)
+                            PassportNfcUtils.retrieveSignatureImage(passportNFC.dg7File!!)
                         passport.signature = bitmap
                     } catch (e: Exception) {
                         //Don't do anything
