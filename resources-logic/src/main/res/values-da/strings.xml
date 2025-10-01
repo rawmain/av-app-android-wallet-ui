@@ -62,6 +62,16 @@
     <string name="passport_biometrics_first_description">Placér dit pas direkte på bagsiden af smartphonen, som regel øverst.</string>
     <string name="passport_biometrics_first_link">Har du brug for hjælp?</string>
 
+    <!-- Passport live video instructions - Danish (da) -->
+    <string name="passport_live_video_header">Optag en hurtig video af dig selv</string>
+    <string name="passport_live_video_description">I dette trin skal du optage en kort video af dig selv for at bekræfte din identitet. Sørg for at:</string>
+    <string name="passport_live_video_step_first">Vend ansigtet direkte mod kameraet i godt lys.</string>
+    <string name="passport_live_video_step_second">Følg instruktionerne på skærmen (f.eks. blink eller drej dit hoved).</string>
+    <string name="passport_live_video_step_third">Undgå filtre, masker eller forhindringer.</string>
+    <string name="passport_live_video_footer">Dette trin sikrer, at du er den rette ejer af pas og forhindrer svindel.</string>
+    <string name="passport_live_video_back">Tilbage</string>
+    <string name="passport_live_video_live_capture">Start live video</string>
+
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Token / QR‑kode</string>
     <string name="onboarding_verification_qr_code_description">Beskrivelse</string>

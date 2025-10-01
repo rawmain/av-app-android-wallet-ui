@@ -62,6 +62,16 @@
     <string name="passport_biometrics_first_description">Placez votre passeport directement à larrière du smartphone, généralement en haut.</string>
     <string name="passport_biometrics_first_link">Besoin d’aide ?</string>
 
+    <!-- Passport live video instructions - French (fr) -->
+    <string name="passport_live_video_header">Enregistrez une courte vidéo de vous-même</string>
+    <string name="passport_live_video_description">À cette étape, vous allez enregistrer une courte vidéo de vous pour confirmer votre identité. Veuillez :</string>
+    <string name="passport_live_video_step_first">Faire face à la caméra directement avec un bon éclairage.</string>
+    <string name="passport_live_video_step_second">Suivre les instructions à lécran (par exemple, cligner des yeux ou tourner la tête).</string>
+    <string name="passport_live_video_step_third">Éviter les filtres, masques ou obstacles.</string>
+    <string name="passport_live_video_footer">Cette étape garantit que vous êtes le propriétaire légitime du passeport et empêche la fraude.</string>
+    <string name="passport_live_video_back">Retour</string>
+    <string name="passport_live_video_live_capture">Démarrer la vidéo en direct</string>
+
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Jeton / Code QR</string>
     <string name="onboarding_verification_qr_code_description">Description</string>
