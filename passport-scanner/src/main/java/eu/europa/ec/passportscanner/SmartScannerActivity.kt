@@ -19,7 +19,6 @@ package eu.europa.ec.passportscanner
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
@@ -37,12 +36,10 @@ import android.view.OrientationEventListener
 import android.view.Surface
 import android.view.View
 import android.view.View.GONE
-import android.view.View.INVISIBLE
 import android.view.View.OnClickListener
 import android.view.View.VISIBLE
 import android.view.ViewTreeObserver
 import android.view.Window
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.camera.camera2.interop.Camera2Interop
 import androidx.camera.core.Camera
@@ -95,15 +92,9 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     companion object {
         val TAG: String = SmartScannerActivity::class.java.simpleName
         const val SCANNER_OPTIONS = "scanner_options"
-        const val SCANNER_RAW_RESULT = "scanner_raw_result"
-        const val SCANNER_HEADER_RESULT = "scanner_header_result"
         const val SCANNER_RESULT = "scanner_result"
         const val SCANNER_INTENT_EXTRAS = "scanner_intent_extras"
-        const val SCANNER_FAIL_RESULT = "scanner_fail_result"
-        const val SCANNER_RESULT_BYTES = "scanner_result_bytes"
         const val SCANNER_IMAGE_TYPE = "scanner_image_type"
-        const val SCANNER_SIGNATURE_VERIFICATION = "scanner_signature_verification"
-        const val SCANNER_JWT_CONFIG_UPDATE = "scanner_jwt_config_update"
         const val SCANNER_SETTINGS_CALL = "scanner_settings"
     }
 
@@ -132,7 +123,6 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     private var xGuideView: View? = null
     private var yGuideView: View? = null
     private var manualCapture: View? = null
-    private var brandingImage: ImageView? = null
     private var captureLabelText: TextView? = null
     private var captureHeaderText: TextView? = null
     private var captureSubHeaderText: TextView? = null
@@ -180,7 +170,6 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         guideWidth = findViewById(R.id.guide_width)
         xGuideView = findViewById(R.id.x_guide)
         yGuideView = findViewById(R.id.y_guide)
-        brandingImage = findViewById(R.id.branding_image)
         manualCapture = findViewById(R.id.manual_capture)
         captureLabelText = findViewById(R.id.capture_label_text)
         captureHeaderText = findViewById(R.id.capture_header_text)
@@ -189,9 +178,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         // Scanner setup from intent
         hideActionBar()
         if (intent.action != null) {
-            scannerOptions = ScannerOptions.defaultForODK().also { options ->
-                if (options == null) throw SmartScannerException("Error: Wrong intent action. Please see smartscanner-android-api for proper intent action strings.")
-            }
+            scannerOptions = ScannerOptions.defaultForODK()
         } else {
             // Use scanner options directly if no scanner type is called
             val options: ScannerOptions? = intent.getParcelableExtra(SCANNER_OPTIONS)
@@ -303,7 +290,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                         )
                     }
                     // Adjust initial zoom ratio of camera to aid high resolution capture of Pdf417 or QR Code or ID PASS Lite
-                    preview?.setSurfaceProvider(viewFinder.surfaceProvider)
+                    preview?.surfaceProvider = viewFinder.surfaceProvider
                     Log.d(
                         TAG,
                         "Measured size: ${viewFinder.width}x${viewFinder.height}"
@@ -411,9 +398,6 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
             // This color string is not valid
             throw SmartScannerException("Please set proper color string in setting background. Example: '#ffc234' ")
         }
-        // branding
-        brandingImage?.visibility =
-            config?.branding?.let { if (it) VISIBLE else INVISIBLE } ?: run { INVISIBLE }
         // manual capture
         manualCapture?.visibility = config?.isManualCapture?.let {
             if (it) VISIBLE else GONE
@@ -531,7 +515,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                             val result: Any = ImageResult(imageString)
                             data.putExtra(SCANNER_IMAGE_TYPE, config?.imageResultType)
                             data.putExtra(SCANNER_RESULT, Gson().toJson(result))
-                            setResult(Activity.RESULT_OK, data)
+                            setResult(RESULT_OK, data)
                             finish()
                         }
 
@@ -554,7 +538,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         data.putExtra(SCANNER_SETTINGS_CALL, true)
         data.putExtra(SCANNER_INTENT_EXTRAS, scannerOptions)
 
-        setResult(Activity.RESULT_OK, data)
+        setResult(RESULT_OK, data)
         this.finish()
     }
 

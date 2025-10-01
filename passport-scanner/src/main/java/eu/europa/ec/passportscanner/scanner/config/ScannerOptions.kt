@@ -35,7 +35,6 @@ data class ScannerOptions(
             nfcOptions = NFCOptions.default,
             config = Config(
                 isManualCapture = false,
-                branding = true
             )
         )
     }

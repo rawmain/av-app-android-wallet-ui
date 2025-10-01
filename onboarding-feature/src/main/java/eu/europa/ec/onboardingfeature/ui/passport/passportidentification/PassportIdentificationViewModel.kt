@@ -73,7 +73,6 @@ class PassportIdentificationViewModel(
                             header = resourceProvider.getString(eu.europa.ec.resourceslogic.R.string.passport_identification_capture),
                             subHeader = resourceProvider.getString(eu.europa.ec.resourceslogic.R.string.passport_identification_title),
                             isManualCapture = false,
-                            branding = true,
                             showGuide = true,
                             showSettings = false
                         ),

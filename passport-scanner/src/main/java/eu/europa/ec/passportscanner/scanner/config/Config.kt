@@ -24,7 +24,6 @@ import eu.europa.ec.passportscanner.utils.extension.empty
 @Parcelize
 data class Config(
     val background: String? = null,
-    val branding: Boolean? = null,
     val imageResultType: String? = null,
     val isManualCapture: Boolean? = null,
     val header: String? = null,
@@ -40,19 +39,8 @@ data class Config(
     val heightGuide: Int = 60
 ) : Parcelable {
     companion object {
-        const val CONFIG_PUB_KEY = "CONFIG_PUB_KEY"
-        const val CONFIG_PROFILE_NAME = "CONFIG_PROFILE_NAME"
-        const val ORIENTATION = "ORIENTATION"
-        const val REGEX = "REGEX"
-        const val WIDTH_GUIDE = "WIDTH_GUIDE"
-        const val HEIGHT_GUIDE = "HEIGHT_GUIDE"
-        const val X_GUIDE = "X_GUIDE"
-        const val Y_GUIDE = "Y_GUIDE"
-        const val SHARED = "SHARED"
-
         val default = Config(
             background = String.empty(),
-            branding = true,
             imageResultType = ImageResultType.PATH.value,
             isManualCapture = false,
             header = String.empty(),
