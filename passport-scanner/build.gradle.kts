@@ -65,6 +65,8 @@ configurations.all {
 dependencies {
     implementation(files("libs/jj2000_imageutil.jar"))
 
+    implementation(libs.keyless)
+
     // Core Android dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

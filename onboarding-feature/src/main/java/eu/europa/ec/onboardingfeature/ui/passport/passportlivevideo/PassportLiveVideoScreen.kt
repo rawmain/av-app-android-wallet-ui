@@ -38,6 +38,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.Effect.Navigation
+import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
+import eu.europa.ec.passportscanner.face.AVFaceMatchSdkImpl
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.BulletHolder
 import eu.europa.ec.uilogic.component.PassportVerificationStepBar
@@ -53,9 +55,6 @@ import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
-import kl.open.fmandroid.FaceMatchSDK
-import kl.open.fmandroid.FaceMatchSdkImpl
-import java.io.File
 
 @Composable
 fun PassportLiveVideoScreen(
@@ -65,8 +64,8 @@ fun PassportLiveVideoScreen(
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val faceMatchSdk: FaceMatchSDK by lazy {
-        FaceMatchSdkImpl(context.applicationContext).apply {
+    val faceMatchSdk: AVFaceMatchSDK by lazy {
+        AVFaceMatchSdkImpl(context.applicationContext).apply {
             val configJson =
                 context.assets.open("keyless_config.json").bufferedReader().use { it.readText() }
             init(configJson)
@@ -100,7 +99,7 @@ fun PassportLiveVideoScreen(
     }
 }
 
-fun startCapturing(context: Context, faceMatchSdk: FaceMatchSDK, faceImageTempPath: String) {
+fun startCapturing(context: Context, faceMatchSdk: AVFaceMatchSDK, faceImageTempPath: String) {
     Log.d("PassportLiveVideoScreen", "start capture & match using face image: $faceImageTempPath")
 
     // Use the face image from passport scanning
