@@ -16,6 +16,7 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportidentification
 
+import android.content.Context
 import android.graphics.Bitmap
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
@@ -31,8 +32,8 @@ import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.android.annotation.KoinViewModel
-import java.io.ByteArrayOutputStream
-import kotlin.io.encoding.Base64
+import java.io.File
+import java.io.FileOutputStream
 
 data class State(
     val isLoading: Boolean = false,
@@ -60,6 +61,7 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class PassportIdentificationViewModel(
+    private val context: Context,
     private val logController: LogController,
     private val uiSerializer: UiSerializer,
 ) : MviViewModel<Event, State, Effect>() {
@@ -96,14 +98,14 @@ class PassportIdentificationViewModel(
     )
 
     private fun generateUiConfig(passportData: PassportData): PassportLiveVideoUiConfig {
-        val stream = ByteArrayOutputStream()
-        passportData.faceImage!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
-        val source = stream.toByteArray()
-        val faceImage = Base64.encode(source)
+        val tempFile = File(context.cacheDir, "passport_face_${System.currentTimeMillis()}.png")
+        FileOutputStream(tempFile).use { fos ->
+            passportData.faceImage!!.compress(Bitmap.CompressFormat.PNG, 100, fos)
+        }
         return PassportLiveVideoUiConfig(
             dateOfBirth = passportData.dateOfBirth!!,
             expiryDate = passportData.expiryDate!!,
-            faceImage = faceImage,
+            faceImageTempPath = tempFile.absolutePath,
         )
     }
 }

@@ -17,6 +17,7 @@
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -29,6 +30,7 @@ private const val TAG = "PassportLiveVideoViewModel"
 
 data class State(
     val isLoading: Boolean = false,
+    val config: PassportLiveVideoUiConfig? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -52,7 +54,12 @@ class PassportLiveVideoViewModel(
 
     override fun setInitialState(): State {
         logController.i { "get the following param=$passportLiveVideoSerializedConfig" }
-        return State()
+        val config: PassportLiveVideoUiConfig? = uiSerializer.fromBase64(
+            passportLiveVideoSerializedConfig,
+            PassportLiveVideoUiConfig::class.java,
+            PassportLiveVideoUiConfig.Parser
+        )
+        return State(config = config)
     }
 
     override fun handleEvents(event: Event) {

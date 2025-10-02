@@ -17,8 +17,6 @@
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -58,7 +56,6 @@ import eu.europa.ec.uilogic.component.wrap.WrapText
 import kl.open.fmandroid.FaceMatchSDK
 import kl.open.fmandroid.FaceMatchSdkImpl
 import java.io.File
-import java.io.FileOutputStream
 
 @Composable
 fun PassportLiveVideoScreen(
@@ -93,32 +90,30 @@ fun PassportLiveVideoScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is Navigation.GoBack -> controller.popBackStack()
-                Navigation.StartVideoLiceCapture -> startCapturing(context, faceMatchSdk)
+                Navigation.StartVideoLiceCapture -> {
+                    state.config?.let { config ->
+                        startCapturing(context, faceMatchSdk, config.faceImageTempPath)
+                    }
+                }
             }
         }
     }
 }
 
-private fun referenceImageFile(context: Context): File =
-    File(context.getExternalFilesDir(null), "reference_image.png")
+fun startCapturing(context: Context, faceMatchSdk: FaceMatchSDK, faceImageTempPath: String) {
+    Log.d("PassportLiveVideoScreen", "start capture & match using face image: $faceImageTempPath")
 
-fun startCapturing(context: Context, faceMatchSdk: FaceMatchSDK) {
-    // TODO use picture from MRZ & passport scanning
-    Log.d("test", "start capture & match")
-    val defaultBitmap = BitmapFactory.decodeStream(context.assets.open("hasan.jpg"))
-    val pngFile = referenceImageFile(context)
-    FileOutputStream(pngFile).use { out ->
-        defaultBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-    }
-    faceMatchSdk.captureAndMatch(pngFile.absolutePath) { result ->
-        Log.d("test", "get result: $result")
+    // Use the face image from passport scanning
+    faceMatchSdk.captureAndMatch(faceImageTempPath) { result ->
+        Log.d("PassportLiveVideoScreen", "get result: $result")
         if (result.processed && result.capturedIsLive && result.isSameSubject) {
             Toast.makeText(context, "Same Person as passport -> Next Page", Toast.LENGTH_SHORT)
                 .show()
         } else {
             Toast.makeText(context, "not matching -> Show Error", Toast.LENGTH_SHORT).show()
         }
-        pngFile.delete()
+        // Clean up the temporary file after use
+        File(faceImageTempPath).delete()
     }
 }
 
