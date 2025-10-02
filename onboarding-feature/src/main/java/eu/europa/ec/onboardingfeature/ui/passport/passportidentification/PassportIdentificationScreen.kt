@@ -92,10 +92,10 @@ fun PassportIdentificationScreen(
                 result.data?.let { intent ->
                     val passportData =
                         PassportScannerIntentHelper.extractPassportDataFromIntent(intent)
-                    if (passportData.dateOfBirth != null || passportData.expiryDate != null) {
-                        viewModel.setEvent(OnPassportScanSuccessful(passportData))
-                    } else {
+                    if (passportData.dateOfBirth == null && passportData.expiryDate == null && passportData.faceImage == null) {
                         viewModel.setEvent(Event.OnPassportScanFailed("No passport data received"))
+                    } else {
+                        viewModel.setEvent(OnPassportScanSuccessful(passportData))
                     }
                 }
             }
@@ -207,7 +207,9 @@ private fun handleEffect(
             )
         )
 
-        is Navigation.StartPassportLiveCheck -> hostNavController.navigate(PassportLiveVideo.screenRoute)
+        is Navigation.StartPassportLiveCheck -> {
+            hostNavController.navigate(effect.screenRoute)
+        }
     }
 }
 

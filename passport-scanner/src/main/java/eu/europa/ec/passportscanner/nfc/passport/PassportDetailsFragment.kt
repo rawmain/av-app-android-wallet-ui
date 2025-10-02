@@ -51,7 +51,6 @@ class PassportDetailsFragment : androidx.fragment.app.Fragment() {
     internal var simpleDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
 
     private var passport: Passport? = null
-    private var language: String? = null
     private var locale: String? = null
     private lateinit var binding : FragmentPassportDetailsBinding
 
@@ -100,7 +99,7 @@ class PassportDetailsFragment : androidx.fragment.app.Fragment() {
             binding.iconPhoto.setImageBitmap(passport.portrait)
         }
 
-        val resultDetails = NFCResult.formatResult(passport, locale)
+        val resultDetails = NFCResult.formatResult(passport)
         binding.valueName.text = resultDetails.givenNames
         binding.lname.text = resultDetails.surname
         binding.valueDOB.text = resultDetails.dateOfBirth

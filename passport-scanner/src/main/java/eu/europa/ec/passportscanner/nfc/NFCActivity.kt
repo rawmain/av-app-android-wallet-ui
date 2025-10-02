@@ -168,7 +168,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
 
     override fun onPassportRead(passport: Passport?) {
         val action = intent.getStringExtra(ScannerConstants.NFC_ACTION)
-        val nfcResult = NFCResult.formatResult(passport = passport, locale = locale, mrzInfo = mrzInfo, mrzImage = mrzImage)
+        val nfcResult = NFCResult.formatResult(passport = passport, mrzInfo = mrzInfo, mrzImage = mrzImage)
 
         Log.d(TAG, "NFC_ACTION from intent: '$action'")
         Log.d(TAG, "Expected IDPASS_SMARTSCANNER_NFC_INTENT: '${ScannerConstants.IDPASS_SMARTSCANNER_NFC_INTENT}'")
@@ -208,7 +208,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
                     is Int -> result.putExtra(prefix + key, value)
                 }
             }
-            setResult(Activity.RESULT_OK, result)
+            setResult(RESULT_OK, result)
             finish()
         } else {
             // Send NFC Results via App

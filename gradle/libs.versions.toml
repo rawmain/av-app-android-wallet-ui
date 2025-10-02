@@ -79,6 +79,7 @@ legacySupportV4 = "1.0.0"
 constraintlayout = "2.1.4"
 mlkitTextRecognition = "16.0.1"
 jnbis = "2.1.2"
+keyless = "0.0.4"
 
 [libraries]
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
@@ -179,6 +180,7 @@ androidx-legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 mlkit-text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mlkitTextRecognition" }
 jnbis = { group = "com.github.mhshams", name = "jnbis", version.ref = "jnbis" }
+keyless = { group = "kl.open", name = "facematchsdk", version.ref = "keyless" }
 
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }

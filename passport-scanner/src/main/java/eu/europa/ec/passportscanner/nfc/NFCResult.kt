@@ -59,7 +59,6 @@ data class NFCResult(
         @RequiresApi(Build.VERSION_CODES.O)
         fun formatResult(
             passport: Passport?,
-            locale: String?,
             mrzInfo: MRZInfo? = null,
             image: String? = null,
             mrzImage: String? = null

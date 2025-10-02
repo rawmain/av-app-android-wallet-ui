@@ -17,13 +17,13 @@
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.android.annotation.KoinViewModel
+import org.koin.core.annotation.InjectedParam
 
 private const val TAG = "PassportLiveVideoViewModel"
 
@@ -32,7 +32,6 @@ data class State(
 ) : ViewState
 
 sealed class Event : ViewEvent {
-    data object Init : Event()
     data object OnBackPressed : Event()
     data object OnLiveVideoCapture : Event()
 }
@@ -40,44 +39,33 @@ sealed class Event : ViewEvent {
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
-        data class SwitchScreen(val screenRoute: String, val inclusive: Boolean) : Navigation()
+        data object StartVideoLiceCapture : Navigation()
     }
 }
 
 @KoinViewModel
 class PassportLiveVideoViewModel(
-    private val resourceProvider: ResourceProvider,
     private val uiSerializer: UiSerializer,
-    private val logController: LogController
+    private val logController: LogController,
+    @InjectedParam private val passportLiveVideoSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
-    override fun setInitialState(): State = State()
+    override fun setInitialState(): State {
+        logController.i { "get the following param=$passportLiveVideoSerializedConfig" }
+        return State()
+    }
 
     override fun handleEvents(event: Event) {
-        when(event) {
-
-            // Do pre-processing of screen
-            Event.Init -> { logController.i(TAG) { "Event invoked Init" } }
-
-            // Navigate to back since user fired back button
+        when (event) {
             Event.OnBackPressed -> setEffect {
                 logController.i(TAG) { "Event invoked OnBackPressed " }
                 Effect.Navigation.GoBack
             }
 
             Event.OnLiveVideoCapture -> {
-                logController.i(TAG) { "Event invoked OnLiveVideoCapture" }
-                processRequestedNavigation()
+                logController.i(tag = TAG) { "Event invoked OnLiveVideoCapture" }
+                setEffect { Effect.Navigation.StartVideoLiceCapture }
             }
-        }
-    }
-
-    private fun processRequestedNavigation() {
-        setEffect {
-            Effect.Navigation.SwitchScreen(
-                // fixme : replace the TAG with the generateComposableNavigationLink
-                TAG, false
-            )
         }
     }
 }

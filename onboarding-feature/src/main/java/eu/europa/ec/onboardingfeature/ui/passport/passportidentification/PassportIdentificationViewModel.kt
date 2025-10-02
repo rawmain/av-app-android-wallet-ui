@@ -16,7 +16,9 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportidentification
 
+import android.graphics.Bitmap
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.GoBack
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.StartMRZScanner
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.StartPassportLiveCheck
@@ -24,7 +26,13 @@ import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
+import eu.europa.ec.uilogic.navigation.OnboardingScreens
+import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
+import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
+import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.android.annotation.KoinViewModel
+import java.io.ByteArrayOutputStream
+import kotlin.io.encoding.Base64
 
 data class State(
     val isLoading: Boolean = false,
@@ -46,13 +54,14 @@ sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
         data object StartMRZScanner : Navigation()
-        data object StartPassportLiveCheck : Navigation()
+        data class StartPassportLiveCheck(val screenRoute: String) : Navigation()
     }
 }
 
 @KoinViewModel
 class PassportIdentificationViewModel(
     private val logController: LogController,
+    private val uiSerializer: UiSerializer,
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State = State()
@@ -62,7 +71,7 @@ class PassportIdentificationViewModel(
             Event.Init -> logController.i { "Init -- PassportIdentificationViewModel " }
             Event.OnBackPressed -> setEffect { GoBack }
             Event.OnStartPassportScan -> setEffect { StartMRZScanner }
-            Event.OnPassportVerificationCompletion -> setEffect { StartPassportLiveCheck }
+            Event.OnPassportVerificationCompletion -> setEffect { generatePasswordLiveLink(viewState.value.passportData!!) }
             Event.OnProcessRestartRequest -> setEffect { GoBack }
             is Event.OnPassportScanSuccessful -> setState { copy(scanComplete = true, passportData = event.passportData) }
             is Event.OnPassportScanFailed -> {
@@ -70,5 +79,31 @@ class PassportIdentificationViewModel(
                 setState { copy(scanComplete = false, passportData = null) }
             }
         }
+    }
+
+    private fun generatePasswordLiveLink(passportData: PassportData): StartPassportLiveCheck = StartPassportLiveCheck(
+        generateComposableNavigationLink(
+            OnboardingScreens.PassportLiveVideo,
+            generateComposableArguments(
+                mapOf(
+                    PassportLiveVideoUiConfig.serializedKeyName to uiSerializer.toBase64(
+                        generateUiConfig(passportData),
+                        PassportLiveVideoUiConfig.Parser
+                    )
+                )
+            )
+        )
+    )
+
+    private fun generateUiConfig(passportData: PassportData): PassportLiveVideoUiConfig {
+        val stream = ByteArrayOutputStream()
+        passportData.faceImage!!.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        val source = stream.toByteArray()
+        val faceImage = Base64.encode(source)
+        return PassportLiveVideoUiConfig(
+            dateOfBirth = passportData.dateOfBirth!!,
+            expiryDate = passportData.expiryDate!!,
+            faceImage = faceImage,
+        )
     }
 }

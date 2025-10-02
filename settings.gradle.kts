@@ -30,6 +30,14 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {
+            name = "Cloudsmith"
+            url = uri("https://dl.cloudsmith.io/gnKsVFVfev0qW2xd/keyless/open_mobile_biometrics/maven/")
+            credentials {
+                username = "token"
+                password = "gnKsVFVfev0qW2xd"
+            }
+        }
+        maven {
             url = uri("https://central.sonatype.com/repository/maven-snapshots/")
             mavenContent { snapshotsOnly() }
         }

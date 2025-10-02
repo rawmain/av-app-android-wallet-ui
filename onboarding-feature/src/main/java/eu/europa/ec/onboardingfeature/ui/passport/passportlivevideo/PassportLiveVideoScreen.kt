@@ -16,6 +16,11 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,10 +34,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.Effect.Navigation
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.BulletHolder
 import eu.europa.ec.uilogic.component.PassportVerificationStepBar
@@ -48,18 +55,34 @@ import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
+import kl.open.fmandroid.FaceMatchSDK
+import kl.open.fmandroid.FaceMatchSdkImpl
+import java.io.File
+import java.io.FileOutputStream
 
 @Composable
-fun PassportLiveVideoScreen(controller: NavController, viewModel: PassportLiveVideoViewModel) {
+fun PassportLiveVideoScreen(
+    controller: NavController,
+    viewModel: PassportLiveVideoViewModel
+) {
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val faceMatchSdk: FaceMatchSDK by lazy {
+        FaceMatchSdkImpl(context.applicationContext).apply {
+            val configJson =
+                context.assets.open("keyless_config.json").bufferedReader().use { it.readText() }
+            init(configJson)
+        }
+    }
 
     ContentScreen(
         isLoading = state.isLoading,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.OnBackPressed) },
         stickyBottom = { paddingValues ->
-            ActionButtons(paddings = paddingValues,
+            ActionButtons(
+                paddings = paddingValues,
                 onBack = { viewModel.setEvent(Event.OnBackPressed) },
                 onLiveVideo = { viewModel.setEvent(Event.OnLiveVideoCapture) }
             )
@@ -69,32 +92,54 @@ fun PassportLiveVideoScreen(controller: NavController, viewModel: PassportLiveVi
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is Effect.Navigation.GoBack -> controller.popBackStack()
-                is Effect.Navigation.SwitchScreen -> controller.navigate(effect.screenRoute)
+                is Navigation.GoBack -> controller.popBackStack()
+                Navigation.StartVideoLiceCapture -> startCapturing(context, faceMatchSdk)
             }
         }
     }
+}
 
-    LaunchedEffect(Unit) {
-        viewModel.setEvent(Event.Init)
+private fun referenceImageFile(context: Context): File =
+    File(context.getExternalFilesDir(null), "reference_image.png")
+
+fun startCapturing(context: Context, faceMatchSdk: FaceMatchSDK) {
+    // TODO use picture from MRZ & passport scanning
+    Log.d("test", "start capture & match")
+    val defaultBitmap = BitmapFactory.decodeStream(context.assets.open("hasan.jpg"))
+    val pngFile = referenceImageFile(context)
+    FileOutputStream(pngFile).use { out ->
+        defaultBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+    }
+    faceMatchSdk.captureAndMatch(pngFile.absolutePath) { result ->
+        Log.d("test", "get result: $result")
+        if (result.processed && result.capturedIsLive && result.isSameSubject) {
+            Toast.makeText(context, "Same Person as passport -> Next Page", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            Toast.makeText(context, "not matching -> Show Error", Toast.LENGTH_SHORT).show()
+        }
+        pngFile.delete()
     }
 }
 
 @Composable
-private fun ActionButtons(onBack : () -> Unit, onLiveVideo : () -> Unit, paddings: PaddingValues) {
+private fun ActionButtons(onBack: () -> Unit, onLiveVideo: () -> Unit, paddings: PaddingValues) {
 
     val buttons = StickyBottomType.TwoButtons(
         primaryButtonConfig = ButtonConfig(
             type = ButtonType.SECONDARY,
-            onClick = { onBack }
+            onClick = onBack
         ),
         secondaryButtonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
-            onClick = { onLiveVideo }
+            onClick = onLiveVideo
         )
     )
 
-    WrapStickyBottomContent(stickyBottomModifier = Modifier.fillMaxWidth().padding(paddings),
+    WrapStickyBottomContent(
+        stickyBottomModifier = Modifier
+            .fillMaxWidth()
+            .padding(paddings),
         stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)
     ) { buttonConfigs ->
         buttonConfigs?.let { buttonConfig ->
@@ -109,10 +154,12 @@ private fun ActionButtons(onBack : () -> Unit, onLiveVideo : () -> Unit, padding
 @Composable
 private fun Content(paddingValues: PaddingValues) {
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(paddingValues)
-        .verticalScroll(rememberScrollState())) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
+    ) {
 
         PassportVerificationStepBar(2)
 
@@ -161,7 +208,8 @@ private fun PassportLiveVideoScreenPreview() {
             navigatableAction = ScreenNavigateAction.NONE,
             onBack = {},
             stickyBottom = { paddingValues ->
-                ActionButtons(paddings = paddingValues,
+                ActionButtons(
+                    paddings = paddingValues,
                     onBack = {},
                     onLiveVideo = {}
                 )
