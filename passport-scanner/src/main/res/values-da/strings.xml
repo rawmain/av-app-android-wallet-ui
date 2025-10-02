@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nfc_title_initial">Læs dit pas ind</string>
+    <string name="nfc_title_reading">Læs dit pas ind via NFC-interface</string>
+    <string name="nfc_body_initial">Placer dit pas direkte på bagsiden af smartphonen, normalt øverst.</string>
+    <string name="nfc_body_reading">Passet bliver læst</string>
+    <string name="nfc_help_link"><u>Har du brug for hjælp?</u></string>
+</resources>
