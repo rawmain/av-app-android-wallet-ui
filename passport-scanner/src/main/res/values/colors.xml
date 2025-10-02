@@ -36,4 +36,11 @@
   <color name="product_description">#5F6368</color>
   <color name="toogle_text_color">#2A3764</color>
   <color name="status_text">#ffffffff</color> <!-- status_view_top/status_view_bottom text color -->
+
+  <!-- NFC Screen colors -->
+  <color name="nfc_title_color">#222433</color>
+  <color name="nfc_body_color">#222433</color>
+  <color name="nfc_link_color">#1544C5</color>
+  <color name="nfc_progress_color">#1544C5</color>
+  <color name="nfc_progress_track_color">#DFDFDF</color>
 </resources>

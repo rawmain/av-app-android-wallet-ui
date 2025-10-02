@@ -114,6 +114,9 @@ dependencies {
     // WorkManager
     implementation(libs.androidx.work.ktx)
 
+    // Browser (for Custom Tabs)
+    implementation(libs.androidx.browser)
+
     // JWT
     api("io.jsonwebtoken:jjwt-api:0.13.0")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")

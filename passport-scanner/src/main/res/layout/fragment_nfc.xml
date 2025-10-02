@@ -1,125 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:fillViewport="true">
 
-    <TableLayout
-        android:layout_gravity="center"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/margin_small"
-        android:stretchColumns="*"
-        android:paddingBottom="@dimen/margin_medium"
-        android:layout_above="@+id/progressBar">
+        android:orientation="vertical"
+        android:padding="@dimen/nfc_screen_padding">
 
-        <TableRow
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tv_nfc_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/margin_small">
+            android:paddingTop="@dimen/nfc_title_padding_top"
+            android:paddingBottom="@dimen/nfc_title_padding_bottom"
+            android:text="@string/nfc_title_initial"
+            android:textColor="@color/nfc_title_color"
+            android:textSize="@dimen/nfc_title_text_size"
+            android:textStyle="bold" />
 
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+        <!-- Passport Image -->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iconNfc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:paddingBottom="@dimen/nfc_image_padding_bottom"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_passport_reading" />
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/iconNfc"
-                    android:layout_width="@dimen/item_photo_width"
-                    android:layout_height="@dimen/item_photo_height"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_passport"
-                    android:layout_marginEnd="@dimen/margin_medium"
-                    />
+        <!-- Body text -->
+        <TextView
+            android:id="@+id/tv_nfc_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/nfc_body_padding_bottom"
+            android:text="@string/nfc_body_initial"
+            android:textColor="@color/nfc_body_color"
+            android:textSize="@dimen/nfc_body_text_size" />
 
-                <TableLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/margin_medium"
-                    android:shrinkColumns="*"
-                    android:layout_weight="1">
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false"
+            android:max="100"
+            android:paddingBottom="@dimen/nfc_progress_padding_bottom"
+            android:progress="0"
+            android:progressBackgroundTint="@color/nfc_progress_track_color"
+            android:progressTint="@color/nfc_progress_color"
+            android:visibility="gone" />
 
-                    <TableRow
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+        <!-- Help Link (minHeight for meeting min touch area) -->
+        <TextView
+            android:id="@+id/tv_help_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:minHeight="48dp"
+            android:paddingTop="@dimen/nfc_link_padding_top"
+            android:paddingBottom="@dimen/nfc_link_padding_bottom"
+            android:text="@string/nfc_help_link"
+            android:textColor="@color/nfc_link_color"
+            android:textSize="@dimen/nfc_body_text_size" />
 
-                        <TextView
-                            android:id="@+id/value_passport_number"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:padding="@dimen/margin_tiny"
-                            android:textColor="@color/idpass_black"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
-                    </TableRow>
+        <!-- Hidden views for MRZ data (kept for compatibility) -->
+        <TextView
+            android:id="@+id/value_passport_number"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-                    <TableRow
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/value_DOB"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-                        <TextView
-                            android:id="@+id/value_DOB"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:padding="@dimen/margin_tiny"
-                            android:textColor="@color/idpass_black"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
-                    </TableRow>
+        <TextView
+            android:id="@+id/value_expiration_date"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-                    <TableRow
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/status_view_bottom"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
 
-                        <TextView
-                            android:id="@+id/value_expiration_date"
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:padding="@dimen/margin_tiny"
-                            android:textColor="@color/idpass_black"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
-                    </TableRow>
-                </TableLayout>
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-        </TableRow>
-    </TableLayout>
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tv_nfc_title"
-        android:layout_alignRight="@+id/tv_nfc_title"
-        android:layout_above="@+id/tv_nfc_title"
-        android:indeterminateTint="@color/grey"
-        android:indeterminate="true"
-        android:visibility="gone"
-        />
-
-    <TextView
-        android:id="@+id/tv_nfc_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/nfc_title"
-        android:gravity="center"
-        android:layout_centerInParent="true"
-        android:textSize="14sp"
-        android:textColor="@color/grey"
-        android:layout_margin="14dp"/>
-
-    <TextView android:id="@+id/status_view_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="14dp"
-        android:background="#0000"
-        android:text=""
-        android:textColor="@color/status_text"
-        android:textSize="14sp"
-        android:autoLink="web"
-        android:clickable="true" />
-</RelativeLayout>
+    </LinearLayout>
+</ScrollView>
