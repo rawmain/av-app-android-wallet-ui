@@ -17,7 +17,6 @@
  */
 package eu.europa.ec.passportscanner.nfc.passport
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import eu.europa.ec.passportscanner.utils.ImageUtils
@@ -128,7 +127,7 @@ object PassportNfcUtils {
     }
 
     @Throws(IOException::class)
-    fun retrieveFingerPrintImage(context: Context, dg3File: DG3File): List<Bitmap> {
+    fun retrieveFingerPrintImage(dg3File: DG3File): List<Bitmap> {
         val allFingerImageInfos = ArrayList<FingerImageInfo>()
         val fingerInfos = dg3File.fingerInfos
 
@@ -251,10 +250,10 @@ object PassportNfcUtils {
                 selector.serialNumber = sodSerialNumber
             }
 
-            val docStoreParams = CollectionCertStoreParameters(setOf<Certificate>(docSigningCertificate as Certificate))
+            val docStoreParams = CollectionCertStoreParameters(setOf(docSigningCertificate as Certificate))
             val docStore = CertStore.getInstance("Collection", docStoreParams)
 
-            val builder = CertPathBuilder.getInstance("PKIX", "SC")//Spungy castle
+            val builder = CertPathBuilder.getInstance("PKIX", "SC")
             val buildParams = PKIXBuilderParameters(cscaTrustAnchors, selector)
             buildParams.addCertStore(docStore)
             for (trustStore in cscaStores) {

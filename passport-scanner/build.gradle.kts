@@ -63,7 +63,6 @@ configurations.all {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(files("libs/jj2000_imageutil.jar"))
 
     // Core Android dependencies

@@ -25,8 +25,6 @@ import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.SmartScannerActivity
 import eu.europa.ec.passportscanner.mrz.MRZAnalyzer
 import eu.europa.ec.passportscanner.mrz.MRZCleaner
-import eu.europa.ec.passportscanner.mrz.MRZResult
-import eu.europa.ec.passportscanner.nfc.NFCActivity.Companion.FOR_SMARTSCANNER_APP
 import eu.europa.ec.passportscanner.nfc.details.IntentData
 
 open class NFCScanAnalyzer(
@@ -34,7 +32,7 @@ open class NFCScanAnalyzer(
     override val intent: Intent,
     private val label: String?,
     private val locale: String?,
-    private val imageResultType: String,
+    imageResultType: String,
     format: String? = null,
     isShowGuide: Boolean? = false
 ) : MRZAnalyzer(
@@ -49,11 +47,6 @@ open class NFCScanAnalyzer(
         Log.d(SmartScannerActivity.TAG, "Success from NFC -- SCAN")
         val nfcIntent = Intent(activity, NFCActivity::class.java)
         when {
-            intent.hasExtra(FOR_SMARTSCANNER_APP) -> nfcIntent.putExtra(
-                FOR_SMARTSCANNER_APP,
-                true
-            )
-
             intent.action == ScannerConstants.IDPASS_SMARTSCANNER_NFC_INTENT ||
                     intent.action == ScannerConstants.IDPASS_SMARTSCANNER_ODK_NFC_INTENT -> nfcIntent.putExtra(
                 ScannerConstants.NFC_ACTION,

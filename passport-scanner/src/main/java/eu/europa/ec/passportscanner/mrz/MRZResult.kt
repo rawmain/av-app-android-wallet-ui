@@ -42,15 +42,16 @@ data class MRZResult(
 ) {
     companion object {
         fun formatMrzResult(record: MrzRecord, image: String? = "") : MRZResult {
-            val dateOfBirth = DateUtils.toAdjustedDate(record.dateOfBirth?.toString()?.replace(Regex("[{}]"), ""))
-            val expirationDate = DateUtils.toReadableDate(record.expirationDate?.toString()?.replace(Regex("[{}]"), ""))
+            val dateOfBirth = DateUtils.toAdjustedDate(record.dateOfBirth.toString().replace(Regex("[{}]"), ""))
+            val expirationDate = DateUtils.toReadableDate(
+                record.expirationDate.toString().replace(Regex("[{}]"), ""))
             return MRZResult(
                     image = image,
                     code = record.code.toString(),
-                    code1 = record.code1.toShort(),
-                    code2 = record.code2.toShort(),
+                    code1 = record.code1.code.toShort(),
+                    code2 = record.code2.code.toShort(),
                     dateOfBirth = dateOfBirth,
-                    documentNumber = record.documentNumber.toString(),
+                    documentNumber = record.documentNumber,
                     expirationDate = expirationDate,
                     format = record.format.toString(),
                     givenNames = record.givenNames,
@@ -63,15 +64,15 @@ data class MRZResult(
         }
 
         fun formatMrtdTd1Result(record: MrtdTd1, image: String?) : MRZResult {
-            val dateOfBirth = DateUtils.toAdjustedDate(record.dateOfBirth?.toString()?.replace(Regex("[{}]"), ""))
-            val expirationDate = DateUtils.toReadableDate(record.expirationDate?.toString()?.replace(Regex("[{}]"), ""))
+            val dateOfBirth = DateUtils.toAdjustedDate(record.dateOfBirth.toString().replace(Regex("[{}]"), ""))
+            val expirationDate = DateUtils.toReadableDate(record.expirationDate.toString().replace(Regex("[{}]"), ""))
             return MRZResult(
                     image = image,
                     code = record.code.toString(),
-                    code1 = record.code1.toShort(),
-                    code2 = record.code2.toShort(),
+                    code1 = record.code1.code.toShort(),
+                    code2 = record.code2.code.toShort(),
                     dateOfBirth = dateOfBirth,
-                    documentNumber = record.documentNumber.toString(),
+                    documentNumber = record.documentNumber,
                     expirationDate = expirationDate,
                     format = record.format.toString(),
                     givenNames = record.givenNames,

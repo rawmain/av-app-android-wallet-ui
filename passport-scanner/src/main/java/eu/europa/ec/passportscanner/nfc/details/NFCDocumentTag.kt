@@ -175,7 +175,6 @@ class NFCDocumentTag(val readDG2: Boolean = true) {
                     //Get the picture
                     try {
                         val bitmaps = PassportNfcUtils.retrieveFingerPrintImage(
-                            context,
                             passportNFC.dg3File!!
                         )
                         passport.fingerprints = bitmaps

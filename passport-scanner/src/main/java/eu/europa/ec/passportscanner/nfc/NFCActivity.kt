@@ -20,7 +20,6 @@ package eu.europa.ec.passportscanner.nfc
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
-import android.graphics.Bitmap
 import android.nfc.NfcAdapter
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
@@ -36,21 +35,14 @@ import eu.europa.ec.passportscanner.SmartScannerActivity
 import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.nfc.details.IntentData
 import eu.europa.ec.passportscanner.nfc.passport.Passport
-import eu.europa.ec.passportscanner.nfc.passport.PassportDetailsFragment
-import eu.europa.ec.passportscanner.nfc.passport.PassportPhotoFragment
 import org.jmrtd.lds.icao.MRZInfo
 
 
-class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, PassportDetailsFragment.PassportDetailsFragmentListener, PassportPhotoFragment.PassportPhotoFragmentListener {
+class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
 
     companion object {
         private val TAG = NFCActivity::class.java.simpleName
-
         private val TAG_NFC = "TAG_NFC"
-        private val TAG_PASSPORT_DETAILS = "TAG_PASSPORT_DETAILS"
-        private val TAG_PASSPORT_PICTURE = "TAG_PASSPORT_PICTURE"
-
-        const val FOR_SMARTSCANNER_APP = "FOR_SMARTSCANNER_APP"
     }
 
     private var mrzInfo: MRZInfo? = null
@@ -79,8 +71,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
             mrzInfo = MRZInfo(mrz)
         } catch (e: Exception) {
             e.printStackTrace()
-        }
-        finally {
+        } finally {
             // when an exception occurs and mrzInfo is still null execute initialization of MrzInfo
             try {
                 if (mrzInfo == null) {
@@ -99,11 +90,13 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
     public override fun onResume() {
         super.onResume()
         val flags = if (VERSION.SDK_INT >= VERSION_CODES.S) {
-                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         } else PendingIntent.FLAG_UPDATE_CURRENT or 0
         if (nfcAdapter != null && nfcAdapter?.isEnabled == true) {
-            pendingIntent = PendingIntent.getActivity(this, 0,
-                Intent(this, this.javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), flags)
+            pendingIntent = PendingIntent.getActivity(
+                this, 0,
+                Intent(this, this.javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), flags
+            )
         } else checkNFC()
     }
 
@@ -126,9 +119,16 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
     private fun showNFCFragment() {
         if (mrzInfo != null) {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.container,
-                            NFCFragment.newInstance(mrzInfo = mrzInfo, label = label, locale = locale, withPhoto = withPhoto), TAG_NFC)
-                    .commit()
+                .replace(
+                    R.id.container,
+                    NFCFragment.newInstance(
+                        mrzInfo = mrzInfo,
+                        label = label,
+                        locale = locale,
+                        withPhoto = withPhoto
+                    ), TAG_NFC
+                )
+                .commit()
         }
     }
 
@@ -168,14 +168,22 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
 
     override fun onPassportRead(passport: Passport?) {
         val action = intent.getStringExtra(ScannerConstants.NFC_ACTION)
-        val nfcResult = NFCResult.formatResult(passport = passport, mrzInfo = mrzInfo, mrzImage = mrzImage)
+        val nfcResult =
+            NFCResult.formatResult(passport = passport, mrzInfo = mrzInfo, mrzImage = mrzImage)
 
         Log.d(TAG, "NFC_ACTION from intent: '$action'")
-        Log.d(TAG, "Expected IDPASS_SMARTSCANNER_NFC_INTENT: '${ScannerConstants.IDPASS_SMARTSCANNER_NFC_INTENT}'")
-        Log.d(TAG, "Expected IDPASS_SMARTSCANNER_ODK_NFC_INTENT: '${ScannerConstants.IDPASS_SMARTSCANNER_ODK_NFC_INTENT}'")
+        Log.d(
+            TAG,
+            "Expected IDPASS_SMARTSCANNER_NFC_INTENT: '${ScannerConstants.IDPASS_SMARTSCANNER_NFC_INTENT}'"
+        )
+        Log.d(
+            TAG,
+            "Expected IDPASS_SMARTSCANNER_ODK_NFC_INTENT: '${ScannerConstants.IDPASS_SMARTSCANNER_ODK_NFC_INTENT}'"
+        )
 
         if (action == ScannerConstants.IDPASS_SMARTSCANNER_NFC_INTENT ||
-                action == ScannerConstants.IDPASS_SMARTSCANNER_ODK_NFC_INTENT) {
+            action == ScannerConstants.IDPASS_SMARTSCANNER_ODK_NFC_INTENT
+        ) {
             // Send NFC Results via Bundle
             val bundle = Bundle()
             Log.d(TAG, "Success from NFC -- BUNDLE")
@@ -198,7 +206,9 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
             val result = Intent()
             val prefix = if (intent.hasExtra(ScannerConstants.IDPASS_ODK_PREFIX_EXTRA)) {
                 intent.getStringExtra(ScannerConstants.IDPASS_ODK_PREFIX_EXTRA)
-            } else { "" }
+            } else {
+                ""
+            }
             result.putExtra(ScannerConstants.RESULT, bundle)
             // Copy all the values in the intent result to be compatible with other implementations than commcare
             for (key in bundle.keySet()) {
@@ -211,34 +221,33 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
             setResult(RESULT_OK, result)
             finish()
         } else {
-            // Send NFC Results via App
-            if (intent.hasExtra(FOR_SMARTSCANNER_APP)) showFragmentDetails(passport, locale)
-            else {
-                // Send NFC Results via Plugin
-                val data = Intent()
-                Log.d(TAG, "Success from NFC -- RESULT")
-                Log.d(TAG, "value: $nfcResult")
-                data.putExtra(SmartScannerActivity.SCANNER_RESULT, Gson().toJson(nfcResult))
+            // Send NFC Results via Plugin
+            val data = Intent()
+            Log.d(TAG, "Success from NFC -- RESULT")
+            Log.d(TAG, "value: $nfcResult")
+            data.putExtra(SmartScannerActivity.SCANNER_RESULT, Gson().toJson(nfcResult))
 
-                // Also add raw face image data for our custom handling
-                Log.d(TAG, "passport object: $passport")
-                Log.d(TAG, "passport.face: ${passport?.face}")
-                Log.d(TAG, "passport.rawFaceImageData: ${passport?.rawFaceImageData}")
+            // Also add raw face image data for our custom handling
+            Log.d(TAG, "passport object: $passport")
+            Log.d(TAG, "passport.face: ${passport?.face}")
+            Log.d(TAG, "passport.rawFaceImageData: ${passport?.rawFaceImageData}")
 
-                passport?.rawFaceImageData?.let { rawImageData ->
-                    Log.d(TAG, "Adding face image data - mime: ${rawImageData.mimeType}, length: ${rawImageData.imageLength}")
-                    data.putExtra(ScannerConstants.NFC_FACE_IMAGE, rawImageData.imageBytes)
-                    data.putExtra(ScannerConstants.NFC_FACE_IMAGE_MIME_TYPE, rawImageData.mimeType)
-                    data.putExtra(ScannerConstants.NFC_FACE_IMAGE_LENGTH, rawImageData.imageLength)
-                } ?: run {
-                    Log.w(TAG, "No rawFaceImageData found in passport")
-                }
-                data.putExtra(ScannerConstants.NFC_EXPIRY_DATE, nfcResult.dateOfExpiry)
-                data.putExtra(ScannerConstants.NFC_DATE_OF_BIRTH, nfcResult.dateOfBirth)
-
-                setResult(Activity.RESULT_OK, data)
-                finish()
+            passport?.rawFaceImageData?.let { rawImageData ->
+                Log.d(
+                    TAG,
+                    "Adding face image data - mime: ${rawImageData.mimeType}, length: ${rawImageData.imageLength}"
+                )
+                data.putExtra(ScannerConstants.NFC_FACE_IMAGE, rawImageData.imageBytes)
+                data.putExtra(ScannerConstants.NFC_FACE_IMAGE_MIME_TYPE, rawImageData.mimeType)
+                data.putExtra(ScannerConstants.NFC_FACE_IMAGE_LENGTH, rawImageData.imageLength)
+            } ?: run {
+                Log.w(TAG, "No rawFaceImageData found in passport")
             }
+            data.putExtra(ScannerConstants.NFC_EXPIRY_DATE, nfcResult.dateOfExpiry)
+            data.putExtra(ScannerConstants.NFC_DATE_OF_BIRTH, nfcResult.dateOfBirth)
+
+            setResult(Activity.RESULT_OK, data)
+            finish()
         }
     }
 
@@ -250,27 +259,5 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener, Passpor
         Toast.makeText(this, getString(R.string.warning_enable_nfc), Toast.LENGTH_SHORT).show()
         val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS)
         startActivity(intent)
-    }
-
-
-    private fun showFragmentDetails(passport: Passport?, locale: String?) {
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.container, PassportDetailsFragment.newInstance(passport, locale))
-                .addToBackStack(TAG_PASSPORT_DETAILS)
-                .commit()
-    }
-
-    private fun showFragmentPhoto(bitmap: Bitmap) {
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.container, PassportPhotoFragment.newInstance(bitmap))
-                .addToBackStack(TAG_PASSPORT_PICTURE)
-                .commit()
-    }
-
-
-    override fun onImageSelected(bitmap: Bitmap?) {
-        if (bitmap != null) {
-            showFragmentPhoto(bitmap)
-        }
     }
 }
