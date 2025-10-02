@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nfc_title_initial">Lisez votre passeport</string>
+    <string name="nfc_title_reading">Lisez votre passeport via l\'interface NFC</string>
+    <string name="nfc_body_initial">Placez votre passeport directement à l\'arrière du smartphone, généralement en haut.</string>
+    <string name="nfc_body_reading">Le passeport est en cours de lecture</string>
+    <string name="nfc_help_link"><u>Avez-vous besoin d\'aide?</u></string>
+</resources>

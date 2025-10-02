@@ -95,4 +95,17 @@
   <dimen name="input_label_padding_bottom">4dp</dimen>
   <dimen name="input_label_vertical_spacing">8dp</dimen>
   <dimen name="input_label_horizontal_spacing">4dp</dimen>
+
+  <!-- NFC Screen dimensions -->
+  <dimen name="nfc_screen_padding">16dp</dimen>
+  <dimen name="nfc_title_text_size">22sp</dimen>
+  <dimen name="nfc_title_padding_top">80dp</dimen>
+  <dimen name="nfc_body_text_size">17sp</dimen>
+  <dimen name="nfc_title_padding_bottom">32dp</dimen>
+  <dimen name="nfc_image_padding_bottom">16dp</dimen>
+  <dimen name="nfc_body_padding_bottom">32dp</dimen>
+  <dimen name="nfc_progress_padding_bottom">8dp</dimen>
+  <dimen name="nfc_link_padding_top">0dp</dimen>
+  <dimen name="nfc_link_padding_bottom">16dp</dimen>
+  <dimen name="nfc_title_reading_padding_bottom">48dp</dimen>
 </resources>

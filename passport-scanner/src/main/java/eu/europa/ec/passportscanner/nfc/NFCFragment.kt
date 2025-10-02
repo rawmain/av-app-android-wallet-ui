@@ -17,8 +17,10 @@
  */
 package eu.europa.ec.passportscanner.nfc
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Build
@@ -29,14 +31,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.LinearInterpolator
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.Fragment
-import io.reactivex.disposables.CompositeDisposable
-import net.sf.scuba.smartcards.CardServiceException
-import net.sf.scuba.smartcards.ISO7816
 import eu.europa.ec.passportscanner.R
 import eu.europa.ec.passportscanner.nfc.details.IntentData
 import eu.europa.ec.passportscanner.nfc.details.NFCDocumentTag
@@ -46,6 +47,9 @@ import eu.europa.ec.passportscanner.utils.DateUtils.BIRTH_DATE_THRESHOLD
 import eu.europa.ec.passportscanner.utils.DateUtils.EXPIRY_DATE_THRESHOLD
 import eu.europa.ec.passportscanner.utils.DateUtils.formatStandardDate
 import eu.europa.ec.passportscanner.utils.KeyStoreUtils
+import io.reactivex.disposables.CompositeDisposable
+import net.sf.scuba.smartcards.CardServiceException
+import net.sf.scuba.smartcards.ISO7816
 import org.jmrtd.AccessDeniedException
 import org.jmrtd.BACDeniedException
 import org.jmrtd.MRTDTrustStore
@@ -60,6 +64,8 @@ class NFCFragment : Fragment() {
     private var nfcFragmentListener: NfcFragmentListener? = null
     private var textViewPassportNumber: TextView? = null
     private var textViewNfcTitle: TextView? = null
+    private var textViewNfcBody: TextView? = null
+    private var textViewHelpLink: TextView? = null
     private var textViewDateOfBirth: TextView? = null
     private var textViewDateOfExpiry: TextView? = null
     private var progressBar: ProgressBar? = null
@@ -69,6 +75,7 @@ class NFCFragment : Fragment() {
     private var withPhoto: Boolean = true
     private var mHandler = Handler(Looper.getMainLooper())
     private var disposable = CompositeDisposable()
+    private var progressAnimator: ObjectAnimator? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -93,11 +100,17 @@ class NFCFragment : Fragment() {
             withPhoto = arguments.getBoolean(IntentData.KEY_WITH_PHOTO)
         }
         textViewNfcTitle = view.findViewById(R.id.tv_nfc_title)
+        textViewNfcBody = view.findViewById(R.id.tv_nfc_body)
+        textViewHelpLink = view.findViewById(R.id.tv_help_link)
         textViewPassportNumber = view.findViewById(R.id.value_passport_number)
         textViewDateOfBirth = view.findViewById(R.id.value_DOB)
         textViewDateOfExpiry = view.findViewById(R.id.value_expiration_date)
         progressBar = view.findViewById(R.id.progressBar)
 
+        // Setup help link click listener
+        textViewHelpLink?.setOnClickListener {
+            openHelpUrl()
+        }
     }
 
     fun handleNfcTag(intent: Intent?) {
@@ -197,8 +210,11 @@ class NFCFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
-        // Display MRZ details
-        textViewNfcTitle?.text = if (label != null) label else getString(R.string.nfc_title)
+        // Set initial UI state
+        textViewNfcTitle?.text = getString(R.string.nfc_title_initial)
+        textViewNfcBody?.text = getString(R.string.nfc_body_initial)
+
+        // Store MRZ details in hidden views for compatibility
         textViewPassportNumber?.text = getString(R.string.doc_number, mrzInfo?.documentNumber)
         textViewDateOfBirth?.text = getString(
             R.string.doc_dob,
@@ -235,18 +251,79 @@ class NFCFragment : Fragment() {
         if (!disposable.isDisposed) {
             disposable.dispose()
         }
+        progressAnimator?.cancel()
         super.onDestroyView()
     }
 
     private fun onNFCSReadStart() {
         Log.d(TAG, "onNFCSReadStart")
-        mHandler.post { progressBar?.visibility = View.VISIBLE }
+        mHandler.post {
+            // Update UI for reading state
+            textViewNfcTitle?.text = getString(R.string.nfc_title_reading)
+            textViewNfcBody?.text = getString(R.string.nfc_body_reading)
+            textViewNfcBody?.gravity = android.view.Gravity.CENTER
+            textViewHelpLink?.visibility = View.GONE
 
+            // Update title padding for reading state
+            val titlePaddingBottom =
+                resources.getDimensionPixelSize(R.dimen.nfc_title_reading_padding_bottom)
+            textViewNfcTitle?.setPadding(
+                textViewNfcTitle?.paddingLeft ?: 0,
+                textViewNfcTitle?.paddingTop ?: 0,
+                textViewNfcTitle?.paddingRight ?: 0,
+                titlePaddingBottom
+            )
+
+            // Show and animate progress bar
+            progressBar?.visibility = View.VISIBLE
+            progressBar?.progress = 0
+
+            // Animate progress bar to 100% over 10 seconds
+            progressAnimator = ObjectAnimator.ofInt(progressBar, "progress", 0, 100).apply {
+                duration = 10000 // 10 seconds
+                interpolator = LinearInterpolator()
+                start()
+            }
+        }
     }
 
     private fun onNFCReadFinish() {
         Log.d(TAG, "onNFCReadFinish")
-        mHandler.post { progressBar?.visibility = View.GONE }
+        mHandler.post {
+            progressAnimator?.cancel()
+            progressBar?.visibility = View.GONE
+
+            // Reset UI to initial state
+            textViewNfcTitle?.text = getString(R.string.nfc_title_initial)
+            textViewNfcBody?.text = getString(R.string.nfc_body_initial)
+            textViewNfcBody?.gravity = android.view.Gravity.START
+            textViewHelpLink?.visibility = View.VISIBLE
+
+            // Reset title padding
+            val titlePaddingBottom =
+                resources.getDimensionPixelSize(R.dimen.nfc_title_padding_bottom)
+            textViewNfcTitle?.setPadding(
+                textViewNfcTitle?.paddingLeft ?: 0,
+                textViewNfcTitle?.paddingTop ?: 0,
+                textViewNfcTitle?.paddingRight ?: 0,
+                titlePaddingBottom
+            )
+        }
+    }
+
+    private fun openHelpUrl() {
+        // Placeholder URL - replace with actual help URL when available
+        val helpUrl = "https://example.com/passport-help"
+        try {
+            val customTabsIntent = CustomTabsIntent.Builder()
+                .setShowTitle(true)
+                .build()
+            customTabsIntent.launchUrl(requireContext(), Uri.parse(helpUrl))
+        } catch (e: Exception) {
+            // Fallback to browser intent if Custom Tabs not available
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(helpUrl))
+            startActivity(intent)
+        }
     }
 
     private fun onCardException(cardException: Exception?) {
