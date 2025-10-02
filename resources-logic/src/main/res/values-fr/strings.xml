@@ -41,13 +41,14 @@
     <string name="qr_scan_intro_step_second">Scannez ce code QR avec votre portefeuille pour obtenir votre justificatif 18+.</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="passport_identification_title">Prenez une photo de votre passeport</string>
+    <string name="passport_identification_title">Scannez votre passeport</string>
     <string name="passport_identification_description">Pour cette étape, capturez simplement une photo claire de votre passeport. Assurez-vous :</string>
     <string name="passport_identification_step_first">Que le passeport entier soit visible et bien éclairé.</string>
     <string name="passport_identification_step_second">Qu’aucun reflet ou flou ne masque les détails.</string>
     <string name="passport_identification_footer">Nous prenons un code d’identification de ce passeport pour accéder à la partie lisible par machine du passeport.</string>
     <string name="passport_identification_back">Retour</string>
-    <string name="passport_identification_capture">Prendre une photo</string>
+    <string name="passport_identification_capture">Scanner le passeport</string>
+    <string name="passport_capture_subtitle">Alignez la page avec photo de votre passeport dans le cadre</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identification</string>

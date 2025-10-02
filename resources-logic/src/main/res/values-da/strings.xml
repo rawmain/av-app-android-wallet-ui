@@ -41,13 +41,14 @@
     <string name="qr_scan_intro_step_second">Scan denne QR-kode med din Wallet for at få dit 18+-legitimationsbevis.</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="passport_identification_title">Tag et billede af dit pas</string>
+    <string name="passport_identification_title">Scan dit pas</string>
     <string name="passport_identification_description">For dette trin skal du blot tage et klart billede af dit pas. Sørg for:</string>
     <string name="passport_identification_step_first">At hele passet er synligt og godt oplyst.</string>
     <string name="passport_identification_step_second">Ingen refleksioner eller sløring skjuler detaljerne.</string>
     <string name="passport_identification_footer">Vi tager en identifikationskode fra dette pas for at få adgang til den maskinlæsbare del af passet.</string>
     <string name="passport_identification_back">Tilbage</string>
-    <string name="passport_identification_capture">Tag et billede</string>
+    <string name="passport_identification_capture">Scan pas</string>
+    <string name="passport_capture_subtitle">Placer fotosiden af dit pas inden for rammen</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identifikation</string>

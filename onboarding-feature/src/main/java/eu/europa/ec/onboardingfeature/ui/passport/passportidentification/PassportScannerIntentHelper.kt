@@ -48,8 +48,8 @@ object PassportScannerIntentHelper {
                 SmartScannerActivity.SCANNER_OPTIONS,
                 ScannerOptions(
                     config = Config(
-                        header = context.getString(R.string.passport_identification_capture),
-                        subHeader = context.getString(R.string.passport_identification_title),
+                        header = context.getString(R.string.passport_identification_title),
+                        subHeader = context.getString(R.string.passport_capture_subtitle),
                         isManualCapture = false,
                         showGuide = true,
                         showSettings = false

@@ -41,13 +41,14 @@
     <string name="qr_scan_intro_step_second">Scansiona questo codice QR con il tuo Wallet per ottenere la credenziale 18+.</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="passport_identification_title">Scatta una foto del tuo passaporto</string>
+    <string name="passport_identification_title">Scansiona il tuo passaporto</string>
     <string name="passport_identification_description">Per questo passaggio, scatta semplicemente una foto chiara del tuo passaporto. Assicurati che:</string>
     <string name="passport_identification_step_first">L’intero passaporto sia visibile e ben illuminato.</string>
     <string name="passport_identification_step_second">Nessun riflesso o sfocatura oscuri i dettagli.</string>
     <string name="passport_identification_footer">Prendiamo un codice identificativo da questo passaporto per accedere alla parte leggibile dalla macchina del passaporto.</string>
     <string name="passport_identification_back">Indietro</string>
-    <string name="passport_identification_capture">Scatta una foto</string>
+    <string name="passport_identification_capture">Scansiona passaporto</string>
+    <string name="passport_capture_subtitle">Allinea la pagina con la foto del passaporto all’interno della cornice</string>
 
     <!-- Passport live video instructions - Italian (it) -->
     <string name="passport_live_video_header">Registra un breve video di te stesso</string>

@@ -22,7 +22,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CaptureRequest
 import android.net.Uri
@@ -379,25 +378,6 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         captureHeaderText?.text = config?.header ?: String.empty()
         // capture text sub-header
         captureSubHeaderText?.text = config?.subHeader ?: String.empty()
-        // Background reader
-        try {
-            config?.background?.let {
-                if (it.isNotEmpty()) {
-                    val color = Color.parseColor(config?.background)
-                    coordinatorLayoutView.setBackgroundColor(color)
-                }
-            } ?: run {
-                coordinatorLayoutView.setBackgroundColor(
-                    ContextCompat.getColor(
-                        this,
-                        R.color.transparent_grey
-                    )
-                )
-            }
-        } catch (iae: IllegalArgumentException) {
-            // This color string is not valid
-            throw SmartScannerException("Please set proper color string in setting background. Example: '#ffc234' ")
-        }
         // manual capture
         manualCapture?.visibility = config?.isManualCapture?.let {
             if (it) VISIBLE else GONE

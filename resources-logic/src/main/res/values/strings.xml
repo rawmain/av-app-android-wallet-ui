@@ -80,13 +80,17 @@
     <string name="passport_scan_intro_step_5_title">Issuing of the Proof of Age Attestation</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="passport_identification_title">Take a Photo of your Passport</string>
-    <string name="passport_identification_description">For this step, simply capture a clear photo of your passport. Make sure:</string>
+    <string name="passport_identification_title">Scan your Passport</string>
+    <string name="passport_identification_description">For this step, simply capture the photo page of your Passport. Make sure:</string>
     <string name="passport_identification_step_first">The entire passport is visible and well-lit.</string>
     <string name="passport_identification_step_second">No reflections or blurriness obscure the details.</string>
     <string name="passport_identification_footer">We take an identification code from this passport to get access to the machine readable part of the passport.</string>
     <string name="passport_identification_back">Back</string>
-    <string name="passport_identification_capture">Take a Photo</string>
+    <string name="passport_identification_capture">Scan Passport</string>
+
+    <!-- Passport Capture Screen -->
+    <string name="passport_capture_subtitle">Align photo page of your Passport within the frame</string>
+    <string name="passport_capture_title">Scan your Passport</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identification</string>

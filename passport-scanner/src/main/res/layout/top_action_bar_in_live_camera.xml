@@ -17,7 +17,7 @@
         android:contentDescription="@string/cd_flash_button"
         android:padding="@dimen/top_action_button_padding"
         app:srcCompat="@drawable/camera_flash"
-        app:tint="@color/white" />
+        app:tint="@color/nfc_link_color" />
 
     <ImageView
         android:id="@+id/settings_button"
@@ -29,7 +29,7 @@
         app:srcCompat="@drawable/ic_settings"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@id/close_button"
-        app:tint="@color/white" />
+        app:tint="@color/nfc_link_color" />
 
     <ImageView
         android:id="@+id/close_button"
@@ -41,6 +41,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close_vd_white_24"
-        app:tint="@color/white" />
+        app:tint="@color/nfc_link_color" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

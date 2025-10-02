@@ -41,13 +41,14 @@
     <string name="qr_scan_intro_step_second">Scannen Sie diesen QR-Code mit Ihrer Wallet, um Ihren 18+-Nachweis zu erhalten.</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="passport_identification_title">Machen Sie ein Foto Ihres Reisepasses</string>
+    <string name="passport_identification_title">Scannen Sie Ihren Reisepass</string>
     <string name="passport_identification_description">Für diesen Schritt machen Sie einfach ein klares Foto Ihres Reisepasses. Stellen Sie sicher:</string>
     <string name="passport_identification_step_first">Der gesamte Reisepass ist sichtbar und gut beleuchtet.</string>
     <string name="passport_identification_step_second">Keine Reflexionen oder Unschärfen verdecken die Details.</string>
     <string name="passport_identification_footer">Wir nehmen einen Identifikationscode von diesem Reisepass, um Zugang zum maschinenlesbaren Teil des Reisepasses zu erhalten.</string>
     <string name="passport_identification_back">Zurück</string>
-    <string name="passport_identification_capture">Foto machen</string>
+    <string name="passport_identification_capture">Reisepass scannen</string>
+    <string name="passport_capture_subtitle">Richten Sie die Fotoseite Ihres Reisepasses im Rahmen aus</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identifikation</string>
