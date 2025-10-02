@@ -112,8 +112,8 @@ fun startCapturing(context: Context, faceMatchSdk: FaceMatchSDK, faceImageTempPa
         } else {
             Toast.makeText(context, "not matching -> Show Error", Toast.LENGTH_SHORT).show()
         }
-        // Clean up the temporary file after use
-        File(faceImageTempPath).delete()
+        // TODO Clean up the temporary file after use
+        //File(faceImageTempPath).delete()
     }
 }
 

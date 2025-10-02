@@ -111,7 +111,7 @@ object PassportScannerIntentHelper {
 
             val bitmap = ImageUtils.decodeImage(inputStream, imageLength, mimeType)
 
-            Log.d("PassportScan", "Decoded bitmap: ${if (bitmap != null) "${bitmap.width}x${bitmap.height}" else "null"}")
+            Log.d("PassportScan", "Decoded bitmap: ${bitmap.width}x${bitmap.height}")
             bitmap
         } catch (e: Exception) {
             Log.e("PassportScan", "Failed to decode face image from raw compressed bytes", e)
