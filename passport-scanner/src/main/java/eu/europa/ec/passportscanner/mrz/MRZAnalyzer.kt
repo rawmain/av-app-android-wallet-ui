@@ -223,8 +223,7 @@ open class MRZAnalyzer(
                             }], with  NL = $NL_count"
                         )
 
-                        val cleanMRZ = "P<D<<HOSGEL<<HASAN<<<<<<<<<<<<<<<<<<<<<<<<<<\nC3J9P0F8C1D<<8010247M2801153<<<<<<<<<<<<<<<4"
-                        //val cleanMRZ = MRZCleaner.clean(rawFullRead)
+                        val cleanMRZ = MRZCleaner.clean(rawFullRead)
                         Log.d(
                             "${SmartScannerActivity.TAG}/SmartScanner",
                             "After cleaner = [${
