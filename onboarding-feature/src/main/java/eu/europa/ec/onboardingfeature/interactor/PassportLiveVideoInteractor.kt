@@ -16,6 +16,7 @@
 
 package eu.europa.ec.onboardingfeature.interactor
 
+import android.content.Context
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchResult
@@ -39,7 +40,7 @@ sealed class PassportValidationState {
 
 interface PassportLiveVideoInteractor {
     suspend fun captureAndMatchFace(
-        context: android.content.Context,
+        context: Context,
         faceImageTempPath: String,
     ): FaceMatchPartialState
 
@@ -56,7 +57,7 @@ class PassportLiveVideoInteractorImpl(
         get() = resourceProvider.genericErrorMessage()
 
     override suspend fun captureAndMatchFace(
-        context: android.content.Context,
+        context: Context,
         faceImageTempPath: String,
     ): FaceMatchPartialState {
         logController.d(TAG) { "Starting face capture and match using image: $faceImageTempPath" }
@@ -64,7 +65,10 @@ class PassportLiveVideoInteractorImpl(
         val matchResult: FaceMatchResult =
             faceMatchController.captureAndMatch(context, faceImageTempPath)
 
-        logController.d(TAG) { "Face match result: processed=${matchResult.processed}, isLive=${matchResult.capturedIsLive}, isSame=${matchResult.isSameSubject}" }
+        logController.d(TAG) {
+            "Face match result: processed=${matchResult.processed}," +
+                    " isLive=${matchResult.capturedIsLive}, isSame=${matchResult.isSameSubject}"
+        }
 
         return if (matchResult.processed && matchResult.capturedIsLive && matchResult.isSameSubject) {
             logController.i(TAG) { "Face match successful" }
@@ -73,8 +77,7 @@ class PassportLiveVideoInteractorImpl(
             val errorMessage = when {
                 !matchResult.processed -> resourceProvider.getString(R.string.passport_live_video_error_not_processed)
                 !matchResult.capturedIsLive -> resourceProvider.getString(R.string.passport_live_video_error_not_live)
-                !matchResult.isSameSubject -> resourceProvider.getString(R.string.passport_live_video_error_not_matching)
-                else -> genericErrorMsg
+                else -> resourceProvider.getString(R.string.passport_live_video_error_not_matching)
             }
             logController.w(TAG) { "Face match failed: $errorMessage" }
             FaceMatchPartialState.Failure(errorMessage)
