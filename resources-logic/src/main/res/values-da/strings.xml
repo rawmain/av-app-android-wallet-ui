@@ -77,6 +77,9 @@
     <string name="passport_live_video_footer">Dette trin sikrer, at du er den rette ejer af pas og forhindrer svindel.</string>
     <string name="passport_live_video_back">Tilbage</string>
     <string name="passport_live_video_live_capture">Start live video</string>
+    <string name="passport_live_video_error_not_processed">Videooptagelsen blev ikke behandlet korrekt. Prøv venligst igen.</string>
+    <string name="passport_live_video_error_not_live">Liveness-tjek mislykkedes. Sørg venligst for, at du optager en live-video.</string>
+    <string name="passport_live_video_error_not_matching">Ansigtet matcher ikke pasfotet. Prøv venligst igen.</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Token / QR‑kode</string>

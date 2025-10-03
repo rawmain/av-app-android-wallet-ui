@@ -382,7 +382,6 @@ class PassportLiveVideoViewModel(
         setState {
             copy(
                 error = ContentErrorConfig(
-                    errorTitle = "Verification Failed",
                     errorSubTitle = errorMessage,
                     onCancel = { setEvent(Event.OnBackPressed) },
                     onRetry = { setEvent(Event.OnRetry) }

@@ -59,6 +59,9 @@
     <string name="passport_live_video_footer">Questo passaggio garantisce che tu sia il legittimo proprietario del passaporto e previene le frodi.</string>
     <string name="passport_live_video_back">Indietro</string>
     <string name="passport_live_video_live_capture">Avvia video live</string>
+    <string name="passport_live_video_error_not_processed">La cattura video non è stata elaborata correttamente. Riprova.</string>
+    <string name="passport_live_video_error_not_live">Verifica della vitalità fallita. Assicurati di registrare un video dal vivo.</string>
+    <string name="passport_live_video_error_not_matching">Il volto non corrisponde alla foto del passaporto. Riprova.</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identificazione</string>
