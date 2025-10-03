@@ -17,8 +17,6 @@
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
 import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,16 +33,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import eu.europa.ec.corelogic.util.CoreActions
 import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.Effect.Navigation
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.BulletHolder
 import eu.europa.ec.uilogic.component.PassportVerificationStepBar
+import eu.europa.ec.uilogic.component.content.BroadcastAction
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
+import eu.europa.ec.uilogic.component.utils.LifecycleEffect
 import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.component.wrap.ButtonConfig
 import eu.europa.ec.uilogic.component.wrap.ButtonType
@@ -53,9 +56,11 @@ import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
-import kl.open.fmandroid.FaceMatchSDK
-import kl.open.fmandroid.FaceMatchSdkImpl
-import java.io.File
+import eu.europa.ec.uilogic.extension.getPendingDeepLink
+import eu.europa.ec.uilogic.navigation.OnboardingScreens
+import eu.europa.ec.uilogic.navigation.helper.handleDeepLinkAction
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun PassportLiveVideoScreen(
@@ -65,55 +70,94 @@ fun PassportLiveVideoScreen(
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val faceMatchSdk: FaceMatchSDK by lazy {
-        FaceMatchSdkImpl(context.applicationContext).apply {
-            val configJson =
-                context.assets.open("keyless_config.json").bufferedReader().use { it.readText() }
-            init(configJson)
-        }
-    }
 
     ContentScreen(
         isLoading = state.isLoading,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.OnBackPressed) },
+        contentErrorConfig = state.error,
+        broadcastAction = BroadcastAction(
+            intentFilters = listOf(
+                CoreActions.VCI_RESUME_ACTION,
+                CoreActions.VCI_DYNAMIC_PRESENTATION
+            ),
+            callback = {
+                when (it?.action) {
+                    CoreActions.VCI_RESUME_ACTION -> it.extras?.getString("uri")?.let { link ->
+                        viewModel.setEvent(Event.OnResumeIssuance(link))
+                    }
+
+                    CoreActions.VCI_DYNAMIC_PRESENTATION -> it.extras?.getString("uri")
+                        ?.let { link ->
+                            viewModel.setEvent(Event.OnDynamicPresentation(link))
+                        }
+                }
+            }
+        ),
         stickyBottom = { paddingValues ->
             ActionButtons(
                 paddings = paddingValues,
                 onBack = { viewModel.setEvent(Event.OnBackPressed) },
-                onLiveVideo = { viewModel.setEvent(Event.OnLiveVideoCapture) }
+                onLiveVideo = { viewModel.setEvent(Event.OnLiveVideoCapture(context)) }
             )
         }
     ) { paddingValues -> Content(paddingValues = paddingValues) }
 
     LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                is Navigation.GoBack -> controller.popBackStack()
-                Navigation.StartVideoLiceCapture -> {
-                    state.config?.let { config ->
-                        startCapturing(context, faceMatchSdk, config.faceImageTempPath)
-                    }
-                }
-            }
-        }
+        viewModel.effect.onEach { effect ->
+            handleEffect(effect, controller, context)
+        }.collect()
+    }
+
+    LifecycleEffect(
+        lifecycleOwner = LocalLifecycleOwner.current,
+        lifecycleEvent = Lifecycle.Event.ON_PAUSE
+    ) {
+        viewModel.setEvent(Event.OnPause)
+    }
+
+    LifecycleEffect(
+        lifecycleOwner = LocalLifecycleOwner.current,
+        lifecycleEvent = Lifecycle.Event.ON_RESUME
+    ) {
+        viewModel.setEvent(Event.Init(context.getPendingDeepLink()))
     }
 }
 
-fun startCapturing(context: Context, faceMatchSdk: FaceMatchSDK, faceImageTempPath: String) {
-    Log.d("PassportLiveVideoScreen", "start capture & match using face image: $faceImageTempPath")
-
-    // Use the face image from passport scanning
-    faceMatchSdk.captureAndMatch(faceImageTempPath) { result ->
-        Log.d("PassportLiveVideoScreen", "get result: $result")
-        if (result.processed && result.capturedIsLive && result.isSameSubject) {
-            Toast.makeText(context, "Same Person as passport -> Next Page", Toast.LENGTH_SHORT)
-                .show()
-        } else {
-            Toast.makeText(context, "not matching -> Show Error", Toast.LENGTH_SHORT).show()
+private fun handleEffect(
+    effect: Effect,
+    controller: NavController,
+    context: Context,
+) {
+    when (effect) {
+        is Navigation.GoBack -> controller.popBackStack()
+        is Navigation.StartVideoLiveCapture -> {
+            // Video capture handled by SDK through interactor
         }
-        // TODO Clean up the temporary file after use
-        //File(faceImageTempPath).delete()
+
+        is Navigation.SwitchScreen -> {
+            android.util.Log.i(
+                "PassportLiveVideoScreen",
+                "Navigating to: ${effect.screenRoute}, inclusive: ${effect.inclusive}"
+            )
+            controller.navigate(effect.screenRoute) {
+                popUpTo(OnboardingScreens.PassportLiveVideo.screenRoute) {
+                    inclusive = effect.inclusive
+                }
+            }
+        }
+
+        is Navigation.OpenDeepLinkAction -> {
+            android.util.Log.i(
+                "PassportLiveVideoScreen",
+                "Handling deeplink: ${effect.deepLinkUri}"
+            )
+            handleDeepLinkAction(
+                controller,
+                effect.deepLinkUri,
+                effect.arguments
+            )
+        }
     }
 }
 

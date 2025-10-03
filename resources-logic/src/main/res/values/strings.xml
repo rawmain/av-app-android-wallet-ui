@@ -119,6 +119,11 @@
     <string name="passport_live_video_footer">This step ensures that you are the rightful owner of the Passport and prevents fraud.</string>
     <string name="passport_live_video_back">Back</string>
     <string name="passport_live_video_live_capture">Start Live Video</string>
+    <string name="passport_live_video_error_not_processed">Video capture was not processed successfully. Please try again.</string>
+    <string name="passport_live_video_error_not_live">Liveness check failed. Please ensure you are recording a live video.</string>
+    <string name="passport_live_video_error_not_matching">Face does not match the passport photo. Please try again.</string>
+    <string name="passport_validation_error_expired">Your passport has expired. Please use a valid passport.</string>
+    <string name="passport_validation_error_underage">You must be at least 18 years old to proceed.</string>
 
     <string name="welcome_page_1">Using this app you can securely prove you are over 18 when accessing services restricted to adults.</string>
     <string name="welcome_page_2">Verify that you are over 18 once, use this proof to securely access many services restricted to adults.</string>
