@@ -80,10 +80,21 @@
     <string name="passport_live_video_error_not_processed">Videooptagelsen blev ikke behandlet korrekt. Prøv venligst igen.</string>
     <string name="passport_live_video_error_not_live">Liveness-tjek mislykkedes. Sørg venligst for, at du optager en live-video.</string>
     <string name="passport_live_video_error_not_matching">Ansigtet matcher ikke pasfotet. Prøv venligst igen.</string>
+    <string name="passport_validation_error_expired">Dit pas er udløbet. Brug venligst et gyldigt pas.</string>
+    <string name="passport_validation_error_underage">Du skal være mindst 18 år gammel for at fortsætte.</string>
+    <string name="passport_validation_error_incomplete_data">Pasdata er ufuldstændige. Scan venligst dit pas igen.</string>
+
+    <!-- Passport Consent Screen -->
+    <string name="passport_consent_title">Samtykke</string>
+    <string name="passport_consent_description">Ved at acceptere giver du samtykke til at verificere din identitet ved at sammenligne dit pasfoto med videoen. For mere detaljeret information om lagring, databeskyttelse og privatliv klik på linket nedenfor.</string>
+    <string name="passport_consent_more_info">Mere information</string>
+    <string name="passport_consent_checkbox">Jeg accepterer</string>
+    <string name="passport_consent_reject_button">Afvis</string>
+    <string name="passport_consent_consent_button">Accepter</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Token / QR‑kode</string>
-    <string name="onboarding_verification_qr_code_description">Beskrivelse</string>
+    <string name="onboarding_verification_qr_code_description">Scan en QR-kode eller indtast et token for at modtage en aldersverifikationslegitimation fra en autoriseret udsteder.</string>
     <string name="passport_scan_intro_enrollment_method">Aldersverifikationsmetode</string>
     <string name="passport_scan_intro_title">Pas eller ID-kort</string>
     <string name="passport_scan_intro_description">Pas-metoden er hurtig og sikker! Scanner dit ID, tag et billede og optag en kort video—tre trin for maksimal sikkerhed og beskyttelse mod svindel.</string>

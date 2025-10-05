@@ -20,17 +20,11 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.commonfeature.config.IssuanceSuccessUiConfig
 import eu.europa.ec.commonfeature.config.OfferUiConfig
-import eu.europa.ec.commonfeature.config.PresentationMode
-import eu.europa.ec.commonfeature.config.RequestUriConfig
-import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
+import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
-import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractor
-import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractorPartialState
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
-import eu.europa.ec.onboardingfeature.interactor.PassportValidationState
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
@@ -41,7 +35,6 @@ import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
 import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
-import eu.europa.ec.uilogic.navigation.PresentationScreens
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkType
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
@@ -50,7 +43,6 @@ import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
-import java.io.File
 
 private const val TAG = "PassportLiveVideoViewModel"
 
@@ -66,8 +58,6 @@ sealed class Event : ViewEvent {
     data class OnLiveVideoCapture(val context: Context) : Event()
     data object OnRetry : Event()
     data object OnPause : Event()
-    data class OnResumeIssuance(val uri: String) : Event()
-    data class OnDynamicPresentation(val uri: String) : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -84,7 +74,6 @@ class PassportLiveVideoViewModel(
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
     private val passportLiveVideoInteractor: PassportLiveVideoInteractor,
-    private val enrollmentInteractor: EnrollmentInteractor,
     @InjectedParam private val passportLiveVideoSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -124,17 +113,6 @@ class PassportLiveVideoViewModel(
                 logController.i(TAG) { "Event invoked OnPause" }
                 setState { copy(isLoading = false) }
             }
-
-            is Event.OnResumeIssuance -> {
-                logController.i(TAG) { "Event invoked OnResumeIssuance with uri: ${event.uri}" }
-                setState { copy(isLoading = true) }
-                enrollmentInteractor.resumeOpenId4VciWithAuthorization(event.uri)
-            }
-
-            is Event.OnDynamicPresentation -> {
-                logController.i(TAG) { "Event invoked OnDynamicPresentation with uri: ${event.uri}" }
-                handleDynamicPresentation(event.uri)
-            }
         }
     }
 
@@ -151,36 +129,21 @@ class PassportLiveVideoViewModel(
 
         viewModelScope.launch {
             try {
-                // Step 1: Validate passport age and expiration
-                when (val validationResult = passportLiveVideoInteractor.validatePassport(
-                    dateOfBirth = config.dateOfBirth,
-                    expiryDate = config.expiryDate
+                // Capture and match face
+                when (val matchResult = passportLiveVideoInteractor.captureAndMatchFace(
+                    context = context,
+                    faceImageTempPath = config.faceImageTempPath
                 )) {
-                    is PassportValidationState.Success -> {
-                        logController.i(TAG) { "Passport validation successful, proceeding to face match" }
-                        // Step 2: Capture and match face
-                        when (val matchResult = passportLiveVideoInteractor.captureAndMatchFace(
-                            context = context,
-                            faceImageTempPath = config.faceImageTempPath
-                        )) {
-                            is FaceMatchPartialState.Success -> {
-                                logController.i(TAG) { "Face match successful, proceeding with document issuance" }
-                                // Step 3: Issue document
-                                issueDocument(context, config.faceImageTempPath)
-                            }
-
-                            is FaceMatchPartialState.Failure -> {
-                                logController.e(TAG) { "Face match failed: ${matchResult.error}" }
-                                setState { copy(isLoading = false) }
-                                showError(matchResult.error)
-                            }
-                        }
+                    is FaceMatchPartialState.Success -> {
+                        logController.i(TAG) { "Face match successful, navigating to consent screen" }
+                        setState { copy(isLoading = false) }
+                        navigateToConsentScreen(config.faceImageTempPath)
                     }
 
-                    is PassportValidationState.Failure -> {
-                        logController.e(TAG) { "Passport validation failed: ${validationResult.error}" }
+                    is FaceMatchPartialState.Failure -> {
+                        logController.e(TAG) { "Face match failed: ${matchResult.error}" }
                         setState { copy(isLoading = false) }
-                        showError(validationResult.error)
+                        showError(matchResult.error)
                     }
                 }
             } catch (e: Exception) {
@@ -191,93 +154,17 @@ class PassportLiveVideoViewModel(
         }
     }
 
-    private fun issueDocument(context: Context, faceImageTempPath: String) {
-        logController.i(TAG) { "Starting document issuance flow using EnrollmentInteractor" }
-        viewModelScope.launch {
-            try {
-                enrollmentInteractor.issueNationalEID(context).collect { issueState ->
-                    logController.i(TAG) { "Received issueState: ${issueState::class.simpleName}" }
-                    when (issueState) {
-                        is EnrollmentInteractorPartialState.Success -> {
-                            logController.i(TAG) { "Document issued successfully: ${issueState.documentId}" }
-                            setState { copy(isLoading = false) }
-                            // Delete temp file after successful issuance
-                            deleteTempFile(faceImageTempPath)
-                            logController.i(TAG) { "Navigating to success screen with documentId: ${issueState.documentId}" }
-                            navigateToSuccessScreen(issueState.documentId)
-                        }
-
-                        is EnrollmentInteractorPartialState.DeferredSuccess -> {
-                            logController.i(TAG) { "Document issuance deferred, navigating to success route: ${issueState.successRoute}" }
-                            setState { copy(isLoading = false) }
-                            // Delete temp file after deferred success
-                            deleteTempFile(faceImageTempPath)
-                            navigateToDeferredSuccessScreen(issueState.successRoute)
-                        }
-
-                        is EnrollmentInteractorPartialState.UserAuthRequired -> {
-                            logController.i(TAG) { "User authentication required for document issuance" }
-                            // Keep loading state, authentication is part of the issuance flow
-                            enrollmentInteractor.handleUserAuth(
-                                context = context,
-                                crypto = issueState.crypto,
-                                notifyOnAuthenticationFailure = true,
-                                resultHandler = issueState.resultHandler
-                            )
-                        }
-
-                        is EnrollmentInteractorPartialState.Failure -> {
-                            logController.e(TAG) { "Document issuance failed: ${issueState.error}" }
-                            setState { copy(isLoading = false) }
-                            showError(issueState.error)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                logController.e(TAG) { "Exception in issueDocument flow: ${e.message}" }
-                setState { copy(isLoading = false) }
-                showError(e.message ?: "Document issuance failed unexpectedly")
-            }
-        }
-    }
-
-    private fun deleteTempFile(filePath: String) {
-        try {
-            val file = File(filePath)
-            if (file.exists()) {
-                val deleted = file.delete()
-                if (deleted) {
-                    logController.i(TAG) { "Successfully deleted temp file: $filePath" }
-                } else {
-                    logController.w(TAG) { "Failed to delete temp file: $filePath" }
-                }
-            } else {
-                logController.w(TAG) { "Temp file does not exist: $filePath" }
-            }
-        } catch (e: Exception) {
-            logController.e(TAG) { "Exception while deleting temp file: ${e.message}" }
-        }
-    }
-
-    private fun navigateToSuccessScreen(documentId: String) {
-        logController.i(TAG) { "Building navigation to success screen for documentId: $documentId" }
-        val onSuccessNavigation = ConfigNavigation(
-            navigationType = NavigationType.PushScreen(
-                screen = LandingScreens.Landing,
-                popUpToScreen = OnboardingScreens.Enrollment
-            )
-        )
-
+    private fun navigateToConsentScreen(faceImageTempPath: String) {
+        logController.i(TAG) { "Building navigation to consent screen" }
         val screenRoute = generateComposableNavigationLink(
-            screen = IssuanceScreens.DocumentIssuanceSuccess,
+            screen = OnboardingScreens.PassportConsent,
             arguments = generateComposableArguments(
                 mapOf(
-                    IssuanceSuccessUiConfig.serializedKeyName to uiSerializer.toBase64(
-                        model = IssuanceSuccessUiConfig(
-                            documentIds = listOf(documentId),
-                            onSuccessNavigation = onSuccessNavigation,
+                    PassportConsentUiConfig.serializedKeyName to uiSerializer.toBase64(
+                        model = PassportConsentUiConfig(
+                            faceImageTempPath = faceImageTempPath
                         ),
-                        parser = IssuanceSuccessUiConfig.Parser
+                        parser = PassportConsentUiConfig.Parser
                     ).orEmpty()
                 )
             )
@@ -286,41 +173,6 @@ class PassportLiveVideoViewModel(
         setEffect {
             Effect.Navigation.SwitchScreen(
                 screenRoute = screenRoute,
-                inclusive = false
-            )
-        }
-    }
-
-    private fun navigateToDeferredSuccessScreen(route: String) {
-        setEffect {
-            Effect.Navigation.SwitchScreen(
-                screenRoute = route,
-                inclusive = true
-            )
-        }
-    }
-
-    private fun handleDynamicPresentation(uri: String) {
-        logController.i(TAG) { "Handling dynamic presentation for uri: $uri" }
-        getOrCreatePresentationScope()
-        setEffect {
-            Effect.Navigation.SwitchScreen(
-                generateComposableNavigationLink(
-                    PresentationScreens.PresentationRequest,
-                    generateComposableArguments(
-                        mapOf(
-                            RequestUriConfig.serializedKeyName to uiSerializer.toBase64(
-                                RequestUriConfig(
-                                    PresentationMode.OpenId4Vp(
-                                        uri,
-                                        IssuanceScreens.AddDocument.screenRoute
-                                    )
-                                ),
-                                RequestUriConfig
-                            )
-                        )
-                    )
-                ),
                 inclusive = false
             )
         }

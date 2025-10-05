@@ -24,10 +24,12 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import eu.europa.ec.onboardingfeature.BuildConfig
+import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.ui.consent.ConsentScreen
 import eu.europa.ec.onboardingfeature.ui.enrollment.EnrollmentScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportbiometrics.PassportBiometricScreen
+import eu.europa.ec.onboardingfeature.ui.passport.passportconsent.PassportConsentScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.PassportIdentificationScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.PassportLiveVideoScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportscanintro.PassportScanIntroScreen
@@ -91,6 +93,31 @@ fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
                     )
                 }
             ))
+        }
+
+        composable(
+            route = OnboardingScreens.PassportConsent.screenRoute,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern =
+                        BuildConfig.DEEPLINK + OnboardingScreens.PassportConsent.screenRoute
+                },
+            ),
+            arguments = listOf(
+                navArgument(PassportConsentUiConfig.serializedKeyName) {
+                    type = StringType
+                }
+            )
+        ) {
+            PassportConsentScreen(
+                navController, koinViewModel(
+                    parameters = {
+                        parametersOf(
+                            it.arguments?.getString(PassportConsentUiConfig.serializedKeyName)
+                                .orEmpty()
+                        )
+                    }
+                ))
         }
 
         composable(route = OnboardingScreens.QRScanIntro.screenRoute) {

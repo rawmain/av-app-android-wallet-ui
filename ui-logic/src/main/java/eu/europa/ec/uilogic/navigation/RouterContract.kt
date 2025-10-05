@@ -40,6 +40,10 @@ sealed class OnboardingScreens {
         name = "PASSPORT_LIVE_VIDEO",
         parameters = "?passportLiveVideoConfig={passportLiveVideoConfig}"
     )
+    data object PassportConsent : Screen(
+        name = "PASSPORT_CONSENT",
+        parameters = "?passportConsentConfig={passportConsentConfig}"
+    )
 
     data object QRScanIntro : Screen(name = "QR_SCAN_INTRO")
 }

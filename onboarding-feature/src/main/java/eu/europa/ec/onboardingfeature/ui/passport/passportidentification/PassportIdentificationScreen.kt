@@ -73,7 +73,6 @@ import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
-import eu.europa.ec.uilogic.navigation.OnboardingScreens.PassportLiveVideo
 
 @Composable
 fun PassportIdentificationScreen(
@@ -114,6 +113,7 @@ fun PassportIdentificationScreen(
         isLoading = state.isLoading,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.OnBackPressed) },
+        contentErrorConfig = state.error,
         stickyBottom = { paddingValues ->
             ActionButtons(
                 state = state,

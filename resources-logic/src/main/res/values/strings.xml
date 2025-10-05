@@ -52,7 +52,7 @@
     <string name="onboarding_verification_passport_id_card">Passport or ID Card</string>
     <string name="onboarding_verification_passport_id_card_description">Scan your passport or ID card for verification</string>
     <string name="onboarding_verification_qr_code">Token / QR-Code</string>
-    <string name="onboarding_verification_qr_code_description">Description</string>
+    <string name="onboarding_verification_qr_code_description">Scan a QR code or enter a token to receive an age verification credential from an authorized issuer.</string>
 
     <!-- QR Scan Introduction Screen -->
     <string name="qr_scan_intro_enrollment_method">Age Verification Enrollment Method</string>
@@ -124,6 +124,15 @@
     <string name="passport_live_video_error_not_matching">Face does not match the passport photo. Please try again.</string>
     <string name="passport_validation_error_expired">Your passport has expired. Please use a valid passport.</string>
     <string name="passport_validation_error_underage">You must be at least 18 years old to proceed.</string>
+    <string name="passport_validation_error_incomplete_data">Passport data is incomplete. Please scan your passport again.</string>
+
+    <!-- Passport Consent Screen -->
+    <string name="passport_consent_title">Consent</string>
+    <string name="passport_consent_description">By agreeing, you give consent to verify your identity by comparing your passport portrait to the video. For more detailed information about storage, data protection and privacy please click the below link.</string>
+    <string name="passport_consent_more_info">More Information</string>
+    <string name="passport_consent_checkbox">I agree</string>
+    <string name="passport_consent_reject_button">Reject</string>
+    <string name="passport_consent_consent_button">Consent</string>
 
     <string name="welcome_page_1">Using this app you can securely prove you are over 18 when accessing services restricted to adults.</string>
     <string name="welcome_page_2">Verify that you are over 18 once, use this proof to securely access many services restricted to adults.</string>

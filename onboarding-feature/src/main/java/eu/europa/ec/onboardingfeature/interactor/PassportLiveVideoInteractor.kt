@@ -22,9 +22,6 @@ import eu.europa.ec.onboardingfeature.controller.FaceMatchController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchResult
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import java.time.LocalDate
-import java.time.Period
-import java.time.format.DateTimeFormatter
 
 private const val TAG = "PassportLiveVideoInteractor"
 
@@ -33,18 +30,11 @@ sealed class FaceMatchPartialState {
     data class Failure(val error: String) : FaceMatchPartialState()
 }
 
-sealed class PassportValidationState {
-    data object Success : PassportValidationState()
-    data class Failure(val error: String) : PassportValidationState()
-}
-
 interface PassportLiveVideoInteractor {
     suspend fun captureAndMatchFace(
         context: Context,
         faceImageTempPath: String,
     ): FaceMatchPartialState
-
-    fun validatePassport(dateOfBirth: String, expiryDate: String): PassportValidationState
 }
 
 class PassportLiveVideoInteractorImpl(
@@ -81,45 +71,6 @@ class PassportLiveVideoInteractorImpl(
             }
             logController.w(TAG) { "Face match failed: $errorMessage" }
             FaceMatchPartialState.Failure(errorMessage)
-        }
-    }
-
-    override fun validatePassport(
-        dateOfBirth: String,
-        expiryDate: String,
-    ): PassportValidationState {
-        logController.d(TAG) { "Validating passport - DOB: $dateOfBirth, Expiry: $expiryDate" }
-
-        return try {
-            val today = LocalDate.now()
-
-            // Parse dates - try multiple formats
-            val dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
-            val dobDate = LocalDate.parse(dateOfBirth, dateFormatter)
-            val expiry = LocalDate.parse(expiryDate, dateFormatter)
-
-            // Check if passport is expired
-            if (expiry.isBefore(today)) {
-                val errorMessage =
-                    resourceProvider.getString(R.string.passport_validation_error_expired)
-                logController.w(TAG) { "Passport validation failed: expired" }
-                return PassportValidationState.Failure(errorMessage)
-            }
-
-            // Check if user is at least 18 years old
-            val age = Period.between(dobDate, today).years
-            if (age < 18) {
-                val errorMessage =
-                    resourceProvider.getString(R.string.passport_validation_error_underage)
-                logController.w(TAG) { "Passport validation failed: user is $age years old" }
-                return PassportValidationState.Failure(errorMessage)
-            }
-
-            logController.i(TAG) { "Passport validation successful - age: $age, expires: $expiry" }
-            PassportValidationState.Success
-        } catch (e: Exception) {
-            logController.e(TAG) { "Error parsing passport dates: ${e.message}" }
-            PassportValidationState.Failure(genericErrorMsg)
         }
     }
 }

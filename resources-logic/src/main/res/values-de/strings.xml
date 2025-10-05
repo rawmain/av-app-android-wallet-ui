@@ -80,10 +80,21 @@
     <string name="passport_live_video_error_not_processed">Die Videoaufnahme wurde nicht erfolgreich verarbeitet. Bitte versuchen Sie es erneut.</string>
     <string name="passport_live_video_error_not_live">Lebensechtheitsüberprüfung fehlgeschlagen. Bitte stellen Sie sicher, dass Sie ein Live-Video aufnehmen.</string>
     <string name="passport_live_video_error_not_matching">Das Gesicht stimmt nicht mit dem Passfoto überein. Bitte versuchen Sie es erneut.</string>
+    <string name="passport_validation_error_expired">Ihr Reisepass ist abgelaufen. Bitte verwenden Sie einen gültigen Reisepass.</string>
+    <string name="passport_validation_error_underage">Sie müssen mindestens 18 Jahre alt sein, um fortzufahren.</string>
+    <string name="passport_validation_error_incomplete_data">Die Passdaten sind unvollständig. Bitte scannen Sie Ihren Pass erneut.</string>
+
+    <!-- Passport Consent Screen -->
+    <string name="passport_consent_title">Einwilligung</string>
+    <string name="passport_consent_description">Mit Ihrer Zustimmung erklären Sie sich damit einverstanden, Ihre Identität durch den Vergleich Ihres Passfotos mit dem Video zu überprüfen. Weitere Informationen zu Speicherung, Datenschutz und Privatsphäre finden Sie unter dem unten stehenden Link.</string>
+    <string name="passport_consent_more_info">Weitere Informationen</string>
+    <string name="passport_consent_checkbox">Ich stimme zu</string>
+    <string name="passport_consent_reject_button">Ablehnen</string>
+    <string name="passport_consent_consent_button">Zustimmen</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Token / QR‑Code</string>
-    <string name="onboarding_verification_qr_code_description">Beschreibung</string>
+    <string name="onboarding_verification_qr_code_description">Scannen Sie einen QR-Code oder geben Sie ein Token ein, um eine Altersverifizierungsbescheinigung von einem autorisierten Aussteller zu erhalten.</string>
     <string name="passport_scan_intro_enrollment_method">Altersverifizierungsmethode</string>
     <string name="passport_scan_intro_title">Reisepass oder Personalausweis</string>
     <string name="passport_scan_intro_description">Die Reisepass-Methode ist schnell und sicher! Scannen Sie Ihren Ausweis, machen Sie ein Foto und nehmen Sie ein kurzes Video auf—drei Schritte für maximale Sicherheit und Betrugsschutz.</string>
