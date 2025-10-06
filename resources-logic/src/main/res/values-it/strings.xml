@@ -59,6 +59,20 @@
     <string name="passport_live_video_footer">Questo passaggio garantisce che tu sia il legittimo proprietario del passaporto e previene le frodi.</string>
     <string name="passport_live_video_back">Indietro</string>
     <string name="passport_live_video_live_capture">Avvia video live</string>
+    <string name="passport_live_video_error_not_processed">La cattura video non è stata elaborata correttamente. Riprova.</string>
+    <string name="passport_live_video_error_not_live">Verifica della vitalità fallita. Assicurati di registrare un video dal vivo.</string>
+    <string name="passport_live_video_error_not_matching">Il volto non corrisponde alla foto del passaporto. Riprova.</string>
+    <string name="passport_validation_error_expired">Il tuo passaporto è scaduto. Utilizza un passaporto valido.</string>
+    <string name="passport_validation_error_underage">Devi avere almeno 18 anni per continuare.</string>
+    <string name="passport_validation_error_incomplete_data">I dati del passaporto sono incompleti. Scansiona nuovamente il tuo passaporto.</string>
+
+    <!-- Passport Consent Screen -->
+    <string name="passport_consent_title">Consenso</string>
+    <string name="passport_consent_description">Accettando, dai il consenso a verificare la tua identità confrontando il ritratto del passaporto con il video. Per informazioni più dettagliate su archiviazione, protezione dei dati e privacy, clicca sul link sottostante.</string>
+    <string name="passport_consent_more_info">Ulteriori informazioni</string>
+    <string name="passport_consent_checkbox">Accetto</string>
+    <string name="passport_consent_reject_button">Rifiuta</string>
+    <string name="passport_consent_consent_button">Acconsenti</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identificazione</string>
@@ -80,7 +94,7 @@
 
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Token / Codice QR</string>
-    <string name="onboarding_verification_qr_code_description">Descrizione</string>
+    <string name="onboarding_verification_qr_code_description">Scansiona un codice QR o inserisci un token per ricevere una credenziale di verifica dell\'età da un emittente autorizzato.</string>
     <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>
     <string name="passport_scan_intro_title">Passaporto o Carta d\'identità</string>
     <string name="passport_scan_intro_description">Il metodo passaporto è veloce e sicuro! Scansiona il tuo documento, scatta una foto e registra un breve video—tre passaggi per la massima sicurezza e protezione dalle frodi.</string>

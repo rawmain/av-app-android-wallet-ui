@@ -77,10 +77,24 @@
     <string name="passport_live_video_footer">Cette étape garantit que vous êtes le propriétaire légitime du passeport et empêche la fraude.</string>
     <string name="passport_live_video_back">Retour</string>
     <string name="passport_live_video_live_capture">Démarrer la vidéo en direct</string>
+    <string name="passport_live_video_error_not_processed">La capture vidéo n\'a pas été traitée avec succès. Veuillez réessayer.</string>
+    <string name="passport_live_video_error_not_live">La vérification de vivacité a échoué. Assurez-vous que vous enregistrez une vidéo en direct.</string>
+    <string name="passport_live_video_error_not_matching">Le visage ne correspond pas à la photo du passeport. Veuillez réessayer.</string>
+    <string name="passport_validation_error_expired">Votre passeport a expiré. Veuillez utiliser un passeport valide.</string>
+    <string name="passport_validation_error_underage">Vous devez avoir au moins 18 ans pour continuer.</string>
+    <string name="passport_validation_error_incomplete_data">Les données du passeport sont incomplètes. Veuillez scanner à nouveau votre passeport.</string>
+
+    <!-- Passport Consent Screen -->
+    <string name="passport_consent_title">Consentement</string>
+    <string name="passport_consent_description">En acceptant, vous consentez à vérifier votre identité en comparant le portrait de votre passeport à la vidéo. Pour plus d\'informations sur le stockage, la protection des données et la confidentialité, veuillez cliquer sur le lien ci-dessous.</string>
+    <string name="passport_consent_more_info">Plus d\'informations</string>
+    <string name="passport_consent_checkbox">J\'accepte</string>
+    <string name="passport_consent_reject_button">Refuser</string>
+    <string name="passport_consent_consent_button">Consentir</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Jeton / Code QR</string>
-    <string name="onboarding_verification_qr_code_description">Description</string>
+    <string name="onboarding_verification_qr_code_description">Scannez un code QR ou saisissez un jeton pour recevoir une attestation de vérification d\'âge d\'un émetteur autorisé.</string>
     <string name="passport_scan_intro_enrollment_method">Méthode de vérification d\'âge</string>
     <string name="passport_scan_intro_title">Passeport ou Carte d\'identité</string>
     <string name="passport_scan_intro_description">La méthode passeport est rapide et sécurisée ! Scannez votre pièce d\'identité, prenez une photo et enregistrez une courte vidéo—trois étapes pour une sécurité maximale et une protection contre la fraude.</string>

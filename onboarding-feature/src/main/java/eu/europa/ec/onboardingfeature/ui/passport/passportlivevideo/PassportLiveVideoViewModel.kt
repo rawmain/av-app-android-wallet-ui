@@ -16,13 +16,26 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
+import android.content.Context
+import android.net.Uri
+import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
+import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
+import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
+import eu.europa.ec.resourceslogic.R
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
+import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
+import eu.europa.ec.uilogic.navigation.OnboardingScreens
+import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
+import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
+import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 
@@ -31,17 +44,20 @@ private const val TAG = "PassportLiveVideoViewModel"
 data class State(
     val isLoading: Boolean = false,
     val config: PassportLiveVideoUiConfig? = null,
+    val error: ContentErrorConfig? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
     data object OnBackPressed : Event()
-    data object OnLiveVideoCapture : Event()
+    data class OnLiveVideoCapture(val context: Context) : Event()
+    data object OnRetry : Event()
 }
 
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
-        data object StartVideoLiceCapture : Navigation()
+        data class SwitchScreen(val screenRoute: String, val inclusive: Boolean) : Navigation()
+        data class OpenDeepLinkAction(val deepLinkUri: Uri, val arguments: String?) : Navigation()
     }
 }
 
@@ -49,6 +65,8 @@ sealed class Effect : ViewSideEffect {
 class PassportLiveVideoViewModel(
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
+    private val passportLiveVideoInteractor: PassportLiveVideoInteractor,
+    private val resourceProvider: ResourceProvider,
     @InjectedParam private val passportLiveVideoSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -65,14 +83,92 @@ class PassportLiveVideoViewModel(
     override fun handleEvents(event: Event) {
         when (event) {
             Event.OnBackPressed -> setEffect {
-                logController.i(TAG) { "Event invoked OnBackPressed " }
+                logController.i(TAG) { "Event invoked OnBackPressed" }
                 Effect.Navigation.GoBack
             }
 
-            Event.OnLiveVideoCapture -> {
+            is Event.OnLiveVideoCapture -> {
                 logController.i(tag = TAG) { "Event invoked OnLiveVideoCapture" }
-                setEffect { Effect.Navigation.StartVideoLiceCapture }
+                handleLiveVideoCapture(event.context)
             }
+
+            Event.OnRetry -> {
+                logController.i(tag = TAG) { "Event invoked OnRetry" }
+                setState { copy(error = null) }
+            }
+        }
+    }
+
+    private fun handleLiveVideoCapture(context: Context) {
+        val config = viewState.value.config
+        if (config == null) {
+            logController.e(TAG) { "Config is null, cannot proceed with live video capture" }
+            showError(resourceProvider.getString(R.string.generic_error_retry))
+            return
+        }
+
+        setState { copy(isLoading = true, error = null) }
+
+        viewModelScope.launch {
+            try {
+                // Capture and match face
+                when (val matchResult = passportLiveVideoInteractor.captureAndMatchFace(
+                    context = context,
+                    faceImageTempPath = config.faceImageTempPath
+                )) {
+                    is FaceMatchPartialState.Success -> {
+                        logController.i(TAG) { "Face match successful, navigating to consent screen" }
+                        setState { copy(isLoading = false) }
+                        navigateToConsentScreen(config.faceImageTempPath)
+                    }
+
+                    is FaceMatchPartialState.Failure -> {
+                        logController.e(TAG) { "Face match failed: ${matchResult.error}" }
+                        setState { copy(isLoading = false) }
+                        showError(matchResult.error)
+                    }
+                }
+            } catch (e: Exception) {
+                logController.e(TAG) { "Exception during live video capture: ${e.message}" }
+                setState { copy(isLoading = false) }
+                showError(e.message ?: "An unexpected error occurred")
+            }
+        }
+    }
+
+    private fun navigateToConsentScreen(faceImageTempPath: String) {
+        logController.i(TAG) { "Building navigation to consent screen" }
+        val screenRoute = generateComposableNavigationLink(
+            screen = OnboardingScreens.PassportConsent,
+            arguments = generateComposableArguments(
+                mapOf(
+                    PassportConsentUiConfig.serializedKeyName to uiSerializer.toBase64(
+                        model = PassportConsentUiConfig(
+                            faceImageTempPath = faceImageTempPath
+                        ),
+                        parser = PassportConsentUiConfig.Parser
+                    ).orEmpty()
+                )
+            )
+        )
+        logController.i(TAG) { "Setting navigation effect to screenRoute: $screenRoute" }
+        setEffect {
+            Effect.Navigation.SwitchScreen(
+                screenRoute = screenRoute,
+                inclusive = false
+            )
+        }
+    }
+
+    private fun showError(errorMessage: String) {
+        setState {
+            copy(
+                error = ContentErrorConfig(
+                    errorSubTitle = errorMessage,
+                    onCancel = { setEvent(Event.OnBackPressed) },
+                    onRetry = { setEvent(Event.OnRetry) }
+                )
+            )
         }
     }
 }
