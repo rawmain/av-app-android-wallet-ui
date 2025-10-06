@@ -16,7 +16,6 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
-import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -85,7 +84,7 @@ fun PassportLiveVideoScreen(
 
     LaunchedEffect(Unit) {
         viewModel.effect.onEach { effect ->
-            handleEffect(effect, controller, context)
+            handleEffect(effect, controller)
         }.collect()
     }
 
@@ -107,13 +106,9 @@ fun PassportLiveVideoScreen(
 private fun handleEffect(
     effect: Effect,
     controller: NavController,
-    context: Context,
 ) {
     when (effect) {
         is Navigation.GoBack -> controller.popBackStack()
-        is Navigation.StartVideoLiveCapture -> {
-            // Video capture handled by SDK through interactor
-        }
 
         is Navigation.SwitchScreen -> {
             android.util.Log.i(

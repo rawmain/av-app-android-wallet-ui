@@ -63,7 +63,6 @@ sealed class Event : ViewEvent {
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
-        data object StartVideoLiveCapture : Navigation()
         data class SwitchScreen(val screenRoute: String, val inclusive: Boolean) : Navigation()
         data class OpenDeepLinkAction(val deepLinkUri: Uri, val arguments: String?) : Navigation()
     }
@@ -125,7 +124,6 @@ class PassportLiveVideoViewModel(
         }
 
         setState { copy(isLoading = true, error = null) }
-        setEffect { Effect.Navigation.StartVideoLiveCapture }
 
         viewModelScope.launch {
             try {
