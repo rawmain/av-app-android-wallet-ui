@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 import java.io.File
+import java.security.Security
 
 private const val TAG = "PassportConsentViewModel"
 
@@ -89,12 +90,63 @@ class PassportConsentViewModel(
 
     override fun setInitialState(): State {
         logController.i { "get the following param=$passportConsentSerializedConfig" }
+
+        // Clean up Security providers left by passport scanning
+        cleanupSecurityProviders()
+
         val config: PassportConsentUiConfig? = uiSerializer.fromBase64(
             passportConsentSerializedConfig,
             PassportConsentUiConfig::class.java,
             PassportConsentUiConfig.Parser
         )
         return State(config = config)
+    }
+
+    /**
+     * Re-prioritizes BouncyCastle and SpongyCastle providers added by passport scanning (JMRTD library).
+     * These providers interfere with Android Keystore signing operations when at position 1.
+     *
+     * The JMRTD library inserts SpongyCastle/BouncyCastle at position 1 (highest priority), which
+     * causes subsequent EC key signing operations to route through SpongyCastle instead of Android
+     * Keystore. SpongyCastle cannot parse Android Keystore key formats, resulting in:
+     * "InvalidKeyException: cannot identify EC private key: no encoding for EC private key"
+     *
+     * Solution: Move BC/SC/JMRTD providers to the end of the list, keeping them available for
+     * TLS/SSL but deprioritizing them for cryptographic operations.
+     */
+    private fun cleanupSecurityProviders() {
+        try {
+            logController.i(TAG) { "Re-prioritizing Security providers before issuance" }
+
+            // Log current providers
+            val providersBefore = Security.getProviders()
+                .map { "${it.name} (position ${Security.getProviders().indexOf(it) + 1})" }
+            logController.d(TAG) { "Security providers before cleanup: $providersBefore" }
+
+            // Move BouncyCastle, SpongyCastle, and JMRTD providers to the end
+            val providersToDeprioritize = listOf("BC", "SC", "JMRTD")
+            var movedCount = 0
+
+            providersToDeprioritize.forEach { providerName ->
+                Security.getProvider(providerName)?.let { provider ->
+                    // Remove and re-add to move to end of list
+                    Security.removeProvider(providerName)
+                    Security.addProvider(provider)
+                    movedCount++
+                    logController.i(TAG) { "Moved Security provider to end: $providerName" }
+                }
+            }
+
+            // Log providers after cleanup
+            val providersAfter = Security.getProviders()
+                .map { "${it.name} (position ${Security.getProviders().indexOf(it) + 1})" }
+            logController.d(TAG) { "Security providers after cleanup: $providersAfter" }
+            logController.i(TAG) { "Moved $movedCount Security provider(s) to lower priority" }
+
+        } catch (e: Exception) {
+            logController.e(TAG) { "Error re-prioritizing Security providers: ${e.message}" }
+            logController.e(TAG) { "Stacktrace: ${e.stackTraceToString()}" }
+        }
     }
 
     override fun handleEvents(event: Event) {
