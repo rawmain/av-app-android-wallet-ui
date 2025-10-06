@@ -20,25 +20,18 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.commonfeature.config.OfferUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
-import eu.europa.ec.uilogic.config.ConfigNavigation
-import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
-import eu.europa.ec.uilogic.navigation.IssuanceScreens
-import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
-import eu.europa.ec.uilogic.navigation.helper.DeepLinkType
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
-import eu.europa.ec.uilogic.navigation.helper.hasDeepLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
@@ -53,11 +46,9 @@ data class State(
 ) : ViewState
 
 sealed class Event : ViewEvent {
-    data class Init(val deepLink: Uri?) : Event()
     data object OnBackPressed : Event()
     data class OnLiveVideoCapture(val context: Context) : Event()
     data object OnRetry : Event()
-    data object OnPause : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -88,11 +79,6 @@ class PassportLiveVideoViewModel(
 
     override fun handleEvents(event: Event) {
         when (event) {
-            is Event.Init -> {
-                logController.i(TAG) { "Event invoked Init with deepLink: ${event.deepLink}" }
-                handleDeepLink(event.deepLink)
-            }
-
             Event.OnBackPressed -> setEffect {
                 logController.i(TAG) { "Event invoked OnBackPressed" }
                 Effect.Navigation.GoBack
@@ -106,11 +92,6 @@ class PassportLiveVideoViewModel(
             Event.OnRetry -> {
                 logController.i(tag = TAG) { "Event invoked OnRetry" }
                 setState { copy(error = null) }
-            }
-
-            is Event.OnPause -> {
-                logController.i(TAG) { "Event invoked OnPause" }
-                setState { copy(isLoading = false) }
             }
         }
     }
@@ -173,58 +154,6 @@ class PassportLiveVideoViewModel(
                 screenRoute = screenRoute,
                 inclusive = false
             )
-        }
-    }
-
-    private fun handleDeepLink(deepLinkUri: Uri?) {
-        logController.i(TAG) { "Handling deepLink: $deepLinkUri" }
-        deepLinkUri?.let { uri ->
-            hasDeepLink(uri)?.let {
-                logController.i(TAG) { "DeepLink detected with type: ${it.type}" }
-                when (it.type) {
-                    DeepLinkType.CREDENTIAL_OFFER -> {
-                        logController.i(TAG) { "Handling CREDENTIAL_OFFER deeplink" }
-                        setEffect {
-                            Effect.Navigation.OpenDeepLinkAction(
-                                deepLinkUri = uri,
-                                arguments = generateComposableArguments(
-                                    mapOf(
-                                        OfferUiConfig.serializedKeyName to uiSerializer.toBase64(
-                                            OfferUiConfig(
-                                                offerURI = it.link.toString(),
-                                                onSuccessNavigation = ConfigNavigation(
-                                                    navigationType = NavigationType.PushScreen(
-                                                        screen = LandingScreens.Landing,
-                                                        popUpToScreen = IssuanceScreens.AddDocument
-                                                    )
-                                                ),
-                                                onCancelNavigation = ConfigNavigation(
-                                                    navigationType = NavigationType.Pop
-                                                )
-                                            ),
-                                            OfferUiConfig.Parser
-                                        )
-                                    )
-                                )
-                            )
-                        }
-                    }
-
-                    DeepLinkType.EXTERNAL -> {
-                        logController.i(TAG) { "Handling EXTERNAL deeplink" }
-                        setEffect {
-                            Effect.Navigation.OpenDeepLinkAction(
-                                deepLinkUri = uri,
-                                arguments = null
-                            )
-                        }
-                    }
-
-                    else -> {
-                        logController.i(TAG) { "Unhandled deeplink type: ${it.type}" }
-                    }
-                }
-            }
         }
     }
 
