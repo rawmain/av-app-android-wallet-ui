@@ -19,9 +19,13 @@ package eu.europa.ec.onboardingfeature.interactor
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import java.time.LocalDate
-import java.time.Period
-import java.time.format.DateTimeFormatter
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.FormatStringsInDatetimeFormats
+import kotlinx.datetime.format.byUnicodePattern
+import kotlinx.datetime.periodUntil
+import kotlinx.datetime.todayIn
 
 private const val TAG = "PassportIdentificationInteractor"
 
@@ -37,11 +41,13 @@ interface PassportIdentificationInteractor {
 class PassportIdentificationInteractorImpl(
     private val resourceProvider: ResourceProvider,
     private val logController: LogController,
+    private val clock: Clock = Clock.System,
 ) : PassportIdentificationInteractor {
 
     private val genericErrorMsg
         get() = resourceProvider.genericErrorMessage()
 
+    @OptIn(FormatStringsInDatetimeFormats::class)
     override fun validatePassport(
         dateOfBirth: String,
         expiryDate: String,
@@ -49,15 +55,15 @@ class PassportIdentificationInteractorImpl(
         logController.d(TAG) { "Validating passport - DOB: $dateOfBirth, Expiry: $expiryDate" }
 
         return try {
-            val today = LocalDate.now()
+            val today = clock.todayIn(TimeZone.currentSystemDefault())
 
             // Parse dates - try multiple formats
-            val dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+            val dateFormatter = LocalDate.Format { byUnicodePattern("MM/dd/yyyy") }
             val dobDate = LocalDate.parse(dateOfBirth, dateFormatter)
             val expiry = LocalDate.parse(expiryDate, dateFormatter)
 
             // Check if passport is expired
-            if (expiry.isBefore(today)) {
+            if (expiry < today) {
                 val errorMessage =
                     resourceProvider.getString(R.string.passport_validation_error_expired)
                 logController.w(TAG) { "Passport validation failed: expired" }
@@ -65,7 +71,7 @@ class PassportIdentificationInteractorImpl(
             }
 
             // Check if user is at least 18 years old
-            val age = Period.between(dobDate, today).years
+            val age = dobDate.periodUntil(today).years
             if (age < 18) {
                 val errorMessage =
                     resourceProvider.getString(R.string.passport_validation_error_underage)

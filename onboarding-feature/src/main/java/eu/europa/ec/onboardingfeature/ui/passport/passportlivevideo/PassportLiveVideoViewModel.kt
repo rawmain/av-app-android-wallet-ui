@@ -24,6 +24,8 @@ import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
+import eu.europa.ec.resourceslogic.R
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
@@ -64,6 +66,7 @@ class PassportLiveVideoViewModel(
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
     private val passportLiveVideoInteractor: PassportLiveVideoInteractor,
+    private val resourceProvider: ResourceProvider,
     @InjectedParam private val passportLiveVideoSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -100,7 +103,7 @@ class PassportLiveVideoViewModel(
         val config = viewState.value.config
         if (config == null) {
             logController.e(TAG) { "Config is null, cannot proceed with live video capture" }
-            showError("Configuration error. Please try again.")
+            showError(resourceProvider.getString(R.string.generic_error_retry))
             return
         }
 
