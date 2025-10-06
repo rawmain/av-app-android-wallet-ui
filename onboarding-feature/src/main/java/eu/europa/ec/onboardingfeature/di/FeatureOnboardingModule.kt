@@ -26,8 +26,6 @@ import eu.europa.ec.onboardingfeature.interactor.ConsentInteractor
 import eu.europa.ec.onboardingfeature.interactor.ConsentInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractor
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractorImpl
-import eu.europa.ec.onboardingfeature.interactor.PassportConsentInteractor
-import eu.europa.ec.onboardingfeature.interactor.PassportConsentInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractor
 import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
@@ -84,21 +82,6 @@ fun providePassportLiveVideoInteractor(
 ): PassportLiveVideoInteractor = PassportLiveVideoInteractorImpl(
     faceMatchController,
     resourceProvider,
-    logController
-)
-
-@Factory
-fun providePassportConsentInteractor(
-    walletCoreDocumentsController: WalletCoreDocumentsController,
-    deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
-    resourceProvider: ResourceProvider,
-    uiSerializer: UiSerializer,
-    logController: LogController,
-): PassportConsentInteractor = PassportConsentInteractorImpl(
-    walletCoreDocumentsController,
-    deviceAuthenticationInteractor,
-    resourceProvider,
-    uiSerializer,
     logController
 )
 
