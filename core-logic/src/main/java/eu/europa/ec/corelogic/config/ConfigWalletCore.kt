@@ -21,6 +21,7 @@ import eu.europa.ec.corelogic.model.DocumentCategory
 import eu.europa.ec.corelogic.model.DocumentIdentifier
 import eu.europa.ec.eudi.wallet.EudiWalletConfig
 import eu.europa.ec.eudi.wallet.document.CreateDocumentSettings.CredentialPolicy
+import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import java.time.Duration
 
 interface WalletCoreConfig {
@@ -179,6 +180,6 @@ interface WalletCoreConfig {
      *
      * @return The OpenId4VciManager.Config for the passport scanning issuer, or null if not configured
      */
-    val passportScanningIssuerConfig: eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager.Config?
+    val passportScanningIssuerConfig: OpenId4VciManager.Config?
         get() = null
 }
