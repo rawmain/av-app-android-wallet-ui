@@ -168,7 +168,7 @@ class PassportConsentInteractorImpl(
     }
 
     override fun resumeOpenId4VciWithAuthorization(uri: String) {
-        passportScanningDocumentsController.resumeOpenId4VciWithAuthorization(uri)
+        passportScanningDocumentsController.resumePassportScanningOpenId4VciWithAuthorization(uri)
     }
 
     private fun getSuccessScreenArgumentsForDeferred(

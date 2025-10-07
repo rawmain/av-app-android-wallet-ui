@@ -71,6 +71,12 @@ interface PassportScanningDocumentsController : WalletCoreDocumentsController {
         issuanceMethod: IssuanceMethod,
         configId: String,
     ): Flow<IssueDocumentPartialState>
+
+    /**
+     * Resume OpenId4VCI authorization for passport scanning issuer
+     * @param uri the authorization response URI
+     */
+    fun resumePassportScanningOpenId4VciWithAuthorization(uri: String)
 }
 
 class PassportScanningDocumentsControllerImpl(
@@ -312,5 +318,9 @@ class PassportScanningDocumentsControllerImpl(
         }
 
         return listener
+    }
+
+    override fun resumePassportScanningOpenId4VciWithAuthorization(uri: String) {
+        passportScanningOpenId4VciManager?.resumeWithAuthorization(uri)
     }
 }
