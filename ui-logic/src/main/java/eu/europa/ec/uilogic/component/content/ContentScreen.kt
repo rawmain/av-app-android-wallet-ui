@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
@@ -124,9 +123,7 @@ fun ContentScreen(
         snackbarHost = snackbarHost,
     ) { padding ->
 
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
 
             if (contentErrorConfig != null) {
                 ContentError(
@@ -134,11 +131,8 @@ fun ContentScreen(
                     paddingValues = screenPaddings(padding)
                 )
             } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .navigationBarsPadding()
-                ) {
+
+                Column(modifier = Modifier.fillMaxSize()) {
 
                     Box(modifier = Modifier.weight(1f)) {
                         bodyContent(screenPaddings(padding, topSpacing))
@@ -153,7 +147,7 @@ fun ContentScreen(
                         ) {
                             stickyBottomContent(
                                 stickyBottomPaddings(
-                                    contentScreenPaddings = screenPaddings(padding),
+                                    contentScreenPaddings = padding,
                                     layoutDirection = LocalLayoutDirection.current
                                 )
                             )
