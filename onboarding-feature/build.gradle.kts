@@ -32,7 +32,6 @@ moduleConfig {
 
 dependencies {
     implementation(project(":passport-scanner"))
-    implementation(libs.keyless)
     implementation(libs.gson)
 }
 

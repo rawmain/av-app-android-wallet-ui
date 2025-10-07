@@ -44,5 +44,10 @@
             android:screenOrientation="nosensor"
             android:launchMode="singleInstance"
             android:keepScreenOn="true"/>
+        <activity
+            android:name="kl.open.fmandroid.CameraActivity"
+            android:screenOrientation="portrait"
+            android:keepScreenOn="true"
+            android:exported="false"/>
     </application>
 </manifest>
