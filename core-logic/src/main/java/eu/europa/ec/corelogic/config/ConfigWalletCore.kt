@@ -170,4 +170,15 @@ interface WalletCoreConfig {
      * (OneTimeUse) or rotated through for multiple uses (RotateUse).
      */
     val credentialPolicy: CredentialPolicy
+
+    /**
+     * Configuration for the passport scanning issuer.
+     *
+     * This configuration is used for issuing age verification documents after passport scanning.
+     * It points to a separate issuer endpoint that handles the passport-based issuance flow.
+     *
+     * @return The OpenId4VciManager.Config for the passport scanning issuer, or null if not configured
+     */
+    val passportScanningIssuerConfig: eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager.Config?
+        get() = null
 }
