@@ -36,9 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,6 +59,8 @@ import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun PassportLiveVideoScreen(
@@ -89,7 +88,12 @@ fun PassportLiveVideoScreen(
                 val configJson = context.assets.open("keyless_config.json").bufferedReader().use { it.readText() }
                 Log.d("PassportLiveVideoScreen", "Config loaded: ${configJson.take(100)}...")
                 Log.d("PassportLiveVideoScreen", "Calling sdk.init()...")
-                val success = sdk.init(configJson)
+
+                val success = sdk.init(configJson) { progress, message ->
+                    Log.d("PassportLiveVideoScreen", "Init progress: $progress% - $message")
+                    viewModel.setEvent(Event.UpdateSdkInitProgress(progress, message))
+                }
+
                 Log.d("PassportLiveVideoScreen", "SDK initialization completed with result: $success")
                 if (success) {
                     withContext(Dispatchers.Main) {
@@ -129,7 +133,14 @@ fun PassportLiveVideoScreen(
                 isEnabled = !isSdkInitializing && faceMatchSdk != null
             )
         }
-    ) { paddingValues -> Content(paddingValues = paddingValues) }
+    ) { paddingValues ->
+        Content(
+            paddingValues = paddingValues,
+            sdkInitProgress = state.sdkInitProgress,
+            sdkInitMessage = state.sdkInitMessage,
+            isSdkInitializing = isSdkInitializing
+        )
+    }
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
@@ -204,7 +215,12 @@ private fun ActionButtons(
 }
 
 @Composable
-private fun Content(paddingValues: PaddingValues) {
+private fun Content(
+    paddingValues: PaddingValues,
+    sdkInitProgress: Int = 0,
+    sdkInitMessage: String = "",
+    isSdkInitializing: Boolean = false
+) {
 
     Column(
         modifier = Modifier
@@ -248,6 +264,42 @@ private fun Content(paddingValues: PaddingValues) {
                 maxLines = Int.MAX_VALUE
             )
         )
+
+        if (isSdkInitializing && sdkInitProgress > 0) {
+            DownloadProgress(
+                progress = sdkInitProgress,
+                message = sdkInitMessage
+            )
+        }
+    }
+}
+
+@Composable
+private fun DownloadProgress(
+    progress: Int,
+    message: String
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        VSpacer.Large()
+        WrapText(
+            text = message,
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                color = MaterialTheme.colorScheme.primary
+            )
+        )
+        VSpacer.Small()
+        WrapText(
+            text = "$progress%",
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        )
     }
 }
 
@@ -263,9 +315,17 @@ private fun PassportLiveVideoScreenPreview() {
                 ActionButtons(
                     paddings = paddingValues,
                     onBack = {},
-                    onLiveVideo = {}
+                    onLiveVideo = {},
+                    isEnabled = true
                 )
             }
-        ) { paddingValues -> Content(paddingValues = paddingValues) }
+        ) { paddingValues ->
+            Content(
+                paddingValues = paddingValues,
+                sdkInitProgress = 45,
+                sdkInitMessage = "Downloading model... 120 / 260 MB",
+                isSdkInitializing = true
+            )
+        }
     }
 }

@@ -31,11 +31,14 @@ private const val TAG = "PassportLiveVideoViewModel"
 data class State(
     val isLoading: Boolean = false,
     val config: PassportLiveVideoUiConfig? = null,
+    val sdkInitProgress: Int = 0, // 0-100 percentage
+    val sdkInitMessage: String = "",
 ) : ViewState
 
 sealed class Event : ViewEvent {
     data object OnBackPressed : Event()
     data object OnLiveVideoCapture : Event()
+    data class UpdateSdkInitProgress(val progress: Int, val message: String) : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -72,6 +75,15 @@ class PassportLiveVideoViewModel(
             Event.OnLiveVideoCapture -> {
                 logController.i(tag = TAG) { "Event invoked OnLiveVideoCapture" }
                 setEffect { Effect.Navigation.StartVideoLiceCapture }
+            }
+
+            is Event.UpdateSdkInitProgress -> {
+                setState {
+                    copy(
+                        sdkInitProgress = event.progress,
+                        sdkInitMessage = event.message
+                    )
+                }
             }
         }
     }

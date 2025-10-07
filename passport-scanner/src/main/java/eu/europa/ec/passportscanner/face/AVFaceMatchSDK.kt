@@ -33,9 +33,10 @@ interface AVFaceMatchSDK {
     /**
      * Initialize the SDK with configuration
      * @param configJson JSON configuration string containing model paths and settings
+     * @param onProgress Optional callback for initialization progress (percentage: 0-100, message)
      * @return true if initialization was successful, false otherwise
      */
-    suspend fun init(configJson: String): Boolean
+    suspend fun init(configJson: String, onProgress: ((Int, String) -> Unit)? = null): Boolean
 
     /**
      * Capture live face and match against reference image

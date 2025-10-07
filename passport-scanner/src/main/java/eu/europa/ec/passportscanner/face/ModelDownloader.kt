@@ -38,9 +38,15 @@ class ModelDownloader(private val context: Context) {
      * @param urlString URL to download from
      * @param destDir Destination directory path
      * @param outputFilename Optional custom filename for the downloaded file. If null, extracts from URL
+     * @param onProgress Optional callback for download progress (percentage: 0-100, message)
      * @return The local filename of the downloaded file, or null if failed
      */
-    suspend fun downloadModelFromUrl(urlString: String, destDir: String, outputFilename: String? = null): String? = withContext(Dispatchers.IO) {
+    suspend fun downloadModelFromUrl(
+        urlString: String,
+        destDir: String,
+        outputFilename: String? = null,
+        onProgress: ((Int, String) -> Unit)? = null
+    ): String? = withContext(Dispatchers.IO) {
         try {
             android.util.Log.d(TAG, "downloadModelFromUrl: Starting download from $urlString")
 
@@ -78,25 +84,36 @@ class ModelDownloader(private val context: Context) {
                         var bytesRead: Int
                         var totalBytesRead = 0L
                         var lastLoggedMB = 0L
+                        var lastReportedPercentage = 0
 
                         while (input.read(buffer).also { bytesRead = it } != -1) {
                             output.write(buffer, 0, bytesRead)
                             totalBytesRead += bytesRead
 
-                            // Log progress every 10MB
                             val currentMB = totalBytesRead / (1024 * 1024)
+                            val percentage = if (contentLength > 0) {
+                                ((totalBytesRead * 100) / contentLength).toInt()
+                            } else {
+                                0
+                            }
+
+                            // Log progress every 10MB
                             if (currentMB >= lastLoggedMB + 10) {
-                                val progress = if (contentLength > 0) {
-                                    " (${(totalBytesRead * 100 / contentLength)}%)"
-                                } else {
-                                    ""
-                                }
-                                android.util.Log.d(TAG, "downloadModelFromUrl: Downloaded $currentMB MB$progress")
+                                val progressMsg = if (contentLength > 0) " ($percentage%)" else ""
+                                android.util.Log.d(TAG, "downloadModelFromUrl: Downloaded $currentMB MB$progressMsg")
                                 lastLoggedMB = currentMB
+                            }
+
+                            // Report progress every 5%
+                            if (percentage >= lastReportedPercentage + 5 && contentLength > 0) {
+                                val sizeMB = contentLength / (1024 * 1024)
+                                onProgress?.invoke(percentage, "Downloading model... $currentMB / $sizeMB MB")
+                                lastReportedPercentage = percentage
                             }
                         }
 
                         android.util.Log.d(TAG, "downloadModelFromUrl: Download complete: ${totalBytesRead / (1024 * 1024)} MB total")
+                        onProgress?.invoke(100, "Download complete")
                     }
                 }
 
@@ -141,14 +158,20 @@ class ModelDownloader(private val context: Context) {
      * @param modelPath Either an asset filename or HTTP(S) URL
      * @param destDir Destination directory path
      * @param outputFilename Optional custom filename for downloaded files. Only used for URLs
+     * @param onProgress Optional callback for download progress (percentage: 0-100, message)
      * @return The local filename, or null if preparation failed
      */
-    suspend fun prepareModel(modelPath: String, destDir: String, outputFilename: String? = null): String? {
+    suspend fun prepareModel(
+        modelPath: String,
+        destDir: String,
+        outputFilename: String? = null,
+        onProgress: ((Int, String) -> Unit)? = null
+    ): String? {
         if (modelPath.isEmpty()) return null
 
         return if (modelPath.startsWith("http://") || modelPath.startsWith("https://")) {
             // Download from URL
-            downloadModelFromUrl(modelPath, destDir, outputFilename)
+            downloadModelFromUrl(modelPath, destDir, outputFilename, onProgress)
         } else {
             // Copy from assets
             copyAssetIfNeeded(modelPath, destDir)
