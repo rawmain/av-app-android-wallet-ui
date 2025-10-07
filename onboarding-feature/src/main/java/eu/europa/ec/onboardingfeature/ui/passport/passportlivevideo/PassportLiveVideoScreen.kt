@@ -31,7 +31,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,23 +71,62 @@ fun PassportLiveVideoScreen(
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val faceMatchSdk: AVFaceMatchSDK by lazy {
-        AVFaceMatchSdkImpl(context.applicationContext).apply {
-            val configJson =
-                context.assets.open("keyless_config.json").bufferedReader().use { it.readText() }
-            init(configJson)
+    val coroutineScope = rememberCoroutineScope()
+
+    var faceMatchSdk by remember { mutableStateOf<AVFaceMatchSDK?>(null) }
+    var isSdkInitializing by remember { mutableStateOf(false) }
+
+    // Initialize SDK in background when screen loads
+    LaunchedEffect(Unit) {
+        Log.d("PassportLiveVideoScreen", "LaunchedEffect started")
+        isSdkInitializing = true
+        try {
+            withContext(Dispatchers.IO) {
+                Log.d("PassportLiveVideoScreen", "Entered IO dispatcher")
+                Log.d("PassportLiveVideoScreen", "Creating AVFaceMatchSdkImpl...")
+                val sdk = AVFaceMatchSdkImpl(context.applicationContext)
+                Log.d("PassportLiveVideoScreen", "Loading config from assets...")
+                val configJson = context.assets.open("keyless_config.json").bufferedReader().use { it.readText() }
+                Log.d("PassportLiveVideoScreen", "Config loaded: ${configJson.take(100)}...")
+                Log.d("PassportLiveVideoScreen", "Calling sdk.init()...")
+                val success = sdk.init(configJson)
+                Log.d("PassportLiveVideoScreen", "SDK initialization completed with result: $success")
+                if (success) {
+                    withContext(Dispatchers.Main) {
+                        Log.d("PassportLiveVideoScreen", "Setting faceMatchSdk state...")
+                        faceMatchSdk = sdk
+                        Log.d("PassportLiveVideoScreen", "SDK is now ready! faceMatchSdk = $sdk")
+                        Toast.makeText(context, "Face recognition ready!", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Log.e("PassportLiveVideoScreen", "SDK init returned false - initialization failed")
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "SDK initialization failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("PassportLiveVideoScreen", "Exception during SDK initialization: ${e.javaClass.simpleName}: ${e.message}", e)
+            e.printStackTrace()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Failed to initialize SDK: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        } finally {
+            isSdkInitializing = false
+            Log.d("PassportLiveVideoScreen", "SDK initialization process complete. isSdkInitializing = false")
         }
     }
 
     ContentScreen(
-        isLoading = state.isLoading,
+        isLoading = state.isLoading || isSdkInitializing,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.OnBackPressed) },
         stickyBottom = { paddingValues ->
             ActionButtons(
                 paddings = paddingValues,
                 onBack = { viewModel.setEvent(Event.OnBackPressed) },
-                onLiveVideo = { viewModel.setEvent(Event.OnLiveVideoCapture) }
+                onLiveVideo = { viewModel.setEvent(Event.OnLiveVideoCapture) },
+                isEnabled = !isSdkInitializing && faceMatchSdk != null
             )
         }
     ) { paddingValues -> Content(paddingValues = paddingValues) }
@@ -90,8 +136,14 @@ fun PassportLiveVideoScreen(
             when (effect) {
                 is Navigation.GoBack -> controller.popBackStack()
                 Navigation.StartVideoLiceCapture -> {
-                    state.config?.let { config ->
-                        startCapturing(context, faceMatchSdk, config.faceImageTempPath)
+                    val sdk = faceMatchSdk
+                    if (sdk != null) {
+                        state.config?.let { config ->
+                            startCapturing(context, sdk, config.faceImageTempPath)
+                        }
+                    } else {
+                        Log.e("PassportLiveVideoScreen", "Cannot start capture: SDK not initialized")
+                        Toast.makeText(context, "SDK not ready, please wait...", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -117,7 +169,12 @@ fun startCapturing(context: Context, faceMatchSdk: AVFaceMatchSDK, faceImageTemp
 }
 
 @Composable
-private fun ActionButtons(onBack: () -> Unit, onLiveVideo: () -> Unit, paddings: PaddingValues) {
+private fun ActionButtons(
+    onBack: () -> Unit,
+    onLiveVideo: () -> Unit,
+    paddings: PaddingValues,
+    isEnabled: Boolean = true
+) {
 
     val buttons = StickyBottomType.TwoButtons(
         primaryButtonConfig = ButtonConfig(
@@ -126,7 +183,8 @@ private fun ActionButtons(onBack: () -> Unit, onLiveVideo: () -> Unit, paddings:
         ),
         secondaryButtonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
-            onClick = onLiveVideo
+            onClick = onLiveVideo,
+            enabled = isEnabled
         )
     )
 
