@@ -16,6 +16,7 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -52,7 +53,6 @@ import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
-import eu.europa.ec.uilogic.navigation.helper.handleDeepLinkAction
 
 @Composable
 fun PassportLiveVideoScreen(
@@ -91,36 +91,30 @@ fun PassportLiveVideoScreen(
 
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
-            when (effect) {
-                is Navigation.GoBack -> controller.popBackStack()
-                is Effect.Failure -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_LONG).show()
-                }
-                is Effect.CaptureSuccess -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
-                }
-                is Navigation.SwitchScreen -> {
-                    android.util.Log.i(
-                        "PassportLiveVideoScreen",
-                        "Navigating to: ${effect.screenRoute}, inclusive: ${effect.inclusive}"
-                    )
-                    controller.navigate(effect.screenRoute) {
-                        popUpTo(OnboardingScreens.PassportLiveVideo.screenRoute) {
-                            inclusive = effect.inclusive
-                        }
-                    }
-                }
+            handleEffect(effect, controller, context)
+        }
+    }
+}
 
-                is Navigation.OpenDeepLinkAction -> {
-                    android.util.Log.i(
-                        "PassportLiveVideoScreen",
-                        "Handling deeplink: ${effect.deepLinkUri}"
-                    )
-                    handleDeepLinkAction(
-                        controller,
-                        effect.deepLinkUri,
-                        effect.arguments
-                    )
+private fun handleEffect(
+    effect: Effect,
+    controller: NavController,
+    context: Context
+) {
+    when (effect) {
+        is Navigation.GoBack -> controller.popBackStack()
+        is Effect.Failure -> {
+            Toast.makeText(context, effect.message, Toast.LENGTH_LONG).show()
+        }
+
+        is Effect.CaptureSuccess -> {
+            Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+        }
+
+        is Navigation.SwitchScreen -> {
+            controller.navigate(effect.screenRoute) {
+                popUpTo(OnboardingScreens.PassportLiveVideo.screenRoute) {
+                    inclusive = effect.inclusive
                 }
             }
         }

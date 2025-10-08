@@ -75,7 +75,6 @@ class AVFaceMatchSdkImpl(private val context: Context) : AVFaceMatchSDK {
         val embeddingOutputFilename = "embedding.onnx"
 
         // Prepare models (download from URL or copy from assets) to internal storage
-        onProgress?.invoke(0, "Preparing models...")
         modelDownloader.prepareModel(livenessModel0, modelBasePath)
         modelDownloader.prepareModel(livenessModel1, modelBasePath)
         modelDownloader.prepareModel(faceDetectorModel, modelBasePath)
@@ -83,6 +82,7 @@ class AVFaceMatchSdkImpl(private val context: Context) : AVFaceMatchSDK {
 
         // Update config to use local filename for embedding model (since it's downloaded from URL)
         if (embeddingModel.startsWith("http")|| embeddingModel.startsWith("https")) {
+            onProgress?.invoke(0, "Preparing models...")
             parsedConfig.put("embedding_extractor_model", embeddingOutputFilename)
             Log.d(TAG, "init: Updated embedding model path to $embeddingOutputFilename")
         }

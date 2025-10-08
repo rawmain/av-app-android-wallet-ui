@@ -17,7 +17,6 @@
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
 import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
@@ -65,7 +64,6 @@ sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
         data class SwitchScreen(val screenRoute: String, val inclusive: Boolean) : Navigation()
-        data class OpenDeepLinkAction(val deepLinkUri: Uri, val arguments: String?) : Navigation()
     }
 
     data class Failure(val message: String) : Effect()
