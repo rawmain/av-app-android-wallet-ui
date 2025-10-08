@@ -43,12 +43,13 @@
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scansiona il tuo passaporto / carta d\'identità</string>
     <string name="passport_identification_description">Per questo passaggio, scatta semplicemente una foto chiara del tuo passaporto / carta d\'identità. Assicurati che:</string>
-    <string name="passport_identification_step_first">L'intero passaporto / carta d\'identità sia visibile e ben illuminato.</string>
+    <string name="passport_identification_step_first">L\'intero passaporto / carta d\'identità sia visibile e ben illuminato.</string>
     <string name="passport_identification_step_second">Nessun riflesso o sfocatura oscuri i dettagli.</string>
     <string name="passport_identification_footer">Prendiamo un codice identificativo da questo passaporto / carta d\'identità per accedere alla parte leggibile dalla macchina del documento.</string>
     <string name="passport_identification_back">Indietro</string>
     <string name="passport_identification_capture">Scansiona passaporto / carta d\'identità</string>
-    <string name="passport_capture_subtitle">Allinea la pagina con la foto del passaporto / carta d\'identità all'interno della cornice</string>
+    <string name="passport_capture_title">Scansiona il tuo passaporto / carta d\'identità</string>
+    <string name="passport_capture_subtitle">Allinea la pagina con la foto del passaporto / carta d\'identità all\'interno della cornice</string>
 
     <!-- Passport live video instructions - Italian (it) -->
     <string name="passport_live_video_header">Registra un breve video di te stesso</string>
@@ -83,7 +84,7 @@
     <string name="passport_biometrics_back">Indietro</string>
     <string name="passport_biometrics_next">Avanti</string>
     <string name="passport_biometrics_content_description">Descrizione del contenuto</string>
-    <string name="passport_biometrics_first_header">Leggi il tuo passaporto / carta d\'identità</string>
+    <string name="passport_biometrics_first_header">Scansiona il tuo passaporto / carta d\'identità</string>
     <string name="passport_biometrics_first_description">Posiziona il passaporto / carta d\'identità direttamente sul retro dello smartphone, di solito nella parte superiore.</string>
     <string name="passport_biometrics_first_link">Hai bisogno di aiuto?</string>
     <string name="passport_biometrics_verify_data">Si prega di verificare i dati</string>
@@ -97,12 +98,12 @@
     <string name="onboarding_verification_qr_code_description">Scansiona un codice QR o inserisci un token per ricevere una credenziale di verifica dell\'età da un emittente autorizzato.</string>
     <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>
     <string name="passport_scan_intro_title">Passaporto o Carta d\'identità</string>
-    <string name="passport_scan_intro_description">Il metodo passaporto / carta d\'identità è veloce e sicuro! Scansiona il tuo documento, scatta una foto e registra un breve video—tre passaggi per un onboarding sicuro.</string>
+    <string name="passport_scan_intro_description">Il metodo passaporto / carta d\'identità è veloce e sicuro! Scatta una foto del tuo passaporto / carta d\'identità, scansiona il tuo passaporto / carta d\'identità e registra un video di te stesso—tre passaggi per un onboarding sicuro.</string>
     <string name="passport_scan_intro_back_button">Indietro</string>
     <string name="passport_scan_intro_start_button">Inizia</string>
-    <string name="passport_scan_intro_step_1_title">Scatta una foto del passaporto / carta d\'identità</string>
+    <string name="passport_scan_intro_step_1_title">Scatta una foto del tuo passaporto / carta d\'identità</string>
     <string name="passport_scan_intro_step_1_description">Cattura un\'immagine chiara del tuo passaporto / carta d\'identità.</string>
-    <string name="passport_scan_intro_step_2_title">Leggi il tuo passaporto / carta d\'identità</string>
+    <string name="passport_scan_intro_step_2_title">Scansiona il tuo passaporto / carta d\'identità</string>
     <string name="passport_scan_intro_step_2_description">Posiziona il tuo passaporto / carta d\'identità sullo smartphone per leggere i dati.</string>
     <string name="passport_scan_intro_step_3_title">Registra un video di te stesso</string>
     <string name="passport_scan_intro_step_3_description">Filmati per la verifica dell\'identità.</string>
