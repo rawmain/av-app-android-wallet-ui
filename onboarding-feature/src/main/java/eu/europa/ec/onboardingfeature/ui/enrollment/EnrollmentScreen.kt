@@ -98,7 +98,8 @@ fun EnrollmentScreen(
             onMethodSelected = { method ->
                 viewModel.setEvent(Event.SelectEnrollmentMethod(method, context))
             },
-            showStepBar = state.isOnboarding
+            showStepBar = state.isOnboarding,
+            availableMethods = state.availableEnrollmentMethods
         )
     }
 
@@ -151,6 +152,7 @@ private fun Content(
     paddingValues: PaddingValues,
     onMethodSelected: (EnrollmentMethod) -> Unit,
     showStepBar: Boolean = true,
+    availableMethods: List<EnrollmentMethod> = EnrollmentMethod.entries,
 ) {
     Column(
         modifier = Modifier
@@ -183,7 +185,7 @@ private fun Content(
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            EnrollmentMethod.entries.forEach { method ->
+            availableMethods.forEach { method ->
                 EnrollmentMethodCard(
                     method = method,
                     onClick = { onMethodSelected(method) }

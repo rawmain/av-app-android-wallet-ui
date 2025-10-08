@@ -19,6 +19,7 @@ package eu.europa.ec.onboardingfeature.di
 import android.content.Context
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
+import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.controller.PassportScanningDocumentsController
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchController
@@ -55,11 +56,13 @@ fun provideEnrollmentInteractor(
     deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
     resourceProvider: ResourceProvider,
     uiSerializer: UiSerializer,
+    walletCoreConfig: WalletCoreConfig,
 ): EnrollmentInteractor = EnrollmentInteractorImpl(
     walletCoreDocumentsController,
     deviceAuthenticationInteractor,
     resourceProvider,
-    uiSerializer
+    uiSerializer,
+    walletCoreConfig
 )
 
 @Single
