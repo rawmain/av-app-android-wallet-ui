@@ -101,10 +101,10 @@
     <string name="passport_scan_intro_description">Die Reisepass / Personalausweis Methode ist schnell und sicher! Foto Ihres Reisepasses / Personalausweises aufnehmen, Reisepass / Personalausweis scannen und Video von sich selbst aufnehmen—drei Schritte für sicheres Onboarding.</string>
     <string name="passport_scan_intro_back_button">Zurück</string>
     <string name="passport_scan_intro_start_button">Starten</string>
-    <string name="passport_scan_intro_step_1_title">Foto Ihres Reisepasses / Personalausweises aufnehmen</string>
-    <string name="passport_scan_intro_step_1_description">Erstellen Sie ein klares Bild Ihres Reisepasses / Personalausweises.</string>
-    <string name="passport_scan_intro_step_2_title">Reisepass / Personalausweis scannen</string>
-    <string name="passport_scan_intro_step_2_description">Legen Sie Ihren Reisepass / Personalausweis auf Ihr Smartphone, um die Daten zu lesen.</string>
+    <string name="passport_scan_intro_step_1_title">Foto Ihres Identitätsdokuments aufnehmen</string>
+    <string name="passport_scan_intro_step_1_description">Erstellen Sie ein klares Bild Ihres Identitätsdokuments.</string>
+    <string name="passport_scan_intro_step_2_title">Identitätsdokument scannen</string>
+    <string name="passport_scan_intro_step_2_description">Legen Sie Ihr Identitätsdokument auf Ihr Smartphone, um die Daten zu lesen.</string>
     <string name="passport_scan_intro_step_3_title">Video von sich selbst aufnehmen</string>
     <string name="passport_scan_intro_step_3_description">Filmen Sie sich selbst zur Identitätsprüfung.</string>
     <string name="passport_scan_intro_step_4_title">Einverständnis</string>
