@@ -57,7 +57,7 @@
     <string name="passport_live_video_step_first">Guardare direttamente la fotocamera con una buona illuminazione.</string>
     <string name="passport_live_video_step_second">Seguire le istruzioni sullo schermo (ad esempio, battere le palpebre o girare la testa).</string>
     <string name="passport_live_video_step_third">Evitare filtri, maschere o ostacoli.</string>
-    <string name="passport_live_video_footer">Questo passaggio garantisce che tu sia il legittimo proprietario del passaporto / carta d\'identità e previene le frodi.</string>
+    <string name="passport_live_video_footer">Questo passaggio garantisce che tu sia il legittimo proprietario del passaporto / carta d\'identità.</string>
     <string name="passport_live_video_back">Indietro</string>
     <string name="passport_live_video_live_capture">Avvia video live</string>
     <string name="passport_live_video_error_not_processed">La cattura video non è stata elaborata correttamente. Riprova.</string>

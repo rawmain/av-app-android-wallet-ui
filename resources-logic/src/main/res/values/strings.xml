@@ -116,7 +116,7 @@
     <string name="passport_live_video_step_first">Face the camera directly in good lighting.</string>
     <string name="passport_live_video_step_second">Follow the on-screen instructions (e.g., blink or turn your head).</string>
     <string name="passport_live_video_step_third">Avoid filters, masks, or obstructions.</string>
-    <string name="passport_live_video_footer">This step ensures that you are the rightful owner of the passport / ID card and prevents fraud.</string>
+    <string name="passport_live_video_footer">This step ensures that you are the rightful owner of the passport / ID card.</string>
     <string name="passport_live_video_back">Back</string>
     <string name="passport_live_video_live_capture">Start live video</string>
     <string name="passport_live_video_error_not_processed">Video capture was not processed successfully. Please try again.</string>

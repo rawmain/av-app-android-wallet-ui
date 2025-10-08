@@ -75,7 +75,7 @@
     <string name="passport_live_video_step_first">Vend ansigtet direkte mod kameraet i godt lys.</string>
     <string name="passport_live_video_step_second">Følg instruktionerne på skærmen (f.eks. blink eller drej dit hoved).</string>
     <string name="passport_live_video_step_third">Undgå filtre, masker eller forhindringer.</string>
-    <string name="passport_live_video_footer">Dette trin sikrer, at du er den rette ejer af pas / ID-kort og forhindrer svindel.</string>
+    <string name="passport_live_video_footer">Dette trin sikrer, at du er den rette ejer af pas / ID-kort.</string>
     <string name="passport_live_video_back">Tilbage</string>
     <string name="passport_live_video_live_capture">Start live-video</string>
     <string name="passport_live_video_error_not_processed">Videooptagelsen blev ikke behandlet korrekt. Prøv venligst igen.</string>

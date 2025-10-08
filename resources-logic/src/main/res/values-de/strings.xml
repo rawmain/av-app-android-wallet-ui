@@ -75,7 +75,7 @@
     <string name="passport_live_video_step_first">Richten Sie Ihr Gesicht bei guter Beleuchtung direkt zur Kamera.</string>
     <string name="passport_live_video_step_second">Folgen Sie den Anweisungen auf dem Bildschirm (z.B. blinzeln oder den Kopf drehen).</string>
     <string name="passport_live_video_step_third">Vermeiden Sie Filter, Masken oder Hindernisse.</string>
-    <string name="passport_live_video_footer">Dieser Schritt stellt sicher, dass Sie der rechtmäßige Eigentümer des Reisepasses / Personalausweises sind und verhindert Betrug.</string>
+    <string name="passport_live_video_footer">Dieser Schritt stellt sicher, dass Sie der rechtmäßige Eigentümer des Reisepasses / Personalausweises sind.</string>
     <string name="passport_live_video_back">Zurück</string>
     <string name="passport_live_video_live_capture">Live-video starten</string>
     <string name="passport_live_video_error_not_processed">Die Videoaufnahme wurde nicht erfolgreich verarbeitet. Bitte versuchen Sie es erneut.</string>

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="nfc_title_initial">Lesen Sie Ihren Reisepass ein</string>
-    <string name="nfc_title_reading">Lesen Sie Ihren Reisepass über die NFC-Schnittstelle ein</string>
-    <string name="nfc_body_initial">Legen Sie Ihren Reisepass direkt auf die Rückseite des Smartphones, normalerweise oben.</string>
-    <string name="nfc_body_reading">Reisepass wird gelesen</string>
+    <string name="nfc_title">Legen Sie Ihr Telefon über Ihren Reisepass / Personalausweis und bewegen Sie es nicht</string>
+    <string name="nfc_title_initial">Lesen Sie Ihren Reisepass / Personalausweis ein</string>
+    <string name="nfc_title_reading">Lesen Sie Ihren Reisepass / Personalausweis über die NFC-Schnittstelle ein</string>
+    <string name="nfc_body_initial">Legen Sie Ihren Reisepass / Personalausweis direkt auf die Rückseite des Smartphones, normalerweise oben.</string>
+    <string name="nfc_body_reading">Reisepass / Personalausweis wird gelesen</string>
     <string name="nfc_help_link"><u>Benötigen Sie Hilfe?</u></string>
 </resources>

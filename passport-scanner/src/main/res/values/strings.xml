@@ -54,11 +54,11 @@
     <string name="status_bar_success">OCR Detected - Time required: %2dms</string>
     <string name="status_bar_failure">OCR Read failure - Time required: %1d ms</string>
 
-    <string name="nfc_title">Put your phone over your passport and don\'t move it</string>
-    <string name="nfc_title_initial">Read in your Passport</string>
-    <string name="nfc_title_reading">Read in your passport via NFC interface</string>
-    <string name="nfc_body_initial">Place your Passport directly on the back of the smartphone, usually at the top.</string>
-    <string name="nfc_body_reading">Passport is being read</string>
+    <string name="nfc_title">Put your phone over your Passport / ID Card and don\'t move it</string>
+    <string name="nfc_title_initial">Read in your Passport / ID Card</string>
+    <string name="nfc_title_reading">Read in your Passport / ID Card via NFC interface</string>
+    <string name="nfc_body_initial">Place your Passport / ID Card directly on the back of the smartphone, usually at the top.</string>
+    <string name="nfc_body_reading">Passport / ID Card is being read</string>
     <string name="nfc_help_link"><u>Do you need Help?</u></string>
 
     <string name="label_document_number">Document Number</string>
