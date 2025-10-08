@@ -17,13 +17,11 @@
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
 import android.content.Context
-import androidx.lifecycle.viewModelScope
 import android.net.Uri
+import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
-import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
-import eu.europa.ec.passportscanner.face.AVFaceMatchSdkImpl
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
 import eu.europa.ec.resourceslogic.R
@@ -83,8 +81,6 @@ class PassportLiveVideoViewModel(
     @InjectedParam private val passportLiveVideoSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
-    private var faceMatchSdk: AVFaceMatchSDK? = null
-
     override fun setInitialState(): State {
         logController.i(TAG) { "get the following param=$passportLiveVideoSerializedConfig" }
         val config: PassportLiveVideoUiConfig? = uiSerializer.fromBase64(
@@ -103,8 +99,7 @@ class PassportLiveVideoViewModel(
 
             Event.OnLiveVideoCapture -> {
                 logController.i(tag = TAG) { "Event invoked OnLiveVideoCapture" }
-                startCapturing()
-                handleLiveVideoCapture(event.context)
+                handleLiveVideoCapture()
             }
 
             is Event.InitializeSdk -> {
@@ -132,17 +127,14 @@ class PassportLiveVideoViewModel(
         viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    logController.d(TAG) { "Initialising AVFaceMatchSdkImpl..." }
-                    val sdk = AVFaceMatchSdkImpl(context.applicationContext)
+                    logController.d(TAG) { "Initializing SDK via interactor..." }
 
-                    val success = sdk.init { progress, message ->
+                    val success = passportLiveVideoInteractor.init(context) { progress, message ->
                         logController.d(TAG) { "Init progress: $progress% - $message" }
                         setEvent(Event.UpdateSdkInitProgress(progress, message))
                     }
 
-                    logController.d(TAG) { "SDK initialization completed with result: $success" }
                     if (success) {
-                        faceMatchSdk = sdk
                         setState {
                             copy(
                                 isSdkInitializing = false,
@@ -162,32 +154,7 @@ class PassportLiveVideoViewModel(
         }
     }
 
-    private fun startCapturing() {
-        val sdk = faceMatchSdk
-        if (sdk == null || !viewState.value.isSdkReady) {
-            logController.e(TAG) { "Cannot start capture: SDK not initialized" }
-            setEffect { Effect.Failure("SDK not ready, please wait...") }
-            return
-        }
-
-        val config = viewState.value.config
-        if (config == null) {
-            logController.e(TAG) { "Cannot start capture: Config is null" }
-            setEffect { Effect.Failure("Configuration error") }
-            return
-        }
-
-        logController.d(TAG) { "Starting capture & match using face image: ${config.faceImageTempPath}" }
-
-        sdk.captureAndMatch(config.faceImageTempPath) { result ->
-            logController.d(TAG) { "Capture result received: $result" }
-            handleCaptureResult(result.processed, result.capturedIsLive, result.isSameSubject)
-            // TODO Clean up the temporary file after use
-            // File(config.faceImageTempPath).delete()
-        }
-    }
-
-    private fun handleLiveVideoCapture(context: Context) {
+    private fun handleLiveVideoCapture() {
         val config = viewState.value.config
         if (config == null) {
             logController.e(TAG) { "Config is null, cannot proceed with live video capture" }
@@ -199,9 +166,7 @@ class PassportLiveVideoViewModel(
 
         viewModelScope.launch {
             try {
-                // Capture and match face
                 when (val matchResult = passportLiveVideoInteractor.captureAndMatchFace(
-                    context = context,
                     faceImageTempPath = config.faceImageTempPath
                 )) {
                     is FaceMatchPartialState.Success -> {
@@ -260,16 +225,4 @@ class PassportLiveVideoViewModel(
         }
     }
 
-    private fun handleCaptureResult(processed: Boolean, capturedIsLive: Boolean, isSameSubject: Boolean) {
-        logController.d(TAG) { "Capture result: processed=$processed, isLive=$capturedIsLive, isSameSubject=$isSameSubject" }
-
-        if (processed && capturedIsLive && isSameSubject) {
-            logController.i(TAG) { "Face match successful - same person as passport" }
-            setEffect { Effect.CaptureSuccess("Same Person as passport -> Next Page") }
-            // TODO: Navigate to next page
-        } else {
-            logController.w(TAG) { "Face match failed - not matching" }
-            setEffect { Effect.Failure("not matching -> Show Error") }
-        }
-    }
 }

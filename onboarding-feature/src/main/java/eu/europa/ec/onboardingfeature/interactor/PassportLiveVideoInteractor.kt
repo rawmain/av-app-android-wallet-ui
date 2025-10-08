@@ -31,10 +31,8 @@ sealed class FaceMatchPartialState {
 }
 
 interface PassportLiveVideoInteractor {
-    suspend fun captureAndMatchFace(
-        context: Context,
-        faceImageTempPath: String,
-    ): FaceMatchPartialState
+    suspend fun init(context: Context, onProgress: ((Int, String) -> Unit)? = null): Boolean
+    suspend fun captureAndMatchFace(faceImageTempPath: String): FaceMatchPartialState
 }
 
 class PassportLiveVideoInteractorImpl(
@@ -43,14 +41,51 @@ class PassportLiveVideoInteractorImpl(
     private val logController: LogController,
 ) : PassportLiveVideoInteractor {
 
-    override suspend fun captureAndMatchFace(
-        context: Context,
-        faceImageTempPath: String,
-    ): FaceMatchPartialState {
+    private var sdkInitialized = false
+
+    override suspend fun init(context: Context, onProgress: ((Int, String) -> Unit)?): Boolean {
+        if (sdkInitialized) {
+            logController.d(TAG) { "SDK already initialized" }
+            return true
+        }
+
+        logController.d(TAG) { "Initializing SDK in interactor..." }
+
+        return try {
+            val success = faceMatchController.init(context, onProgress)
+
+            if (success) {
+                sdkInitialized = true
+                logController.i(TAG) { "SDK initialization complete" }
+                true
+            } else {
+                logController.e(TAG) { "SDK initialization failed" }
+                false
+            }
+        } catch (e: Exception) {
+            logController.e(TAG) { "Exception during SDK initialization: ${e.message}" }
+            false
+        }
+    }
+
+    override suspend fun captureAndMatchFace(faceImageTempPath: String): FaceMatchPartialState {
+        if (!sdkInitialized) {
+            logController.e(TAG) { "SDK not initialized" }
+            return FaceMatchPartialState.Failure(
+                resourceProvider.getString(R.string.generic_error_retry)
+            )
+        }
+
         logController.d(TAG) { "Starting face capture and match using image: $faceImageTempPath" }
 
-        val matchResult: FaceMatchResult =
-            faceMatchController.captureAndMatch(context, faceImageTempPath)
+        val matchResult: FaceMatchResult = try {
+            faceMatchController.captureAndMatch(faceImageTempPath)
+        } catch (e: IllegalStateException) {
+            logController.e(TAG) { "SDK not initialized when calling captureAndMatch: ${e.message}" }
+            return FaceMatchPartialState.Failure(
+                resourceProvider.getString(R.string.generic_error_retry)
+            )
+        }
 
         logController.d(TAG) {
             "Face match result: processed=${matchResult.processed}," +

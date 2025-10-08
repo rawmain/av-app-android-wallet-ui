@@ -64,7 +64,7 @@ fun PassportLiveVideoScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.setEvent(Event.InitializeSdk)
+        viewModel.setEvent(Event.InitializeSdk(context))
     }
 
     ContentScreen(
