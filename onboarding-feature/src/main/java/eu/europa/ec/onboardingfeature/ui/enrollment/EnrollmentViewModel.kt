@@ -51,6 +51,7 @@ data class State(
     val isLoading: Boolean = false,
     val error: ContentErrorConfig? = null,
     val isOnboarding: Boolean = true,
+    val availableEnrollmentMethods: List<EnrollmentMethod> = emptyList(),
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -87,8 +88,17 @@ class EnrollmentViewModel(
     private var issuanceJob: Job? = null
 
     override fun setInitialState(): State {
+        val availableMethods = buildList {
+            add(EnrollmentMethod.NATIONAL_ID)
+            if (enrollmentInteractor.isPassportScanningAvailable()) {
+                add(EnrollmentMethod.PASSPORT_ID_CARD)
+            }
+            add(EnrollmentMethod.TOKEN_QR)
+        }
+
         return State(
-            isOnboarding = !enrollmentInteractor.hasDocuments()
+            isOnboarding = !enrollmentInteractor.hasDocuments(),
+            availableEnrollmentMethods = availableMethods
         )
     }
 

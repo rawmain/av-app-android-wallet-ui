@@ -16,17 +16,32 @@
 
 package eu.europa.ec.onboardingfeature.di
 
+import android.content.Context
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
+import eu.europa.ec.corelogic.config.WalletCoreConfig
+import eu.europa.ec.corelogic.controller.PassportScanningDocumentsController
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
+import eu.europa.ec.onboardingfeature.controller.FaceMatchController
+import eu.europa.ec.onboardingfeature.controller.FaceMatchControllerImpl
 import eu.europa.ec.onboardingfeature.interactor.ConsentInteractor
 import eu.europa.ec.onboardingfeature.interactor.ConsentInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractor
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractorImpl
+import eu.europa.ec.onboardingfeature.interactor.PassportConsentInteractor
+import eu.europa.ec.onboardingfeature.interactor.PassportConsentInteractorImpl
+import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractor
+import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractorImpl
+import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
+import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractorImpl
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.serializer.UiSerializer
+import kl.open.fmandroid.FaceMatchSDK
+import kl.open.fmandroid.FaceMatchSdkImpl
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
+import org.koin.core.annotation.Single
 
 @Module
 @ComponentScan("eu.europa.ec.onboardingfeature")
@@ -41,8 +56,58 @@ fun provideEnrollmentInteractor(
     deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
     resourceProvider: ResourceProvider,
     uiSerializer: UiSerializer,
+    walletCoreConfig: WalletCoreConfig,
 ): EnrollmentInteractor = EnrollmentInteractorImpl(
     walletCoreDocumentsController,
+    deviceAuthenticationInteractor,
+    resourceProvider,
+    uiSerializer,
+    walletCoreConfig
+)
+
+@Single
+fun provideFaceMatchSDK(context: Context): FaceMatchSDK {
+    return FaceMatchSdkImpl(context.applicationContext).apply {
+        val configJson = context.assets.open("keyless_config.json")
+            .bufferedReader()
+            .use { it.readText() }
+        init(configJson)
+    }
+}
+
+@Factory
+fun provideFaceMatchController(
+    faceMatchSDK: FaceMatchSDK,
+): FaceMatchController = FaceMatchControllerImpl(faceMatchSDK)
+
+@Factory
+fun providePassportLiveVideoInteractor(
+    faceMatchController: FaceMatchController,
+    resourceProvider: ResourceProvider,
+    logController: LogController,
+): PassportLiveVideoInteractor = PassportLiveVideoInteractorImpl(
+    faceMatchController,
+    resourceProvider,
+    logController
+)
+
+@Factory
+fun providePassportIdentificationInteractor(
+    resourceProvider: ResourceProvider,
+    logController: LogController,
+): PassportIdentificationInteractor = PassportIdentificationInteractorImpl(
+    resourceProvider,
+    logController
+)
+
+@Factory
+fun providePassportConsentInteractor(
+    passportScanningDocumentsController: PassportScanningDocumentsController,
+    deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
+    resourceProvider: ResourceProvider,
+    uiSerializer: UiSerializer,
+): PassportConsentInteractor = PassportConsentInteractorImpl(
+    passportScanningDocumentsController,
     deviceAuthenticationInteractor,
     resourceProvider,
     uiSerializer

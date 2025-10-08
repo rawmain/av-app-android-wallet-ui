@@ -22,11 +22,10 @@ import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenti
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
-import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.controller.FetchScopedDocumentsPartialState
 import eu.europa.ec.corelogic.controller.IssuanceMethod
 import eu.europa.ec.corelogic.controller.IssueDocumentPartialState
-import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
+import eu.europa.ec.corelogic.controller.PassportScanningDocumentsController
 import eu.europa.ec.corelogic.model.ScopedDocument
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
@@ -43,19 +42,19 @@ import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-sealed class EnrollmentInteractorPartialState {
-    data class Success(val documentId: String) : EnrollmentInteractorPartialState()
-    data class DeferredSuccess(val successRoute: String) : EnrollmentInteractorPartialState()
+sealed class PassportConsentInteractorPartialState {
+    data class Success(val documentId: String) : PassportConsentInteractorPartialState()
+    data class DeferredSuccess(val successRoute: String) : PassportConsentInteractorPartialState()
     data class UserAuthRequired(
         val crypto: BiometricCrypto,
         val resultHandler: DeviceAuthenticationResult,
-    ) : EnrollmentInteractorPartialState()
+    ) : PassportConsentInteractorPartialState()
 
-    data class Failure(val error: String) : EnrollmentInteractorPartialState()
+    data class Failure(val error: String) : PassportConsentInteractorPartialState()
 }
 
-interface EnrollmentInteractor {
-    fun issueNationalEID(context: Context): Flow<EnrollmentInteractorPartialState>
+interface PassportConsentInteractor {
+    fun issuePassportScanningDocument(context: Context): Flow<PassportConsentInteractorPartialState>
     fun handleUserAuth(
         context: Context,
         crypto: BiometricCrypto,
@@ -64,66 +63,68 @@ interface EnrollmentInteractor {
     )
 
     fun resumeOpenId4VciWithAuthorization(uri: String)
-
-    fun hasDocuments(): Boolean
-
-    fun isPassportScanningAvailable(): Boolean
 }
 
-class EnrollmentInteractorImpl(
-    private val walletCoreDocumentsController: WalletCoreDocumentsController,
+class PassportConsentInteractorImpl(
+    private val passportScanningDocumentsController: PassportScanningDocumentsController,
     private val deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
     private val resourceProvider: ResourceProvider,
     private val uiSerializer: UiSerializer,
-    private val walletCoreConfig: WalletCoreConfig,
-) : EnrollmentInteractor {
+) : PassportConsentInteractor {
 
     private val genericErrorMsg
         get() = resourceProvider.genericErrorMessage()
 
-    override fun issueNationalEID(context: Context): Flow<EnrollmentInteractorPartialState> = flow {
-        when (val state =
-            walletCoreDocumentsController.getScopedDocuments(resourceProvider.getLocale())) {
-            is FetchScopedDocumentsPartialState.Success -> {
-                val ageVerificationDocument: ScopedDocument? = state.documents
-                    .firstOrNull { it.isAgeVerification }
+    override fun issuePassportScanningDocument(context: Context): Flow<PassportConsentInteractorPartialState> =
+        flow {
+            when (val state =
+                passportScanningDocumentsController.getPassportScanningScopedDocuments(
+                    resourceProvider.getLocale()
+                )) {
+                is FetchScopedDocumentsPartialState.Success -> {
+                    val ageVerificationDocument: ScopedDocument? = state.documents
+                        .firstOrNull { it.isAgeVerification }
 
-                if (ageVerificationDocument == null) {
-                    emit(EnrollmentInteractorPartialState.Failure(genericErrorMsg))
-                    return@flow
-                }
+                    if (ageVerificationDocument == null) {
+                        emit(PassportConsentInteractorPartialState.Failure(genericErrorMsg))
+                        return@flow
+                    }
 
-                walletCoreDocumentsController.issueDocument(
-                    issuanceMethod = IssuanceMethod.OPENID4VCI,
-                    configId = ageVerificationDocument.configurationId
-                ).collect { issueState ->
-                    when (issueState) {
-                        is IssueDocumentPartialState.Success ->
-                            emit(EnrollmentInteractorPartialState.Success(issueState.documentId))
+                    passportScanningDocumentsController.issuePassportScanningDocument(
+                        issuanceMethod = IssuanceMethod.OPENID4VCI,
+                        configId = ageVerificationDocument.configurationId
+                    ).collect { issueState ->
+                        when (issueState) {
+                            is IssueDocumentPartialState.Success ->
+                                emit(PassportConsentInteractorPartialState.Success(issueState.documentId))
 
-                        is IssueDocumentPartialState.DeferredSuccess -> {
-                            val successRoute = buildGenericSuccessRouteForDeferred()
-                            emit(EnrollmentInteractorPartialState.DeferredSuccess(successRoute))
-                        }
-
-                        is IssueDocumentPartialState.UserAuthRequired ->
-                            emit(
-                                EnrollmentInteractorPartialState.UserAuthRequired(
-                                    issueState.crypto,
-                                    issueState.resultHandler
+                            is IssueDocumentPartialState.DeferredSuccess -> {
+                                val successRoute = buildGenericSuccessRouteForDeferred()
+                                emit(
+                                    PassportConsentInteractorPartialState.DeferredSuccess(
+                                        successRoute
+                                    )
                                 )
-                            )
+                            }
 
-                        is IssueDocumentPartialState.Failure ->
-                            emit(EnrollmentInteractorPartialState.Failure(issueState.errorMessage))
+                            is IssueDocumentPartialState.UserAuthRequired ->
+                                emit(
+                                    PassportConsentInteractorPartialState.UserAuthRequired(
+                                        issueState.crypto,
+                                        issueState.resultHandler
+                                    )
+                                )
+
+                            is IssueDocumentPartialState.Failure ->
+                                emit(PassportConsentInteractorPartialState.Failure(issueState.errorMessage))
+                        }
                     }
                 }
-            }
 
-            is FetchScopedDocumentsPartialState.Failure ->
-                emit(EnrollmentInteractorPartialState.Failure(state.errorMessage))
+                is FetchScopedDocumentsPartialState.Failure ->
+                    emit(PassportConsentInteractorPartialState.Failure(state.errorMessage))
+            }
         }
-    }
 
     override fun handleUserAuth(
         context: Context,
@@ -167,7 +168,7 @@ class EnrollmentInteractorImpl(
     }
 
     override fun resumeOpenId4VciWithAuthorization(uri: String) {
-        walletCoreDocumentsController.resumeOpenId4VciWithAuthorization(uri)
+        passportScanningDocumentsController.resumePassportScanningOpenId4VciWithAuthorization(uri)
     }
 
     private fun getSuccessScreenArgumentsForDeferred(
@@ -206,13 +207,5 @@ class EnrollmentInteractorImpl(
                 ).orEmpty()
             )
         )
-    }
-
-    override fun hasDocuments(): Boolean {
-        return walletCoreDocumentsController.getAgeOver18IssuedDocument() != null
-    }
-
-    override fun isPassportScanningAvailable(): Boolean {
-        return walletCoreConfig.passportScanningIssuerConfig != null
     }
 }

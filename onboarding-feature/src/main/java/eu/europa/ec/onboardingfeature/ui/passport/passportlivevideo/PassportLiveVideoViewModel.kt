@@ -18,14 +18,24 @@ package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
+import android.net.Uri
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
 import eu.europa.ec.passportscanner.face.AVFaceMatchSdkImpl
+import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
+import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
+import eu.europa.ec.resourceslogic.R
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
+import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
+import eu.europa.ec.uilogic.navigation.OnboardingScreens
+import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
+import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,18 +52,22 @@ data class State(
     val sdkInitMessage: String = "",
     val isSdkInitializing: Boolean = false,
     val isSdkReady: Boolean = false,
+    val error: ContentErrorConfig? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
     data object OnBackPressed : Event()
     data object OnLiveVideoCapture : Event()
-    data object InitializeSdk : Event()
+    data object OnRetry : Event()
+    data class InitializeSdk(val context: Context) : Event()
     data class UpdateSdkInitProgress(val progress: Int, val message: String) : Event()
 }
 
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
+        data class SwitchScreen(val screenRoute: String, val inclusive: Boolean) : Navigation()
+        data class OpenDeepLinkAction(val deepLinkUri: Uri, val arguments: String?) : Navigation()
     }
 
     data class Failure(val message: String) : Effect()
@@ -62,9 +76,10 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class PassportLiveVideoViewModel(
-    private val context: Context,
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
+    private val passportLiveVideoInteractor: PassportLiveVideoInteractor,
+    private val resourceProvider: ResourceProvider,
     @InjectedParam private val passportLiveVideoSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -89,10 +104,11 @@ class PassportLiveVideoViewModel(
             Event.OnLiveVideoCapture -> {
                 logController.i(tag = TAG) { "Event invoked OnLiveVideoCapture" }
                 startCapturing()
+                handleLiveVideoCapture(event.context)
             }
 
-            Event.InitializeSdk -> {
-                initializeSdk()
+            is Event.InitializeSdk -> {
+                initializeSdk(event.context)
             }
 
             is Event.UpdateSdkInitProgress -> {
@@ -103,11 +119,15 @@ class PassportLiveVideoViewModel(
                     )
                 }
             }
+            Event.OnRetry -> {
+                logController.i(tag = TAG) { "Event invoked OnRetry" }
+                setState { copy(error = null) }
+            }
         }
     }
 
-    private fun initializeSdk() {
-        setState { copy(isSdkInitializing = true) }
+    private fun initializeSdk(context: Context) {
+        setState { copy(isSdkInitializing = true, error = null) }
 
         viewModelScope.launch {
             try {
@@ -164,6 +184,79 @@ class PassportLiveVideoViewModel(
             handleCaptureResult(result.processed, result.capturedIsLive, result.isSameSubject)
             // TODO Clean up the temporary file after use
             // File(config.faceImageTempPath).delete()
+        }
+    }
+
+    private fun handleLiveVideoCapture(context: Context) {
+        val config = viewState.value.config
+        if (config == null) {
+            logController.e(TAG) { "Config is null, cannot proceed with live video capture" }
+            showError(resourceProvider.getString(R.string.generic_error_retry))
+            return
+        }
+
+        setState { copy(isLoading = true, error = null) }
+
+        viewModelScope.launch {
+            try {
+                // Capture and match face
+                when (val matchResult = passportLiveVideoInteractor.captureAndMatchFace(
+                    context = context,
+                    faceImageTempPath = config.faceImageTempPath
+                )) {
+                    is FaceMatchPartialState.Success -> {
+                        logController.i(TAG) { "Face match successful, navigating to consent screen" }
+                        setState { copy(isLoading = false) }
+                        navigateToConsentScreen(config.faceImageTempPath)
+                    }
+
+                    is FaceMatchPartialState.Failure -> {
+                        logController.e(TAG) { "Face match failed: ${matchResult.error}" }
+                        setState { copy(isLoading = false) }
+                        showError(matchResult.error)
+                    }
+                }
+            } catch (e: Exception) {
+                logController.e(TAG) { "Exception during live video capture: ${e.message}" }
+                setState { copy(isLoading = false) }
+                showError(e.message ?: "An unexpected error occurred")
+            }
+        }
+    }
+
+    private fun navigateToConsentScreen(faceImageTempPath: String) {
+        logController.i(TAG) { "Building navigation to consent screen" }
+        val screenRoute = generateComposableNavigationLink(
+            screen = OnboardingScreens.PassportConsent,
+            arguments = generateComposableArguments(
+                mapOf(
+                    PassportConsentUiConfig.serializedKeyName to uiSerializer.toBase64(
+                        model = PassportConsentUiConfig(
+                            faceImageTempPath = faceImageTempPath
+                        ),
+                        parser = PassportConsentUiConfig.Parser
+                    ).orEmpty()
+                )
+            )
+        )
+        logController.i(TAG) { "Setting navigation effect to screenRoute: $screenRoute" }
+        setEffect {
+            Effect.Navigation.SwitchScreen(
+                screenRoute = screenRoute,
+                inclusive = false
+            )
+        }
+    }
+
+    private fun showError(errorMessage: String) {
+        setState {
+            copy(
+                error = ContentErrorConfig(
+                    errorSubTitle = errorMessage,
+                    onCancel = { setEvent(Event.OnBackPressed) },
+                    onRetry = { setEvent(Event.OnRetry) }
+                )
+            )
         }
     }
 
