@@ -54,10 +54,10 @@ sealed class Event : ViewEvent {
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
-        data object StartVideoLiceCapture : Navigation()
     }
 
     data class Failure(val message: String) : Effect()
+    data class CaptureSuccess(val message: String) : Effect()
 }
 
 @KoinViewModel
@@ -88,12 +88,7 @@ class PassportLiveVideoViewModel(
 
             Event.OnLiveVideoCapture -> {
                 logController.i(tag = TAG) { "Event invoked OnLiveVideoCapture" }
-                if (faceMatchSdk != null && viewState.value.isSdkReady) {
-                    setEffect { Effect.Navigation.StartVideoLiceCapture }
-                } else {
-                    logController.e(TAG) { "Cannot start capture: SDK not initialized" }
-                    setEffect { Effect.Failure("SDK not ready, please wait...") }
-                }
+                startCapturing()
             }
 
             Event.InitializeSdk -> {
@@ -147,5 +142,41 @@ class PassportLiveVideoViewModel(
         }
     }
 
-    fun getSdk(): AVFaceMatchSDK? = faceMatchSdk
+    private fun startCapturing() {
+        val sdk = faceMatchSdk
+        if (sdk == null || !viewState.value.isSdkReady) {
+            logController.e(TAG) { "Cannot start capture: SDK not initialized" }
+            setEffect { Effect.Failure("SDK not ready, please wait...") }
+            return
+        }
+
+        val config = viewState.value.config
+        if (config == null) {
+            logController.e(TAG) { "Cannot start capture: Config is null" }
+            setEffect { Effect.Failure("Configuration error") }
+            return
+        }
+
+        logController.d(TAG) { "Starting capture & match using face image: ${config.faceImageTempPath}" }
+
+        sdk.captureAndMatch(config.faceImageTempPath) { result ->
+            logController.d(TAG) { "Capture result received: $result" }
+            handleCaptureResult(result.processed, result.capturedIsLive, result.isSameSubject)
+            // TODO Clean up the temporary file after use
+            // File(config.faceImageTempPath).delete()
+        }
+    }
+
+    private fun handleCaptureResult(processed: Boolean, capturedIsLive: Boolean, isSameSubject: Boolean) {
+        logController.d(TAG) { "Capture result: processed=$processed, isLive=$capturedIsLive, isSameSubject=$isSameSubject" }
+
+        if (processed && capturedIsLive && isSameSubject) {
+            logController.i(TAG) { "Face match successful - same person as passport" }
+            setEffect { Effect.CaptureSuccess("Same Person as passport -> Next Page") }
+            // TODO: Navigate to next page
+        } else {
+            logController.w(TAG) { "Face match failed - not matching" }
+            setEffect { Effect.Failure("not matching -> Show Error") }
+        }
+    }
 }

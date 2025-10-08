@@ -16,8 +16,6 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
-import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -38,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.Effect.Navigation
-import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.BulletHolder
 import eu.europa.ec.uilogic.component.PassportVerificationStepBar
@@ -93,36 +90,14 @@ fun PassportLiveVideoScreen(
         viewModel.effect.collect { effect ->
             when (effect) {
                 is Navigation.GoBack -> controller.popBackStack()
-                Navigation.StartVideoLiceCapture -> {
-                    val sdk = viewModel.getSdk()
-                    if (sdk != null) {
-                        state.config?.let { config ->
-                            startCapturing(context, sdk, config.faceImageTempPath)
-                        }
-                    }
-                }
                 is Effect.Failure -> {
                     Toast.makeText(context, effect.message, Toast.LENGTH_LONG).show()
                 }
+                is Effect.CaptureSuccess -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
-    }
-}
-
-fun startCapturing(context: Context, faceMatchSdk: AVFaceMatchSDK, faceImageTempPath: String) {
-    Log.d("PassportLiveVideoScreen", "start capture & match using face image: $faceImageTempPath")
-
-    // Use the face image from passport scanning
-    faceMatchSdk.captureAndMatch(faceImageTempPath) { result ->
-        Log.d("PassportLiveVideoScreen", "get result: $result")
-        if (result.processed && result.capturedIsLive && result.isSameSubject) {
-            Toast.makeText(context, "Same Person as passport -> Next Page", Toast.LENGTH_SHORT)
-                .show()
-        } else {
-            Toast.makeText(context, "not matching -> Show Error", Toast.LENGTH_SHORT).show()
-        }
-        // TODO Clean up the temporary file after use
-        //File(faceImageTempPath).delete()
     }
 }
 
