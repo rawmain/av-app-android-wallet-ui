@@ -31,10 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -43,7 +39,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.Effect.Navigation
 import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
-import eu.europa.ec.passportscanner.face.AVFaceMatchSdkImpl
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.BulletHolder
 import eu.europa.ec.uilogic.component.PassportVerificationStepBar
@@ -59,8 +54,6 @@ import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
 fun PassportLiveVideoScreen(
@@ -70,59 +63,13 @@ fun PassportLiveVideoScreen(
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
-    var faceMatchSdk by remember { mutableStateOf<AVFaceMatchSDK?>(null) }
-    var isSdkInitializing by remember { mutableStateOf(false) }
-
-    // Initialize SDK in background when screen loads
     LaunchedEffect(Unit) {
-        Log.d("PassportLiveVideoScreen", "LaunchedEffect started")
-        isSdkInitializing = true
-        try {
-            withContext(Dispatchers.IO) {
-                Log.d("PassportLiveVideoScreen", "Entered IO dispatcher")
-                Log.d("PassportLiveVideoScreen", "Creating AVFaceMatchSdkImpl...")
-                val sdk = AVFaceMatchSdkImpl(context.applicationContext)
-                Log.d("PassportLiveVideoScreen", "Loading config from assets...")
-                val configJson = context.assets.open("keyless_config.json").bufferedReader().use { it.readText() }
-                Log.d("PassportLiveVideoScreen", "Config loaded: ${configJson.take(100)}...")
-                Log.d("PassportLiveVideoScreen", "Calling sdk.init()...")
-
-                val success = sdk.init(configJson) { progress, message ->
-                    Log.d("PassportLiveVideoScreen", "Init progress: $progress% - $message")
-                    viewModel.setEvent(Event.UpdateSdkInitProgress(progress, message))
-                }
-
-                Log.d("PassportLiveVideoScreen", "SDK initialization completed with result: $success")
-                if (success) {
-                    withContext(Dispatchers.Main) {
-                        Log.d("PassportLiveVideoScreen", "Setting faceMatchSdk state...")
-                        faceMatchSdk = sdk
-                        Log.d("PassportLiveVideoScreen", "SDK is now ready! faceMatchSdk = $sdk")
-                        Toast.makeText(context, "Face recognition ready!", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    Log.e("PassportLiveVideoScreen", "SDK init returned false - initialization failed")
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "SDK initialization failed", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("PassportLiveVideoScreen", "Exception during SDK initialization: ${e.javaClass.simpleName}: ${e.message}", e)
-            e.printStackTrace()
-            withContext(Dispatchers.Main) {
-                Toast.makeText(context, "Failed to initialize SDK: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        } finally {
-            isSdkInitializing = false
-            Log.d("PassportLiveVideoScreen", "SDK initialization process complete. isSdkInitializing = false")
-        }
+        viewModel.setEvent(Event.InitializeSdk)
     }
 
     ContentScreen(
-        isLoading = state.isLoading || isSdkInitializing,
+        isLoading = state.isLoading || state.isSdkInitializing,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.OnBackPressed) },
         stickyBottom = { paddingValues ->
@@ -130,7 +77,7 @@ fun PassportLiveVideoScreen(
                 paddings = paddingValues,
                 onBack = { viewModel.setEvent(Event.OnBackPressed) },
                 onLiveVideo = { viewModel.setEvent(Event.OnLiveVideoCapture) },
-                isEnabled = !isSdkInitializing && faceMatchSdk != null
+                isEnabled = state.isSdkReady
             )
         }
     ) { paddingValues ->
@@ -138,7 +85,7 @@ fun PassportLiveVideoScreen(
             paddingValues = paddingValues,
             sdkInitProgress = state.sdkInitProgress,
             sdkInitMessage = state.sdkInitMessage,
-            isSdkInitializing = isSdkInitializing
+            isSdkInitializing = state.isSdkInitializing
         )
     }
 
@@ -147,15 +94,15 @@ fun PassportLiveVideoScreen(
             when (effect) {
                 is Navigation.GoBack -> controller.popBackStack()
                 Navigation.StartVideoLiceCapture -> {
-                    val sdk = faceMatchSdk
+                    val sdk = viewModel.getSdk()
                     if (sdk != null) {
                         state.config?.let { config ->
                             startCapturing(context, sdk, config.faceImageTempPath)
                         }
-                    } else {
-                        Log.e("PassportLiveVideoScreen", "Cannot start capture: SDK not initialized")
-                        Toast.makeText(context, "SDK not ready, please wait...", Toast.LENGTH_SHORT).show()
                     }
+                }
+                is Effect.Failure -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_LONG).show()
                 }
             }
         }

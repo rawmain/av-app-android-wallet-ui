@@ -16,13 +16,20 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
+import android.content.Context
+import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
+import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
+import eu.europa.ec.passportscanner.face.AVFaceMatchSdkImpl
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.serializer.UiSerializer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 
@@ -33,11 +40,14 @@ data class State(
     val config: PassportLiveVideoUiConfig? = null,
     val sdkInitProgress: Int = 0, // 0-100 percentage
     val sdkInitMessage: String = "",
+    val isSdkInitializing: Boolean = false,
+    val isSdkReady: Boolean = false,
 ) : ViewState
 
 sealed class Event : ViewEvent {
     data object OnBackPressed : Event()
     data object OnLiveVideoCapture : Event()
+    data object InitializeSdk : Event()
     data class UpdateSdkInitProgress(val progress: Int, val message: String) : Event()
 }
 
@@ -46,17 +56,22 @@ sealed class Effect : ViewSideEffect {
         data object GoBack : Navigation()
         data object StartVideoLiceCapture : Navigation()
     }
+
+    data class Failure(val message: String) : Effect()
 }
 
 @KoinViewModel
 class PassportLiveVideoViewModel(
+    private val context: Context,
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
     @InjectedParam private val passportLiveVideoSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
+    private var faceMatchSdk: AVFaceMatchSDK? = null
+
     override fun setInitialState(): State {
-        logController.i { "get the following param=$passportLiveVideoSerializedConfig" }
+        logController.i(TAG) { "get the following param=$passportLiveVideoSerializedConfig" }
         val config: PassportLiveVideoUiConfig? = uiSerializer.fromBase64(
             passportLiveVideoSerializedConfig,
             PassportLiveVideoUiConfig::class.java,
@@ -68,13 +83,21 @@ class PassportLiveVideoViewModel(
     override fun handleEvents(event: Event) {
         when (event) {
             Event.OnBackPressed -> setEffect {
-                logController.i(TAG) { "Event invoked OnBackPressed " }
                 Effect.Navigation.GoBack
             }
 
             Event.OnLiveVideoCapture -> {
                 logController.i(tag = TAG) { "Event invoked OnLiveVideoCapture" }
-                setEffect { Effect.Navigation.StartVideoLiceCapture }
+                if (faceMatchSdk != null && viewState.value.isSdkReady) {
+                    setEffect { Effect.Navigation.StartVideoLiceCapture }
+                } else {
+                    logController.e(TAG) { "Cannot start capture: SDK not initialized" }
+                    setEffect { Effect.Failure("SDK not ready, please wait...") }
+                }
+            }
+
+            Event.InitializeSdk -> {
+                initializeSdk()
             }
 
             is Event.UpdateSdkInitProgress -> {
@@ -87,4 +110,42 @@ class PassportLiveVideoViewModel(
             }
         }
     }
+
+    private fun initializeSdk() {
+        setState { copy(isSdkInitializing = true) }
+
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    logController.d(TAG) { "Initialising AVFaceMatchSdkImpl..." }
+                    val sdk = AVFaceMatchSdkImpl(context.applicationContext)
+
+                    val success = sdk.init { progress, message ->
+                        logController.d(TAG) { "Init progress: $progress% - $message" }
+                        setEvent(Event.UpdateSdkInitProgress(progress, message))
+                    }
+
+                    logController.d(TAG) { "SDK initialization completed with result: $success" }
+                    if (success) {
+                        faceMatchSdk = sdk
+                        setState {
+                            copy(
+                                isSdkInitializing = false,
+                                isSdkReady = true
+                            )
+                        }
+                    } else {
+                        setState { copy(isSdkInitializing = false) }
+                        setEffect { Effect.Failure("SDK initialization failed") }
+                    }
+                }
+            } catch (e: Exception) {
+                logController.e(TAG) { "Exception during SDK initialization: ${e.javaClass.simpleName}: ${e.message}" }
+                setState { copy(isSdkInitializing = false) }
+                setEffect { Effect.Failure("Failed to initialize SDK: ${e.message}") }
+            }
+        }
+    }
+
+    fun getSdk(): AVFaceMatchSDK? = faceMatchSdk
 }

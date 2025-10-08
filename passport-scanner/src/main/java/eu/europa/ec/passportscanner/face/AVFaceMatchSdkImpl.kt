@@ -47,11 +47,21 @@ class AVFaceMatchSdkImpl(private val context: Context) : AVFaceMatchSDK {
         }
     }
 
-    override suspend fun init(configJson: String, onProgress: ((Int, String) -> Unit)?): Boolean {
+    override suspend fun init(onProgress: ((Int, String) -> Unit)?): Boolean {
         Log.d(TAG, "init: Starting SDK initialization")
 
         val modelBasePath = context.filesDir.absolutePath
         Log.d(TAG, "init: Model base path: $modelBasePath")
+
+        // Load config from assets
+        Log.d(TAG, "init: Loading config from assets...")
+        val configJson = try {
+            context.assets.open("keyless_config.json").bufferedReader().use { it.readText() }
+        } catch (e: Exception) {
+            Log.e(TAG, "init: Failed to load config from assets", e)
+            return false
+        }
+        Log.d(TAG, "init: Config loaded: ${configJson.take(100)}...")
 
         val parsedConfig = JSONObject(configJson)
 
