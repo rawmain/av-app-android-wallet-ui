@@ -24,6 +24,8 @@
 
 package eu.europa.ec.passportscanner.face
 
+import android.util.Log
+
 /**
  * Decision making component for face matching based on multiple samples
  * Aggregates results from multiple frame captures to make final decision
@@ -38,8 +40,8 @@ class AVDecisor(private val numSamples: Int = 3) {
      */
     fun addResult(isMatch: Boolean) {
         results.add(isMatch)
-        android.util.Log.d(TAG, "addResult: Added result $isMatch, total samples: ${results.size}/$numSamples")
-        android.util.Log.d(TAG, "addResult: Current results: $results")
+        Log.d(TAG, "addResult: Added result $isMatch, total samples: ${results.size}/$numSamples")
+        Log.d(TAG, "addResult: Current results: $results")
     }
 
     /**
@@ -47,7 +49,7 @@ class AVDecisor(private val numSamples: Int = 3) {
      */
     fun hasEnoughSamples(): Boolean {
         val enough = results.size >= numSamples
-        android.util.Log.d(TAG, "hasEnoughSamples: $enough (${results.size}/$numSamples)")
+        Log.d(TAG, "hasEnoughSamples: $enough (${results.size}/$numSamples)")
         return enough
     }
 
@@ -57,13 +59,13 @@ class AVDecisor(private val numSamples: Int = 3) {
      */
     fun getFinalDecision(): Boolean {
         if (results.isEmpty()) {
-            android.util.Log.d(TAG, "getFinalDecision: No results available, returning false")
+            Log.d(TAG, "getFinalDecision: No results available, returning false")
             return false
         }
 
         val matchCount = results.count { it }
         val decision = matchCount > results.size / 2
-        android.util.Log.d(TAG, "getFinalDecision: $matchCount matches out of ${results.size} samples = $decision")
+        Log.d(TAG, "getFinalDecision: $matchCount matches out of ${results.size} samples = $decision")
         return decision
     }
 
@@ -71,7 +73,7 @@ class AVDecisor(private val numSamples: Int = 3) {
      * Reset the decisor for a new matching session
      */
     fun reset() {
-        android.util.Log.d(TAG, "reset: Clearing ${results.size} previous results")
+        Log.d(TAG, "reset: Clearing ${results.size} previous results")
         results.clear()
     }
 

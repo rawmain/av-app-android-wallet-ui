@@ -17,6 +17,7 @@
 package eu.europa.ec.passportscanner.face
 
 import android.content.Context
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -48,18 +49,18 @@ class ModelDownloader(private val context: Context) {
         onProgress: ((Int, String) -> Unit)? = null
     ): String? = withContext(Dispatchers.IO) {
         try {
-            android.util.Log.d(TAG, "downloadModelFromUrl: Starting download from $urlString")
+            Log.d(TAG, "downloadModelFromUrl: Starting download from $urlString")
 
             val url = URL(urlString)
             val filename = outputFilename ?: url.path.substringAfterLast('/').ifEmpty { "model.onnx" }
             val destFile = File(destDir, filename)
 
             if (destFile.exists()) {
-                android.util.Log.i(TAG, "File already exists. Not downloading.")
+                Log.i(TAG, "File already exists. Not downloading.")
                 return@withContext filename
             }
 
-            android.util.Log.d(TAG, "downloadModelFromUrl: Downloading to ${destFile.absolutePath}")
+            Log.d(TAG, "downloadModelFromUrl: Downloading to ${destFile.absolutePath}")
 
             // Use HttpURLConnection with proper configuration
             val connection = url.openConnection() as HttpURLConnection
@@ -72,11 +73,11 @@ class ModelDownloader(private val context: Context) {
             connection.connect()
 
             val responseCode = connection.responseCode
-            android.util.Log.d(TAG, "downloadModelFromUrl: Response code: $responseCode")
+            Log.d(TAG, "downloadModelFromUrl: Response code: $responseCode")
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 val contentLength = connection.contentLength
-                android.util.Log.d(TAG, "downloadModelFromUrl: Content length: $contentLength bytes")
+                Log.d(TAG, "downloadModelFromUrl: Content length: $contentLength bytes")
 
                 connection.inputStream.use { input ->
                     destFile.outputStream().use { output ->
@@ -100,7 +101,7 @@ class ModelDownloader(private val context: Context) {
                             // Log progress every 10MB
                             if (currentMB >= lastLoggedMB + 10) {
                                 val progressMsg = if (contentLength > 0) " ($percentage%)" else ""
-                                android.util.Log.d(TAG, "downloadModelFromUrl: Downloaded $currentMB MB$progressMsg")
+                                Log.d(TAG, "downloadModelFromUrl: Downloaded $currentMB MB$progressMsg")
                                 lastLoggedMB = currentMB
                             }
 
@@ -112,19 +113,19 @@ class ModelDownloader(private val context: Context) {
                             }
                         }
 
-                        android.util.Log.d(TAG, "downloadModelFromUrl: Download complete: ${totalBytesRead / (1024 * 1024)} MB total")
+                        Log.d(TAG, "downloadModelFromUrl: Download complete: ${totalBytesRead / (1024 * 1024)} MB total")
                         onProgress?.invoke(100, "Download complete")
                     }
                 }
 
-                android.util.Log.d(TAG, "downloadModelFromUrl: Download complete: ${destFile.length()} bytes")
+                Log.d(TAG, "downloadModelFromUrl: Download complete: ${destFile.length()} bytes")
                 filename
             } else {
-                android.util.Log.e(TAG, "downloadModelFromUrl: HTTP error code: $responseCode")
+                Log.e(TAG, "downloadModelFromUrl: HTTP error code: $responseCode")
                 null
             }
         } catch (e: Exception) {
-            android.util.Log.e(TAG, "downloadModelFromUrl: Failed to download from $urlString", e)
+            Log.e(TAG, "downloadModelFromUrl: Failed to download from $urlString", e)
             null
         }
     }
@@ -145,10 +146,10 @@ class ModelDownloader(private val context: Context) {
                         input.copyTo(output)
                     }
                 }
-                android.util.Log.d(TAG, "copyAssetIfNeeded: Copied asset $assetName to ${destFile.absolutePath}")
+                Log.d(TAG, "copyAssetIfNeeded: Copied asset $assetName to ${destFile.absolutePath}")
             } catch (e: Exception) {
                 // Log error but don't fail initialization
-                android.util.Log.e(TAG, "Failed to copy asset: $assetName", e)
+                Log.e(TAG, "Failed to copy asset: $assetName", e)
             }
         }
     }
