@@ -173,7 +173,8 @@ private fun Content(paddingValues: PaddingValues) {
         WrapText(
             text = stringResource(R.string.passport_live_video_description),
             textConfig = TextConfig(
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = Int.MAX_VALUE
             )
         )
 

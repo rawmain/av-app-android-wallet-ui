@@ -26,8 +26,8 @@ import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
 import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
-import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractor
-import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractorPartialState
+import eu.europa.ec.onboardingfeature.interactor.PassportConsentInteractor
+import eu.europa.ec.onboardingfeature.interactor.PassportConsentInteractorPartialState
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
@@ -84,7 +84,7 @@ sealed class Effect : ViewSideEffect {
 class PassportConsentViewModel(
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
-    private val enrollmentInteractor: EnrollmentInteractor,
+    private val passportConsentInteractor: PassportConsentInteractor,
     @InjectedParam private val passportConsentSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -184,7 +184,7 @@ class PassportConsentViewModel(
             is Event.OnResumeIssuance -> {
                 logController.i(TAG) { "Event invoked OnResumeIssuance with uri: ${event.uri}" }
                 setState { copy(isLoading = true) }
-                enrollmentInteractor.resumeOpenId4VciWithAuthorization(event.uri)
+                passportConsentInteractor.resumeOpenId4VciWithAuthorization(event.uri)
             }
 
             is Event.OnDynamicPresentation -> {
@@ -218,10 +218,11 @@ class PassportConsentViewModel(
 
         viewModelScope.launch {
             try {
-                enrollmentInteractor.issueNationalEID(context).collect { issueState ->
+                passportConsentInteractor.issuePassportScanningDocument(context)
+                    .collect { issueState ->
                     logController.i(TAG) { "Received issueState: ${issueState::class.simpleName}" }
                     when (issueState) {
-                        is EnrollmentInteractorPartialState.Success -> {
+                        is PassportConsentInteractorPartialState.Success -> {
                             logController.i(TAG) { "Document issued successfully: ${issueState.documentId}" }
                             setState { copy(isLoading = false) }
                             // Delete temp file after successful issuance
@@ -230,7 +231,7 @@ class PassportConsentViewModel(
                             navigateToSuccessScreen(issueState.documentId)
                         }
 
-                        is EnrollmentInteractorPartialState.DeferredSuccess -> {
+                        is PassportConsentInteractorPartialState.DeferredSuccess -> {
                             logController.i(TAG) { "Document issuance deferred, navigating to success route: ${issueState.successRoute}" }
                             setState { copy(isLoading = false) }
                             // Delete temp file after deferred success
@@ -238,10 +239,10 @@ class PassportConsentViewModel(
                             navigateToDeferredSuccessScreen(issueState.successRoute)
                         }
 
-                        is EnrollmentInteractorPartialState.UserAuthRequired -> {
+                        is PassportConsentInteractorPartialState.UserAuthRequired -> {
                             logController.i(TAG) { "User authentication required for document issuance" }
                             // Keep loading state, authentication is part of the issuance flow
-                            enrollmentInteractor.handleUserAuth(
+                            passportConsentInteractor.handleUserAuth(
                                 context = context,
                                 crypto = issueState.crypto,
                                 notifyOnAuthenticationFailure = true,
@@ -249,7 +250,7 @@ class PassportConsentViewModel(
                             )
                         }
 
-                        is EnrollmentInteractorPartialState.Failure -> {
+                        is PassportConsentInteractorPartialState.Failure -> {
                             logController.e(TAG) { "Document issuance failed: ${issueState.error}" }
                             setState { copy(isLoading = false) }
                             showError(issueState.error)
