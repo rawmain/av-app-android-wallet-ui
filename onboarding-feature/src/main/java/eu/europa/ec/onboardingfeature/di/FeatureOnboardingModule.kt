@@ -16,7 +16,6 @@
 
 package eu.europa.ec.onboardingfeature.di
 
-import android.content.Context
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
 import eu.europa.ec.corelogic.config.WalletCoreConfig
@@ -36,12 +35,9 @@ import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractorImpl
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.serializer.UiSerializer
-import kl.open.fmandroid.FaceMatchSDK
-import kl.open.fmandroid.FaceMatchSdkImpl
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
-import org.koin.core.annotation.Single
 
 @Module
 @ComponentScan("eu.europa.ec.onboardingfeature")
@@ -65,20 +61,8 @@ fun provideEnrollmentInteractor(
     walletCoreConfig
 )
 
-@Single
-fun provideFaceMatchSDK(context: Context): FaceMatchSDK {
-    return FaceMatchSdkImpl(context.applicationContext).apply {
-        val configJson = context.assets.open("keyless_config.json")
-            .bufferedReader()
-            .use { it.readText() }
-        init(configJson)
-    }
-}
-
 @Factory
-fun provideFaceMatchController(
-    faceMatchSDK: FaceMatchSDK,
-): FaceMatchController = FaceMatchControllerImpl(faceMatchSDK)
+fun provideFaceMatchController(): FaceMatchController = FaceMatchControllerImpl()
 
 @Factory
 fun providePassportLiveVideoInteractor(

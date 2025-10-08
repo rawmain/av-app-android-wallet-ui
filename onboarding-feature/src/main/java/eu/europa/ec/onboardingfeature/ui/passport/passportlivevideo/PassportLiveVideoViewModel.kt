@@ -17,7 +17,6 @@
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
 import android.content.Context
-import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
@@ -35,7 +34,9 @@ import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
 
@@ -44,21 +45,29 @@ private const val TAG = "PassportLiveVideoViewModel"
 data class State(
     val isLoading: Boolean = false,
     val config: PassportLiveVideoUiConfig? = null,
+    val sdkInitProgress: Int = 0, // 0-100 percentage
+    val sdkInitMessage: String = "",
+    val isSdkInitializing: Boolean = false,
+    val isSdkReady: Boolean = false,
     val error: ContentErrorConfig? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
     data object OnBackPressed : Event()
-    data class OnLiveVideoCapture(val context: Context) : Event()
+    data object OnLiveVideoCapture : Event()
     data object OnRetry : Event()
+    data class InitializeSdk(val context: Context) : Event()
+    data class UpdateSdkInitProgress(val progress: Int, val message: String) : Event()
 }
 
 sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
         data class SwitchScreen(val screenRoute: String, val inclusive: Boolean) : Navigation()
-        data class OpenDeepLinkAction(val deepLinkUri: Uri, val arguments: String?) : Navigation()
     }
+
+    data class Failure(val message: String) : Effect()
+    data class CaptureSuccess(val message: String) : Effect()
 }
 
 @KoinViewModel
@@ -71,7 +80,7 @@ class PassportLiveVideoViewModel(
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State {
-        logController.i { "get the following param=$passportLiveVideoSerializedConfig" }
+        logController.i(TAG) { "get the following param=$passportLiveVideoSerializedConfig" }
         val config: PassportLiveVideoUiConfig? = uiSerializer.fromBase64(
             passportLiveVideoSerializedConfig,
             PassportLiveVideoUiConfig::class.java,
@@ -83,15 +92,26 @@ class PassportLiveVideoViewModel(
     override fun handleEvents(event: Event) {
         when (event) {
             Event.OnBackPressed -> setEffect {
-                logController.i(TAG) { "Event invoked OnBackPressed" }
                 Effect.Navigation.GoBack
             }
 
-            is Event.OnLiveVideoCapture -> {
+            Event.OnLiveVideoCapture -> {
                 logController.i(tag = TAG) { "Event invoked OnLiveVideoCapture" }
-                handleLiveVideoCapture(event.context)
+                handleLiveVideoCapture()
             }
 
+            is Event.InitializeSdk -> {
+                initializeSdk(event.context)
+            }
+
+            is Event.UpdateSdkInitProgress -> {
+                setState {
+                    copy(
+                        sdkInitProgress = event.progress,
+                        sdkInitMessage = event.message
+                    )
+                }
+            }
             Event.OnRetry -> {
                 logController.i(tag = TAG) { "Event invoked OnRetry" }
                 setState { copy(error = null) }
@@ -99,7 +119,40 @@ class PassportLiveVideoViewModel(
         }
     }
 
-    private fun handleLiveVideoCapture(context: Context) {
+    private fun initializeSdk(context: Context) {
+        setState { copy(isSdkInitializing = true, error = null) }
+
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    logController.d(TAG) { "Initializing SDK via interactor..." }
+
+                    val success = passportLiveVideoInteractor.init(context) { progress, message ->
+                        logController.d(TAG) { "Init progress: $progress% - $message" }
+                        setEvent(Event.UpdateSdkInitProgress(progress, message))
+                    }
+
+                    if (success) {
+                        setState {
+                            copy(
+                                isSdkInitializing = false,
+                                isSdkReady = true
+                            )
+                        }
+                    } else {
+                        setState { copy(isSdkInitializing = false) }
+                        setEffect { Effect.Failure("SDK initialization failed") }
+                    }
+                }
+            } catch (e: Exception) {
+                logController.e(TAG) { "Exception during SDK initialization: ${e.javaClass.simpleName}: ${e.message}" }
+                setState { copy(isSdkInitializing = false) }
+                setEffect { Effect.Failure("Failed to initialize SDK: ${e.message}") }
+            }
+        }
+    }
+
+    private fun handleLiveVideoCapture() {
         val config = viewState.value.config
         if (config == null) {
             logController.e(TAG) { "Config is null, cannot proceed with live video capture" }
@@ -111,9 +164,7 @@ class PassportLiveVideoViewModel(
 
         viewModelScope.launch {
             try {
-                // Capture and match face
                 when (val matchResult = passportLiveVideoInteractor.captureAndMatchFace(
-                    context = context,
                     faceImageTempPath = config.faceImageTempPath
                 )) {
                     is FaceMatchPartialState.Success -> {
@@ -171,4 +222,5 @@ class PassportLiveVideoViewModel(
             )
         }
     }
+
 }

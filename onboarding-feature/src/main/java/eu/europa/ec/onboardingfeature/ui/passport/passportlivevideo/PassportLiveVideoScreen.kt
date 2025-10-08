@@ -16,6 +16,8 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,9 +52,6 @@ import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
-import eu.europa.ec.uilogic.navigation.helper.handleDeepLinkAction
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun PassportLiveVideoScreen(
@@ -63,8 +62,12 @@ fun PassportLiveVideoScreen(
     val state by viewModel.viewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) {
+        viewModel.setEvent(Event.InitializeSdk(context))
+    }
+
     ContentScreen(
-        isLoading = state.isLoading,
+        isLoading = state.isLoading || state.isSdkInitializing,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.OnBackPressed) },
         contentErrorConfig = state.error,
@@ -72,53 +75,58 @@ fun PassportLiveVideoScreen(
             ActionButtons(
                 paddings = paddingValues,
                 onBack = { viewModel.setEvent(Event.OnBackPressed) },
-                onLiveVideo = { viewModel.setEvent(Event.OnLiveVideoCapture(context)) }
+                onLiveVideo = { viewModel.setEvent(Event.OnLiveVideoCapture) },
+                isEnabled = state.isSdkReady
             )
         }
-    ) { paddingValues -> Content(paddingValues = paddingValues) }
+    ) { paddingValues ->
+        Content(
+            paddingValues = paddingValues,
+            sdkInitProgress = state.sdkInitProgress,
+            sdkInitMessage = state.sdkInitMessage,
+            isSdkInitializing = state.isSdkInitializing
+        )
+    }
 
     LaunchedEffect(Unit) {
-        viewModel.effect.onEach { effect ->
-            handleEffect(effect, controller)
-        }.collect()
+        viewModel.effect.collect { effect ->
+            handleEffect(effect, controller, context)
+        }
     }
 }
 
 private fun handleEffect(
     effect: Effect,
     controller: NavController,
+    context: Context
 ) {
     when (effect) {
         is Navigation.GoBack -> controller.popBackStack()
+        is Effect.Failure -> {
+            Toast.makeText(context, effect.message, Toast.LENGTH_LONG).show()
+        }
+
+        is Effect.CaptureSuccess -> {
+            Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+        }
 
         is Navigation.SwitchScreen -> {
-            android.util.Log.i(
-                "PassportLiveVideoScreen",
-                "Navigating to: ${effect.screenRoute}, inclusive: ${effect.inclusive}"
-            )
             controller.navigate(effect.screenRoute) {
                 popUpTo(OnboardingScreens.PassportLiveVideo.screenRoute) {
                     inclusive = effect.inclusive
                 }
             }
         }
-
-        is Navigation.OpenDeepLinkAction -> {
-            android.util.Log.i(
-                "PassportLiveVideoScreen",
-                "Handling deeplink: ${effect.deepLinkUri}"
-            )
-            handleDeepLinkAction(
-                controller,
-                effect.deepLinkUri,
-                effect.arguments
-            )
-        }
     }
 }
 
 @Composable
-private fun ActionButtons(onBack: () -> Unit, onLiveVideo: () -> Unit, paddings: PaddingValues) {
+private fun ActionButtons(
+    onBack: () -> Unit,
+    onLiveVideo: () -> Unit,
+    paddings: PaddingValues,
+    isEnabled: Boolean = true
+) {
 
     val buttons = StickyBottomType.TwoButtons(
         primaryButtonConfig = ButtonConfig(
@@ -127,7 +135,8 @@ private fun ActionButtons(onBack: () -> Unit, onLiveVideo: () -> Unit, paddings:
         ),
         secondaryButtonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
-            onClick = onLiveVideo
+            onClick = onLiveVideo,
+            enabled = isEnabled
         )
     )
 
@@ -147,7 +156,12 @@ private fun ActionButtons(onBack: () -> Unit, onLiveVideo: () -> Unit, paddings:
 }
 
 @Composable
-private fun Content(paddingValues: PaddingValues) {
+private fun Content(
+    paddingValues: PaddingValues,
+    sdkInitProgress: Int = 0,
+    sdkInitMessage: String = "",
+    isSdkInitializing: Boolean = false
+) {
 
     Column(
         modifier = Modifier
@@ -187,6 +201,42 @@ private fun Content(paddingValues: PaddingValues) {
                 maxLines = Int.MAX_VALUE
             )
         )
+
+        if (isSdkInitializing && sdkInitProgress > 0) {
+            DownloadProgress(
+                progress = sdkInitProgress,
+                message = sdkInitMessage
+            )
+        }
+    }
+}
+
+@Composable
+private fun DownloadProgress(
+    progress: Int,
+    message: String
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        VSpacer.Large()
+        WrapText(
+            text = message,
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                color = MaterialTheme.colorScheme.primary
+            )
+        )
+        VSpacer.Small()
+        WrapText(
+            text = "$progress%",
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        )
     }
 }
 
@@ -202,9 +252,17 @@ private fun PassportLiveVideoScreenPreview() {
                 ActionButtons(
                     paddings = paddingValues,
                     onBack = {},
-                    onLiveVideo = {}
+                    onLiveVideo = {},
+                    isEnabled = true
                 )
             }
-        ) { paddingValues -> Content(paddingValues = paddingValues) }
+        ) { paddingValues ->
+            Content(
+                paddingValues = paddingValues,
+                sdkInitProgress = 45,
+                sdkInitMessage = "Downloading model... 120 / 260 MB",
+                isSdkInitializing = true
+            )
+        }
     }
 }
