@@ -42,7 +42,6 @@ import androidx.navigation.NavController
 import eu.europa.ec.corelogic.util.CoreActions
 import eu.europa.ec.onboardingfeature.ui.passport.passportconsent.Effect.Navigation
 import eu.europa.ec.resourceslogic.R
-import eu.europa.ec.uilogic.component.PassportVerificationStepBar
 import eu.europa.ec.uilogic.component.content.BroadcastAction
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
@@ -218,10 +217,6 @@ private fun Content(
             .padding(paddingValues)
             .verticalScroll(rememberScrollState())
     ) {
-
-        PassportVerificationStepBar(3)
-
-        VSpacer.ExtraLarge()
         WrapText(
             text = stringResource(R.string.passport_consent_title),
             textConfig = TextConfig(

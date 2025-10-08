@@ -128,7 +128,7 @@
 
     <!-- Passport Consent Screen -->
     <string name="passport_consent_title">Consent</string>
-    <string name="passport_consent_description">By agreeing, you give consent to verify your identity by comparing your passport / ID card portrait to the video. For more detailed information about storage, data protection and privacy please click the below link.</string>
+    <string name="passport_consent_description">By agreeing, you give consent to verify your identity by comparing your passport / ID card portrait to the video. For more detailed information about data processing and data protection please click the link below.</string>
     <string name="passport_consent_more_info">More information</string>
     <string name="passport_consent_checkbox">I agree</string>
     <string name="passport_consent_reject_button">Reject</string>

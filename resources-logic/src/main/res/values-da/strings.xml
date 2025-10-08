@@ -87,7 +87,7 @@
 
     <!-- Passport Consent Screen -->
     <string name="passport_consent_title">Samtykke</string>
-    <string name="passport_consent_description">Ved at acceptere giver du samtykke til at verificere din identitet ved at sammenligne dit pas / ID-kort foto med videoen. For mere detaljeret information om lagring, databeskyttelse og privatliv klik på linket nedenfor.</string>
+    <string name="passport_consent_description">Ved at acceptere giver du samtykke til at verificere din identitet ved at sammenligne dit pas / ID-kort foto med videoen. For mere detaljeret information om databehandling og databeskyttelse klik på linket nedenfor.</string>
     <string name="passport_consent_more_info">Mere information</string>
     <string name="passport_consent_checkbox">Jeg accepterer</string>
     <string name="passport_consent_reject_button">Afvis</string>

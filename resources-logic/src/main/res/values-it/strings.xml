@@ -69,7 +69,7 @@
 
     <!-- Passport Consent Screen -->
     <string name="passport_consent_title">Consenso</string>
-    <string name="passport_consent_description">Accettando, dai il consenso a verificare la tua identità confrontando il ritratto del passaporto / carta d\'identità con il video. Per informazioni più dettagliate su archiviazione, protezione dei dati e privacy, clicca sul link sottostante.</string>
+    <string name="passport_consent_description">Accettando, dai il consenso a verificare la tua identità confrontando il ritratto del passaporto / carta d\'identità con il video. Per informazioni più dettagliate sul trattamento dei dati e sulla protezione dei dati, clicca sul link sottostante.</string>
     <string name="passport_consent_more_info">Ulteriori informazioni</string>
     <string name="passport_consent_checkbox">Accetto</string>
     <string name="passport_consent_reject_button">Rifiuta</string>
