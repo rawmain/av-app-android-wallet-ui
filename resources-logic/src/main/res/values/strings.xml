@@ -65,71 +65,71 @@
     <string name="qr_scan_intro_step_second">Scan this QR code it with your Wallet to get your 18+ credential.</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="passport_scan_intro_enrollment_method">Age Verification Enrollment Method</string>
-    <string name="passport_scan_intro_title">Passport or ID Card</string>
-    <string name="passport_scan_intro_description">The Passport method is quick and secure! Scan your ID, take a photo, and record a short video—three steps for maximum safety and fraud protection.</string>
+    <string name="passport_scan_intro_enrollment_method">Age verification enrollment method</string>
+    <string name="passport_scan_intro_title">Passport or ID card</string>
+    <string name="passport_scan_intro_description">The passport / ID card method is quick and secure! Take a photo of your passport / ID card, scan your passport / ID card, and record a video of yourself—three steps for secure onboarding.</string>
     <string name="passport_scan_intro_back_button">Back</string>
     <string name="passport_scan_intro_start_button">Start</string>
-    <string name="passport_scan_intro_step_1_title">Take a Photo of the Passport</string>
-    <string name="passport_scan_intro_step_1_description">Capture a clear image of your Passport.</string>
-    <string name="passport_scan_intro_step_2_title">Read in your Passport</string>
-    <string name="passport_scan_intro_step_2_description">Place your Passport on your smartphone to read the data.</string>
+    <string name="passport_scan_intro_step_1_title">Take a photo of your identity document</string>
+    <string name="passport_scan_intro_step_1_description">Capture a clear image of your identity document.</string>
+    <string name="passport_scan_intro_step_2_title">Scan your identity document</string>
+    <string name="passport_scan_intro_step_2_description">Place your identity document on your smartphone to read the data.</string>
     <string name="passport_scan_intro_step_3_title">Record a video of yourself</string>
     <string name="passport_scan_intro_step_3_description">Film yourself for identity verification.</string>
     <string name="passport_scan_intro_step_4_title">Consent</string>
-    <string name="passport_scan_intro_step_5_title">Issuing of the Proof of Age Attestation</string>
+    <string name="passport_scan_intro_step_5_title">Receive your proof of age</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="passport_identification_title">Scan your Passport</string>
-    <string name="passport_identification_description">For this step, simply capture the photo page of your Passport. Make sure:</string>
-    <string name="passport_identification_step_first">The entire passport is visible and well-lit.</string>
+    <string name="passport_identification_title">Scan your passport / ID card</string>
+    <string name="passport_identification_description">For this step, capture the MRZ (Machine Readable Zone) area at the bottom of your passport / ID card photo page. Make sure:</string>
+    <string name="passport_identification_step_first">The entire passport / ID card photo page is visible and well-lit.</string>
     <string name="passport_identification_step_second">No reflections or blurriness obscure the details.</string>
-    <string name="passport_identification_footer">We take an identification code from this passport to get access to the machine readable part of the passport.</string>
+    <string name="passport_identification_footer">We take an identification code from this passport / ID card to get access to the machine readable part of the document.</string>
     <string name="passport_identification_back">Back</string>
-    <string name="passport_identification_capture">Scan Passport</string>
+    <string name="passport_identification_capture">Scan</string>
 
     <!-- Passport Capture Screen -->
-    <string name="passport_capture_subtitle">Align photo page of your Passport within the frame</string>
-    <string name="passport_capture_title">Scan your Passport</string>
+    <string name="passport_capture_subtitle">Align photo page of your passport / ID card within the frame</string>
+    <string name="passport_capture_title">Scan your passport / ID card</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identification</string>
     <string name="passport_biometrics">Biometrics</string>
-    <string name="passport_live_video">Live Video</string>
+    <string name="passport_live_video">Live video</string>
 
     <!-- Passport verification Biometrics -->
     <string name="passport_biometrics_back">Back</string>
     <string name="passport_biometrics_next">Next</string>
-    <string name="passport_biometrics_content_description">Content Description</string>
-    <string name="passport_biometrics_first_header">Read in your Passport</string>
-    <string name="passport_biometrics_first_description">Place your Passport directly on the back of the smartphone, usually at the top.</string>
-    <string name="passport_biometrics_first_link">Do you need Help?</string>
+    <string name="passport_biometrics_content_description">Content description</string>
+    <string name="passport_biometrics_first_header">Scan your passport / ID card</string>
+    <string name="passport_biometrics_first_description">Place your passport / ID card directly on the back of the smartphone, usually at the top.</string>
+    <string name="passport_biometrics_first_link">Do you need help?</string>
     <string name="passport_biometrics_verify_data">Please verify your data</string>
-    <string name="passport_biometrics_try_again">Try Again</string>
-    <string name="passport_biometrics_passport">Passport</string>
-    <string name="passport_biometrics_dob">Date of Birth</string>
+    <string name="passport_biometrics_try_again">Try again</string>
+    <string name="passport_biometrics_passport">Passport / ID card</string>
+    <string name="passport_biometrics_dob">Date of birth</string>
     <string name="passport_biometrics_doe">Date of expiry</string>
 
     <!-- Passport live video instructions -->
-    <string name="passport_live_video_header">Record a quick Video of yourself</string>
+    <string name="passport_live_video_header">Record a quick video of yourself</string>
     <string name="passport_live_video_description">In this step, you will record a short video of yourself to confirm your identity. Make sure to:</string>
     <string name="passport_live_video_step_first">Face the camera directly in good lighting.</string>
     <string name="passport_live_video_step_second">Follow the on-screen instructions (e.g., blink or turn your head).</string>
     <string name="passport_live_video_step_third">Avoid filters, masks, or obstructions.</string>
-    <string name="passport_live_video_footer">This step ensures that you are the rightful owner of the Passport and prevents fraud.</string>
+    <string name="passport_live_video_footer">This step ensures that you are the rightful owner of the passport / ID card.</string>
     <string name="passport_live_video_back">Back</string>
-    <string name="passport_live_video_live_capture">Start Live Video</string>
+    <string name="passport_live_video_live_capture">Start live video</string>
     <string name="passport_live_video_error_not_processed">Video capture was not processed successfully. Please try again.</string>
     <string name="passport_live_video_error_not_live">Liveness check failed. Please ensure you are recording a live video.</string>
-    <string name="passport_live_video_error_not_matching">Face does not match the passport photo. Please try again.</string>
-    <string name="passport_validation_error_expired">Your passport has expired. Please use a valid passport.</string>
+    <string name="passport_live_video_error_not_matching">Face does not match the passport / ID card photo. Please try again.</string>
+    <string name="passport_validation_error_expired">Your passport / ID card has expired. Please use a valid document.</string>
     <string name="passport_validation_error_underage">You must be at least 18 years old to proceed.</string>
-    <string name="passport_validation_error_incomplete_data">Passport data is incomplete. Please scan your passport again.</string>
+    <string name="passport_validation_error_incomplete_data">Passport / ID card data is incomplete. Please scan your document again.</string>
 
     <!-- Passport Consent Screen -->
     <string name="passport_consent_title">Consent</string>
-    <string name="passport_consent_description">By agreeing, you give consent to verify your identity by comparing your passport portrait to the video. For more detailed information about storage, data protection and privacy please click the below link.</string>
-    <string name="passport_consent_more_info">More Information</string>
+    <string name="passport_consent_description">By agreeing, you give consent to verify your identity by comparing your passport / ID card portrait to the video. For more detailed information about data processing and data protection please click the link below.</string>
+    <string name="passport_consent_more_info">More information</string>
     <string name="passport_consent_checkbox">I agree</string>
     <string name="passport_consent_reject_button">Reject</string>
     <string name="passport_consent_consent_button">Consent</string>

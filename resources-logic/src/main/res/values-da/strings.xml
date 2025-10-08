@@ -41,30 +41,31 @@
     <string name="qr_scan_intro_step_second">Scan denne QR-kode med din Wallet for at få dit 18+-legitimationsbevis.</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="passport_identification_title">Scan dit pas</string>
-    <string name="passport_identification_description">For dette trin skal du blot tage et klart billede af dit pas. Sørg for:</string>
-    <string name="passport_identification_step_first">At hele passet er synligt og godt oplyst.</string>
+    <string name="passport_identification_title">Scan dit pas / ID-kort</string>
+    <string name="passport_identification_description">For dette trin skal du tage MRZ-området (maskinlæsbar zone) nederst på fotosiden af dit pas / ID-kort. Sørg for:</string>
+    <string name="passport_identification_step_first">At hele fotosiden af passet / ID-kortet er synlig og godt oplyst.</string>
     <string name="passport_identification_step_second">Ingen refleksioner eller sløring skjuler detaljerne.</string>
-    <string name="passport_identification_footer">Vi tager en identifikationskode fra dette pas for at få adgang til den maskinlæsbare del af passet.</string>
+    <string name="passport_identification_footer">Vi tager en identifikationskode fra dette pas / ID-kort for at få adgang til den maskinlæsbare del af dokumentet.</string>
     <string name="passport_identification_back">Tilbage</string>
-    <string name="passport_identification_capture">Scan pas</string>
-    <string name="passport_capture_subtitle">Placer fotosiden af dit pas inden for rammen</string>
+    <string name="passport_identification_capture">Scan</string>
+    <string name="passport_capture_title">Scan dit pas / ID-kort</string>
+    <string name="passport_capture_subtitle">Placer fotosiden af dit pas / ID-kort inden for rammen</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identifikation</string>
     <string name="passport_biometrics">Biometri</string>
-    <string name="passport_live_video">Live video</string>
+    <string name="passport_live_video">Live-video</string>
 
     <!-- Passport verification Biometrics -->
     <string name="passport_biometrics_back">Tilbage</string>
     <string name="passport_biometrics_next">Næste</string>
     <string name="passport_biometrics_content_description">Indholdsbeskrivelse</string>
-    <string name="passport_biometrics_first_header">Læs dit pas</string>
-    <string name="passport_biometrics_first_description">Placér dit pas direkte på bagsiden af smartphonen, som regel øverst.</string>
+    <string name="passport_biometrics_first_header">Scan dit pas / ID-kort</string>
+    <string name="passport_biometrics_first_description">Placér dit pas / ID-kort direkte på bagsiden af smartphonen, som regel øverst.</string>
     <string name="passport_biometrics_first_link">Har du brug for hjælp?</string>
     <string name="passport_biometrics_verify_data">Bekræft venligst dine oplysninger</string>
     <string name="passport_biometrics_try_again">Prøv igen</string>
-    <string name="passport_biometrics_passport">Pas</string>
+    <string name="passport_biometrics_passport">Pas / ID-kort</string>
     <string name="passport_biometrics_dob">Fødselsdato</string>
     <string name="passport_biometrics_doe">Udløbsdato</string>
 
@@ -74,19 +75,19 @@
     <string name="passport_live_video_step_first">Vend ansigtet direkte mod kameraet i godt lys.</string>
     <string name="passport_live_video_step_second">Følg instruktionerne på skærmen (f.eks. blink eller drej dit hoved).</string>
     <string name="passport_live_video_step_third">Undgå filtre, masker eller forhindringer.</string>
-    <string name="passport_live_video_footer">Dette trin sikrer, at du er den rette ejer af pas og forhindrer svindel.</string>
+    <string name="passport_live_video_footer">Dette trin sikrer, at du er den rette ejer af pas / ID-kort.</string>
     <string name="passport_live_video_back">Tilbage</string>
-    <string name="passport_live_video_live_capture">Start live video</string>
+    <string name="passport_live_video_live_capture">Start live-video</string>
     <string name="passport_live_video_error_not_processed">Videooptagelsen blev ikke behandlet korrekt. Prøv venligst igen.</string>
     <string name="passport_live_video_error_not_live">Liveness-tjek mislykkedes. Sørg venligst for, at du optager en live-video.</string>
-    <string name="passport_live_video_error_not_matching">Ansigtet matcher ikke pasfotet. Prøv venligst igen.</string>
-    <string name="passport_validation_error_expired">Dit pas er udløbet. Brug venligst et gyldigt pas.</string>
+    <string name="passport_live_video_error_not_matching">Ansigtet matcher ikke pas / ID-kort fotet. Prøv venligst igen.</string>
+    <string name="passport_validation_error_expired">Dit pas / ID-kort er udløbet. Brug venligst et gyldigt dokument.</string>
     <string name="passport_validation_error_underage">Du skal være mindst 18 år gammel for at fortsætte.</string>
-    <string name="passport_validation_error_incomplete_data">Pasdata er ufuldstændige. Scan venligst dit pas igen.</string>
+    <string name="passport_validation_error_incomplete_data">Pas / ID-kort data er ufuldstændige. Scan venligst dit dokument igen.</string>
 
     <!-- Passport Consent Screen -->
     <string name="passport_consent_title">Samtykke</string>
-    <string name="passport_consent_description">Ved at acceptere giver du samtykke til at verificere din identitet ved at sammenligne dit pasfoto med videoen. For mere detaljeret information om lagring, databeskyttelse og privatliv klik på linket nedenfor.</string>
+    <string name="passport_consent_description">Ved at acceptere giver du samtykke til at verificere din identitet ved at sammenligne dit pas / ID-kort foto med videoen. For mere detaljeret information om databehandling og databeskyttelse klik på linket nedenfor.</string>
     <string name="passport_consent_more_info">Mere information</string>
     <string name="passport_consent_checkbox">Jeg accepterer</string>
     <string name="passport_consent_reject_button">Afvis</string>
@@ -97,17 +98,17 @@
     <string name="onboarding_verification_qr_code_description">Scan en QR-kode eller indtast et token for at modtage en aldersverifikationslegitimation fra en autoriseret udsteder.</string>
     <string name="passport_scan_intro_enrollment_method">Aldersverifikationsmetode</string>
     <string name="passport_scan_intro_title">Pas eller ID-kort</string>
-    <string name="passport_scan_intro_description">Pas-metoden er hurtig og sikker! Scanner dit ID, tag et billede og optag en kort video—tre trin for maksimal sikkerhed og beskyttelse mod svindel.</string>
+    <string name="passport_scan_intro_description">Pas / ID-kort metoden er hurtig og sikker! Tag et billede af dit pas / ID-kort, scan dit pas / ID-kort og optag en video af dig selv—tre trin for sikker onboarding.</string>
     <string name="passport_scan_intro_back_button">Tilbage</string>
     <string name="passport_scan_intro_start_button">Start</string>
-    <string name="passport_scan_intro_step_1_title">Tag et billede af passet</string>
-    <string name="passport_scan_intro_step_1_description">Tag et klart billede af dit pas.</string>
-    <string name="passport_scan_intro_step_2_title">Læs dit pas</string>
-    <string name="passport_scan_intro_step_2_description">Placer dit pas på din smartphone for at læse dataene.</string>
+    <string name="passport_scan_intro_step_1_title">Tag et billede af dit identitetsdokument</string>
+    <string name="passport_scan_intro_step_1_description">Tag et klart billede af dit identitetsdokument.</string>
+    <string name="passport_scan_intro_step_2_title">Scan dit identitetsdokument</string>
+    <string name="passport_scan_intro_step_2_description">Placer dit identitetsdokument på din smartphone for at læse dataene.</string>
     <string name="passport_scan_intro_step_3_title">Optag en video af dig selv</string>
     <string name="passport_scan_intro_step_3_description">Film dig selv til identitetsverifikation.</string>
     <string name="passport_scan_intro_step_4_title">Samtykke</string>
-    <string name="passport_scan_intro_step_5_title">Udstedelse af aldersbevis</string>
+    <string name="passport_scan_intro_step_5_title">Modtag dit aldersbevis</string>
     <string name="welcome_page_1">Med denne app kan du sikkert bevise, at du er over 18 år, når du får adgang til tjenester der er begrænset til voksne.</string>
     <string name="welcome_page_2">Verificér din alder én gang og brug dette bevis til sikker adgang til mange tjenester, der er begrænset til voksne.</string>
     <string name="welcome_page_3">Du bevarer kontrollen over dine data: Det er kun beviset for, at du er over 18 år, som deles. Ingen andre personlige oplysninger gemmes eller deles med onlinetjenester.</string>

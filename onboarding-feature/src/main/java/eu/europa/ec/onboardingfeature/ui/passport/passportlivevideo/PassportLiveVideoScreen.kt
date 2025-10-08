@@ -39,7 +39,6 @@ import androidx.navigation.NavController
 import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.Effect.Navigation
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.BulletHolder
-import eu.europa.ec.uilogic.component.PassportVerificationStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -170,10 +169,6 @@ private fun Content(
             .padding(paddingValues)
             .verticalScroll(rememberScrollState())
     ) {
-
-        PassportVerificationStepBar(2)
-
-        VSpacer.ExtraLarge()
         WrapText(
             text = stringResource(R.string.passport_live_video_header),
             textConfig = TextConfig(
@@ -195,7 +190,6 @@ private fun Content(
         VSpacer.Large()
         BulletHolder(
             stringResource(R.string.passport_live_video_step_first),
-            stringResource(R.string.passport_live_video_step_second),
             stringResource(R.string.passport_live_video_step_third)
         )
 

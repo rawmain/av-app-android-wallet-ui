@@ -41,30 +41,31 @@
     <string name="qr_scan_intro_step_second">Scannen Sie diesen QR-Code mit Ihrer Wallet, um Ihren 18+-Nachweis zu erhalten.</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="passport_identification_title">Scannen Sie Ihren Reisepass</string>
-    <string name="passport_identification_description">Für diesen Schritt machen Sie einfach ein klares Foto Ihres Reisepasses. Stellen Sie sicher:</string>
-    <string name="passport_identification_step_first">Der gesamte Reisepass ist sichtbar und gut beleuchtet.</string>
+    <string name="passport_identification_title">Scannen Sie Ihren Reisepass / Personalausweis</string>
+    <string name="passport_identification_description">Für diesen Schritt erfassen Sie den MRZ-Bereich (maschinenlesbare Zone) am unteren Rand der Fotoseite Ihres Reisepasses / Personalausweises. Stellen Sie sicher:</string>
+    <string name="passport_identification_step_first">Die gesamte Fotoseite des Reisepasses / Personalausweises ist sichtbar und gut beleuchtet.</string>
     <string name="passport_identification_step_second">Keine Reflexionen oder Unschärfen verdecken die Details.</string>
-    <string name="passport_identification_footer">Wir nehmen einen Identifikationscode von diesem Reisepass, um Zugang zum maschinenlesbaren Teil des Reisepasses zu erhalten.</string>
+    <string name="passport_identification_footer">Wir nehmen einen Identifikationscode von diesem Reisepass / Personalausweis, um Zugang zum maschinenlesbaren Teil des Dokuments zu erhalten.</string>
     <string name="passport_identification_back">Zurück</string>
-    <string name="passport_identification_capture">Reisepass scannen</string>
-    <string name="passport_capture_subtitle">Richten Sie die Fotoseite Ihres Reisepasses im Rahmen aus</string>
+    <string name="passport_identification_capture">Scannen</string>
+    <string name="passport_capture_title">Scannen Sie Ihren Reisepass / Personalausweis</string>
+    <string name="passport_capture_subtitle">Richten Sie die Fotoseite Ihres Reisepasses / Personalausweises im Rahmen aus</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identifikation</string>
     <string name="passport_biometrics">Biometrie</string>
-    <string name="passport_live_video">Live-Video</string>
+    <string name="passport_live_video">Live-video</string>
 
     <!-- Passport verification Biometrics -->
     <string name="passport_biometrics_back">Zurück</string>
     <string name="passport_biometrics_next">Weiter</string>
     <string name="passport_biometrics_content_description">Inhaltsbeschreibung</string>
-    <string name="passport_biometrics_first_header">Lese deinen Reisepass ein</string>
-    <string name="passport_biometrics_first_description">Lege deinen Reisepass direkt auf die Rückseite des Smartphones, normalerweise oben.</string>
+    <string name="passport_biometrics_first_header">Scanne deinen Reisepass / Personalausweis</string>
+    <string name="passport_biometrics_first_description">Lege deinen Reisepass / Personalausweis direkt auf die Rückseite des Smartphones, normalerweise oben.</string>
     <string name="passport_biometrics_first_link">Brauchst du Hilfe?</string>
     <string name="passport_biometrics_verify_data">Bitte überprüfen Sie Ihre Daten</string>
     <string name="passport_biometrics_try_again">Erneut versuchen</string>
-    <string name="passport_biometrics_passport">Reisepass</string>
+    <string name="passport_biometrics_passport">Reisepass / Personalausweis</string>
     <string name="passport_biometrics_dob">Geburtsdatum</string>
     <string name="passport_biometrics_doe">Ablaufdatum</string>
 
@@ -74,20 +75,20 @@
     <string name="passport_live_video_step_first">Richten Sie Ihr Gesicht bei guter Beleuchtung direkt zur Kamera.</string>
     <string name="passport_live_video_step_second">Folgen Sie den Anweisungen auf dem Bildschirm (z.B. blinzeln oder den Kopf drehen).</string>
     <string name="passport_live_video_step_third">Vermeiden Sie Filter, Masken oder Hindernisse.</string>
-    <string name="passport_live_video_footer">Dieser Schritt stellt sicher, dass Sie der rechtmäßige Eigentümer des Reisepasses sind und verhindert Betrug.</string>
+    <string name="passport_live_video_footer">Dieser Schritt stellt sicher, dass Sie der rechtmäßige Eigentümer des Reisepasses / Personalausweises sind.</string>
     <string name="passport_live_video_back">Zurück</string>
-    <string name="passport_live_video_live_capture">Live-Video starten</string>
+    <string name="passport_live_video_live_capture">Live-video starten</string>
     <string name="passport_live_video_error_not_processed">Die Videoaufnahme wurde nicht erfolgreich verarbeitet. Bitte versuchen Sie es erneut.</string>
     <string name="passport_live_video_error_not_live">Lebensechtheitsüberprüfung fehlgeschlagen. Bitte stellen Sie sicher, dass Sie ein Live-Video aufnehmen.</string>
-    <string name="passport_live_video_error_not_matching">Das Gesicht stimmt nicht mit dem Passfoto überein. Bitte versuchen Sie es erneut.</string>
-    <string name="passport_validation_error_expired">Ihr Reisepass ist abgelaufen. Bitte verwenden Sie einen gültigen Reisepass.</string>
+    <string name="passport_live_video_error_not_matching">Das Gesicht stimmt nicht mit dem Reisepass / Personalausweis Foto überein. Bitte versuchen Sie es erneut.</string>
+    <string name="passport_validation_error_expired">Ihr Reisepass / Personalausweis ist abgelaufen. Bitte verwenden Sie ein gültiges Dokument.</string>
     <string name="passport_validation_error_underage">Sie müssen mindestens 18 Jahre alt sein, um fortzufahren.</string>
-    <string name="passport_validation_error_incomplete_data">Die Passdaten sind unvollständig. Bitte scannen Sie Ihren Pass erneut.</string>
+    <string name="passport_validation_error_incomplete_data">Die Reisepass / Personalausweis Daten sind unvollständig. Bitte scannen Sie Ihr Dokument erneut.</string>
 
     <!-- Passport Consent Screen -->
     <string name="passport_consent_title">Einwilligung</string>
-    <string name="passport_consent_description">Mit Ihrer Zustimmung erklären Sie sich damit einverstanden, Ihre Identität durch den Vergleich Ihres Passfotos mit dem Video zu überprüfen. Weitere Informationen zu Speicherung, Datenschutz und Privatsphäre finden Sie unter dem unten stehenden Link.</string>
-    <string name="passport_consent_more_info">Weitere Informationen</string>
+    <string name="passport_consent_description">Mit Ihrer Zustimmung erklären Sie sich damit einverstanden, Ihre Identität durch den Vergleich Ihres Reisepass / Personalausweis Fotos mit dem Video zu überprüfen. Weitere Informationen zur Datenverarbeitung und zum Datenschutz finden Sie unter dem unten stehenden Link.</string>
+    <string name="passport_consent_more_info">Weitere informationen</string>
     <string name="passport_consent_checkbox">Ich stimme zu</string>
     <string name="passport_consent_reject_button">Ablehnen</string>
     <string name="passport_consent_consent_button">Zustimmen</string>
@@ -97,17 +98,17 @@
     <string name="onboarding_verification_qr_code_description">Scannen Sie einen QR-Code oder geben Sie ein Token ein, um eine Altersverifizierungsbescheinigung von einem autorisierten Aussteller zu erhalten.</string>
     <string name="passport_scan_intro_enrollment_method">Altersverifizierungsmethode</string>
     <string name="passport_scan_intro_title">Reisepass oder Personalausweis</string>
-    <string name="passport_scan_intro_description">Die Reisepass-Methode ist schnell und sicher! Scannen Sie Ihren Ausweis, machen Sie ein Foto und nehmen Sie ein kurzes Video auf—drei Schritte für maximale Sicherheit und Betrugsschutz.</string>
+    <string name="passport_scan_intro_description">Die Reisepass / Personalausweis Methode ist schnell und sicher! Foto Ihres Reisepasses / Personalausweises aufnehmen, Reisepass / Personalausweis scannen und Video von sich selbst aufnehmen—drei Schritte für sicheres Onboarding.</string>
     <string name="passport_scan_intro_back_button">Zurück</string>
     <string name="passport_scan_intro_start_button">Starten</string>
-    <string name="passport_scan_intro_step_1_title">Foto des Reisepasses aufnehmen</string>
-    <string name="passport_scan_intro_step_1_description">Erstellen Sie ein klares Bild Ihres Reisepasses.</string>
-    <string name="passport_scan_intro_step_2_title">Reisepass einlesen</string>
-    <string name="passport_scan_intro_step_2_description">Legen Sie Ihren Reisepass auf Ihr Smartphone, um die Daten zu lesen.</string>
+    <string name="passport_scan_intro_step_1_title">Foto Ihres Identitätsdokuments aufnehmen</string>
+    <string name="passport_scan_intro_step_1_description">Erstellen Sie ein klares Bild Ihres Identitätsdokuments.</string>
+    <string name="passport_scan_intro_step_2_title">Identitätsdokument scannen</string>
+    <string name="passport_scan_intro_step_2_description">Legen Sie Ihr Identitätsdokument auf Ihr Smartphone, um die Daten zu lesen.</string>
     <string name="passport_scan_intro_step_3_title">Video von sich selbst aufnehmen</string>
     <string name="passport_scan_intro_step_3_description">Filmen Sie sich selbst zur Identitätsprüfung.</string>
     <string name="passport_scan_intro_step_4_title">Einverständnis</string>
-    <string name="passport_scan_intro_step_5_title">Ausstellung der Altersnachweis-Bescheinigung</string>
+    <string name="passport_scan_intro_step_5_title">Erhalten Sie Ihren Altersnachweis</string>
     <string name="welcome_page_1">Mit dieser App können Sie Ihre Volljährigkeit sicher nachweisen, wenn Sie auf Dienste zugreifen, die Erwachsenen vorbehalten sind.</string>
     <string name="welcome_page_2">Bestätigen Sie einmal, dass Sie über 18 Jahre alt sind. Nutzen Sie diesen Nachweis, um sicher auf viele Dienste zuzugreifen, die Erwachsenen vorbehalten sind.</string>
     <string name="welcome_page_3">Sie behalten die Kontrolle über Ihre Daten: Nur der Nachweis, dass Sie über 18 Jahre alt sind, wird weitergegeben. Es werden keine weiteren personenbezogenen Daten gespeichert oder an Online-Dienste weitergegeben.</string>

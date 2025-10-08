@@ -132,7 +132,9 @@ fun ContentScreen(
                 )
             } else {
 
-                Column(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding()) {
 
                     Box(modifier = Modifier.weight(1f)) {
                         bodyContent(screenPaddings(padding, topSpacing))
