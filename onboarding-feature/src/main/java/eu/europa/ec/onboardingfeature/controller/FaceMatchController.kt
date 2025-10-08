@@ -17,7 +17,8 @@
 package eu.europa.ec.onboardingfeature.controller
 
 import android.content.Context
-import kl.open.fmandroid.FaceMatchSDK
+import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
+import eu.europa.ec.passportscanner.face.AVFaceMatchSdkImpl
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -28,16 +29,33 @@ data class FaceMatchResult(
 )
 
 interface FaceMatchController {
-    suspend fun captureAndMatch(context: Context, faceImagePath: String): FaceMatchResult
+    suspend fun init(context: Context, onProgress: ((Int, String) -> Unit)? = null): Boolean
+    suspend fun captureAndMatch(faceImagePath: String): FaceMatchResult
 }
 
-class FaceMatchControllerImpl(
-    private val faceMatchSDK: FaceMatchSDK,
-) : FaceMatchController {
+class FaceMatchControllerImpl : FaceMatchController {
 
-    override suspend fun captureAndMatch(context: Context, faceImagePath: String): FaceMatchResult {
+    private var faceMatchSDK: AVFaceMatchSDK? = null
+
+    override suspend fun init(context: Context, onProgress: ((Int, String) -> Unit)?): Boolean {
+        return try {
+            val sdk = AVFaceMatchSdkImpl(context.applicationContext)
+            val success = sdk.init(onProgress)
+            if (success) {
+                faceMatchSDK = sdk
+            }
+            success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    override suspend fun captureAndMatch(faceImagePath: String): FaceMatchResult {
+        val sdk = faceMatchSDK ?: throw IllegalStateException("SDK not initialized")
+
         return suspendCancellableCoroutine { continuation ->
-            faceMatchSDK.captureAndMatch(faceImagePath) { result ->
+            sdk.captureAndMatch(faceImagePath) { result ->
                 continuation.resume(
                     FaceMatchResult(
                         processed = result.processed,
