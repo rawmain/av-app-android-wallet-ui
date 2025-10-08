@@ -42,12 +42,12 @@
 
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scan dit pas / ID-kort</string>
-    <string name="passport_identification_description">For dette trin skal du blot tage et klart billede af dit pas / ID-kort. Sørg for:</string>
-    <string name="passport_identification_step_first">At hele passet / ID-kortet er synligt og godt oplyst.</string>
+    <string name="passport_identification_description">For dette trin skal du tage MRZ-området (maskinlæsbar zone) nederst på fotosiden af dit pas / ID-kort. Sørg for:</string>
+    <string name="passport_identification_step_first">At hele fotosiden af passet / ID-kortet er synlig og godt oplyst.</string>
     <string name="passport_identification_step_second">Ingen refleksioner eller sløring skjuler detaljerne.</string>
     <string name="passport_identification_footer">Vi tager en identifikationskode fra dette pas / ID-kort for at få adgang til den maskinlæsbare del af dokumentet.</string>
     <string name="passport_identification_back">Tilbage</string>
-    <string name="passport_identification_capture">Scan pas / ID-kort</string>
+    <string name="passport_identification_capture">Scan</string>
     <string name="passport_capture_title">Scan dit pas / ID-kort</string>
     <string name="passport_capture_subtitle">Placer fotosiden af dit pas / ID-kort inden for rammen</string>
 

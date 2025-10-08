@@ -42,12 +42,12 @@
 
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scannen Sie Ihren Reisepass / Personalausweis</string>
-    <string name="passport_identification_description">Für diesen Schritt machen Sie einfach ein klares Foto Ihres Reisepasses / Personalausweises. Stellen Sie sicher:</string>
-    <string name="passport_identification_step_first">Der gesamte Reisepass / Personalausweis ist sichtbar und gut beleuchtet.</string>
+    <string name="passport_identification_description">Für diesen Schritt erfassen Sie den MRZ-Bereich (maschinenlesbare Zone) am unteren Rand der Fotoseite Ihres Reisepasses / Personalausweises. Stellen Sie sicher:</string>
+    <string name="passport_identification_step_first">Die gesamte Fotoseite des Reisepasses / Personalausweises ist sichtbar und gut beleuchtet.</string>
     <string name="passport_identification_step_second">Keine Reflexionen oder Unschärfen verdecken die Details.</string>
     <string name="passport_identification_footer">Wir nehmen einen Identifikationscode von diesem Reisepass / Personalausweis, um Zugang zum maschinenlesbaren Teil des Dokuments zu erhalten.</string>
     <string name="passport_identification_back">Zurück</string>
-    <string name="passport_identification_capture">Reisepass / Personalausweis scannen</string>
+    <string name="passport_identification_capture">Scannen</string>
     <string name="passport_capture_title">Scannen Sie Ihren Reisepass / Personalausweis</string>
     <string name="passport_capture_subtitle">Richten Sie die Fotoseite Ihres Reisepasses / Personalausweises im Rahmen aus</string>
 

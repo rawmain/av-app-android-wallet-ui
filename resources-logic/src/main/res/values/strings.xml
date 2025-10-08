@@ -81,12 +81,12 @@
 
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scan your passport / ID card</string>
-    <string name="passport_identification_description">For this step, simply capture the photo page of your passport / ID card. Make sure:</string>
-    <string name="passport_identification_step_first">The entire passport / ID card is visible and well-lit.</string>
+    <string name="passport_identification_description">For this step, capture the MRZ (Machine Readable Zone) area at the bottom of your passport / ID card photo page. Make sure:</string>
+    <string name="passport_identification_step_first">The entire passport / ID card photo page is visible and well-lit.</string>
     <string name="passport_identification_step_second">No reflections or blurriness obscure the details.</string>
     <string name="passport_identification_footer">We take an identification code from this passport / ID card to get access to the machine readable part of the document.</string>
     <string name="passport_identification_back">Back</string>
-    <string name="passport_identification_capture">Scan passport / ID card</string>
+    <string name="passport_identification_capture">Scan</string>
 
     <!-- Passport Capture Screen -->
     <string name="passport_capture_subtitle">Align photo page of your passport / ID card within the frame</string>

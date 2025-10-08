@@ -57,7 +57,6 @@ import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Event.O
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.theme.values.elevated
 import eu.europa.ec.uilogic.component.BulletHolder
-import eu.europa.ec.uilogic.component.PassportVerificationStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -223,16 +222,13 @@ private fun Content(paddingValues: PaddingValues) {
             .padding(paddingValues)
             .verticalScroll(rememberScrollState())
     ) {
-
-        PassportVerificationStepBar(0)
-
-        VSpacer.ExtraLarge()
         WrapText(
             text = stringResource(R.string.passport_identification_title),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.SemiBold
-                )
+                    fontWeight = FontWeight.SemiBold,
+                ),
+                maxLines = Int.MAX_VALUE
             ),
         )
 
@@ -240,8 +236,9 @@ private fun Content(paddingValues: PaddingValues) {
         WrapText(
             text = stringResource(R.string.passport_identification_description),
             textConfig = TextConfig(
-                style = MaterialTheme.typography.bodyLarge
-            )
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = Int.MAX_VALUE
+            ),
         )
 
         VSpacer.Large()
@@ -271,10 +268,6 @@ fun VerifyYourDataContent(passportData: PassportData, paddingValues: PaddingValu
             .padding(paddingValues)
             .verticalScroll(rememberScrollState())
     ) {
-
-        PassportVerificationStepBar(1)
-
-        VSpacer.ExtraLarge()
         WrapText(
             text = stringResource(R.string.passport_biometrics_verify_data),
             textConfig = TextConfig(

@@ -42,12 +42,12 @@
 
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scansiona il tuo passaporto / carta d\'identità</string>
-    <string name="passport_identification_description">Per questo passaggio, scatta semplicemente una foto chiara del tuo passaporto / carta d\'identità. Assicurati che:</string>
-    <string name="passport_identification_step_first">L\'intero passaporto / carta d\'identità sia visibile e ben illuminato.</string>
+    <string name="passport_identification_description">Per questo passaggio, cattura l\'area MRZ (zona leggibile dalla macchina) nella parte inferiore della pagina foto del tuo passaporto / carta d\'identità. Assicurati che:</string>
+    <string name="passport_identification_step_first">L\'intera pagina foto del passaporto / carta d\'identità sia visibile e ben illuminata.</string>
     <string name="passport_identification_step_second">Nessun riflesso o sfocatura oscuri i dettagli.</string>
     <string name="passport_identification_footer">Prendiamo un codice identificativo da questo passaporto / carta d\'identità per accedere alla parte leggibile dalla macchina del documento.</string>
     <string name="passport_identification_back">Indietro</string>
-    <string name="passport_identification_capture">Scansiona passaporto / carta d\'identità</string>
+    <string name="passport_identification_capture">Scansiona</string>
     <string name="passport_capture_title">Scansiona il tuo passaporto / carta d\'identità</string>
     <string name="passport_capture_subtitle">Allinea la pagina con la foto del passaporto / carta d\'identità all\'interno della cornice</string>
 
