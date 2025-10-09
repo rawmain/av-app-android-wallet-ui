@@ -112,7 +112,7 @@
     <string name="passport_consent_checkbox">J\'accepte</string>
     <string name="passport_consent_reject_button">Refuser</string>
     <string name="passport_consent_consent_button">Consentir</string>
-    <string name="consent_screen_personal_data_checkbox">Je consens au traitement de mes données personnelles par %1$s dans le but d’obtenir une attestation de vérification d’âge.</string>
+    <string name="consent_screen_personal_data_checkbox">Je consens au traitement de mes données personnelles par [le fournisseur de l\'application] dans le but d\'obtenir une attestation de vérification d\'âge. Ce processus nécessite la numérisation de ma carte d\'identité ou de mon passeport et une vidéo de moi-même pour confirmer mon identité. Ces données seront traitées uniquement sur mon appareil et ne seront pas accessibles par [le fournisseur de l\'application] ou par un tiers. Consultez l\'avis de protection des données pour plus d\'informations</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Jeton / Code QR</string>
@@ -257,7 +257,7 @@ Veuillez essayer une autre méthode</string>
     <string name="document_details_boolean_item_false_readable_value">Non</string>
     <string name="consent_screen_title">Nous avons d\'abord besoin de votre consentement</string>
     <string name="consent_screen_tos_checkbox">J\'accepte les conditions d\'utilisation</string>
-    <string name="consent_screen_data_protection_checkbox">J\'accepte la politique de protection des données</string>
+    <string name="consent_screen_data_protection_checkbox">J\'ai lu l\'avis de protection des données</string>
     <string name="consent_screen_tos_button">Conditions de service</string>
     <string name="consent_screen_data_protection_button">Information relatifs a la protection des données</string>
     <string name="consent_screen_confirm_button">Suivant</string>

@@ -90,7 +90,7 @@
     <string name="passport_consent_checkbox">Accetto</string>
     <string name="passport_consent_reject_button">Rifiuta</string>
     <string name="passport_consent_consent_button">Acconsenti</string>
-    <string name="consent_screen_personal_data_checkbox">Acconsento al trattamento dei miei dati personali da parte di %1$s al fine di ottenere unattestazione di verifica delletà.</string>
+    <string name="consent_screen_personal_data_checkbox">Acconsento al trattamento dei miei dati personali da parte [del fornitore dell\'applicazione] al fine di ottenere un\'attestazione di verifica dell\'età. Questo processo richiede la scansione del mio documento d\'identità o passaporto e un video di me stesso per confermare la mia identità. Questi dati verranno elaborati solo sul mio dispositivo e non saranno accessibili [al fornitore dell\'applicazione] o a terze parti. Consultare l\'informativa sulla protezione dei dati per ulteriori informazioni</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identificazione</string>
@@ -256,7 +256,7 @@ Prova con un metodo alternativo</string>
     <string name="document_details_boolean_item_false_readable_value">no</string>
     <string name="consent_screen_title">Per prima cosa abbiamo bisogno del tuo consenso</string>
     <string name="consent_screen_tos_checkbox">Accetto i Termini di servizio</string>
-    <string name="consent_screen_data_protection_checkbox">Accetto le Informazioni sulla protezione dei dati</string>
+    <string name="consent_screen_data_protection_checkbox">Ho letto l\'informativa sulla protezione dei dati</string>
     <string name="consent_screen_tos_button">Termini di servizio</string>
     <string name="consent_screen_data_protection_button">Informazioni sulla protezione dei dati</string>
     <string name="consent_screen_confirm_button">Avanti</string>

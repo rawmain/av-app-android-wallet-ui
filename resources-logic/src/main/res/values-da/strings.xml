@@ -112,7 +112,7 @@
     <string name="passport_consent_checkbox">Jeg accepterer</string>
     <string name="passport_consent_reject_button">Afvis</string>
     <string name="passport_consent_consent_button">Accepter</string>
-    <string name="consent_screen_personal_data_checkbox">Jeg giver mit samtykke til behandling af mine personoplysninger af %1$s med det formål at opnå en aldersverifikationserklæring.</string>
+    <string name="consent_screen_personal_data_checkbox">Jeg giver mit samtykke til behandling af mine personoplysninger af [applikationsudbyderen] med det formål at opnå en aldersverifikationserklæring. Denne proces kræver scanning af mit ID eller pas og en video af mig selv for at bekræfte min identitet. Disse data vil kun blive behandlet på min enhed og vil ikke være tilgængelige for [applikationsudbyderen] eller nogen tredjepart. Se databeskyttelsesmeddelelsen for mere information</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Token / QR‑kode</string>
@@ -256,7 +256,7 @@ Prøv en alternativ måde</string>
     <string name="document_details_boolean_item_false_readable_value">nej</string>
     <string name="consent_screen_title">Vi skal bruge dit samtykke først</string>
     <string name="consent_screen_tos_checkbox">Jeg accepterer servicevilkårene</string>
-    <string name="consent_screen_data_protection_checkbox">Jeg accepterer</string>
+    <string name="consent_screen_data_protection_checkbox">Jeg har læst databeskyttelsesmeddelelsen</string>
     <string name="consent_screen_tos_button">Servicevilkår</string>
     <string name="consent_screen_data_protection_button">Oplysninger om databeskyttelse</string>
     <string name="consent_screen_confirm_button">Næste</string>

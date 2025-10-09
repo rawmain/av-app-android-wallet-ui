@@ -20,9 +20,13 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -78,10 +83,7 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
     val personalDataCheckBoxData = CheckboxWithTextData(
         isChecked = state.value.personalDataAccepted,
         onCheckedChange = { viewModel.setEvent(Event.PersonalDataSelected) },
-        text = stringResource(
-            R.string.consent_screen_personal_data_checkbox,
-            "[the application provider]"
-        )
+        text = stringResource(R.string.consent_screen_personal_data_checkbox)
     )
 
     val config = ButtonConfig(
@@ -117,7 +119,12 @@ private fun ContinueButton(
     WrapStickyBottomContent(
         stickyBottomModifier = Modifier
             .fillMaxWidth()
-            .padding(paddingValues),
+            .padding(
+                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                bottom = 8.dp,
+                top = 4.dp
+            ),
         stickyBottomConfig = StickyBottomConfig(
             type = StickyBottomType.OneButton(config = config), showDivider = false
         )
@@ -182,7 +189,8 @@ fun ConsentAndTosSection(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 0.dp, vertical = SPACING_EXTRA_LARGE.dp),
+            .padding(horizontal = 0.dp, vertical = SPACING_EXTRA_LARGE.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
         WrapText(
             modifier = Modifier.fillMaxWidth(),
@@ -192,7 +200,7 @@ fun ConsentAndTosSection(
             )
         )
 
-        VSpacer.XXLarge()
+        VSpacer.Small()
 
         WrapCheckboxWithText(checkboxData = tosCheckBoxData)
         WrapCheckboxWithText(checkboxData = dataProtectionCheckBoxData)
