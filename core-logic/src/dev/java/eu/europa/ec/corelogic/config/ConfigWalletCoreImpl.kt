@@ -59,7 +59,7 @@ internal class WalletCoreConfigImpl(
                         )
 
                         withClientIdSchemes(
-                            listOf(ClientIdScheme.X509SanDns)
+                            listOf(ClientIdScheme.RedirectUri)
                         )
                         withSchemes(
                             listOf(
@@ -69,7 +69,7 @@ internal class WalletCoreConfigImpl(
                             )
                         )
                         withFormats(
-                            Format.MsoMdoc, Format.SdJwtVc.ES256
+                            Format.MsoMdoc,
                         )
                     }
 
@@ -77,8 +77,8 @@ internal class WalletCoreConfigImpl(
                         withIssuerUrl(issuerUrl = VCI_ISSUER_URL)
                         withClientId(clientId = VCI_CLIENT_ID)
                         withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
-                        withParUsage(OpenId4VciManager.Config.ParUsage.IF_SUPPORTED)
-                        withUseDPoPIfSupported(true)
+                        withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
+                        withUseDPoPIfSupported(false)
                     }
 
                     configureReaderTrustStore(
