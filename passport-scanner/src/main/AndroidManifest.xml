@@ -13,6 +13,8 @@
     <application
         android:hardwareAccelerated="true"
         android:supportsRtl="true"
+        android:allowBackup="false"
+        android:usesCleartextTraffic="false"
         tools:ignore="UnusedAttribute">
         <activity
             android:name="SmartScannerActivity"
