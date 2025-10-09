@@ -80,6 +80,7 @@ class PassportNFC @Throws(GeneralSecurityException::class)
 private constructor() {
 
     var readDG2 = true
+    var readDG3 = false
 
     /** The hash function for DG hashes.  */
     private var digest: MessageDigest? = null
@@ -212,8 +213,9 @@ private constructor() {
      * @throws GeneralSecurityException if certain security primitives are not supported
      */
     @Throws(CardServiceException::class, GeneralSecurityException::class)
-    constructor(ps: PassportService?, trustManager: MRTDTrustStore, mrzInfo: MRZInfo, readDG2: Boolean = true) : this() {
+    constructor(ps: PassportService?, trustManager: MRTDTrustStore, mrzInfo: MRZInfo, readDG2: Boolean = true, readDG3: Boolean = false) : this() {
         this.readDG2 = readDG2
+        this.readDG3 = readDG3
         if (ps == null) {
             throw IllegalArgumentException("Service cannot be null")
         }
@@ -876,7 +878,7 @@ private constructor() {
                 return if (readDG2) dg2File else null
             }
             3 -> {
-                return dg3File
+                return if (readDG3) dg3File else null
             }
             5 -> {
                 return dg5File

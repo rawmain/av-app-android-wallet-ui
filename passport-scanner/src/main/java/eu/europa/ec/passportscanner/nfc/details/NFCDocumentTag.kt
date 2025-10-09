@@ -42,7 +42,7 @@ import org.jmrtd.lds.icao.MRZInfo
 import java.security.Security
 
 
-class NFCDocumentTag(val readDG2: Boolean = true) {
+class NFCDocumentTag(val readDG2: Boolean = true, val readDG3: Boolean = false) {
 
     fun handleTag(
         context: Context,
@@ -72,7 +72,7 @@ class NFCDocumentTag(val readDG2: Boolean = true) {
                 })*/
                 ps.open()
 
-                val passportNFC = PassportNFC(ps, mrtdTrustStore, mrzInfo, readDG2)
+                val passportNFC = PassportNFC(ps, mrtdTrustStore, mrzInfo, readDG2, readDG3)
                 val verifySecurity = passportNFC.verifySecurity()
                 val features = passportNFC.features
                 val verificationStatus = passportNFC.verificationStatus
@@ -171,7 +171,7 @@ class NFCDocumentTag(val readDG2: Boolean = true) {
 
                 //Finger prints
                 //Get the pictures
-                if (passportNFC.dg3File != null) {
+                if (passportNFC.dg3File != null && passportNFC.readDG3) {
                     //Get the picture
                     try {
                         val bitmaps = PassportNfcUtils.retrieveFingerPrintImage(

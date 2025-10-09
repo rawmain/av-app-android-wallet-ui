@@ -73,6 +73,7 @@ class NFCFragment : Fragment() {
     private var language: String? = null
     private var locale: String? = null
     private var withPhoto: Boolean = true
+    private var withFingerprints: Boolean = false
     private var mHandler = Handler(Looper.getMainLooper())
     private var disposable = CompositeDisposable()
     private var progressAnimator: ObjectAnimator? = null
@@ -98,6 +99,9 @@ class NFCFragment : Fragment() {
         }
         if (arguments?.containsKey(IntentData.KEY_WITH_PHOTO) == true) {
             withPhoto = arguments.getBoolean(IntentData.KEY_WITH_PHOTO)
+        }
+        if (arguments?.containsKey(IntentData.KEY_WITH_FINGERPRINTS) == true) {
+            withFingerprints = arguments.getBoolean(IntentData.KEY_WITH_FINGERPRINTS)
         }
         textViewNfcTitle = view.findViewById(R.id.tv_nfc_title)
         textViewNfcBody = view.findViewById(R.id.tv_nfc_body)
@@ -127,7 +131,8 @@ class NFCFragment : Fragment() {
             mrtdTrustStore.addAsCSCACertStore(certStore)
         }
         // if withPhoto is true, readDG2 is enabled and photo is added to NFC result
-        val subscribe = NFCDocumentTag(withPhoto).handleTag(
+        // And, if withFingerprints is true, readDG3 is enabled and fingerpints are added to NFC result
+        val subscribe = NFCDocumentTag(withPhoto, withFingerprints).handleTag(
             requireContext(),
             tag,
             mrzInfo!!,
@@ -361,6 +366,7 @@ class NFCFragment : Fragment() {
             label: String?,
             locale: String?,
             withPhoto: Boolean,
+            withFingerprints: Boolean
         ): NFCFragment {
             val myFragment = NFCFragment()
             val args = Bundle()
@@ -368,6 +374,7 @@ class NFCFragment : Fragment() {
             args.putString(IntentData.KEY_LABEL, label)
             args.putString(IntentData.KEY_LOCALE, locale)
             args.putBoolean(IntentData.KEY_WITH_PHOTO, withPhoto)
+            args.putBoolean(IntentData.KEY_WITH_FINGERPRINTS, withFingerprints)
             myFragment.arguments = args
             return myFragment
         }

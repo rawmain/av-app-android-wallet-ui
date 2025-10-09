@@ -57,6 +57,7 @@ open class NFCScanAnalyzer(
         nfcIntent.putExtra(ScannerConstants.NFC_LOCALE, locale)
         nfcIntent.putExtra(IntentData.KEY_LABEL, label)
         nfcIntent.putExtra(IntentData.KEY_WITH_PHOTO, true)
+        nfcIntent.putExtra(IntentData.KEY_WITH_FINGERPRINTS, false)
         nfcIntent.putExtra(IntentData.KEY_ENABLE_LOGGGING, false)
         nfcIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
         activity.startActivity(nfcIntent)

@@ -52,6 +52,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
     private var mrzImage: String? = null
     private var locale: String? = null
     private var withPhoto: Boolean = true
+    private var withFingerprints: Boolean = false
     private var enableLogging: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +65,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
         label = intent.getStringExtra(IntentData.KEY_LABEL)
         mrzImage = intent.getStringExtra(IntentData.KEY_MRZ_PHOTO)
         withPhoto = intent.getBooleanExtra(IntentData.KEY_WITH_PHOTO, true)
+        withFingerprints = intent.getBooleanExtra(IntentData.KEY_WITH_FINGERPRINTS, false)
         enableLogging = intent.getBooleanExtra(IntentData.KEY_ENABLE_LOGGGING, false)
         // setup nfc adapter
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
@@ -125,7 +127,8 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
                         mrzInfo = mrzInfo,
                         label = label,
                         locale = locale,
-                        withPhoto = withPhoto
+                        withPhoto = withPhoto,
+                        withFingerprints = withFingerprints
                     ), TAG_NFC
                 )
                 .commit()
