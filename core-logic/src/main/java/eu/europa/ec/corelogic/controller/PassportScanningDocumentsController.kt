@@ -127,8 +127,6 @@ class PassportScanningDocumentsControllerImpl(
                         val isAgeVerification: Boolean = when (config) {
                             is MsoMdocCredential -> config.docType.toDocumentIdentifier() == DocumentIdentifier.MdocEUDIAgeOver18 ||
                                     config.docType.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18
-
-                            is SdJwtVcCredential -> config.type.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18
                             else -> false
                         }
 

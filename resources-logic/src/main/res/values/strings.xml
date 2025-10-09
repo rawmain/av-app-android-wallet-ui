@@ -71,7 +71,7 @@
     <string name="passport_scan_intro_back_button">Back</string>
     <string name="passport_scan_intro_start_button">Start</string>
     <string name="passport_scan_intro_step_1_title">Take a photo of your identity document</string>
-    <string name="passport_scan_intro_step_1_description">Capture a clear image of your identity document.</string>
+    <string name="passport_scan_intro_step_1_description">Capture a clear photo of your identity document page with personal details.</string>
     <string name="passport_scan_intro_step_2_title">Scan your identity document</string>
     <string name="passport_scan_intro_step_2_description">Place your identity document on your smartphone to read the data.</string>
     <string name="passport_scan_intro_step_3_title">Record a video of yourself</string>

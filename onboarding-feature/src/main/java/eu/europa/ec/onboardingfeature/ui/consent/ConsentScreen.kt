@@ -80,7 +80,7 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
         onCheckedChange = { viewModel.setEvent(Event.PersonalDataSelected) },
         text = stringResource(
             R.string.consent_screen_personal_data_checkbox,
-            LocalContext.current.applicationInfo.loadLabel(LocalContext.current.packageManager)
+            "[the application provider]"
         )
     )
 

@@ -123,7 +123,7 @@
     <string name="passport_scan_intro_back_button">Retour</string>
     <string name="passport_scan_intro_start_button">Commencer</string>
     <string name="passport_scan_intro_step_1_title">Prendre une photo de votre document d\'identité</string>
-    <string name="passport_scan_intro_step_1_description">Capturez une image claire de votre document d\'identité.</string>
+    <string name="passport_scan_intro_step_1_description">Capturez une photo claire de la page de votre document d\'identité avec les détails personnels.</string>
     <string name="passport_scan_intro_step_2_title">Scannez votre document d\'identité</string>
     <string name="passport_scan_intro_step_2_description">Placez votre document d\'identité sur votre smartphone pour lire les données.</string>
     <string name="passport_scan_intro_step_3_title">Enregistrer une vidéo de vous-même</string>
