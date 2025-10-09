@@ -1,6 +1,12 @@
 # Changelog
 
-## v1.0.0 - 2025.10-1
+## 2025.10-2
+
+### Added
+
+- Credential issuance via passport scanning flow
+
+## 2025.10-1
 
 ### Added
 

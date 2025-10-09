@@ -229,6 +229,57 @@ In the case of an additive change regarding OpenID4VP, you also need to update t
 The credential configuration is derived directly from the issuer's metadata. The issuer URL is configured per flavor via the *configureOpenId4Vci* method inside the core-logic module at src/demo/config/WalletCoreConfigImpl and src/dev/config/WalletCoreConfigImpl.
 If you want to add or adjust the displayed scoped documents, you must modify the issuer's metadata, and the wallet will automatically resolve your changes.
 
+### Passport Scanning Issuer Configuration
+
+The application supports a separate issuer configuration specifically for passport scanning flows.
+This allows age verification documents to be issued through a dedicated endpoint after passport
+scanning.
+
+The passport scanning issuer is configured via the `passportScanningIssuerConfig` property in the
+*WalletCoreConfig* interface. The configuration is flavor-specific and defined in
+src/demo/config/WalletCoreConfigImpl and src/dev/config/WalletCoreConfigImpl.
+
+**Dev Flavor Configuration:**
+
+```Kotlin
+private companion object {
+    const val VCI_ISSUER_URL = "https://issuer.ageverification.dev"
+    const val PASSPORT_SCANNING_ISSUER_URL = "https://issuer.dev.ageverification.dev"
+    const val VCI_CLIENT_ID = "wallet-dev"
+}
+
+override val passportScanningIssuerConfig: OpenId4VciManager.Config =
+    OpenId4VciManager.Config(
+        issuerUrl = PASSPORT_SCANNING_ISSUER_URL,
+        clientId = VCI_CLIENT_ID,
+        authFlowRedirectionURI = BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK,
+        useDPoPIfSupported = true,
+        parUsage = OpenId4VciManager.Config.ParUsage.IF_SUPPORTED
+    )
+```
+
+**Demo Flavor Configuration:**
+
+```Kotlin
+private companion object {
+    const val VCI_ISSUER_URL = "https://issuer.ageverification.dev"
+    const val PASSPORT_SCANNING_ISSUER_URL = "https://issuer.dev.ageverification.dev"
+    const val VCI_CLIENT_ID = "wallet-dev"
+}
+
+override val passportScanningIssuerConfig: OpenId4VciManager.Config =
+    OpenId4VciManager.Config(
+        issuerUrl = PASSPORT_SCANNING_ISSUER_URL,
+        clientId = VCI_CLIENT_ID,
+        authFlowRedirectionURI = BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK,
+        useDPoPIfSupported = true,
+        parUsage = OpenId4VciManager.Config.ParUsage.IF_SUPPORTED
+    )
+```
+
+The passport scanning issuer configuration is optional. If set to `null` in the interface, passport
+scanning issuance will not be available.
+
 ## How to work with self-signed certificates
 
 This section describes configuring the application to interact with services utilizing self-signed certificates.

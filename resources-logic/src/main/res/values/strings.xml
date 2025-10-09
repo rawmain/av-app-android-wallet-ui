@@ -49,6 +49,90 @@
     <string name="onboarding_verification_description">This verification is needed to create a proof that you are over 18. The eID details will not be shared with online services you access.</string>
     <string name="onboarding_verification_national_id">National eID / National idP</string>
     <string name="onboarding_verification_national_id_description">Identify online using your eID</string>
+    <string name="onboarding_verification_passport_id_card">Passport or ID Card</string>
+    <string name="onboarding_verification_passport_id_card_description">Scan your passport or ID card for verification</string>
+    <string name="onboarding_verification_qr_code">Token / QR-Code</string>
+    <string name="onboarding_verification_qr_code_description">Scan a QR code or enter a token to receive an age verification credential from an authorized issuer.</string>
+
+    <!-- QR Scan Introduction Screen -->
+    <string name="qr_scan_intro_enrollment_method">Age Verification Enrollment Method</string>
+    <string name="qr_scan_intro_title">Token / QR-Code</string>
+    <string name="qr_scan_intro_description">The token/QR code method is a secure on-site process: </string>
+    <string name="qr_scan_intro_hyperlink">Do you need Help?</string>
+    <string name="qr_scan_intro_back_button">Back</string>
+    <string name="qr_scan_intro_scan_button">Scan</string>
+    <string name="qr_scan_intro_step_first">You show your ID to an authorized person and receive a QR code</string>
+    <string name="qr_scan_intro_step_second">Scan this QR code it with your Wallet to get your 18+ credential.</string>
+
+    <!-- Passport Scan Intro Screen -->
+    <string name="passport_scan_intro_enrollment_method">Age verification enrollment method</string>
+    <string name="passport_scan_intro_title">Passport or ID card</string>
+    <string name="passport_scan_intro_description">The passport / ID card method is quick and secure! Take a photo of your passport / ID card, scan your passport / ID card, and record a video of yourself—three steps for secure onboarding.</string>
+    <string name="passport_scan_intro_back_button">Back</string>
+    <string name="passport_scan_intro_start_button">Start</string>
+    <string name="passport_scan_intro_step_1_title">Take a photo of your identity document</string>
+    <string name="passport_scan_intro_step_1_description">Capture a clear photo of your identity document page with personal details.</string>
+    <string name="passport_scan_intro_step_2_title">Scan your identity document</string>
+    <string name="passport_scan_intro_step_2_description">Place your identity document on your smartphone to read the data.</string>
+    <string name="passport_scan_intro_step_3_title">Record a video of yourself</string>
+    <string name="passport_scan_intro_step_3_description">Film yourself for identity verification.</string>
+    <string name="passport_scan_intro_step_4_title">Consent</string>
+    <string name="passport_scan_intro_step_5_title">Receive your proof of age</string>
+
+    <!-- Passport Scan Intro Screen -->
+    <string name="passport_identification_title">Scan your passport / ID card</string>
+    <string name="passport_identification_description">For this step, capture the MRZ (Machine Readable Zone) area at the bottom of your passport / ID card photo page. Make sure:</string>
+    <string name="passport_identification_step_first">The entire passport / ID card photo page is visible and well-lit.</string>
+    <string name="passport_identification_step_second">No reflections or blurriness obscure the details.</string>
+    <string name="passport_identification_footer">We take an identification code from this passport / ID card to get access to the machine readable part of the document.</string>
+    <string name="passport_identification_back">Back</string>
+    <string name="passport_identification_capture">Scan</string>
+
+    <!-- Passport Capture Screen -->
+    <string name="passport_capture_subtitle">Align photo page of your passport / ID card within the frame</string>
+    <string name="passport_capture_title">Scan your passport / ID card</string>
+
+    <!-- Passport verification steps procedures -->
+    <string name="passport_identification">Identification</string>
+    <string name="passport_biometrics">Biometrics</string>
+    <string name="passport_live_video">Live video</string>
+
+    <!-- Passport verification Biometrics -->
+    <string name="passport_biometrics_back">Back</string>
+    <string name="passport_biometrics_next">Next</string>
+    <string name="passport_biometrics_content_description">Content description</string>
+    <string name="passport_biometrics_first_header">Scan your passport / ID card</string>
+    <string name="passport_biometrics_first_description">Place your passport / ID card directly on the back of the smartphone, usually at the top.</string>
+    <string name="passport_biometrics_first_link">Do you need help?</string>
+    <string name="passport_biometrics_verify_data">Please verify your data</string>
+    <string name="passport_biometrics_try_again">Try again</string>
+    <string name="passport_biometrics_passport">Passport / ID card</string>
+    <string name="passport_biometrics_dob">Date of birth</string>
+    <string name="passport_biometrics_doe">Date of expiry</string>
+    <string name="passport_biometrics_no_availability">Not available</string>
+    <string name="passport_biometrics_no_passport_data">No passport data received</string>
+    <string name="passport_biometrics_scan_cancelled">Passport scan was cancelled</string>
+    <string name="passport_biometrics_unknown_error">Unknown error occurred during passport scan</string>
+
+    <!-- Passport live video instructions -->
+    <string name="passport_live_video_header">Record a quick video of yourself</string>
+    <string name="passport_live_video_description">In this step, you will record a short video of yourself to confirm your identity. Make sure to:</string>
+    <string name="passport_live_video_step_first">Face the camera directly in good lighting.</string>
+    <string name="passport_live_video_step_second">Follow the on-screen instructions (e.g., blink or turn your head).</string>
+    <string name="passport_live_video_step_third">Avoid filters, masks, or obstructions.</string>
+    <string name="passport_live_video_footer">This step ensures that you are the rightful owner of the passport / ID card.</string>
+    <string name="passport_live_video_back">Back</string>
+    <string name="passport_live_video_live_capture">Start live video</string>
+    <string name="passport_live_video_error_not_processed">Video capture was not processed successfully. Please try again.</string>
+    <string name="passport_live_video_error_not_live">Liveness check failed. Please ensure you are recording a live video.</string>
+    <string name="passport_live_video_error_not_matching">Face does not match the passport / ID card photo. Please try again.</string>
+    <string name="passport_validation_error_expired">Your passport / ID card has expired. Please use a valid document.</string>
+    <string name="passport_validation_error_underage">You must be at least 18 years old to proceed.</string>
+    <string name="passport_validation_error_incomplete_data">Passport / ID card data is incomplete. Please scan your document again.</string>
+
+    <!-- Passport Consent Screen -->
+    <string name="passport_credential_issuance_title">Verification Complete</string>
+    <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
 
     <string name="welcome_page_1">Using this app you can securely prove you are over 18 when accessing services restricted to adults.</string>
     <string name="welcome_page_2">Verify that you are over 18 once, use this proof to securely access many services restricted to adults.</string>
@@ -195,10 +279,11 @@
     <!-- Consent Screen -->
     <string name="consent_screen_title">First we need your consent</string>
     <string name="consent_screen_tos_checkbox">I accept the Terms of Service</string>
-    <string name="consent_screen_data_protection_checkbox">I accept the Data Protection Information</string>
+    <string name="consent_screen_data_protection_checkbox">I have read the data protection notice</string>
+    <string name="consent_screen_personal_data_checkbox">I consent to the processing of my personal data by [the application provider] for the purpose of obtaining an age verification attestation. This process requires the scanning of my ID or passport and a video of myself to confirm my identity. These data will be processed on my device only and will not be accessible by [the application provider] or any third party. See the data protection notice for more information</string>
     <string name="consent_screen_tos_button">Terms of Service</string>
     <string name="consent_screen_data_protection_button">Data Protection Information</string>
-    <string name="consent_screen_confirm_button">Confirm</string>
+    <string name="consent_screen_confirm_button">Next</string>
 
     <!-- Presentation Qr Scan -->
     <string name="presentation_qr_scan_title">Present document online</string>

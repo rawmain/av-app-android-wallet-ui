@@ -42,5 +42,5 @@ fun handleIntentAction(
 
     Log.d("Intent handling", "Navigating to: ${screen.screenName} with intent")
     navController.currentBackStackEntry?.savedStateHandle?.set("intentToHandle", action.intent)
-    navController.navigate("${screen.screenRoute}")
+    navController.navigate(screen.screenRoute)
 }

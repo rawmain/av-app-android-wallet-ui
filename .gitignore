@@ -55,3 +55,7 @@ fastlane/report.xml
 
 # extensions
 *.apk
+
+# Claude
+CLAUDE.md
+.claude/*

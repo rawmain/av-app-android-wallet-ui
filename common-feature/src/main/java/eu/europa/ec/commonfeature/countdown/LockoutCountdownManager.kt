@@ -16,7 +16,7 @@
 
 package eu.europa.ec.commonfeature.countdown
 
-import android.util.Log
+import eu.europa.ec.businesslogic.controller.log.LogController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -29,7 +29,8 @@ class LockoutCountdownManager(
     private val getLockoutEndTime: () -> Long,
     private val onCountdownUpdate: (String?) -> Unit,
     private val onLockoutEnd: () -> Unit,
-    private val getTimeMessage: (minutes: Long, seconds: Long) -> String
+    private val getTimeMessage: (minutes: Long, seconds: Long) -> String,
+    private val logController: LogController,
 ) {
     private var job: Job? = null
 
@@ -39,7 +40,7 @@ class LockoutCountdownManager(
             while (getIsLockedOut()) {
                 val currentTime = System.currentTimeMillis()
                 val lockoutEndTime = getLockoutEndTime()
-                Log.i("PIN", "Current time: $currentTime, Lockout end time: $lockoutEndTime")
+                logController.i("PIN") { "Current time: $currentTime, Lockout end time: $lockoutEndTime" }
 
                 if (currentTime >= lockoutEndTime) {
                     onLockoutEnd()

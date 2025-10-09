@@ -21,6 +21,7 @@ import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAuthenticate
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
 import eu.europa.ec.commonfeature.countdown.LockoutCountdownManager
@@ -101,6 +102,7 @@ class BiometricViewModel(
     private val biometricInteractor: BiometricInteractor,
     private val uiSerializer: UiSerializer,
     private val resourceProvider: ResourceProvider,
+    private val logController: LogController,
     private val biometricConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -124,7 +126,8 @@ class BiometricViewModel(
                 )
             else
                 resourceProvider.getString(R.string.quick_pin_lockout_countdown_seconds, seconds)
-        }
+        },
+        logController = logController
     )
 
     override fun setInitialState(): State {

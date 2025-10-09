@@ -32,7 +32,8 @@ internal class WalletCoreConfigImpl(
 ) : WalletCoreConfig {
 
     private companion object {
-        const val VCI_ISSUER_URL = "https://issuer.dev.ageverification.dev"
+        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev"
+        const val PASSPORT_SCANNING_ISSUER_URL = "https://issuer.dev.ageverification.dev"
         const val VCI_CLIENT_ID = "wallet-dev"
         const val AUTHENTICATION_REQUIRED = false
         const val DEFAULT_CREDENTIAL_BATCH_SIZE = 30
@@ -59,7 +60,7 @@ internal class WalletCoreConfigImpl(
                         )
 
                         withClientIdSchemes(
-                            listOf(ClientIdScheme.X509SanDns)
+                            listOf(ClientIdScheme.RedirectUri)
                         )
                         withSchemes(
                             listOf(
@@ -69,7 +70,7 @@ internal class WalletCoreConfigImpl(
                             )
                         )
                         withFormats(
-                            Format.MsoMdoc, Format.SdJwtVc.ES256
+                            Format.MsoMdoc,
                         )
                     }
 
@@ -77,8 +78,8 @@ internal class WalletCoreConfigImpl(
                         withIssuerUrl(issuerUrl = VCI_ISSUER_URL)
                         withClientId(clientId = VCI_CLIENT_ID)
                         withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
-                        withParUsage(OpenId4VciManager.Config.ParUsage.IF_SUPPORTED)
-                        withUseDPoPIfSupported(true)
+                        withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
+                        withUseDPoPIfSupported(false)
                     }
 
                     configureReaderTrustStore(
@@ -99,4 +100,16 @@ internal class WalletCoreConfigImpl(
      * The credential usage policy for issued documents.
      */
     override val credentialPolicy: CredentialPolicy = CredentialPolicy.OneTimeUse
+
+    /**
+     * Configuration for the passport scanning issuer.
+     */
+    override val passportScanningIssuerConfig: OpenId4VciManager.Config =
+        OpenId4VciManager.Config(
+            issuerUrl = PASSPORT_SCANNING_ISSUER_URL,
+            clientId = VCI_CLIENT_ID,
+            authFlowRedirectionURI = BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK,
+            useDPoPIfSupported = true,
+            parUsage = OpenId4VciManager.Config.ParUsage.IF_SUPPORTED
+        )
 }

@@ -64,12 +64,12 @@ fun WrapCheckboxWithText(
                     role = Role.Checkbox,
                 )
                 .padding(vertical = SPACING_SMALL_PLUS.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
 
             Checkbox(
                 checked = checkboxData.isChecked,
-                onCheckedChange = null // null recommended for accessibility with screenreaders
+                onCheckedChange = null // null recommended for accessibility with screen readers
             )
 
             HSpacer.Small()
@@ -77,7 +77,7 @@ fun WrapCheckboxWithText(
             val textConfig = TextConfig(
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
-                maxLines = 4
+                maxLines = Int.MAX_VALUE
             )
             WrapText(text = checkboxData.text, textConfig = textConfig)
         }
