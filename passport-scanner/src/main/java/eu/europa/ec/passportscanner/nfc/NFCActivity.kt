@@ -87,10 +87,6 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
         } else checkNFC()
     }
 
-    public override fun onPause() {
-        super.onPause()
-    }
-
     public override fun onNewIntent(intent: Intent) {
         if (NfcAdapter.ACTION_TAG_DISCOVERED == intent.action || NfcAdapter.ACTION_TECH_DISCOVERED == intent.action) {
             // drop NFC events

@@ -70,8 +70,6 @@ class NFCDocumentTag {
                 passport.sodFile = passportNFC.sodFile
 
                 //Passport features and verification
-                Log.i(TAG, features.summary(mrzInfo.documentNumber))
-                Log.i(TAG, verificationStatus.summary(mrzInfo.documentNumber))
 
                 //Basic Information
                 if (passportNFC.dg1File != null) {

@@ -266,7 +266,11 @@ private constructor() {
             triedBACEntries.add(bacKey)
             try {
                 doBAC(service as PassportService, mrzInfo)
-                verificationStatus.setBAC(VerificationStatus.Verdict.SUCCEEDED, "BAC succeeded with key $bacKey", triedBACEntries)
+                verificationStatus.setBAC(
+                    VerificationStatus.Verdict.SUCCEEDED,
+                    "BAC succeeded",
+                    triedBACEntries
+                )
             } catch (_: Exception) {
                 verificationStatus.setBAC(VerificationStatus.Verdict.FAILED, "BAC failed", triedBACEntries)
             }
