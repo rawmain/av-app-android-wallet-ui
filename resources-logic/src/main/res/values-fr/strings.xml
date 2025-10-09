@@ -112,6 +112,7 @@
     <string name="passport_consent_checkbox">J\'accepte</string>
     <string name="passport_consent_reject_button">Refuser</string>
     <string name="passport_consent_consent_button">Consentir</string>
+    <string name="consent_screen_personal_data_checkbox">Je consens au traitement de mes données personnelles par %1$s dans le but d’obtenir une attestation de vérification d’âge.</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Jeton / Code QR</string>

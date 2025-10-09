@@ -90,6 +90,7 @@
     <string name="passport_consent_checkbox">Accetto</string>
     <string name="passport_consent_reject_button">Rifiuta</string>
     <string name="passport_consent_consent_button">Acconsenti</string>
+    <string name="consent_screen_personal_data_checkbox">Acconsento al trattamento dei miei dati personali da parte di %1$s al fine di ottenere unattestazione di verifica delletà.</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identificazione</string>

@@ -75,6 +75,15 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
         text = stringResource(R.string.consent_screen_data_protection_checkbox),
     )
 
+    val personalDataCheckBoxData = CheckboxWithTextData(
+        isChecked = state.value.personalDataAccepted,
+        onCheckedChange = { viewModel.setEvent(Event.PersonalDataSelected) },
+        text = stringResource(
+            R.string.consent_screen_personal_data_checkbox,
+            LocalContext.current.applicationInfo.loadLabel(LocalContext.current.packageManager)
+        )
+    )
+
     val config = ButtonConfig(
         type = ButtonType.PRIMARY,
         onClick = { viewModel.setEvent(Event.GoNext) },
@@ -92,6 +101,7 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
             paddingValues = paddingValues,
             tosCheckBoxData = tosCheckBoxData,
             dataProtectionCheckBoxData = dataProtectionCheckBoxData,
+            personalDataCheckBoxData = personalDataCheckBoxData,
             effectFlow = viewModel.effect,
             onNavigationRequested = { navigationEffect ->
                 handleNavigationEffect(navigationEffect, navController)
@@ -121,6 +131,7 @@ private fun Content(
     paddingValues: PaddingValues,
     tosCheckBoxData: CheckboxWithTextData,
     dataProtectionCheckBoxData: CheckboxWithTextData,
+    personalDataCheckBoxData: CheckboxWithTextData,
     effectFlow: Flow<Effect>,
     onNavigationRequested: (Effect.Navigation) -> Unit,
 ) {
@@ -133,6 +144,7 @@ private fun Content(
         ConsentAndTosSection(
             tosCheckBoxData = tosCheckBoxData,
             dataProtectionCheckBoxData = dataProtectionCheckBoxData,
+            personalDataCheckBoxData = personalDataCheckBoxData
         )
     }
 
@@ -164,6 +176,7 @@ private fun handleNavigationEffect(
 fun ConsentAndTosSection(
     tosCheckBoxData: CheckboxWithTextData,
     dataProtectionCheckBoxData: CheckboxWithTextData,
+    personalDataCheckBoxData : CheckboxWithTextData
 ) {
     val context = LocalContext.current
     Column(
@@ -183,6 +196,7 @@ fun ConsentAndTosSection(
 
         WrapCheckboxWithText(checkboxData = tosCheckBoxData)
         WrapCheckboxWithText(checkboxData = dataProtectionCheckBoxData)
+        WrapCheckboxWithText(checkboxData = personalDataCheckBoxData)
 
         VSpacer.Small()
 
@@ -222,6 +236,12 @@ private fun ContentPreview() {
             text = "I accept the Data Protection Information",
         )
 
+        val personalDataCheckBoxData = CheckboxWithTextData(
+            isChecked = false,
+            onCheckedChange = { },
+            text = stringResource(R.string.consent_screen_personal_data_checkbox, "**********")
+        )
+
         val buttonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
             onClick = { },
@@ -241,7 +261,8 @@ private fun ContentPreview() {
                 tosCheckBoxData = tosCheckBoxData,
                 dataProtectionCheckBoxData = dataProtectionCheckBoxData,
                 effectFlow = flowOf(),
-                onNavigationRequested = {}
+                onNavigationRequested = {},
+                personalDataCheckBoxData = personalDataCheckBoxData
             )
         }
     }
