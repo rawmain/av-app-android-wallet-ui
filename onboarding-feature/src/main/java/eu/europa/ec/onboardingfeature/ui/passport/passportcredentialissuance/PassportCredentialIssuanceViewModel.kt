@@ -196,11 +196,9 @@ class PassportCredentialIssuanceViewModel(
                     logController.i(TAG) { "Received issueState: ${issueState::class.simpleName}" }
                     when (issueState) {
                         is CredentialIssuancePartialState.Success -> {
-                            logController.i(TAG) { "Document issued successfully: ${issueState.documentId}" }
                             setState { copy(isLoading = false) }
                             // Delete temp file after successful issuance
                             deleteTempFile(config.faceImageTempPath)
-                            logController.i(TAG) { "Navigating to success screen with documentId: ${issueState.documentId}" }
                             navigateToSuccessScreen(issueState.documentId)
                         }
 
@@ -213,7 +211,6 @@ class PassportCredentialIssuanceViewModel(
                         }
 
                         is CredentialIssuancePartialState.UserAuthRequired -> {
-                            logController.i(TAG) { "User authentication required for document issuance" }
                             // Keep loading state, authentication is part of the issuance flow
                             passportCredentialIssuanceInteractor.handleUserAuth(
                                 context = context,
@@ -257,7 +254,6 @@ class PassportCredentialIssuanceViewModel(
     }
 
     private fun navigateToSuccessScreen(documentId: String) {
-        logController.i(TAG) { "Building navigation to success screen for documentId: $documentId" }
         val onSuccessNavigation = ConfigNavigation(
             navigationType = NavigationType.PushScreen(
                 screen = LandingScreens.Landing,
@@ -279,7 +275,6 @@ class PassportCredentialIssuanceViewModel(
                 )
             )
         )
-        logController.i(TAG) { "Setting navigation effect to screenRoute: $screenRoute" }
         setEffect {
             Effect.Navigation.SwitchScreen(
                 screenRoute = screenRoute,
@@ -324,13 +319,10 @@ class PassportCredentialIssuanceViewModel(
     }
 
     private fun handleDeepLink(deepLinkUri: Uri?) {
-        logController.i(TAG) { "Handling deepLink: $deepLinkUri" }
         deepLinkUri?.let { uri ->
             hasDeepLink(uri)?.let {
-                logController.i(TAG) { "DeepLink detected with type: ${it.type}" }
                 when (it.type) {
                     DeepLinkType.CREDENTIAL_OFFER -> {
-                        logController.i(TAG) { "Handling CREDENTIAL_OFFER deeplink" }
                         setEffect {
                             Effect.Navigation.OpenDeepLinkAction(
                                 deepLinkUri = uri,
@@ -358,7 +350,6 @@ class PassportCredentialIssuanceViewModel(
                     }
 
                     DeepLinkType.EXTERNAL -> {
-                        logController.i(TAG) { "Handling EXTERNAL deeplink" }
                         setEffect {
                             Effect.Navigation.OpenDeepLinkAction(
                                 deepLinkUri = uri,
@@ -368,7 +359,7 @@ class PassportCredentialIssuanceViewModel(
                     }
 
                     else -> {
-                        logController.i(TAG) { "Unhandled deeplink type: ${it.type}" }
+                        logController.w(TAG) { "Unhandled deeplink type: ${it.type}" }
                     }
                 }
             }
