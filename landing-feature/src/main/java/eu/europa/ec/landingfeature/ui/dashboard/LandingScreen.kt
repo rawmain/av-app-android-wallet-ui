@@ -25,20 +25,20 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -51,7 +51,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
@@ -74,14 +73,11 @@ import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
-import eu.europa.ec.uilogic.component.wrap.StickyBottomConfig
-import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapIcon
 import eu.europa.ec.uilogic.component.wrap.WrapIconButton
 import eu.europa.ec.uilogic.component.wrap.WrapImage
 import eu.europa.ec.uilogic.component.wrap.WrapListItems
-import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.extension.finish
 import eu.europa.ec.uilogic.extension.getPendingDeepLink
@@ -92,10 +88,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
 @Composable
-fun LandingScreen(
-    hostNavController: NavController,
-    viewModel: LandingViewModel,
-) {
+fun LandingScreen(controller: NavController, viewModel: LandingViewModel) {
+
     val context = LocalContext.current
     val state: State by viewModel.viewState.collectAsStateWithLifecycle()
 
@@ -103,23 +97,9 @@ fun LandingScreen(
         isLoading = state.isLoading,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { context.finish() },
-        topBar = {
-            TopBar(
-                onEventSend = { viewModel.setEvent(it) }
-            )
-        },
-        stickyBottom = { paddingValues ->
-            WrapStickyBottomContent(
-                stickyBottomModifier = Modifier
-                    .fillMaxWidth()
-                    .padding(paddingValues),
-                stickyBottomConfig = StickyBottomConfig(
-                    type = StickyBottomType.Generic
-                )
-            ) {
-                ScanButton(onEventSend = { viewModel.setEvent(it) })
-            }
-        },
+        topBar = { TopBar(onEventSend = { viewModel.setEvent(it) }) },
+        fab = { ScanButton(onEventSend = { viewModel.setEvent(it) }) },
+        fabPosition = FabPosition.Center
     ) { paddingValues ->
         Content(
             paddingValues = paddingValues,
@@ -144,23 +124,18 @@ fun LandingScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.onEach { effect ->
             when (effect) {
-                is Effect.Navigation -> handleNavigationEffect(effect, hostNavController, context)
+                is Effect.Navigation -> handleNavigationEffect(effect, controller, context)
             }
         }.collect()
     }
 }
 
 @Composable
-private fun ScanButton(
-    onEventSend: (Event) -> Unit,
-) {
-    Column {
-        VSpacer.Small()
-        FloatingActionButton(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            onClick = {
-                onEventSend(Event.GoToScanQR)
-            },
+private fun ScanButton(onEventSend: (Event) -> Unit) {
+
+    Column(modifier = Modifier.wrapContentSize()) {
+        FloatingActionButton(modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = { onEventSend(Event.GoToScanQR) },
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
             shape = CircleShape,
@@ -170,16 +145,15 @@ private fun ScanButton(
                 iconData = AppIcons.QrScanner
             )
         }
+
         VSpacer.ExtraSmall()
-        WrapText(
-            text = stringResource(R.string.landing_screen_primary_button_label_scan),
+        WrapText(text = stringResource(R.string.landing_screen_primary_button_label_scan),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             ),
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        VSpacer.Small()
     }
 }
 
@@ -246,23 +220,14 @@ private fun Content(
     credentialCount: Int?,
     onAddCredential: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                paddingValues = PaddingValues(
-                    top = paddingValues.calculateTopPadding(),
-                    bottom = 0.dp,
-                    start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                    end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                )
-            )
-            .verticalScroll(rememberScrollState()),
-    ) {
+
+    Column(modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState())) {
+
         WrapText(
             text = stringResource(R.string.landing_screen_title),
             textConfig = TextConfig(style = MaterialTheme.typography.headlineLarge)
         )
+
         VSpacer.Large()
         WrapText(
             text = stringResource(R.string.landing_screen_subtitle),

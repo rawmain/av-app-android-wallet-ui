@@ -72,6 +72,10 @@ import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 @Composable
 fun PassportIdentificationScreen(
@@ -91,7 +95,7 @@ fun PassportIdentificationScreen(
                     val passportData =
                         PassportScannerIntentHelper.extractPassportDataFromIntent(intent)
                     if (passportData.dateOfBirth == null && passportData.expiryDate == null && passportData.faceImage == null) {
-                        viewModel.setEvent(Event.OnPassportScanFailed("No passport data received"))
+                        viewModel.setEvent(Event.OnPassportScanFailed(PassportErrors.NoPassportDataReceived))
                     } else {
                         viewModel.setEvent(OnPassportScanSuccessful(passportData))
                     }
@@ -99,11 +103,11 @@ fun PassportIdentificationScreen(
             }
 
             Activity.RESULT_CANCELED -> {
-                viewModel.setEvent(Event.OnPassportScanFailed("Passport scan was cancelled"))
+                viewModel.setEvent(Event.OnPassportScanFailed(PassportErrors.ScanCancelled))
             }
 
             else -> {
-                viewModel.setEvent(Event.OnPassportScanFailed("Unknown error occurred during passport scan"))
+                viewModel.setEvent(Event.OnPassportScanFailed(PassportErrors.UnknownError))
             }
         }
     }
@@ -302,20 +306,29 @@ fun VerifyYourDataContent(passportData: PassportData, paddingValues: PaddingValu
 
                 VSpacer.ExtraLarge()
                 val labelId = R.string.passport_biometrics_dob
-                PassportInfoWithLabel(labelId, passportData?.dateOfBirth)
+                PassportInfoWithLabel(labelId, formatDateForLocale(passportData.dateOfBirth))
 
                 VSpacer.ExtraLarge()
                 val labelExpiry = R.string.passport_biometrics_doe
-                PassportInfoWithLabel(labelExpiry, passportData?.expiryDate)
+                PassportInfoWithLabel(labelExpiry, formatDateForLocale(passportData.expiryDate))
             }
         }
     }
 }
 
+fun formatDateForLocale(dateString: String?): String {
+    if (dateString.isNullOrEmpty()) return ""
+    val inputFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+    val date = LocalDate.parse(dateString, inputFormatter)
+    val locale = Locale.getDefault()
+    val outputFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)
+    return date.format(outputFormatter)
+}
+
 @Composable
 private fun PassportInfoWithLabel(
     labelId: Int,
-    text: String?
+    text: String?,
 ) {
     WrapText(
         text = stringResource(labelId),
@@ -326,7 +339,7 @@ private fun PassportInfoWithLabel(
 
     VSpacer.Small()
     WrapText(
-        text = text ?: "Not available",
+        text = text ?: stringResource(R.string.passport_biometrics_no_availability),
         textConfig = TextConfig(
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.SemiBold
@@ -337,7 +350,7 @@ private fun PassportInfoWithLabel(
 
 @Composable
 private fun PassportImageOrFallback(passportData: PassportData) {
-    passportData?.faceImage?.let { faceImage ->
+    passportData.faceImage?.let { faceImage ->
         Image(
             painter = BitmapPainter(faceImage.asImageBitmap()),
             contentDescription = "Passport Face Image",

@@ -109,6 +109,10 @@
     <string name="passport_biometrics_passport">Passport / ID card</string>
     <string name="passport_biometrics_dob">Date of birth</string>
     <string name="passport_biometrics_doe">Date of expiry</string>
+    <string name="passport_biometrics_no_availability">Not available</string>
+    <string name="passport_biometrics_no_passport_data">No passport data received</string>
+    <string name="passport_biometrics_scan_cancelled">Passport scan was cancelled</string>
+    <string name="passport_biometrics_unknown_error">Unknown error occurred during passport scan</string>
 
     <!-- Passport live video instructions -->
     <string name="passport_live_video_header">Record a quick video of yourself</string>

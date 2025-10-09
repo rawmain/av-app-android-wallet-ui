@@ -40,6 +40,12 @@ import org.koin.android.annotation.KoinViewModel
 import java.io.File
 import java.io.FileOutputStream
 
+sealed class PassportErrors(val errorMessage: Int) {
+    data object NoPassportDataReceived : PassportErrors(R.string.passport_biometrics_no_passport_data)
+    data object ScanCancelled : PassportErrors(R.string.passport_biometrics_scan_cancelled)
+    data object UnknownError: PassportErrors(R.string.passport_biometrics_unknown_error)
+}
+
 data class State(
     val isLoading: Boolean = false,
     val scanComplete: Boolean = false,
@@ -54,7 +60,7 @@ sealed class Event : ViewEvent {
     data object OnProcessRestartRequest : Event()
     data object OnPassportVerificationCompletion : Event()
     data class OnPassportScanSuccessful(val passportData: PassportData) : Event()
-    data class OnPassportScanFailed(val errorMessage: String) : Event()
+    data class OnPassportScanFailed(var errors: PassportErrors) : Event()
     data object OnRetry : Event()
 }
 
@@ -92,7 +98,7 @@ class PassportIdentificationViewModel(
             }
 
             is Event.OnPassportScanFailed -> {
-                logController.e { "Passport scan failed: ${event.errorMessage}" }
+                logController.e { "Passport scan failed: ${resourceProvider.getString(event.errors.errorMessage)}" }
                 setState { copy(scanComplete = false, passportData = null) }
             }
 
