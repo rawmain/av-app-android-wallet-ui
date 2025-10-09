@@ -25,6 +25,7 @@ import org.jmrtd.JMRTDSecurityProvider
 import org.jmrtd.MRTDTrustStore
 import org.jmrtd.PACEKeySpec
 import org.jmrtd.PassportService
+import org.jmrtd.Verdict
 import org.jmrtd.VerificationStatus
 import org.jmrtd.cert.CardVerifiableCertificate
 import org.jmrtd.lds.AbstractTaggedLDSFile
@@ -38,14 +39,11 @@ import org.jmrtd.lds.SODFile
 import org.jmrtd.lds.SecurityInfo
 import org.jmrtd.lds.icao.COMFile
 import org.jmrtd.lds.icao.DG11File
-import org.jmrtd.lds.icao.DG12File
 import org.jmrtd.lds.icao.DG14File
 import org.jmrtd.lds.icao.DG15File
 import org.jmrtd.lds.icao.DG1File
 import org.jmrtd.lds.icao.DG2File
-import org.jmrtd.lds.icao.DG3File
 import org.jmrtd.lds.icao.DG5File
-import org.jmrtd.lds.icao.DG7File
 import org.jmrtd.lds.icao.MRZInfo
 import org.jmrtd.protocol.BACResult
 import org.jmrtd.protocol.EACCAResult
@@ -59,7 +57,6 @@ import java.security.KeyStore
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.PrivateKey
-import java.security.PublicKey
 import java.security.SecureRandom
 import java.security.Security
 import java.security.Signature
@@ -78,10 +75,6 @@ import javax.security.auth.x500.X500Principal
 
 class PassportNFC @Throws(GeneralSecurityException::class)
 private constructor() {
-
-    var readDG2 = true
-    var readDG3 = false
-
     /** The hash function for DG hashes.  */
     private var digest: MessageDigest? = null
 
@@ -149,19 +142,6 @@ private constructor() {
 
         }
 
-    /**
-     * Gets the private key for EAC, or null if not present.
-     *
-     * @return a private key or null
-     */
-    /**
-     * Sets the private key for EAC.
-     *
-     * @param eacPrivateKey a private key
-     */
-    var eacPrivateKey: PrivateKey? = null
-
-
     private var service: PassportService?=null
 
     private val random: Random
@@ -175,15 +155,9 @@ private constructor() {
         private set
     var dg2File: DG2File? = null
         private set
-    var dg3File: DG3File? = null
-        private set
     var dg5File: DG5File? = null
         private set
-    var dg7File: DG7File? = null
-        private set
     var dg11File: DG11File? = null
-        private set
-    var dg12File: DG12File? = null
         private set
     var dg14File: DG14File? = null
         private set
@@ -213,9 +187,7 @@ private constructor() {
      * @throws GeneralSecurityException if certain security primitives are not supported
      */
     @Throws(CardServiceException::class, GeneralSecurityException::class)
-    constructor(ps: PassportService?, trustManager: MRTDTrustStore, mrzInfo: MRZInfo, readDG2: Boolean = true, readDG3: Boolean = false) : this() {
-        this.readDG2 = readDG2
-        this.readDG3 = readDG3
+    constructor(ps: PassportService?, trustManager: MRTDTrustStore, mrzInfo: MRZInfo) : this() {
         if (ps == null) {
             throw IllegalArgumentException("Service cannot be null")
         }
@@ -235,7 +207,7 @@ private constructor() {
                 val securityInfos = cardAccessFile.securityInfos
                 for (securityInfo in securityInfos) {
                     if (securityInfo is PACEInfo) {
-                        features.setSAC(FeatureStatus.Verdict.PRESENT)
+                        features.setSAC(Verdict.PRESENT)
                     }
                 }
             } catch (e: Exception) {
@@ -244,7 +216,7 @@ private constructor() {
                 e.printStackTrace()
             }
 
-            hasSAC = features.hasSAC() == FeatureStatus.Verdict.PRESENT
+            hasSAC = features.hasSAC() == Verdict.PRESENT
 
             if (hasSAC) {
                 try {
@@ -272,21 +244,21 @@ private constructor() {
 
             if (isSACSucceeded) {
                 verificationStatus.setSAC(VerificationStatus.Verdict.SUCCEEDED, "Succeeded")
-                features.setBAC(FeatureStatus.Verdict.UNKNOWN)
+                features.setBAC(Verdict.UNKNOWN)
                 verificationStatus.setBAC(VerificationStatus.Verdict.NOT_CHECKED, "Using SAC, BAC not checked", EMPTY_TRIED_BAC_ENTRY_LIST)
             } else {
                 /* We failed SAC, and we failed BAC. */
-                features.setBAC(FeatureStatus.Verdict.NOT_PRESENT)
+                features.setBAC(Verdict.NOT_PRESENT)
                 verificationStatus.setBAC(VerificationStatus.Verdict.NOT_PRESENT, "Non-BAC document", EMPTY_TRIED_BAC_ENTRY_LIST)
             }
         } catch (e: Exception) {
             Log.i(TAG, "Attempt to read EF.COM before BAC failed with: " + e.message)
-            features.setBAC(FeatureStatus.Verdict.PRESENT)
+            features.setBAC(Verdict.PRESENT)
             verificationStatus.setBAC(VerificationStatus.Verdict.NOT_CHECKED, "BAC document", EMPTY_TRIED_BAC_ENTRY_LIST)
         }
 
         /* If we have to do BAC, try to do BAC. */
-        val hasBAC = features.hasBAC() == FeatureStatus.Verdict.PRESENT
+        val hasBAC = features.hasBAC() == Verdict.PRESENT
 
         if (hasBAC && !(hasSAC && isSACSucceeded)) {
             val bacKey = BACKey(mrzInfo.documentNumber, mrzInfo.dateOfBirth, mrzInfo.dateOfExpiry)
@@ -295,7 +267,7 @@ private constructor() {
             try {
                 doBAC(service as PassportService, mrzInfo)
                 verificationStatus.setBAC(VerificationStatus.Verdict.SUCCEEDED, "BAC succeeded with key $bacKey", triedBACEntries)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 verificationStatus.setBAC(VerificationStatus.Verdict.FAILED, "BAC failed", triedBACEntries)
             }
 
@@ -369,25 +341,25 @@ private constructor() {
 
         /* Check EAC support by DG14 presence. */
         if (dgNumbers.contains(14)) {
-            features.setEAC(FeatureStatus.Verdict.PRESENT)
-            features.setCA(FeatureStatus.Verdict.PRESENT)
+            features.setEAC(Verdict.PRESENT)
+            features.setCA(Verdict.PRESENT)
         } else {
-            features.setEAC(FeatureStatus.Verdict.NOT_PRESENT)
-            features.setCA(FeatureStatus.Verdict.NOT_PRESENT)
+            features.setEAC(Verdict.NOT_PRESENT)
+            features.setCA(Verdict.NOT_PRESENT)
         }
 
-        val hasCA = features.hasCA() == FeatureStatus.Verdict.PRESENT
+        val hasCA = features.hasCA() == Verdict.PRESENT
         if (hasCA) {
             try {
-                val eaccaResults = doEACCA(ps, mrzInfo, dg14File, sodFile)
+                val eaccaResults = doEACCA(ps, dg14File, sodFile)
                 verificationStatus.setCA(VerificationStatus.Verdict.SUCCEEDED, "EAC succeeded", eaccaResults[0])
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 verificationStatus.setCA(VerificationStatus.Verdict.FAILED, "CA Failed", null)
             }
 
         }
 
-        val hasEAC = features.hasEAC() == FeatureStatus.Verdict.PRESENT
+        val hasEAC = features.hasEAC() == Verdict.PRESENT
         val cvcaKeyStores = trustManager.cvcaStores
         if (hasEAC && cvcaKeyStores != null && cvcaKeyStores.size > 0 && verificationStatus.ca == VerificationStatus.Verdict.SUCCEEDED) {
             try {
@@ -422,23 +394,10 @@ private constructor() {
         }
 
         try {
-            dg3File = getDG3File(ps)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-        try {
             dg5File = getDG5File(ps)
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-        try {
-            dg7File = getDG7File(ps)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
 
         try {
             dg11File = getDG11File(ps)
@@ -447,35 +406,7 @@ private constructor() {
             Log.e(TAG, dg11Failmsg)
             e.printStackTrace()
         }
-
-        try {
-            dg12File = getDG12File(ps)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
     }
-
-    /**
-     * Sets the document signing certificate.
-     *
-     * @param docSigningCertificate a certificate
-     */
-    fun setDocSigningCertificate(docSigningCertificate: X509Certificate) {
-        updateCOMSODFile(docSigningCertificate)
-    }
-
-    /**
-     * Sets the public key for EAC.
-     *
-     * @param eacPublicKey a public key
-     */
-    fun setEACPublicKey(eacPublicKey: PublicKey) {
-        val chipAuthenticationPublicKeyInfo = ChipAuthenticationPublicKeyInfo(eacPublicKey)
-        val dg14File = DG14File(Arrays.asList(*arrayOf<SecurityInfo>(chipAuthenticationPublicKeyInfo)))
-        putFile(PassportService.EF_DG14, dg14File.encoded)
-    }
-
 
     /**
      * Verifies the document using the security related mechanisms.
@@ -540,8 +471,7 @@ private constructor() {
             val dgHashes = TreeMap<Int, ByteArray>()
 
             val dgFids = LDSFileUtil.getDataGroupNumbers(sodFile)
-            val digest: MessageDigest
-            digest = MessageDigest.getInstance(digestAlg)
+            val digest: MessageDigest = MessageDigest.getInstance(digestAlg)
             for (fid in dgFids) {
                 if (fid != PassportService.EF_COM.toInt() && fid != PassportService.EF_SOD.toInt() && fid != PassportService.EF_CVCA.toInt()) {
                     val dg = getDG(fid)
@@ -579,16 +509,13 @@ private constructor() {
             val docSigningCert = sodFile!!.docSigningCertificate
             if (docSigningCert == null) {
                 Log.w(TAG, "Could not get document signer certificate from EF.SOd")
-                // FIXME: We search for it in cert stores. See note at verifyCS.
-                // X500Principal issuer = sod.getIssuerX500Principal();
-                // BigInteger serialNumber = sod.getSerialNumber();
             }
             if (checkDocSignature(docSigningCert)) {
                 verificationStatus.setDS(VerificationStatus.Verdict.SUCCEEDED, "Signature checked")
             } else {
                 verificationStatus.setDS(VerificationStatus.Verdict.FAILED, "Signature incorrect")
             }
-        } catch (nsae: NoSuchAlgorithmException) {
+        } catch (_: NoSuchAlgorithmException) {
             verificationStatus.setDS(VerificationStatus.Verdict.FAILED, "Unsupported signature algorithm")
             return  /* NOTE: Serious enough to not perform other checks, leave method. */
         } catch (e: Exception) {
@@ -657,10 +584,6 @@ private constructor() {
 
             /* Run PKIX algorithm to build chain to any trust anchor. Add certificates to our chain. */
             val pkixChain = PassportNfcUtils.getCertificateChain(docSigningCertificate, sodIssuer!!, sodSerialNumber!!, cscaStores!!, cscaTrustAnchors!!)
-            if (pkixChain == null) {
-                verificationStatus.setCS(VerificationStatus.Verdict.FAILED, "Could not build chain to trust anchor (pkixChain == null)", chain)
-                return
-            }
 
             for (certificate in pkixChain) {
                 if (certificate == docSigningCertificate) {
@@ -674,7 +597,7 @@ private constructor() {
                 verificationStatus.setCS(VerificationStatus.Verdict.FAILED, "Could not build chain to trust anchor", chain)
                 return
             }
-            if (chainDepth > 1 && verificationStatus.cs == VerificationStatus.Verdict.UNKNOWN) {
+            if (verificationStatus.cs == VerificationStatus.Verdict.UNKNOWN) {
                 verificationStatus.setCS(VerificationStatus.Verdict.SUCCEEDED, "Found a chain to a trust anchor", chain)
             }
 
@@ -778,11 +701,11 @@ private constructor() {
 
 
         /* Get the stored hash for the DG. */
-        var storedHash: ByteArray? = null
+        var storedHash: ByteArray?
         try {
             val storedHashes = sodFile!!.dataGroupHashes
             storedHash = storedHashes[dgNumber]
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "DG$dgNumber failed, could not get stored hash", hashResults)
             return null
         }
@@ -791,7 +714,7 @@ private constructor() {
         val digestAlgorithm = sodFile!!.digestAlgorithm
         try {
             digest = getDigest(digestAlgorithm)
-        } catch (nsae: NoSuchAlgorithmException) {
+        } catch (_: NoSuchAlgorithmException) {
             verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "Unsupported algorithm \"$digestAlgorithm\"", null)
             return null // DEBUG -- MO
         }
@@ -799,15 +722,6 @@ private constructor() {
         /* Read the DG. */
         var dgBytes: ByteArray? = null
         try {
-            /*InputStream dgIn = null;
-            int length = lds.getLength(fid);
-            if (length > 0) {
-                dgBytes = new byte[length];
-                dgIn = lds.getInputStream(fid);
-                DataInputStream dgDataIn = new DataInputStream(dgIn);
-                dgDataIn.readFully(dgBytes);
-            }*/
-
             val abstractTaggedLDSFile = getDG(dgNumber)
             if (abstractTaggedLDSFile != null) {
                 dgBytes = readEF(service!!, dgNumber)
@@ -826,7 +740,7 @@ private constructor() {
                 return hashResult
             }
 
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             val hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
             hashResults[dgNumber] = hashResult
             verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "DG$dgNumber failed due to exception", hashResults)
@@ -844,7 +758,7 @@ private constructor() {
             }
 
             return hashResult
-        } catch (ioe: Exception) {
+        } catch (_: Exception) {
             val hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
             hashResults[dgNumber] = hashResult
             verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "Hash failed due to exception", hashResults)
@@ -875,22 +789,13 @@ private constructor() {
                 return dg1File
             }
             2 -> {
-                return if (readDG2) dg2File else null
-            }
-            3 -> {
-                return if (readDG3) dg3File else null
+                return dg2File
             }
             5 -> {
                 return dg5File
             }
-            7 -> {
-                return dg7File
-            }
             11 -> {
                 return dg11File
-            }
-            12 -> {
-                return dg12File
             }
             14 -> {
                 return dg14File
@@ -927,11 +832,10 @@ private constructor() {
         val eContent = sodFile!!.eContent
         val signature = sodFile!!.encryptedDigest
 
-        var digestEncryptionAlgorithm: String? = null
-        try {
-            digestEncryptionAlgorithm = sodFile!!.digestEncryptionAlgorithm
-        } catch (e: Exception) {
-            digestEncryptionAlgorithm = null
+        var digestEncryptionAlgorithm = try {
+            sodFile!!.digestEncryptionAlgorithm
+        } catch (_: Exception) {
+            null
         }
 
         /*
@@ -940,16 +844,16 @@ private constructor() {
          */
         if (digestEncryptionAlgorithm == null) {
             val digestAlg = sodFile!!.signerInfoDigestAlgorithm
-            var digest: MessageDigest? = null
+            var digest: MessageDigest
             try {
                 digest = MessageDigest.getInstance(digestAlg)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 digest = MessageDigest.getInstance(digestAlg, BC_PROVIDER)
             }
 
-            digest!!.update(eContent)
+            digest.update(eContent)
             val digestBytes = digest.digest()
-            return Arrays.equals(digestBytes, signature)
+            return digestBytes.contentEquals(signature)
         }
 
 
@@ -970,21 +874,14 @@ private constructor() {
 
         Log.i(TAG, "digestEncryptionAlgorithm = $digestEncryptionAlgorithm")
 
-        var sig: Signature? = null
-
-        sig = Signature.getInstance(digestEncryptionAlgorithm, BC_PROVIDER)
+        val sig: Signature = Signature.getInstance(digestEncryptionAlgorithm, BC_PROVIDER)
         if (digestEncryptionAlgorithm.endsWith("withRSA/PSS")) {
             val saltLength = findSaltRSA_PSS(digestEncryptionAlgorithm, docSigningCert, eContent, signature)//Unknown salt so we try multiples until we get a success or failure
             val mgf1ParameterSpec = MGF1ParameterSpec("SHA-256")
             val pssParameterSpec = PSSParameterSpec("SHA-256", "MGF1", mgf1ParameterSpec, saltLength, 1)
-            sig!!.setParameter(pssParameterSpec)
+            sig.setParameter(pssParameterSpec)
         }
-        /*try {
-            sig = Signature.getInstance(digestEncryptionAlgorithm);
-        } catch (Exception e) {
-            sig = Signature.getInstance(digestEncryptionAlgorithm, BC_PROVIDER);
-        }*/
-        sig!!.initVerify(docSigningCert)
+        sig.initVerify(docSigningCert)
         sig.update(eContent)
         return sig.verify(signature)
     }
@@ -994,16 +891,15 @@ private constructor() {
         //Using brute force
         for (i in 0..512) {
             try {
-                var sig: Signature? = null
 
-                sig = Signature.getInstance(digestEncryptionAlgorithm, BC_PROVIDER)
+                val sig: Signature = Signature.getInstance(digestEncryptionAlgorithm, BC_PROVIDER)
                 if (digestEncryptionAlgorithm.endsWith("withRSA/PSS")) {
                     val mgf1ParameterSpec = MGF1ParameterSpec("SHA-256")
                     val pssParameterSpec = PSSParameterSpec("SHA-256", "MGF1", mgf1ParameterSpec, i, 1)
-                    sig!!.setParameter(pssParameterSpec)
+                    sig.setParameter(pssParameterSpec)
                 }
 
-                sig!!.initVerify(docSigningCert)
+                sig.initVerify(docSigningCert)
                 sig.update(eContent)
                 val verify = sig.verify(signature)
                 if (verify) {
@@ -1016,9 +912,6 @@ private constructor() {
         }
         return 0//Unable to find it
     }
-
-
-    ////////////////////////////
 
     @Throws(IOException::class, CardServiceException::class, GeneralSecurityException::class)
     private fun doPACE(ps: PassportService, mrzInfo: MRZInfo): PACEResult? {
@@ -1037,15 +930,12 @@ private constructor() {
                 paceInfos.add(securityInfo)
             }
 
-            if (paceInfos.size > 0) {
+            if (paceInfos.isNotEmpty()) {
                 val paceInfo = paceInfos.iterator().next()
                 paceResult = ps.doPACE(paceKeySpec, paceInfo.objectIdentifier, PACEInfo.toParameterSpec(paceInfo.parameterId))
             }
         } finally {
-            if (isCardAccessFile != null) {
-                isCardAccessFile.close()
-                isCardAccessFile = null
-            }
+            isCardAccessFile?.close()
         }
         return paceResult
     }
@@ -1056,7 +946,7 @@ private constructor() {
         return ps.doBAC(bacKey)
     }
 
-    private fun doEACCA(ps: PassportService, mrzInfo: MRZInfo, dg14File: DG14File?, sodFile: SODFile?): List<EACCAResult> {
+    private fun doEACCA(ps: PassportService, dg14File: DG14File?, sodFile: SODFile?): List<EACCAResult> {
         Log.i(TAG, "doEACCA entry")
         if (dg14File == null) {
             throw NullPointerException("dg14File is null")
@@ -1085,9 +975,9 @@ private constructor() {
             }
         }
 
-        var keyid = BigInteger.ZERO
-        var oidasn1 = ""
-        var oidhumanreadable = ""
+        var keyid: BigInteger
+        var oidasn1: String
+        var oidhumanreadable: String
 
         val publicKeyInfoIterator = chipAuthenticationPublicKeyInfos.iterator()
         outer@
@@ -1104,8 +994,7 @@ private constructor() {
                     val doEACCA = ps.doEACCA(keyid, oidasn1, oidhumanreadable, authenticationPublicKeyInfo.subjectPublicKey)
                     eaccaResults.add(doEACCA)
                     Log.i("EMRTD", "Chip Authentication succeeded")
-                } catch (cse: CardServiceException) {
-                    //cse.printStackTrace()
+                } catch (_: CardServiceException) {
                     /* NOTE: Failed? Too bad, try next public key. */
                     Log.w(TAG, "try next public key")
                 }
@@ -1172,26 +1061,6 @@ private constructor() {
         return eaccaResults
     }
 
-    private fun inferChipAuthenticationOIDfromPublicKeyOID(publicKeyOID: String): String? {
-        if (SecurityInfo.ID_PK_ECDH.equals(publicKeyOID)) {
-            /*
-            * This seems to work for French passports (generation 2013, 2014),
-            * but it is best effort.
-            */
-            Log.w(TAG,"Could not determine ChipAuthentication algorithm, defaulting to id-CA-ECDH-3DES-CBC-CBC")
-            return SecurityInfo.ID_CA_ECDH_3DES_CBC_CBC
-        } else if (SecurityInfo.ID_PK_DH.equals(publicKeyOID)) {
-            /*
-            * Not tested. Best effort.
-            */
-            Log.w(TAG,"Could not determine ChipAuthentication algorithm, defaulting to id-CA-DH-3DES-CBC-CBC")
-            return SecurityInfo.ID_CA_DH_3DES_CBC_CBC
-        } else {
-            Log.w(TAG,"No ChipAuthenticationInfo and unsupported ChipAuthenticationPublicKeyInfo public key OID $publicKeyOID")
-        }
-        return null
-    }
-
     @Throws(IOException::class, CardServiceException::class, GeneralSecurityException::class, IllegalArgumentException::class, NullPointerException::class)
     private fun doEACTA(ps: PassportService, mrzInfo: MRZInfo, cvcaFile: CVCAFile?, paceResult: PACEResult?, eaccaResult: EACCAResult?, cvcaKeyStores: List<KeyStore>): List<EACTAResult> {
         if (cvcaFile == null) {
@@ -1246,10 +1115,7 @@ private constructor() {
             isComFile = ps.getInputStream(PassportService.EF_COM)
             return LDSFileUtil.getLDSFile(PassportService.EF_COM, isComFile) as COMFile
         } finally {
-            if (isComFile != null) {
-                isComFile.close()
-                isComFile = null
-            }
+            isComFile?.close()
         }
     }
 
@@ -1261,10 +1127,7 @@ private constructor() {
             isSodFile = ps.getInputStream(PassportService.EF_SOD)
             return LDSFileUtil.getLDSFile(PassportService.EF_SOD, isSodFile) as SODFile
         } finally {
-            if (isSodFile != null) {
-                isSodFile.close()
-                isSodFile = null
-            }
+            isSodFile?.close()
         }
     }
 
@@ -1276,10 +1139,7 @@ private constructor() {
             isDG1 = ps.getInputStream(PassportService.EF_DG1)
             return LDSFileUtil.getLDSFile(PassportService.EF_DG1, isDG1) as DG1File
         } finally {
-            if (isDG1 != null) {
-                isDG1.close()
-                isDG1 = null
-            }
+            isDG1?.close()
         }
     }
 
@@ -1291,25 +1151,7 @@ private constructor() {
             isDG2 = ps.getInputStream(PassportService.EF_DG2)
             return LDSFileUtil.getLDSFile(PassportService.EF_DG2, isDG2) as DG2File
         } finally {
-            if (isDG2 != null) {
-                isDG2.close()
-                isDG2 = null
-            }
-        }
-    }
-
-    @Throws(CardServiceException::class, IOException::class)
-    private fun getDG3File(ps: PassportService): DG3File {
-        // Basic data
-        var isDG3: InputStream? = null
-        try {
-            isDG3 = ps.getInputStream(PassportService.EF_DG3)
-            return LDSFileUtil.getLDSFile(PassportService.EF_DG3, isDG3) as DG3File
-        } finally {
-            if (isDG3 != null) {
-                isDG3.close()
-                isDG3 = null
-            }
+            isDG2?.close()
         }
     }
 
@@ -1321,25 +1163,7 @@ private constructor() {
             isDG5 = ps.getInputStream(PassportService.EF_DG5)
             return LDSFileUtil.getLDSFile(PassportService.EF_DG5, isDG5) as DG5File
         } finally {
-            if (isDG5 != null) {
-                isDG5.close()
-                isDG5 = null
-            }
-        }
-    }
-
-    @Throws(CardServiceException::class, IOException::class)
-    private fun getDG7File(ps: PassportService): DG7File {
-        // Basic data
-        var isDG7: InputStream? = null
-        try {
-            isDG7 = ps.getInputStream(PassportService.EF_DG7)
-            return LDSFileUtil.getLDSFile(PassportService.EF_DG7, isDG7) as DG7File
-        } finally {
-            if (isDG7 != null) {
-                isDG7.close()
-                isDG7 = null
-            }
+            isDG5?.close()
         }
     }
 
@@ -1351,25 +1175,7 @@ private constructor() {
             isDG11 = ps.getInputStream(PassportService.EF_DG11)
             return LDSFileUtil.getLDSFile(PassportService.EF_DG11, isDG11) as DG11File
         } finally {
-            if (isDG11 != null) {
-                isDG11.close()
-                isDG11 = null
-            }
-        }
-    }
-
-    @Throws(CardServiceException::class, IOException::class)
-    private fun getDG12File(ps: PassportService): DG12File {
-        // Basic data
-        var isDG12: InputStream? = null
-        try {
-            isDG12 = ps.getInputStream(PassportService.EF_DG12)
-            return LDSFileUtil.getLDSFile(PassportService.EF_DG12, isDG12) as DG12File
-        } finally {
-            if (isDG12 != null) {
-                isDG12.close()
-                isDG12 = null
-            }
+            isDG11?.close()
         }
     }
 
@@ -1381,10 +1187,7 @@ private constructor() {
             isDG14 = ps.getInputStream(PassportService.EF_DG14)
             return LDSFileUtil.getLDSFile(PassportService.EF_DG14, isDG14) as DG14File
         } finally {
-            if (isDG14 != null) {
-                isDG14.close()
-                isDG14 = null
-            }
+            isDG14?.close()
         }
     }
 
@@ -1396,10 +1199,7 @@ private constructor() {
             isDG15 = ps.getInputStream(PassportService.EF_DG15)
             return LDSFileUtil.getLDSFile(PassportService.EF_DG15, isDG15) as DG15File
         } finally {
-            if (isDG15 != null) {
-                isDG15.close()
-                isDG15 = null
-            }
+            isDG15?.close()
         }
     }
 
@@ -1411,10 +1211,7 @@ private constructor() {
             isEF_CVCA = ps.getInputStream(PassportService.EF_CVCA)
             return LDSFileUtil.getLDSFile(PassportService.EF_CVCA, isEF_CVCA) as CVCAFile
         } finally {
-            if (isEF_CVCA != null) {
-                isEF_CVCA.close()
-                isEF_CVCA = null
-            }
+            isEF_CVCA?.close()
         }
     }
 

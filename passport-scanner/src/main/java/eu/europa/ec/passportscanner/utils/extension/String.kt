@@ -17,23 +17,6 @@
  */
 package eu.europa.ec.passportscanner.utils.extension
 
-import org.json.JSONException
-import org.json.JSONObject
-
-
-private val hexArray = "0123456789ABCDEF".toCharArray()
-
-fun String.Companion.empty() = ""
-
-fun ByteArray.bytesToHex(): String {
-    val hexChars = CharArray(this.size * 2)
-    for (j in this.indices) {
-        val v = this[j].toInt() and 0xFF
-        hexChars[j * 2] = hexArray[v.ushr(4)]
-        hexChars[j * 2 + 1] = hexArray[v and 0x0F]
-    }
-    return String(hexChars)
-}
 
 fun List<String>.arrayToString(): String {
     var temp = ""
@@ -45,13 +28,4 @@ fun List<String>.arrayToString(): String {
         temp = temp.substring(0, temp.length - "\n".length)
     }
     return temp
-}
-
-fun String.isJSONValid(): Boolean {
-    return try {
-        val o = JSONObject(this)
-        true
-    } catch (e: JSONException) {
-        false
-    }
 }

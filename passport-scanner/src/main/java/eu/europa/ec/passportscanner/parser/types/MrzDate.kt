@@ -63,21 +63,21 @@ class MrzDate : Serializable, Comparable<MrzDate?> {
 
 
     override fun toString(): String {
-        return "{" + day + "/" + month + "/" + year + '}'
+        return "{$day/$month/$year}"
     }
 
 
     private fun check(): Boolean {
         if (year < 0 || year > 99) {
-            Timber.d("Parameter year: invalid value " + year + ": must be 0..99")
+            Timber.d("Parameter year: invalid value %s: must be 0..99", year)
             return false
         }
         if (month < 1 || month > 12) {
-            Timber.d("Parameter month: invalid value " + month + ": must be 1..12")
+            Timber.d("Parameter month: invalid value %s: must be 1..12", month)
             return false
         }
         if (day < 1 || day > 31) {
-            Timber.d("Parameter day: invalid value " + day + ": must be 1..31")
+            Timber.d("Parameter day: invalid value %s: must be 1..31", day)
             return false
         }
 
@@ -114,11 +114,5 @@ class MrzDate : Serializable, Comparable<MrzDate?> {
             return 1
         }
         return year * 10000 + month * 100 + day.compareTo(o.year * 10000 + o.month * 100 + o.day)
-    }
-
-    companion object {
-        private const val serialVersionUID = 1L
-
-        // Using Timber for logging
     }
 }

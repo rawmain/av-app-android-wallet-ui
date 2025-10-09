@@ -33,9 +33,7 @@ data class ScannerOptions(
 
         fun defaultForODK() : ScannerOptions = ScannerOptions(
             nfcOptions = NFCOptions.default,
-            config = Config(
-                isManualCapture = false,
-            )
+            config = Config()
         )
     }
 }

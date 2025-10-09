@@ -17,8 +17,6 @@
  */
 package eu.europa.ec.passportscanner.nfc.details
 
-import android.content.Context
-import android.graphics.BitmapFactory
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
 import android.util.Log
@@ -41,11 +39,9 @@ import org.jmrtd.lds.icao.DG1File
 import org.jmrtd.lds.icao.MRZInfo
 import java.security.Security
 
-
-class NFCDocumentTag(val readDG2: Boolean = true, val readDG3: Boolean = false) {
+class NFCDocumentTag {
 
     fun handleTag(
-        context: Context,
         tag: Tag,
         mrzInfo: MRZInfo,
         mrtdTrustStore: MRTDTrustStore,
@@ -61,18 +57,9 @@ class NFCDocumentTag(val readDG2: Boolean = true, val readDG3: Boolean = false) 
                 nfc.timeout = 5 * 1000 //5 seconds timeout
                 val cs = CardService.getInstance(nfc)
                 ps = PassportService(cs, 256, 224, false, true)
-                /* Note commented out logs of full APDU command/response tracing for future use
-                ps.addAPDUListener(APDUListener { e ->
-                    val cmdBuf = e.commandAPDU.bytes
-                    val respBuf = e.responseAPDU.bytes
-                    val cmdBufStr: String = printLine(cmdBuf, "PACKET ==> ")
-                    val respBufStr: String = printLine(respBuf, "PACKET <== ")
-                    Log.w(TAG, cmdBufStr)
-                    Log.w(TAG, respBufStr)
-                })*/
                 ps.open()
 
-                val passportNFC = PassportNFC(ps, mrtdTrustStore, mrzInfo, readDG2, readDG3)
+                val passportNFC = PassportNFC(ps, mrtdTrustStore, mrzInfo)
                 val verifySecurity = passportNFC.verifySecurity()
                 val features = passportNFC.features
                 val verificationStatus = passportNFC.verificationStatus
@@ -89,23 +76,11 @@ class NFCDocumentTag(val readDG2: Boolean = true, val readDG3: Boolean = false) 
                 //Basic Information
                 if (passportNFC.dg1File != null) {
                     val info = (passportNFC.dg1File as DG1File).mrzInfo
-                    val personDetails = PersonDetails()
-                    personDetails.dateOfBirth = info.dateOfBirth
-                    personDetails.dateOfExpiry = info.dateOfExpiry
-                    personDetails.documentCode = info.documentCode
-                    personDetails.documentNumber = info.documentNumber
-                    personDetails.optionalData1 = info.optionalData1
-                    personDetails.optionalData2 = info.optionalData2
-                    personDetails.issuingState = info.issuingState
-                    personDetails.primaryIdentifier = info.primaryIdentifier
-                    personDetails.secondaryIdentifier = info.secondaryIdentifier
-                    personDetails.nationality = info.nationality
-                    personDetails.gender = info.gender
-                    passport.personDetails = personDetails
+                    passport.personDetails = PersonDetails(info.dateOfBirth, info.dateOfExpiry)
                 }
 
                 //Picture
-                if (passportNFC.dg2File != null && passportNFC.readDG2) {
+                if (passportNFC.dg2File != null) {
                     //Get the picture
                     try {
                         val faceImage =
@@ -113,7 +88,8 @@ class NFCDocumentTag(val readDG2: Boolean = true, val readDG3: Boolean = false) 
                         passport.face = faceImage
 
                         // Also get the raw image data
-                        val rawFaceImageData = PassportNfcUtils.retrieveFaceImageRaw(passportNFC.dg2File!!)
+                        val rawFaceImageData =
+                            PassportNfcUtils.retrieveFaceImageRaw(passportNFC.dg2File!!)
                         passport.rawFaceImageData = rawFaceImageData
                     } catch (e: Exception) {
                         //Don't do anything
@@ -139,25 +115,8 @@ class NFCDocumentTag(val readDG2: Boolean = true, val readDG3: Boolean = false) 
 
                 val dg11 = passportNFC.dg11File
                 if (dg11 != null) {
-                    val additionalPersonDetails = AdditionalPersonDetails()
-                    additionalPersonDetails.custodyInformation = dg11.custodyInformation
-                    additionalPersonDetails.fullDateOfBirth = dg11.fullDateOfBirth
-                    additionalPersonDetails.nameOfHolder = dg11.nameOfHolder
-                    additionalPersonDetails.otherNames = dg11.otherNames
-                    additionalPersonDetails.otherNames = dg11.otherNames
-                    additionalPersonDetails.otherValidTDNumbers = dg11.otherValidTDNumbers
-                    additionalPersonDetails.permanentAddress = dg11.permanentAddress
-                    additionalPersonDetails.personalNumber = dg11.personalNumber
-                    additionalPersonDetails.personalSummary = dg11.personalSummary
-                    additionalPersonDetails.placeOfBirth = dg11.placeOfBirth
-                    additionalPersonDetails.profession = dg11.profession
-                    additionalPersonDetails.proofOfCitizenship = dg11.proofOfCitizenship
-                    additionalPersonDetails.tag = dg11.tag
-                    additionalPersonDetails.tagPresenceList = dg11.tagPresenceList
-                    additionalPersonDetails.telephone = dg11.telephone
-                    additionalPersonDetails.title = dg11.title
 
-                    passport.additionalPersonDetails = additionalPersonDetails
+                    passport.additionalPersonDetails = AdditionalPersonDetails(dg11.fullDateOfBirth)
 
                     // Hash Checking
                     val hashCheckNotSucceeded = "hash-check not SUCCEEDED"
@@ -167,70 +126,6 @@ class NFCDocumentTag(val readDG2: Boolean = true, val readDG3: Boolean = false) 
                 } else {
                     val dg11Null = "DG11 is null"
                     Log.e(TAG, dg11Null)
-                }
-
-                //Finger prints
-                //Get the pictures
-                if (passportNFC.dg3File != null && passportNFC.readDG3) {
-                    //Get the picture
-                    try {
-                        val bitmaps = PassportNfcUtils.retrieveFingerPrintImage(
-                            passportNFC.dg3File!!
-                        )
-                        passport.fingerprints = bitmaps
-                    } catch (e: Exception) {
-                        //Don't do anything
-                        e.printStackTrace()
-                    }
-
-                }
-
-                //Signature
-                //Get the pictures
-                if (passportNFC.dg7File != null) {
-                    //Get the picture
-                    try {
-                        val bitmap =
-                            PassportNfcUtils.retrieveSignatureImage(passportNFC.dg7File!!)
-                        passport.signature = bitmap
-                    } catch (e: Exception) {
-                        //Don't do anything
-                        e.printStackTrace()
-                    }
-                }
-
-                //Additional Document Details
-                val dg12 = passportNFC.dg12File
-                if (dg12 != null) {
-                    val additionalDocumentDetails = AdditionalDocumentDetails()
-                    additionalDocumentDetails.dateAndTimeOfPersonalization =
-                        dg12.dateAndTimeOfPersonalization
-                    additionalDocumentDetails.dateOfIssue = dg12.dateOfIssue
-                    additionalDocumentDetails.endorsementsAndObservations =
-                        dg12.endorsementsAndObservations
-                    try {
-                        val imageOfFront = dg12.imageOfFront
-                        val bitmapImageOfFront =
-                            BitmapFactory.decodeByteArray(imageOfFront, 0, imageOfFront.size)
-                        additionalDocumentDetails.imageOfFront = bitmapImageOfFront
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Additional document image front: $e")
-                    }
-                    try {
-                        val imageOfRear = dg12.imageOfRear
-                        val bitmapImageOfRear =
-                            BitmapFactory.decodeByteArray(imageOfRear, 0, imageOfRear.size)
-                        additionalDocumentDetails.imageOfRear = bitmapImageOfRear
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Additional document image rear: $e")
-                    }
-                    additionalDocumentDetails.issuingAuthority = dg12.issuingAuthority
-                    additionalDocumentDetails.namesOfOtherPersons = dg12.namesOfOtherPersons
-                    additionalDocumentDetails.personalizationSystemSerialNumber =
-                        dg12.personalizationSystemSerialNumber
-                    additionalDocumentDetails.taxOrExitRequirements = dg12.taxOrExitRequirements
-
-                    passport.additionalDocumentDetails = additionalDocumentDetails
                 }
 
             } catch (e: Exception) {
@@ -289,14 +184,10 @@ class NFCDocumentTag(val readDG2: Boolean = true, val readDG3: Boolean = false) 
     }
 
     companion object {
-
         private val TAG = NFCDocumentTag::class.java.simpleName
 
         init {
             Security.insertProviderAt(org.spongycastle.jce.provider.BouncyCastleProvider(), 1)
         }
-
-        private val EMPTY_TRIED_BAC_ENTRY_LIST = emptyList<Any>()
-        private val EMPTY_CERTIFICATE_CHAIN = emptyList<Any>()
     }
 }

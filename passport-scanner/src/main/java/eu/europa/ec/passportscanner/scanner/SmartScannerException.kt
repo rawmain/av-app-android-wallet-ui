@@ -18,6 +18,5 @@
 package eu.europa.ec.passportscanner.scanner
 
 class SmartScannerException : Exception {
-    constructor() : super()
     constructor(s: String?) : super(s)
 }

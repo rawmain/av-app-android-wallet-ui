@@ -68,9 +68,6 @@ androidxRoom = "2.7.2"
 # Passport reading dependencies
 jsonPath = "2.9.0"
 jsonFlattener = "0.17.3"
-glide = "5.0.4"
-glideTransformations = "4.3.0"
-glideCompiler = "5.0.5"
 jmrtd = "0.8.3"
 spongycastle = "1.58.0.0"
 scubaScAndroid = "0.0.26"
@@ -168,9 +165,6 @@ androidx-room-ksp = { group = "androidx.room", name = "room-compiler", version.r
 # Passport reading libraries
 json-path = { group = "com.jayway.jsonpath", name = "json-path", version.ref = "jsonPath" }
 json-flattener = { group = "com.github.wnameless.json", name = "json-flattener", version.ref = "jsonFlattener" }
-glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
-glide-transformations = { group = "jp.wasabeef", name = "glide-transformations", version.ref = "glideTransformations" }
-glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glideCompiler" }
 jmrtd = { group = "org.jmrtd", name = "jmrtd", version.ref = "jmrtd" }
 spongycastle-prov = { group = "com.madgag.spongycastle", name = "prov", version.ref = "spongycastle" }
 scuba-sc-android = { group = "net.sf.scuba", name = "scuba-sc-android", version.ref = "scubaScAndroid" }

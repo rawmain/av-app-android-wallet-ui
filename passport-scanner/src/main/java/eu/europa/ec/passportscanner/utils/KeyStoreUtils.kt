@@ -26,7 +26,6 @@ import kotlin.collections.ArrayList
 
 class KeyStoreUtils {
 
-
     fun readKeystoreFromFile(cscaInputStream: InputStream, password:String=""):KeyStore?{
         try{
             val keyStore: KeyStore = KeyStore.getInstance("PKCS12")

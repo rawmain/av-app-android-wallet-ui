@@ -18,13 +18,5 @@
 package eu.europa.ec.passportscanner.nfc.details
 
 object IntentData {
-    val KEY_IMAGE = "KEY_IMAGE"
-    val KEY_LABEL = "KEY_LABEL"
-    val KEY_LOCALE = "KEY_LOCALE"
-    val KEY_MRZ_INFO = "KEY_MRZ_INFO"
-    val KEY_MRZ_PHOTO = "KEY_MRZ_PHOTO"
-    val KEY_PASSPORT = "KEY_PASSPORT"
-    val KEY_WITH_PHOTO = "KEY_WITH_PHOTO"
-    val KEY_WITH_FINGERPRINTS = "KEY_WITH_FINGERPRINTS"
-    val KEY_ENABLE_LOGGGING = "KEY_ENABLE_LOGGGING"
+    const val KEY_MRZ_INFO = "KEY_MRZ_INFO"
 }

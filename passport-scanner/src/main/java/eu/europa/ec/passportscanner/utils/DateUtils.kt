@@ -18,19 +18,14 @@
 package eu.europa.ec.passportscanner.utils
 
 import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 object DateUtils {
-
-    private val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.ROOT)
-
-
     /**
      *  DATE THRESHOLD is for the staring year of date parsing yy -> yyyy
      *  Example:
@@ -44,20 +39,15 @@ object DateUtils {
     const val BIRTH_DATE_THRESHOLD = 99
     const val EXPIRY_DATE_THRESHOLD = 49
 
-    fun isValidDate(inDate: String): Boolean {
-        dateFormat.isLenient = false
-        try {
-            dateFormat.parse(inDate.trim { it <= ' ' })
-        } catch (pe: ParseException) {
-            return false
-        }
-        return true
-    }
-    fun formatDate(date: Date) : String = dateFormat.format(date)
-
     @SuppressLint("SimpleDateFormat")
-    fun formatStandardDate(dateString: String?, fromPattern: String = "yyMMdd", toPattern: String = "MM/dd/yyyy", locale: Locale? = Locale("en"), threshold: Int? = null): String? {
-        if(fromPattern === "yyMMdd") {
+    fun formatStandardDate(
+        dateString: String?,
+        fromPattern: String = "yyMMdd",
+        toPattern: String = "MM/dd/yyyy",
+        locale: Locale? = Locale("en"),
+        threshold: Int? = null
+    ): String? {
+        if (fromPattern === "yyMMdd") {
             val date = stringToDate2DigitsYear(dateString, threshold) ?: return null
             return dateToString(date, SimpleDateFormat(toPattern, locale))
         }
@@ -70,7 +60,7 @@ object DateUtils {
         if (dateStr == null || threshold == null) return null
         var date: Date? = null
         try {
-            val sdf = SimpleDateFormat("dd/MM/yyyy");
+            val sdf = SimpleDateFormat("dd/MM/yyyy")
             val startYear = LocalDate.now().minusYears(threshold.toLong()).year
             sdf.set2DigitYearStart(sdf.parse("01/01/$startYear"))
             sdf.applyPattern("yyMMdd")
@@ -96,7 +86,7 @@ object DateUtils {
         return dateFormat.format(date)
     }
 
-    fun toAdjustedDate(date: String?) : String? {
+    fun toAdjustedDate(date: String?): String? {
         val parts: Array<String>? = date?.split("/")?.toTypedArray()
         // Convert 2 digit date to 4 digits
         if (parts?.size == 3 && parts[2].length == 2) {
@@ -112,7 +102,7 @@ object DateUtils {
         return date
     }
 
-    fun toReadableDate(date: String?) : String? {
+    fun toReadableDate(date: String?): String? {
         val parts: Array<String>? = date?.split("/")?.toTypedArray()
         // Convert 2 digit date to 4 digits
         if (parts?.size == 3 && parts[2].length == 2) {

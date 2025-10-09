@@ -21,23 +21,18 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
-import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.SmartScannerActivity
+import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.mrz.MRZAnalyzer
 import eu.europa.ec.passportscanner.mrz.MRZCleaner
-import eu.europa.ec.passportscanner.nfc.details.IntentData
 
 open class NFCScanAnalyzer(
     override val activity: Activity,
     override val intent: Intent,
-    private val label: String?,
-    private val locale: String?,
-    imageResultType: String,
-    format: String? = null,
-    isShowGuide: Boolean? = false
+    isShowGuide: Boolean = false
 ) : MRZAnalyzer(
     activity, intent,
-    imageResultType, format, isShowGuide
+    isShowGuide
 ) {
 
     override fun processResult(result: String, bitmap: Bitmap, rotation: Int) {
@@ -46,19 +41,7 @@ open class NFCScanAnalyzer(
 
         Log.d(SmartScannerActivity.TAG, "Success from NFC -- SCAN")
         val nfcIntent = Intent(activity, NFCActivity::class.java)
-        when {
-            intent.action == ScannerConstants.IDPASS_SMARTSCANNER_NFC_INTENT ||
-                    intent.action == ScannerConstants.IDPASS_SMARTSCANNER_ODK_NFC_INTENT -> nfcIntent.putExtra(
-                ScannerConstants.NFC_ACTION,
-                intent.action
-            )
-        }
         nfcIntent.putExtra(ScannerConstants.NFC_MRZ_STRING, result)
-        nfcIntent.putExtra(ScannerConstants.NFC_LOCALE, locale)
-        nfcIntent.putExtra(IntentData.KEY_LABEL, label)
-        nfcIntent.putExtra(IntentData.KEY_WITH_PHOTO, true)
-        nfcIntent.putExtra(IntentData.KEY_WITH_FINGERPRINTS, false)
-        nfcIntent.putExtra(IntentData.KEY_ENABLE_LOGGGING, false)
         nfcIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
         activity.startActivity(nfcIntent)
         activity.finish()

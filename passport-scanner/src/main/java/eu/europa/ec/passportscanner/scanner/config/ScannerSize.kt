@@ -19,6 +19,5 @@ package eu.europa.ec.passportscanner.scanner.config
 
 enum class ScannerSize (val value : String) {
     SMALL("SMALL"),
-    MEDIUM("MEDIUM"),
     LARGE("LARGE")
 }

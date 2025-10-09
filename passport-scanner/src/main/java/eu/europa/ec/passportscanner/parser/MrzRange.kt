@@ -55,7 +55,7 @@ class MrzRange(column: Int, columnTo: Int, row: Int) : Serializable {
     }
 
     override fun toString(): String {
-        return "" + column + "-" + columnTo + "," + row
+        return "$column-$columnTo,$row"
     }
 
     /**

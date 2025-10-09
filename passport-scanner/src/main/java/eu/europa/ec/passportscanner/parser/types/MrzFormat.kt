@@ -23,7 +23,6 @@ import eu.europa.ec.passportscanner.parser.MrzParseException
 import eu.europa.ec.passportscanner.parser.MrzRange
 import eu.europa.ec.passportscanner.parser.MrzRecord
 import eu.europa.ec.passportscanner.parser.records.MRP
-import eu.europa.ec.passportscanner.parser.records.MrtdTd1
 
 
 /**
@@ -35,11 +34,6 @@ enum class MrzFormat(
     val columns: Int,
     private val recordClass: Class<out MrzRecord>
 ) {
-    /**
-     * MRTD td1 format: A three line long, 30 characters per line format.
-     */
-    MRTD_TD1(3, 30, MrtdTd1::class.java),
-
     /**
      * MRP Passport format: A two line long, 44 characters per line format.
      */

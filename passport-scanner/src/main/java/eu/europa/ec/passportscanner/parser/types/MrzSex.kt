@@ -36,9 +36,9 @@ enum class MrzSex(
         @JvmStatic
         fun fromMrz(sex: Char): MrzSex {
             when (sex) {
-                'M' -> return MrzSex.Male
-                'F' -> return MrzSex.Female
-                '<', 'X' -> return MrzSex.Unspecified
+                'M' -> return Male
+                'F' -> return Female
+                '<', 'X' -> return Unspecified
                 else -> throw RuntimeException("Invalid MRZ sex character: " + sex)
             }
         }

@@ -17,21 +17,12 @@
  */
 package eu.europa.ec.passportscanner.utils.extension
 
-import android.content.Context
-import android.content.res.Resources
-import android.graphics.*
-import android.util.Base64
-import android.util.Base64OutputStream
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 
-
-val Float.px: Float get() = (this * Resources.getSystem().displayMetrics.density)
-val Int.px: Int get() = ((this * Resources.getSystem().displayMetrics.density).toInt())
 
 // extension function to change bitmap contrast
 fun Bitmap.setContrast(
@@ -81,62 +72,4 @@ fun Bitmap.setBrightness(
 
     Canvas(bitmap).drawBitmap(this, 0f, 0f, paint)
     return bitmap
-}
-
-fun Bitmap.cacheImageToLocal(localPath: String, rotation: Int = 0, quality: Int = 80) {
-    val matrix = Matrix().apply { postRotate(rotation.toFloat()) }
-    val b = Bitmap.createBitmap(this, 0, 0, this.width, this.height, matrix, true)
-    val file = File(localPath)
-    file.createNewFile()
-    val ostream = FileOutputStream(file)
-    try {
-        b.compress(Bitmap.CompressFormat.JPEG, quality, ostream)
-        ostream.close()
-    } catch (e: Exception) {
-        e.printStackTrace()
-    } finally {
-        ostream.flush()
-        ostream.close()
-    }
-}
-
-fun File.encodeBase64(): String {
-    return FileInputStream(this).use { inputStream ->
-        ByteArrayOutputStream().use { outputStream ->
-            Base64OutputStream(outputStream, Base64.DEFAULT).use { base64FilterStream ->
-                inputStream.copyTo(base64FilterStream)
-                base64FilterStream.close()
-                outputStream.toString()
-            }
-        }
-    }
-}
-
-fun Context.cacheImagePath(identifier: String = "Scanner"): String {
-    val date = Calendar.getInstance().time
-    val formatter = SimpleDateFormat("yyyyMMddHHmmss", Locale.ROOT)
-    val currentDateTime = formatter.format(date)
-    return "${this.cacheDir}/$identifier-$currentDateTime.jpg"
-}
-
-fun Bitmap.cropCenter() : Bitmap {
-    return if (this.width >= this.height){
-       Bitmap.createBitmap(
-            this,
-           this.width /2 - this.height /2,
-            0,
-           this.height,
-           this.height
-        )
-
-    }else{
-
-        Bitmap.createBitmap(
-            this,
-            0,
-            this.height /2 - this.width /2,
-            this.width,
-            this.width
-        )
-    }
 }

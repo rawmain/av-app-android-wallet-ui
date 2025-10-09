@@ -83,25 +83,25 @@ enum class MrzDocumentCode {
                     null
                 ) // TODO why?
 
-                "AC" -> return MrzDocumentCode.CrewMember
-                "ME" -> return MrzDocumentCode.Migrant
-                "TD" -> return MrzDocumentCode.Migrant // travel document
-                "IP" -> return MrzDocumentCode.Passport
+                "AC" -> return CrewMember
+                "ME" -> return Migrant
+                "TD" -> return Migrant // travel document
+                "IP" -> return Passport
             }
 
             // 1-letter checks
             when (code.get(0)) {
-                'T', 'P' -> return MrzDocumentCode.Passport
-                'A' -> return MrzDocumentCode.TypeA
-                'C' -> return MrzDocumentCode.TypeC
-                'V' -> return MrzDocumentCode.TypeV
-                'I' -> return MrzDocumentCode.TypeI // identity card or residence permit
-                'R' -> return MrzDocumentCode.Migrant // swedish '51 Convention Travel Document
+                'T', 'P' -> return Passport
+                'A' -> return TypeA
+                'C' -> return TypeC
+                'V' -> return TypeV
+                'I' -> return TypeI // identity card or residence permit
+                'R' -> return Migrant // swedish '51 Convention Travel Document
             }
 
 
             throw MrzParseException(
-                "Unsupported document code: " + code,
+                "Unsupported document code: $code",
                 mrz,
                 MrzRange(0, 2, 0),
                 null

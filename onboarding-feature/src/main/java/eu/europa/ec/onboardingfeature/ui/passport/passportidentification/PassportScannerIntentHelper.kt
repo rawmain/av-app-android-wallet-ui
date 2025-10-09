@@ -50,9 +50,7 @@ object PassportScannerIntentHelper {
                     config = Config(
                         header = context.getString(R.string.passport_identification_title),
                         subHeader = context.getString(R.string.passport_capture_subtitle),
-                        isManualCapture = false,
                         showGuide = true,
-                        showSettings = false
                     ),
                     captureOptions = CaptureOptions(
                         type = CaptureType.DOCUMENT.value,

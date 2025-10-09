@@ -21,7 +21,6 @@ import android.util.Log
 import eu.europa.ec.passportscanner.SmartScannerActivity
 import eu.europa.ec.passportscanner.parser.MrzParser
 import eu.europa.ec.passportscanner.parser.MrzRecord
-import eu.europa.ec.passportscanner.parser.records.MrtdTd1
 
 import java.net.URLEncoder
 
@@ -33,7 +32,6 @@ object MRZCleaner {
         if (mrz.isBlank()) {
             throw IllegalArgumentException("Empty MRZ string.")
         }
-//        Log.v(SmartScannerActivity.TAG, "got MRZ: $mrz")
 
         var result = mrz
             .replace(Regex("^[^PIACV]*"), "") // Remove everything before P, I, A or C
@@ -63,7 +61,7 @@ object MRZCleaner {
                     result.startsWith("C") ||
                     result.startsWith("V"))
         ) {
-            when (result.filter{ it == '\n' }.count()) {
+            when (result.count { it == '\n' }) {
                 1 -> {
                     if (result.length > 89) {
                         result = result.slice(IntRange(0, 88))
@@ -106,7 +104,7 @@ object MRZCleaner {
         }
     }
 
-    private fun String.replaceNumbertoChar(): String {
+    private fun String.replaceNumberToChar(): String {
         return this
             .replace('0', 'O')
             .replace("1", "I")
@@ -121,10 +119,10 @@ object MRZCleaner {
 
         Log.d(SmartScannerActivity.TAG, "Previous Scan: $previousMRZString")
         if (record.validDateOfBirth && record.validDocumentNumber && record.validExpirationDate || record.validComposite) {
-            record.givenNames = record.givenNames?.replaceNumbertoChar()
-            record.surname = record.surname.replaceNumbertoChar()
-            record.issuingCountry = record.issuingCountry.replaceNumbertoChar()
-            record.nationality = record.nationality.replaceNumbertoChar()
+            record.givenNames = record.givenNames?.replaceNumberToChar()
+            record.surname = record.surname.replaceNumberToChar()
+            record.issuingCountry = record.issuingCountry.replaceNumberToChar()
+            record.nationality = record.nationality.replaceNumberToChar()
             return record
         } else {
             Log.d(SmartScannerActivity.TAG, "Still accept scanning.")
@@ -136,22 +134,4 @@ object MRZCleaner {
         }
     }
 
-    fun parseAndCleanMrtdTd1(mrz: String): MrtdTd1 {
-        val record = MrzParser.parseToMrtdTd1(mrz)
-
-        Log.d(SmartScannerActivity.TAG, "Previous Scan: $previousMRZString")
-        if (record.validDateOfBirth && record.validDocumentNumber && record.validExpirationDate || record.validComposite) {
-            record.givenNames = record.givenNames?.replaceNumbertoChar()
-            record.surname = record.surname.replaceNumbertoChar()
-            record.issuingCountry = record.issuingCountry.replaceNumbertoChar()
-            record.nationality = record.nationality.replaceNumbertoChar()
-            return record
-        } else {
-            Log.d(SmartScannerActivity.TAG, "Still accept scanning.")
-            if (mrz != previousMRZString) {
-                previousMRZString = mrz
-            }
-            throw IllegalArgumentException("Invalid check digits.")
-        }
-    }
 }

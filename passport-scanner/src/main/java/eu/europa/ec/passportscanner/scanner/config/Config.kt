@@ -19,34 +19,21 @@ package eu.europa.ec.passportscanner.scanner.config
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import eu.europa.ec.passportscanner.utils.extension.empty
 
 @Parcelize
 data class Config(
-    val background: String? = null,
-    val imageResultType: String? = null,
-    val isManualCapture: Boolean? = null,
     val header: String? = null,
     val subHeader: String? = null,
-    val label: String? = null,
     val orientation: String? = null,
-    val showSettings: Boolean = false,
-    val showGuide: Boolean? = null,
-    val showOcrGuide: Boolean? = null,
-    val xGuide: Number? = null,
-    val yGuide: Number? = null,
+    val showGuide: Boolean = false,
     val widthGuide: Int = 0,
     val heightGuide: Int = 60
 ) : Parcelable {
     companion object {
         val default = Config(
-            background = String.empty(),
-            imageResultType = ImageResultType.PATH.value,
-            isManualCapture = false,
-            header = String.empty(),
-            subHeader = String.empty(),
+            header = "",
+            subHeader = "",
             orientation = Orientation.PORTRAIT.value,
-            label = String.empty()
         )
     }
 }

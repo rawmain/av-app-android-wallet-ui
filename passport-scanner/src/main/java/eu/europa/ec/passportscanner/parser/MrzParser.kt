@@ -18,15 +18,12 @@
  */
 package eu.europa.ec.passportscanner.parser
 
-import eu.europa.ec.passportscanner.parser.records.MrtdTd1
 import eu.europa.ec.passportscanner.parser.types.MrzDate
 import eu.europa.ec.passportscanner.parser.types.MrzFormat
 import eu.europa.ec.passportscanner.parser.types.MrzFormat.Companion.get
 import eu.europa.ec.passportscanner.parser.types.MrzSex
 import eu.europa.ec.passportscanner.parser.types.MrzSex.Companion.fromMrz
 import timber.log.Timber
-import java.text.Normalizer
-import java.util.Locale
 
 
 /**
@@ -36,21 +33,23 @@ import java.util.Locale
  * All parse methods throws [MrzParseException] unless stated otherwise.
  * @author Martin Vysny
  */
-class MrzParser(mrz: String) {
+class MrzParser(
     /**
      * The MRZ record, not null.
      */
-    val mrz: String?
+    val mrz: String
+) {
 
     /**
      * The MRZ record separated into rows.
      */
-    val rows: Array<String>
+    val rows: Array<String> =
+        mrz.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
 
     /**
      * MRZ record format.
      */
-    val format: MrzFormat
+    val format: MrzFormat = get(mrz)
 
     /**
      * @author jllarraz@github
@@ -102,7 +101,7 @@ class MrzParser(mrz: String) {
                 )
             )
         }
-        return arrayOf<String?>(surname, givenNames)
+        return arrayOf(surname, givenNames)
     }
 
     /**
@@ -152,26 +151,6 @@ class MrzParser(mrz: String) {
     }
 
     /**
-     * Parses a string in given range. and known characters will be replaced to numbers
-     * &lt;&lt; are replaced with ", ", &lt; is replaced by space.
-     * @param range the range
-     * @return parsed string.
-     */
-    fun parseNumberString(range: MrzRange): String {
-        checkValidCharacters(range)
-        var str = rawValue(range)
-            .replace("O", "0")
-            .replace("I", "1")
-            .replace("B", "8")
-            .replace("S", "5")
-            .replace("Z", "2")
-        while (str.endsWith("<")) {
-            str = str.substring(0, str.length - 1)
-        }
-        return str.replace("<", "").replace("" + FILLER + FILLER, ", ").replace(FILLER, ' ')
-    }
-
-    /**
      * Parses a string in given range for MRZ names. &lt;&lt; are replaced with  "",
      * &lt; is replaced by space.
      * @param range the range
@@ -194,48 +173,6 @@ class MrzParser(mrz: String) {
     }
 
     /**
-     * Parses a string in given range for MRZ names. &lt;&lt; are replaced with  "",
-     * &lt; is replaced by space.
-     * @param range the range
-     * @return parsed string.
-     */
-    fun parseNameStringWithSeparators(range: MrzRange): String {
-        checkValidCharacters(range)
-        var str = rawValue(range)
-        while (str.endsWith("<") ||
-            str.endsWith("<<S") ||  // Sometimes MLKit perceives `<` as `S`
-            str.endsWith("<<E") ||  // Sometimes MLKit perceives `<` as `E`
-            str.endsWith("<<C") ||  // Sometimes MLKit perceives `<` as `C`
-            str.endsWith("<<CC") ||  // Sometimes MLKit perceives `<` as `C`
-            str.endsWith("<<K") ||  // Sometimes MLKit perceives `<` as `K`
-            str.endsWith("<<KK") ||  // Sometimes MLKit perceives `<<` as `KK`
-            str.endsWith("<<KKK") ||  // Sometimes MLKit perceives `<<` as `KKK`
-            str.endsWith("<<KKKK") ||  // Sometimes MLKit perceives `<<` as `KKKK`
-            str.endsWith("<<KKKKK")
-        )  // Sometimes MLKit perceives `<<` as `KKKKK`
-        {
-            str = str.substring(0, str.length - 1)
-        }
-        return str.replace("" + FILLER + FILLER, ", ").replace(FILLER, ' ')
-    }
-
-    /**
-     * Parses a document number string in given range, &lt;&lt; are replaced with "-",
-     * &lt; is replaced by space.
-     *
-     * @param range the range
-     * @return parsed string.
-     */
-    fun parseDocuString(range: MrzRange): String {
-        checkValidCharacters(range)
-        var str = rawValue(range)
-        while (str.endsWith("<")) {
-            str = str.substring(0, str.length - 1)
-        }
-        return str.replace("" + FILLER + FILLER, "-").replace(FILLER, ' ')
-    }
-
-    /**
      * Verifies the check digit.
      * @param col the 0-based column of the check digit.
      * @param row the 0-based column of the check digit.
@@ -245,23 +182,6 @@ class MrzParser(mrz: String) {
      */
     fun checkDigit(col: Int, row: Int, strRange: MrzRange, fieldName: String?): Boolean {
         return checkDigit(col, row, rawValue(strRange), fieldName)
-    }
-
-    /**
-     * Verifies the check digit.
-     * @param col the 0-based column of the check digit.
-     * @param row the 0-based column of the check digit.
-     * @param strRange the range for which the check digit is computed.
-     * @param fieldName (optional) field name. Used only when validity check fails.
-     * @return true if check digit is valid, false if not
-     */
-    fun checkDigitWithoutFiller(
-        col: Int,
-        row: Int,
-        strRange: MrzRange,
-        fieldName: String?
-    ): Boolean {
-        return checkDigit(col, row, rawValue(strRange).replace("<", ""), fieldName)
     }
 
     /**
@@ -347,29 +267,10 @@ class MrzParser(mrz: String) {
         return fromMrz(rows[row].get(col))
     }
 
-    /**
-     * Creates new parser which parses given MRZ record.
-     * @param mrz the MRZ record, not null.
-     */
-    init {
-        this.mrz = mrz
-        this.rows = mrz.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        this.format = get(mrz)
-    }
-
     companion object {
         // Using Timber for logging
 
         private val MRZ_WEIGHTS = intArrayOf(7, 3, 1)
-
-        /**
-         * Checks if given character is valid in MRZ.
-         * @param c the character.
-         * @return true if the character is valid, false otherwise.
-         */
-        private fun isValid(c: Char): Boolean {
-            return ((c == FILLER) || (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z'))
-        }
 
         private fun getCharacterValue(c: Char): Int {
             if (c == FILLER) {
@@ -410,23 +311,8 @@ class MrzParser(mrz: String) {
         }
 
         /**
-         * Factory method, which parses the MRZ and returns appropriate record class.
-         * @param mrz MRZ to parse.
-         * @return MrtdTd1 record class.
-         */
-        fun parseToMrtdTd1(mrz: String): MrtdTd1 {
-            val result = get(mrz).newRecord() as MrtdTd1
-            result.fromMrz(mrz)
-            return result
-        }
-
-
-
-        /**
          * The filler character, '&lt;'.
          */
         const val FILLER: Char = '<'
-
-
     }
 }

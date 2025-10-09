@@ -74,7 +74,6 @@ public class BitmapUtils {
                 new FrameMetadata.Builder()
                         .setWidth(image.getWidth())
                         .setHeight(image.getHeight())
-                        .setRotation(image.getImageInfo().getRotationDegrees())
                         .build();
 
         ByteBuffer nv21Buffer = yuv420ThreePlanesToNV21(image.getImage().getPlanes(), image.getWidth(), image.getHeight());

@@ -23,7 +23,6 @@ import android.content.Intent
 import android.net.Uri
 import android.nfc.NfcAdapter
 import android.nfc.Tag
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -35,17 +34,12 @@ import android.view.animation.LinearInterpolator
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.fragment.app.Fragment
 import eu.europa.ec.passportscanner.R
 import eu.europa.ec.passportscanner.nfc.details.IntentData
 import eu.europa.ec.passportscanner.nfc.details.NFCDocumentTag
 import eu.europa.ec.passportscanner.nfc.passport.Passport
-import eu.europa.ec.passportscanner.utils.DateUtils
-import eu.europa.ec.passportscanner.utils.DateUtils.BIRTH_DATE_THRESHOLD
-import eu.europa.ec.passportscanner.utils.DateUtils.EXPIRY_DATE_THRESHOLD
-import eu.europa.ec.passportscanner.utils.DateUtils.formatStandardDate
 import eu.europa.ec.passportscanner.utils.KeyStoreUtils
 import io.reactivex.disposables.CompositeDisposable
 import net.sf.scuba.smartcards.CardServiceException
@@ -57,23 +51,16 @@ import org.jmrtd.PACEException
 import org.jmrtd.lds.icao.MRZInfo
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
+import androidx.core.net.toUri
 
 class NFCFragment : Fragment() {
 
     private var mrzInfo: MRZInfo? = null
     private var nfcFragmentListener: NfcFragmentListener? = null
-    private var textViewPassportNumber: TextView? = null
     private var textViewNfcTitle: TextView? = null
     private var textViewNfcBody: TextView? = null
     private var textViewHelpLink: TextView? = null
-    private var textViewDateOfBirth: TextView? = null
-    private var textViewDateOfExpiry: TextView? = null
     private var progressBar: ProgressBar? = null
-    private var label: String? = null
-    private var language: String? = null
-    private var locale: String? = null
-    private var withPhoto: Boolean = true
-    private var withFingerprints: Boolean = false
     private var mHandler = Handler(Looper.getMainLooper())
     private var disposable = CompositeDisposable()
     private var progressAnimator: ObjectAnimator? = null
@@ -91,24 +78,9 @@ class NFCFragment : Fragment() {
         if (arguments?.containsKey(IntentData.KEY_MRZ_INFO) == true) {
             mrzInfo = arguments.getSerializable(IntentData.KEY_MRZ_INFO) as MRZInfo?
         }
-        if (arguments?.containsKey(IntentData.KEY_LABEL) == true) {
-            label = arguments.getString(IntentData.KEY_LABEL)
-        }
-        if (arguments?.containsKey(IntentData.KEY_LOCALE) == true) {
-            locale = arguments.getString(IntentData.KEY_LOCALE)
-        }
-        if (arguments?.containsKey(IntentData.KEY_WITH_PHOTO) == true) {
-            withPhoto = arguments.getBoolean(IntentData.KEY_WITH_PHOTO)
-        }
-        if (arguments?.containsKey(IntentData.KEY_WITH_FINGERPRINTS) == true) {
-            withFingerprints = arguments.getBoolean(IntentData.KEY_WITH_FINGERPRINTS)
-        }
         textViewNfcTitle = view.findViewById(R.id.tv_nfc_title)
         textViewNfcBody = view.findViewById(R.id.tv_nfc_body)
         textViewHelpLink = view.findViewById(R.id.tv_help_link)
-        textViewPassportNumber = view.findViewById(R.id.value_passport_number)
-        textViewDateOfBirth = view.findViewById(R.id.value_DOB)
-        textViewDateOfExpiry = view.findViewById(R.id.value_expiration_date)
         progressBar = view.findViewById(R.id.progressBar)
 
         // Setup help link click listener
@@ -130,10 +102,7 @@ class NFCFragment : Fragment() {
             val certStore = KeyStoreUtils().toCertStore(keyStore = keyStore)
             mrtdTrustStore.addAsCSCACertStore(certStore)
         }
-        // if withPhoto is true, readDG2 is enabled and photo is added to NFC result
-        // And, if withFingerprints is true, readDG3 is enabled and fingerpints are added to NFC result
-        val subscribe = NFCDocumentTag(withPhoto, withFingerprints).handleTag(
-            requireContext(),
+        val subscribe = NFCDocumentTag().handleTag(
             tag,
             mrzInfo!!,
             mrtdTrustStore,
@@ -212,33 +181,11 @@ class NFCFragment : Fragment() {
         super.onDetach()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
         // Set initial UI state
         textViewNfcTitle?.text = getString(R.string.nfc_title_initial)
         textViewNfcBody?.text = getString(R.string.nfc_body_initial)
-
-        // Store MRZ details in hidden views for compatibility
-        textViewPassportNumber?.text = getString(R.string.doc_number, mrzInfo?.documentNumber)
-        textViewDateOfBirth?.text = getString(
-            R.string.doc_dob,
-            DateUtils.toAdjustedDate(
-                formatStandardDate(
-                    mrzInfo?.dateOfBirth,
-                    threshold = BIRTH_DATE_THRESHOLD
-                )
-            )
-        )
-        textViewDateOfExpiry?.text = getString(
-            R.string.doc_expiry,
-            DateUtils.toReadableDate(
-                formatStandardDate(
-                    mrzInfo?.dateOfExpiry,
-                    threshold = EXPIRY_DATE_THRESHOLD
-                )
-            )
-        )
 
         if (nfcFragmentListener != null) {
             nfcFragmentListener?.onEnableNfc()
@@ -323,10 +270,10 @@ class NFCFragment : Fragment() {
             val customTabsIntent = CustomTabsIntent.Builder()
                 .setShowTitle(true)
                 .build()
-            customTabsIntent.launchUrl(requireContext(), Uri.parse(helpUrl))
-        } catch (e: Exception) {
+            customTabsIntent.launchUrl(requireContext(), helpUrl.toUri())
+        } catch (_: Exception) {
             // Fallback to browser intent if Custom Tabs not available
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(helpUrl))
+            val intent = Intent(Intent.ACTION_VIEW, helpUrl.toUri())
             startActivity(intent)
         }
     }
@@ -363,18 +310,10 @@ class NFCFragment : Fragment() {
 
         fun newInstance(
             mrzInfo: MRZInfo?,
-            label: String?,
-            locale: String?,
-            withPhoto: Boolean,
-            withFingerprints: Boolean
         ): NFCFragment {
             val myFragment = NFCFragment()
             val args = Bundle()
             args.putSerializable(IntentData.KEY_MRZ_INFO, mrzInfo)
-            args.putString(IntentData.KEY_LABEL, label)
-            args.putString(IntentData.KEY_LOCALE, locale)
-            args.putBoolean(IntentData.KEY_WITH_PHOTO, withPhoto)
-            args.putBoolean(IntentData.KEY_WITH_FINGERPRINTS, withFingerprints)
             myFragment.arguments = args
             return myFragment
         }

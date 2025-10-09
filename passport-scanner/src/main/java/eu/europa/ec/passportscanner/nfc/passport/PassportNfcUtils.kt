@@ -23,11 +23,8 @@ import eu.europa.ec.passportscanner.utils.ImageUtils
 import org.jmrtd.cert.CVCPrincipal
 import org.jmrtd.cert.CardVerifiableCertificate
 import org.jmrtd.lds.icao.DG2File
-import org.jmrtd.lds.icao.DG3File
 import org.jmrtd.lds.icao.DG5File
-import org.jmrtd.lds.icao.DG7File
 import org.jmrtd.lds.iso19794.FaceImageInfo
-import org.jmrtd.lds.iso19794.FingerImageInfo
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
@@ -72,7 +69,11 @@ object PassportNfcUtils {
 
         if (!allFaceImageInfos.isEmpty()) {
             val faceImageInfo = allFaceImageInfos.iterator().next()
-            return toBitmap(faceImageInfo.imageLength, faceImageInfo.imageInputStream, faceImageInfo.mimeType)
+            return toBitmap(
+                faceImageInfo.imageLength,
+                faceImageInfo.imageInputStream,
+                faceImageInfo.mimeType
+            )
         }
         throw IOException("Unable to decodeImage FaceImage")
     }
@@ -81,7 +82,27 @@ object PassportNfcUtils {
         val imageBytes: ByteArray,
         val mimeType: String,
         val imageLength: Int
-    )
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as RawImageData
+
+            if (imageLength != other.imageLength) return false
+            if (!imageBytes.contentEquals(other.imageBytes)) return false
+            if (mimeType != other.mimeType) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = imageLength
+            result = 31 * result + imageBytes.contentHashCode()
+            result = 31 * result + mimeType.hashCode()
+            return result
+        }
+    }
 
     @Throws(IOException::class)
     fun retrieveFaceImageRaw(dg2File: DG2File): RawImageData {
@@ -111,45 +132,14 @@ object PassportNfcUtils {
         val faceInfos = dg5File.images
         if (!faceInfos.isEmpty()) {
             val faceImageInfo = faceInfos.iterator().next()
-            return toBitmap(faceImageInfo.imageLength, faceImageInfo.imageInputStream, faceImageInfo.mimeType)
+            return toBitmap(
+                faceImageInfo.imageLength,
+                faceImageInfo.imageInputStream,
+                faceImageInfo.mimeType
+            )
         }
         throw IOException("Unable to decodeImage PortraitImage")
     }
-
-    @Throws(IOException::class)
-    fun retrieveSignatureImage(dg7File: DG7File): Bitmap {
-        val displayedImageInfos = dg7File.images
-        if (!displayedImageInfos.isEmpty()) {
-            val displayedImageInfo = displayedImageInfos.iterator().next()
-            return toBitmap(displayedImageInfo.imageLength, displayedImageInfo.imageInputStream, displayedImageInfo.mimeType)
-        }
-        throw IOException("Unable to decodeImage SignatureImage")
-    }
-
-    @Throws(IOException::class)
-    fun retrieveFingerPrintImage(dg3File: DG3File): List<Bitmap> {
-        val allFingerImageInfos = ArrayList<FingerImageInfo>()
-        val fingerInfos = dg3File.fingerInfos
-
-        val fingerprintsImage = ArrayList<Bitmap>()
-        for (fingerInfo in fingerInfos) {
-            allFingerImageInfos.addAll(fingerInfo.fingerImageInfos)
-        }
-
-        val iterator = allFingerImageInfos.iterator()
-        while (iterator.hasNext()) {
-            val fingerImageInfo = iterator.next()
-            val bitmap = toBitmap(fingerImageInfo.imageLength, fingerImageInfo.imageInputStream, fingerImageInfo.mimeType)
-            fingerprintsImage.add(bitmap)
-        }
-
-        if (fingerprintsImage.isEmpty()) {
-            throw IOException("Unable to decodeImage Finger print Image")
-        }
-        return fingerprintsImage
-
-    }
-
 
     @Throws(IOException::class)
     private fun toBitmap(imageLength: Int, inputStream: InputStream, mimeType: String): Bitmap {
@@ -181,7 +171,10 @@ object PassportNfcUtils {
      * @throws GeneralSecurityException
      */
     @Throws(GeneralSecurityException::class)
-    private fun getEACCredentials(caReference: CVCPrincipal?, cvcaStore: KeyStore): EACCredentials? {
+    private fun getEACCredentials(
+        caReference: CVCPrincipal?,
+        cvcaStore: KeyStore
+    ): EACCredentials? {
         if (caReference == null) {
             throw IllegalArgumentException("CA reference cannot be null")
         }
@@ -211,16 +204,14 @@ object PassportNfcUtils {
                 /* See if we have a private key for that certificate. */
                 privateKey = cvcaStore.getKey(holderRef.name, "".toCharArray()) as PrivateKey
                 chain = cvcaStore.getCertificateChain(holderRef.name)
-                if (privateKey == null) {
-                    continue
-                }
                 Log.i(TAG, "found a key, privateKey = $privateKey")
                 return EACCredentials(privateKey, chain!!)
             }
-            if (privateKey == null || chain == null) {
-                Log.e(TAG, "null chain or key for entry " + alias + ": chain = " + Arrays.toString(chain) + ", privateKey = " + privateKey)
-                continue
-            }
+            Log.e(
+                TAG,
+                "null chain or key for entry " + alias + ": chain = " + Arrays.toString(chain) + ", privateKey = " + privateKey
+            )
+            continue
         }
         return null
     }
@@ -234,11 +225,13 @@ object PassportNfcUtils {
      *
      * @return the certificate chain
      */
-    fun getCertificateChain(docSigningCertificate: X509Certificate?,
-                            sodIssuer: X500Principal,
-                            sodSerialNumber: BigInteger,
-                            cscaStores: List<CertStore>,
-                            cscaTrustAnchors: Set<TrustAnchor>): List<Certificate> {
+    fun getCertificateChain(
+        docSigningCertificate: X509Certificate?,
+        sodIssuer: X500Principal,
+        sodSerialNumber: BigInteger,
+        cscaStores: List<CertStore>,
+        cscaTrustAnchors: Set<TrustAnchor>
+    ): List<Certificate> {
         val chain = ArrayList<Certificate>()
         val selector = X509CertSelector()
         try {
@@ -250,7 +243,8 @@ object PassportNfcUtils {
                 selector.serialNumber = sodSerialNumber
             }
 
-            val docStoreParams = CollectionCertStoreParameters(setOf(docSigningCertificate as Certificate))
+            val docStoreParams =
+                CollectionCertStoreParameters(setOf(docSigningCertificate as Certificate))
             val docStore = CertStore.getInstance("Collection", docStoreParams)
 
             val builder = CertPathBuilder.getInstance("PKIX", "SC")
@@ -259,13 +253,14 @@ object PassportNfcUtils {
             for (trustStore in cscaStores) {
                 buildParams.addCertStore(trustStore)
             }
-            buildParams.isRevocationEnabled = IS_PKIX_REVOCATION_CHECKING_ENABLED /* NOTE: set to false for checking disabled. */
+            buildParams.isRevocationEnabled =
+                IS_PKIX_REVOCATION_CHECKING_ENABLED /* NOTE: set to false for checking disabled. */
 
             var result: PKIXCertPathBuilderResult? = null
 
             try {
                 result = builder.build(buildParams) as PKIXCertPathBuilderResult
-            } catch (cpbe: CertPathBuilderException) {
+            } catch (_: CertPathBuilderException) {
                 /* NOTE: ignore, result remain null */
             }
 
@@ -275,7 +270,7 @@ object PassportNfcUtils {
                     chain.addAll(pkixCertPath.certificates)
                 }
             }
-            if (docSigningCertificate != null && !chain.contains(docSigningCertificate)) {
+            if (!chain.contains(docSigningCertificate)) {
                 /* NOTE: if doc signing certificate not in list, we add it ourselves. */
                 Log.w(TAG, "Adding doc signing certificate after PKIXBuilder finished")
                 chain.add(0, docSigningCertificate)

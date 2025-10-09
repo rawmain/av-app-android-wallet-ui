@@ -189,15 +189,6 @@ class VerificationStatus : Parcelable {
 
 
     /**
-     * Gets the tried BAC entries.
-     *
-     * @return a list of BAC keys
-     */
-    fun getTriedBACEntries(): List<*>? {
-        return triedBACEntries
-    }
-
-    /**
      * Sets the BAC verdict.
      *
      * @param v the status to set
@@ -219,15 +210,6 @@ class VerificationStatus : Parcelable {
     fun setSAC(v: Verdict, reason: String) {
         this.sac = v
         this.sacReason = reason
-    }
-
-    /**
-     * Gets the certificate chain between DS and CSCA.
-     *
-     * @return a certificate chain
-     */
-    fun getCertificateChain(): List<*>? {
-        return certificateChain
     }
 
     /**
@@ -254,15 +236,6 @@ class VerificationStatus : Parcelable {
         this.ds = v
         this.dsReason = reason
     }
-
-    /**
-     * Gets the hash match results.
-     *
-     * @return a list of hash match results
-     */
-    /*fun getHashResults(): MutableMap<Int, HashMatchResult>? {
-        return hashResults
-    }*/
 
     /**
      * Sets the hash table status.
@@ -343,7 +316,7 @@ class VerificationStatus : Parcelable {
         if (`in`.readInt() == 1) {
             hashResults = TreeMap()
             val size = `in`.readInt()
-            for (i in 0 until size) {
+            (0 until size).forEach { i ->
                 val key = `in`.readInt()
                 val value = `in`.readSerializable() as HashMatchResult
                 hashResults!![key] = value
@@ -569,10 +542,6 @@ class VerificationStatus : Parcelable {
                     outputStream.writeInt(b.toInt())
                 }
             }
-        }
-
-        companion object {
-            private const val serialVersionUID = 263961258911936111L
         }
     }
 

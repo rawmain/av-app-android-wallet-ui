@@ -17,36 +17,15 @@
         <activity
             android:name="SmartScannerActivity"
             android:configChanges="screenSize|screenLayout|smallestScreenSize|keyboardHidden"
-            android:resizeableActivity="false"
             android:exported="true"
-            android:screenOrientation="nosensor"
             android:keepScreenOn="true">
-            <intent-filter>
-                <!--Bundle intent-->
-                <action android:name="eu.europa.ec.passportscanner.BARCODE_SCAN" />
-                <action android:name="eu.europa.ec.passportscanner.IDPASS_LITE_SCAN" />
-                <action android:name="eu.europa.ec.passportscanner.MRZ_SCAN" />
-                <action android:name="eu.europa.ec.passportscanner.NFC_SCAN" />
-                <action android:name="eu.europa.ec.passportscanner.QRCODE_SCAN" />
-                <action android:name="eu.europa.ec.passportscanner.OCR_SCAN" />
-                <!--ODK bundle intent-->
-                <action android:name="eu.europa.ec.passportscanner.odk.BARCODE_SCAN" />
-                <action android:name="eu.europa.ec.passportscanner.odk.IDPASS_LITE_SCAN" />
-                <action android:name="eu.europa.ec.passportscanner.odk.MRZ_SCAN" />
-                <action android:name="eu.europa.ec.passportscanner.odk.NFC_SCAN" />
-                <action android:name="eu.europa.ec.passportscanner.odk.QRCODE_SCAN" />
-                <action android:name="eu.europa.ec.passportscanner.odk.OCR_SCAN" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".nfc.NFCActivity"
-            android:screenOrientation="nosensor"
             android:launchMode="singleInstance"
             android:keepScreenOn="true"/>
         <activity
             android:name="kl.open.fmandroid.CameraActivity"
-            android:screenOrientation="portrait"
             android:keepScreenOn="true"
             android:exported="false"/>
     </application>

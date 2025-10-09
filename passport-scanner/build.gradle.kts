@@ -89,11 +89,6 @@ dependencies {
     implementation(libs.json.path)
     implementation(libs.json.flattener)
 
-    // Image processing
-    implementation(libs.glide)
-    implementation(libs.glide.transformations)
-    annotationProcessor(libs.glide.compiler)
-
     // NFC dependencies
     implementation(libs.jmrtd)
     implementation(libs.spongycastle.prov)

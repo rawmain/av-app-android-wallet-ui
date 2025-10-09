@@ -102,27 +102,12 @@
             android:layout_height="match_parent"
             android:layout_marginBottom="36dp"
             android:adjustViewBounds="false"
-            android:contentDescription="@string/rectangle"
+            android:contentDescription="@null"
             android:src="@drawable/rectangle"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/capture_label_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:gravity="center"
-            android:lineSpacingMultiplier="0.9"
-            android:textColor="@color/white"
-            android:textDirection="anyRtl"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rect_image" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/crop_guide"
@@ -131,31 +116,6 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.5" />
 
-        <ImageView
-            android:id="@+id/rect_image_crop"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="36dp"
-            android:adjustViewBounds="false"
-            android:contentDescription="@string/rectangle"
-            android:src="@drawable/rectangle_white_with_crop"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/crop_guide" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/manual_capture"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/circle_photo_camera"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/action_bar_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

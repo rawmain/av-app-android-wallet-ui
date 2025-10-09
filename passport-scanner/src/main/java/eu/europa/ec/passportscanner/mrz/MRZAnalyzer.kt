@@ -26,33 +26,23 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.camera.core.ImageProxy
-import com.google.gson.Gson
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import eu.europa.ec.passportscanner.R
 import eu.europa.ec.passportscanner.SmartScannerActivity
 import eu.europa.ec.passportscanner.scanner.BaseImageAnalyzer
-import eu.europa.ec.passportscanner.scanner.config.ImageResultType
-import eu.europa.ec.passportscanner.scanner.config.MrzFormat
 import eu.europa.ec.passportscanner.utils.BitmapUtils
 import eu.europa.ec.passportscanner.utils.draw.BoundingBoxDraw
-import eu.europa.ec.passportscanner.utils.extension.cacheImagePath
-import eu.europa.ec.passportscanner.utils.extension.cacheImageToLocal
-import eu.europa.ec.passportscanner.utils.extension.cropCenter
-import eu.europa.ec.passportscanner.utils.extension.encodeBase64
 import eu.europa.ec.passportscanner.utils.extension.setBrightness
 import eu.europa.ec.passportscanner.utils.extension.setContrast
 import eu.europa.ec.passportscanner.utils.extension.toPx
-import java.io.File
 import java.net.URLEncoder
 
-open class MRZAnalyzer(
+abstract class MRZAnalyzer(
     override val activity: Activity,
     override val intent: Intent,
-    private val imageResultType: String,
-    private val format: String?,
-    private val isShowGuide: Boolean? = false
+    private val isShowGuide: Boolean = false
 ) : BaseImageAnalyzer() {
 
     companion object {
@@ -77,7 +67,7 @@ open class MRZAnalyzer(
         viewFinder: View,
         rectGuide: ImageView
     ): android.graphics.Rect {
-        if (isShowGuide != null && isShowGuide) {
+        if (isShowGuide) {
             // Scale factors between the cropped MRZ image and preview view
             val imageToViewRatio = rotatedBF.width.toFloat() / viewFinder.width.toFloat()
             val scaleX = 1.0f / imageToViewRatio
@@ -96,7 +86,7 @@ open class MRZAnalyzer(
             val mrzCropY = (viewFinder.height - 30.toPx - rectGuide.height)
 
             // Apply offsets to position the boxes correctly in the preview
-            scaledRect.offset(mrzCropX.toInt(), mrzCropY.toInt())
+            scaledRect.offset(mrzCropX, mrzCropY)
 
             return scaledRect
         }
@@ -214,13 +204,13 @@ open class MRZAnalyzer(
                             .replace("%3C", "<")
                             .replace("%0A", "↩")
 
-                        val NL_count = encoded.count { it == '↩' }
+                        val nlCount = encoded.count { it == '↩' }
                         Log.d(
                             "${SmartScannerActivity.TAG}/SmartScanner",
                             "Before cleaner: [${
                                 encoded
 
-                            }], with  NL = $NL_count"
+                            }], with  NL = $nlCount"
                         )
 
                         val cleanMRZ = MRZCleaner.clean(rawFullRead)
@@ -244,36 +234,5 @@ open class MRZAnalyzer(
         }
     }
 
-    internal open fun processResult(result: String, bitmap: Bitmap, rotation: Int) {
-        val imagePath = activity.cacheImagePath()
-        bitmap.cropCenter().cacheImageToLocal(
-            imagePath,
-            rotation,
-            if (imageResultType == ImageResultType.BASE_64.value) 40 else 80
-        )
-        val imageFile = File(imagePath)
-        val imageString =
-            if (imageResultType == ImageResultType.BASE_64.value) imageFile.encodeBase64() else imagePath
-        val mrz = when (format) {
-            MrzFormat.MRTD_TD1.value -> MRZResult.formatMrtdTd1Result(
-                MRZCleaner.parseAndCleanMrtdTd1(
-                    result
-                ), imageString
-            )
-
-            else -> MRZResult.formatMrzResult(MRZCleaner.parseAndClean(result), imageString)
-        }
-        val jsonString = Gson().toJson(mrz)
-        sendAnalyzerResult(result = jsonString)
-    }
-
-    private fun sendAnalyzerResult(result: String) {
-        val data = Intent()
-        Log.d(SmartScannerActivity.TAG, "Success from MRZ")
-        Log.d(SmartScannerActivity.TAG, "value: $result")
-        data.putExtra(SmartScannerActivity.SCANNER_IMAGE_TYPE, imageResultType)
-        data.putExtra(SmartScannerActivity.SCANNER_RESULT, result)
-        activity.setResult(Activity.RESULT_OK, data)
-        activity.finish()
-    }
+    abstract fun processResult(result: String, bitmap: Bitmap, rotation: Int)
 }
