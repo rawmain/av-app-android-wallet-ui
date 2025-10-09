@@ -260,7 +260,7 @@ Veuillez essayer une autre méthode</string>
     <string name="consent_screen_data_protection_checkbox">J\'accepte la politique de protection des données</string>
     <string name="consent_screen_tos_button">Conditions de service</string>
     <string name="consent_screen_data_protection_button">Information relatifs a la protection des données</string>
-    <string name="consent_screen_confirm_button">Confirmer</string>
+    <string name="consent_screen_confirm_button">Suivant</string>
     <string name="presentation_qr_scan_title">Présenter un document en ligne</string>
     <string name="presentation_qr_scan_subtitle">Lisez un code QR fourni par le service en ligne pour présenter la preuve de l\'âge.</string>
     <string name="issuance_add_document_title">Ajouter un document à partir de la liste</string>

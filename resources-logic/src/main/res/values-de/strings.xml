@@ -256,7 +256,7 @@ Für weitere Informationen wenden Sie sich bitte an den autorisierten Aussteller
     <string name="consent_screen_data_protection_checkbox">Ich akzeptiere die Datenschutzinformationen</string>
     <string name="consent_screen_tos_button">Nutzungsbedingungen</string>
     <string name="consent_screen_data_protection_button">Datenschutzinformationen</string>
-    <string name="consent_screen_confirm_button">Bestätigen</string>
+    <string name="consent_screen_confirm_button">Weiter</string>
     <string name="presentation_qr_scan_title">Dokument online präsentieren</string>
     <string name="presentation_qr_scan_subtitle">Scannen Sie einen von einer vertrauenden Partei bereitgestellten QR-Code, um ein digitales Dokument zu präsentieren.</string>
     <string name="issuance_add_document_title">Dokument aus Liste hinzufügen</string>

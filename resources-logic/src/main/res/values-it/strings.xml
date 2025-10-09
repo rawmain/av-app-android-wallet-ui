@@ -259,7 +259,7 @@ Prova con un metodo alternativo</string>
     <string name="consent_screen_data_protection_checkbox">Accetto le Informazioni sulla protezione dei dati</string>
     <string name="consent_screen_tos_button">Termini di servizio</string>
     <string name="consent_screen_data_protection_button">Informazioni sulla protezione dei dati</string>
-    <string name="consent_screen_confirm_button">Conferma</string>
+    <string name="consent_screen_confirm_button">Avanti</string>
     <string name="presentation_qr_scan_title">Presenta il documento online</string>
     <string name="presentation_qr_scan_subtitle">Scansiona il codice QR fornito dal servizio online per presentare l\'attestazione dell\'età.</string>
     <string name="issuance_add_document_title">Aggiungi un documento dall\'elenco</string>

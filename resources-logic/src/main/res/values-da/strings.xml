@@ -259,7 +259,7 @@ Prøv en alternativ måde</string>
     <string name="consent_screen_data_protection_checkbox">Jeg accepterer</string>
     <string name="consent_screen_tos_button">Servicevilkår</string>
     <string name="consent_screen_data_protection_button">Oplysninger om databeskyttelse</string>
-    <string name="consent_screen_confirm_button">Bekræft</string>
+    <string name="consent_screen_confirm_button">Næste</string>
     <string name="presentation_qr_scan_title">Fremvis dokument online</string>
     <string name="presentation_qr_scan_subtitle">Scan en QR-kode leveret af onlinetjenesten  for at vise et bevis på alder.</string>
     <string name="issuance_add_document_title">Tilføj dokument fra listen</string>

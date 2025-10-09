@@ -283,7 +283,7 @@
     <string name="consent_screen_personal_data_checkbox">I consent to the processing of my personal data by %1$s for the purpose of obtaining an age verification attestation.</string>
     <string name="consent_screen_tos_button">Terms of Service</string>
     <string name="consent_screen_data_protection_button">Data Protection Information</string>
-    <string name="consent_screen_confirm_button">Confirm</string>
+    <string name="consent_screen_confirm_button">Next</string>
 
     <!-- Presentation Qr Scan -->
     <string name="presentation_qr_scan_title">Present document online</string>
