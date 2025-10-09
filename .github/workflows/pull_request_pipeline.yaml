@@ -71,47 +71,47 @@ jobs:
           git lfs install
 
       - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        lfs: true
+        uses: actions/checkout@v4
+        with:
+          lfs: true
 
-    - name: Copy CI gradle.properties
-      run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
+      - name: Copy CI gradle.properties
+        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
-    - name: Setup Android SDK
-      uses: amyu/setup-android@v4
+      - name: Setup Android SDK
+        uses: amyu/setup-android@v4
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        gradle-version: wrapper
-        cache-read-only: false
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: wrapper
+          cache-read-only: false
 
-    - name: Run lint check
-      run: ./gradlew lint
+      - name: Run lint check
+        run: ./gradlew lint
 
-    - name: Run unit tests
-      run: ./gradlew testDevDebugUnitTest
+      - name: Run unit tests
+        run: ./gradlew testDevDebugUnitTest
 
-    - name: Run tests with coverage
-      run: ./gradlew koverHtmlReportDevDebug
+      - name: Run tests with coverage
+        run: ./gradlew koverHtmlReportDevDebug
 
-    - name: Upload test results only on failure
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: |
-          **/build/reports/tests/
-          **/build/reports/kover
-        retention-days: 20
+      - name: Upload test results only on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/build/reports/tests/
+            **/build/reports/kover
+          retention-days: 20
 
-    - name: Build DEV debug APK
-      run: ./gradlew assembleDevDebug
+      - name: Build DEV debug APK
+        run: ./gradlew assembleDevDebug
