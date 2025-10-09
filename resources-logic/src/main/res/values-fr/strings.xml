@@ -106,8 +106,8 @@
     <string name="passport_validation_error_incomplete_data">Les données du passeport / carte d\'identité sont incomplètes. Veuillez scanner à nouveau votre document.</string>
 
     <!-- Passport Consent Screen -->
-    <string name="passport_consent_title">Consentement</string>
-    <string name="passport_consent_description">En acceptant, vous consentez à vérifier votre identité en comparant le portrait de votre passeport / carte d\'identité à la vidéo. Pour plus d\'informations sur le traitement des données et la protection des données, veuillez cliquer sur le lien ci-dessous.</string>
+    <string name="passport_credential_issuance_title">Verification Complete</string>
+    <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
     <string name="passport_consent_more_info">Plus d\'informations</string>
     <string name="passport_consent_checkbox">J\'accepte</string>
     <string name="passport_consent_reject_button">Refuser</string>

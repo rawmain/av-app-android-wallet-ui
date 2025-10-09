@@ -19,7 +19,7 @@ package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
+import eu.europa.ec.onboardingfeature.config.PassportCredentialIssuanceUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
@@ -190,14 +190,14 @@ class PassportLiveVideoViewModel(
     private fun navigateToConsentScreen(faceImageTempPath: String) {
         logController.i(TAG) { "Building navigation to consent screen" }
         val screenRoute = generateComposableNavigationLink(
-            screen = OnboardingScreens.PassportConsent,
+            screen = OnboardingScreens.PassportCredentialIssuance,
             arguments = generateComposableArguments(
                 mapOf(
-                    PassportConsentUiConfig.serializedKeyName to uiSerializer.toBase64(
-                        model = PassportConsentUiConfig(
+                    PassportCredentialIssuanceUiConfig.serializedKeyName to uiSerializer.toBase64(
+                        model = PassportCredentialIssuanceUiConfig(
                             faceImageTempPath = faceImageTempPath
                         ),
-                        parser = PassportConsentUiConfig.Parser
+                        parser = PassportCredentialIssuanceUiConfig.Parser
                     ).orEmpty()
                 )
             )

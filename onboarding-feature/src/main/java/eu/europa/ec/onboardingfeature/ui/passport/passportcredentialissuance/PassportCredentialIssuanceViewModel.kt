@@ -14,7 +14,7 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.onboardingfeature.ui.passport.passportconsent
+package eu.europa.ec.onboardingfeature.ui.passport.passportcredentialissuance
 
 import android.content.Context
 import android.net.Uri
@@ -25,9 +25,9 @@ import eu.europa.ec.commonfeature.config.OfferUiConfig
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
-import eu.europa.ec.onboardingfeature.config.PassportConsentUiConfig
-import eu.europa.ec.onboardingfeature.interactor.PassportConsentInteractor
-import eu.europa.ec.onboardingfeature.interactor.PassportConsentInteractorPartialState
+import eu.europa.ec.onboardingfeature.config.PassportCredentialIssuanceUiConfig
+import eu.europa.ec.onboardingfeature.interactor.CredentialIssuancePartialState
+import eu.europa.ec.onboardingfeature.interactor.PassportCredentialIssuanceInteractor
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
@@ -50,25 +50,22 @@ import org.koin.core.annotation.InjectedParam
 import java.io.File
 import java.security.Security
 
-private const val TAG = "PassportConsentViewModel"
+private const val TAG = "PassportCredentialIssuanceViewModel"
 
 data class State(
     val isLoading: Boolean = false,
-    val config: PassportConsentUiConfig? = null,
+    val config: PassportCredentialIssuanceUiConfig? = null,
     val error: ContentErrorConfig? = null,
-    val isConsentChecked: Boolean = false,
 ) : ViewState
 
 sealed class Event : ViewEvent {
-    data class Init(val deepLink: Uri?) : Event()
+    data class Init(val context: Context) : Event()
+    data class OnResume(val deepLink: Uri?) : Event()
     data object OnBackPressed : Event()
-    data class OnConsentChecked(val isChecked: Boolean) : Event()
-    data class OnConsentClicked(val context: Context) : Event()
     data object OnRetry : Event()
     data object OnPause : Event()
     data class OnResumeIssuance(val uri: String) : Event()
     data class OnDynamicPresentation(val uri: String) : Event()
-    data object OnMoreInfoClicked : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -81,23 +78,23 @@ sealed class Effect : ViewSideEffect {
 }
 
 @KoinViewModel
-class PassportConsentViewModel(
+class PassportCredentialIssuanceViewModel(
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
-    private val passportConsentInteractor: PassportConsentInteractor,
-    @InjectedParam private val passportConsentSerializedConfig: String,
+    private val passportCredentialIssuanceInteractor: PassportCredentialIssuanceInteractor,
+    @InjectedParam private val passportCredentialIssuanceSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State {
-        logController.i { "get the following param=$passportConsentSerializedConfig" }
+        logController.i { "get the following param=$passportCredentialIssuanceSerializedConfig" }
 
         // Clean up Security providers left by passport scanning
         cleanupSecurityProviders()
 
-        val config: PassportConsentUiConfig? = uiSerializer.fromBase64(
-            passportConsentSerializedConfig,
-            PassportConsentUiConfig::class.java,
-            PassportConsentUiConfig.Parser
+        val config: PassportCredentialIssuanceUiConfig? = uiSerializer.fromBase64(
+            passportCredentialIssuanceSerializedConfig,
+            PassportCredentialIssuanceUiConfig::class.java,
+            PassportCredentialIssuanceUiConfig.Parser
         )
         return State(config = config)
     }
@@ -152,23 +149,18 @@ class PassportConsentViewModel(
     override fun handleEvents(event: Event) {
         when (event) {
             is Event.Init -> {
-                logController.i(TAG) { "Event invoked Init with deepLink: ${event.deepLink}" }
+                logController.i(TAG) { "Event invoked Init" }
+                issueCredential(event.context)
+            }
+
+            is Event.OnResume -> {
+                logController.i(TAG) { "Event invoked OnResume with deepLink: ${event.deepLink}" }
                 handleDeepLink(event.deepLink)
             }
 
             Event.OnBackPressed -> setEffect {
                 logController.i(TAG) { "Event invoked OnBackPressed" }
                 Effect.Navigation.GoBack
-            }
-
-            is Event.OnConsentChecked -> {
-                logController.i(TAG) { "Event invoked OnConsentChecked: ${event.isChecked}" }
-                setState { copy(isConsentChecked = event.isChecked) }
-            }
-
-            is Event.OnConsentClicked -> {
-                logController.i(tag = TAG) { "Event invoked OnConsentClicked" }
-                handleConsentAndIssue(event.context)
             }
 
             Event.OnRetry -> {
@@ -184,23 +176,17 @@ class PassportConsentViewModel(
             is Event.OnResumeIssuance -> {
                 logController.i(TAG) { "Event invoked OnResumeIssuance with uri: ${event.uri}" }
                 setState { copy(isLoading = true) }
-                passportConsentInteractor.resumeOpenId4VciWithAuthorization(event.uri)
+                passportCredentialIssuanceInteractor.resumeOpenId4VciWithAuthorization(event.uri)
             }
 
             is Event.OnDynamicPresentation -> {
                 logController.i(TAG) { "Event invoked OnDynamicPresentation with uri: ${event.uri}" }
                 handleDynamicPresentation(event.uri)
             }
-
-            Event.OnMoreInfoClicked -> {
-                logController.i(TAG) { "Event invoked OnMoreInfoClicked" }
-                // TODO: Replace with actual privacy policy URL
-                setEffect { Effect.Navigation.OpenExternalLink("https://placeholder.com/privacy") }
-            }
         }
     }
 
-    private fun handleConsentAndIssue(context: Context) {
+    private fun issueCredential(context: Context) {
         val config = viewState.value.config
         if (config == null) {
             logController.e(TAG) { "Config is null, cannot proceed with issuance" }
@@ -208,21 +194,15 @@ class PassportConsentViewModel(
             return
         }
 
-        if (!viewState.value.isConsentChecked) {
-            logController.w(TAG) { "Consent not checked, cannot proceed" }
-            showError("Please agree to the consent terms to continue.")
-            return
-        }
-
         setState { copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
             try {
-                passportConsentInteractor.issuePassportScanningDocument(context)
+                passportCredentialIssuanceInteractor.issuePassportScanningDocument(context)
                     .collect { issueState ->
                     logController.i(TAG) { "Received issueState: ${issueState::class.simpleName}" }
                     when (issueState) {
-                        is PassportConsentInteractorPartialState.Success -> {
+                        is CredentialIssuancePartialState.Success -> {
                             logController.i(TAG) { "Document issued successfully: ${issueState.documentId}" }
                             setState { copy(isLoading = false) }
                             // Delete temp file after successful issuance
@@ -231,7 +211,7 @@ class PassportConsentViewModel(
                             navigateToSuccessScreen(issueState.documentId)
                         }
 
-                        is PassportConsentInteractorPartialState.DeferredSuccess -> {
+                        is CredentialIssuancePartialState.DeferredSuccess -> {
                             logController.i(TAG) { "Document issuance deferred, navigating to success route: ${issueState.successRoute}" }
                             setState { copy(isLoading = false) }
                             // Delete temp file after deferred success
@@ -239,10 +219,10 @@ class PassportConsentViewModel(
                             navigateToDeferredSuccessScreen(issueState.successRoute)
                         }
 
-                        is PassportConsentInteractorPartialState.UserAuthRequired -> {
+                        is CredentialIssuancePartialState.UserAuthRequired -> {
                             logController.i(TAG) { "User authentication required for document issuance" }
                             // Keep loading state, authentication is part of the issuance flow
-                            passportConsentInteractor.handleUserAuth(
+                            passportCredentialIssuanceInteractor.handleUserAuth(
                                 context = context,
                                 crypto = issueState.crypto,
                                 notifyOnAuthenticationFailure = true,
@@ -250,7 +230,7 @@ class PassportConsentViewModel(
                             )
                         }
 
-                        is PassportConsentInteractorPartialState.Failure -> {
+                        is CredentialIssuancePartialState.Failure -> {
                             logController.e(TAG) { "Document issuance failed: ${issueState.error}" }
                             setState { copy(isLoading = false) }
                             showError(issueState.error)

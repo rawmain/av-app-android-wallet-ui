@@ -42,19 +42,19 @@ import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-sealed class PassportConsentInteractorPartialState {
-    data class Success(val documentId: String) : PassportConsentInteractorPartialState()
-    data class DeferredSuccess(val successRoute: String) : PassportConsentInteractorPartialState()
+sealed class CredentialIssuancePartialState {
+    data class Success(val documentId: String) : CredentialIssuancePartialState()
+    data class DeferredSuccess(val successRoute: String) : CredentialIssuancePartialState()
     data class UserAuthRequired(
         val crypto: BiometricCrypto,
         val resultHandler: DeviceAuthenticationResult,
-    ) : PassportConsentInteractorPartialState()
+    ) : CredentialIssuancePartialState()
 
-    data class Failure(val error: String) : PassportConsentInteractorPartialState()
+    data class Failure(val error: String) : CredentialIssuancePartialState()
 }
 
-interface PassportConsentInteractor {
-    fun issuePassportScanningDocument(context: Context): Flow<PassportConsentInteractorPartialState>
+interface PassportCredentialIssuanceInteractor {
+    fun issuePassportScanningDocument(context: Context): Flow<CredentialIssuancePartialState>
     fun handleUserAuth(
         context: Context,
         crypto: BiometricCrypto,
@@ -65,17 +65,17 @@ interface PassportConsentInteractor {
     fun resumeOpenId4VciWithAuthorization(uri: String)
 }
 
-class PassportConsentInteractorImpl(
+class PassportCredentialIssuanceInteractorImpl(
     private val passportScanningDocumentsController: PassportScanningDocumentsController,
     private val deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
     private val resourceProvider: ResourceProvider,
     private val uiSerializer: UiSerializer,
-) : PassportConsentInteractor {
+) : PassportCredentialIssuanceInteractor {
 
     private val genericErrorMsg
         get() = resourceProvider.genericErrorMessage()
 
-    override fun issuePassportScanningDocument(context: Context): Flow<PassportConsentInteractorPartialState> =
+    override fun issuePassportScanningDocument(context: Context): Flow<CredentialIssuancePartialState> =
         flow {
             when (val state =
                 passportScanningDocumentsController.getPassportScanningScopedDocuments(
@@ -86,7 +86,7 @@ class PassportConsentInteractorImpl(
                         .firstOrNull { it.isAgeVerification }
 
                     if (ageVerificationDocument == null) {
-                        emit(PassportConsentInteractorPartialState.Failure(genericErrorMsg))
+                        emit(CredentialIssuancePartialState.Failure(genericErrorMsg))
                         return@flow
                     }
 
@@ -96,12 +96,12 @@ class PassportConsentInteractorImpl(
                     ).collect { issueState ->
                         when (issueState) {
                             is IssueDocumentPartialState.Success ->
-                                emit(PassportConsentInteractorPartialState.Success(issueState.documentId))
+                                emit(CredentialIssuancePartialState.Success(issueState.documentId))
 
                             is IssueDocumentPartialState.DeferredSuccess -> {
                                 val successRoute = buildGenericSuccessRouteForDeferred()
                                 emit(
-                                    PassportConsentInteractorPartialState.DeferredSuccess(
+                                    CredentialIssuancePartialState.DeferredSuccess(
                                         successRoute
                                     )
                                 )
@@ -109,20 +109,20 @@ class PassportConsentInteractorImpl(
 
                             is IssueDocumentPartialState.UserAuthRequired ->
                                 emit(
-                                    PassportConsentInteractorPartialState.UserAuthRequired(
+                                    CredentialIssuancePartialState.UserAuthRequired(
                                         issueState.crypto,
                                         issueState.resultHandler
                                     )
                                 )
 
                             is IssueDocumentPartialState.Failure ->
-                                emit(PassportConsentInteractorPartialState.Failure(issueState.errorMessage))
+                                emit(CredentialIssuancePartialState.Failure(issueState.errorMessage))
                         }
                     }
                 }
 
                 is FetchScopedDocumentsPartialState.Failure ->
-                    emit(PassportConsentInteractorPartialState.Failure(state.errorMessage))
+                    emit(CredentialIssuancePartialState.Failure(state.errorMessage))
             }
         }
 

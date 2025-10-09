@@ -131,12 +131,8 @@
     <string name="passport_validation_error_incomplete_data">Passport / ID card data is incomplete. Please scan your document again.</string>
 
     <!-- Passport Consent Screen -->
-    <string name="passport_consent_title">Consent</string>
-    <string name="passport_consent_description">By agreeing, you give consent to verify your identity by comparing your passport / ID card portrait to the video. For more detailed information about data processing and data protection please click the link below.</string>
-    <string name="passport_consent_more_info">More information</string>
-    <string name="passport_consent_checkbox">I agree</string>
-    <string name="passport_consent_reject_button">Reject</string>
-    <string name="passport_consent_consent_button">Consent</string>
+    <string name="passport_credential_issuance_title">Verification Complete</string>
+    <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
 
     <string name="welcome_page_1">Using this app you can securely prove you are over 18 when accessing services restricted to adults.</string>
     <string name="welcome_page_2">Verify that you are over 18 once, use this proof to securely access many services restricted to adults.</string>

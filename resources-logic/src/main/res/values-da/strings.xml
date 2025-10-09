@@ -106,8 +106,8 @@
     <string name="passport_validation_error_incomplete_data">Pas / ID-kort data er ufuldstændige. Scan venligst dit dokument igen.</string>
 
     <!-- Passport Consent Screen -->
-    <string name="passport_consent_title">Samtykke</string>
-    <string name="passport_consent_description">Ved at acceptere giver du samtykke til at verificere din identitet ved at sammenligne dit pas / ID-kort foto med videoen. For mere detaljeret information om databehandling og databeskyttelse klik på linket nedenfor.</string>
+    <string name="passport_credential_issuance_title">Verification Complete</string>
+    <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
     <string name="passport_consent_more_info">Mere information</string>
     <string name="passport_consent_checkbox">Jeg accepterer</string>
     <string name="passport_consent_reject_button">Afvis</string>
