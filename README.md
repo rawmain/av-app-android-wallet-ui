@@ -35,6 +35,62 @@ The AV Android is the application that allows users to:
 
 ## Development
 
+### Prerequisites
+
+#### Git LFS (Large File Storage)
+
+This repository uses **Git LFS** to manage large ONNX model files used for liveness detection and
+biometric comparison during passport scanning. The following model files are stored using Git LFS:
+
+- `glintr100.onnx` (~249 MB) - Biometric comparison model
+- `mediapipe_long.onnx` (~636 KB) - Face detection model
+- `silentface27.onnx` (~2.1 MB) - Liveness detection model
+- `silentface40.onnx` (~2.2 MB) - Liveness detection model
+
+These files are located in `passport-scanner/src/main/assets/` and are essential for the app to
+function correctly.
+
+**Installation:**
+
+1. Install Git LFS on your system:
+   ```bash
+   # macOS (using Homebrew)
+   brew install git-lfs
+
+   # Ubuntu/Debian
+   sudo apt-get install git-lfs
+
+   # Windows (using Chocolatey)
+   choco install git-lfs
+   ```
+
+2. Initialize Git LFS in your Git configuration (only needs to be done once per machine):
+   ```bash
+   git lfs install
+   ```
+
+3. When cloning the repository, Git LFS will automatically download the actual model files:
+   ```bash
+   git clone https://github.com/eu-digital-identity-wallet/av-app-android-wallet-ui.git
+   ```
+
+**Important:** If you cloned the repository before installing Git LFS, the ONNX files will be
+pointer files instead of the actual models. To fix this, run:
+
+```bash
+git lfs pull
+```
+
+**Verification:** After cloning, you can verify that the ONNX files were downloaded correctly by
+checking their size:
+
+```bash
+ls -lh passport-scanner/src/main/assets/*.onnx
+```
+
+The `glintr100.onnx` file should be approximately 249 MB. If it's only a few bytes, Git LFS didn't
+download the actual files.
+
 ### Specifications Employed
 
 The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.com/eu-digital-identity-wallet/eudi-lib-android-wallet-core) and a list of available libraries to facilitate remote presentation and issuing test/demo functionality following partially the specification of the [ARF](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework), including:
@@ -55,7 +111,7 @@ Whether you cloned or downloaded the 'zipped' sources you will either find the s
 In either case open a terminal pointing to the directory you put the sources in. The local build process is described [here](./docs/how_to_build.md) and the configuration options are described [here](./docs/configuration.md).
 
 > [!NOTE]
-> The minimum device requirement for this application is  Android API level 28.
+> The minimum device requirement for this application is  Android API level 29.
 
 ### Testing
 

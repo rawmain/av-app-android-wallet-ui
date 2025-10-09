@@ -27,6 +27,7 @@ import eu.europa.ec.commonfeature.util.TestsData.mockedSuccessContentDescription
 import eu.europa.ec.commonfeature.util.TestsData.mockedSuccessDescription
 import eu.europa.ec.commonfeature.util.TestsData.mockedSuccessText
 import eu.europa.ec.commonfeature.util.TestsData.mockedUriPath1
+import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.controller.FetchScopedDocumentsPartialState
 import eu.europa.ec.corelogic.controller.IssuanceMethod
 import eu.europa.ec.corelogic.controller.IssueDocumentPartialState
@@ -74,6 +75,9 @@ class TestEnrollmentInteractor {
     private lateinit var uiSerializer: UiSerializer
 
     @Mock
+    private lateinit var walletCoreConfig: WalletCoreConfig
+
+    @Mock
     private lateinit var context: Context
 
     @Mock
@@ -93,7 +97,8 @@ class TestEnrollmentInteractor {
             walletCoreDocumentsController = walletCoreDocumentsController,
             deviceAuthenticationInteractor = deviceAuthenticationInteractor,
             resourceProvider = resourceProvider,
-            uiSerializer = uiSerializer
+            uiSerializer = uiSerializer,
+            walletCoreConfig = walletCoreConfig
         )
 
         crypto = BiometricCrypto(cryptoObject = null)

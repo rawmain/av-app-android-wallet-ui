@@ -19,17 +19,13 @@ package eu.europa.ec.onboardingfeature.ui.enrollment
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
-import eu.europa.ec.commonfeature.config.IssuanceFlowUiConfig
 import eu.europa.ec.commonfeature.config.IssuanceSuccessUiConfig
 import eu.europa.ec.commonfeature.config.OfferUiConfig
 import eu.europa.ec.commonfeature.config.PresentationMode
-import eu.europa.ec.commonfeature.config.QrScanFlow
-import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractor
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractorPartialState
-import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.config.ConfigNavigation
@@ -38,7 +34,6 @@ import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
-import eu.europa.ec.uilogic.navigation.CommonScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
 import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
@@ -56,6 +51,7 @@ data class State(
     val isLoading: Boolean = false,
     val error: ContentErrorConfig? = null,
     val isOnboarding: Boolean = true,
+    val availableEnrollmentMethods: List<EnrollmentMethod> = emptyList(),
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -78,7 +74,8 @@ sealed class Effect : ViewSideEffect {
 
 enum class EnrollmentMethod {
     NATIONAL_ID,
-//    TOKEN_QR,
+    PASSPORT_ID_CARD,
+    TOKEN_QR,
 }
 
 @KoinViewModel
@@ -91,8 +88,17 @@ class EnrollmentViewModel(
     private var issuanceJob: Job? = null
 
     override fun setInitialState(): State {
+        val availableMethods = buildList {
+            add(EnrollmentMethod.NATIONAL_ID)
+            if (enrollmentInteractor.isPassportScanningAvailable()) {
+                add(EnrollmentMethod.PASSPORT_ID_CARD)
+            }
+            add(EnrollmentMethod.TOKEN_QR)
+        }
+
         return State(
-            isOnboarding = !enrollmentInteractor.hasDocuments()
+            isOnboarding = !enrollmentInteractor.hasDocuments(),
+            availableEnrollmentMethods = availableMethods
         )
     }
 
@@ -112,9 +118,14 @@ class EnrollmentViewModel(
                         issueNationalEID(event.context)
                     }
 
-//                    EnrollmentMethod.TOKEN_QR -> {
-//                        goToQrScan()
-//                    }
+                    EnrollmentMethod.PASSPORT_ID_CARD -> {
+                        navigateToPassportScanIntro()
+                    }
+
+                    EnrollmentMethod.TOKEN_QR -> {
+                        //goToQrScan()
+                        navigateToQRScanIntro()
+                    }
                 }
             }
 
@@ -267,24 +278,19 @@ class EnrollmentViewModel(
         }
     }
 
-    private fun goToQrScan() {
+    private fun navigateToPassportScanIntro() {
         setEffect {
             Effect.Navigation.SwitchScreen(
-                screenRoute = generateComposableNavigationLink(
-                    screen = CommonScreens.QrScan,
-                    arguments = generateComposableArguments(
-                        mapOf(
-                            QrScanUiConfig.serializedKeyName to uiSerializer.toBase64(
-                                QrScanUiConfig(
-                                    title = resourceProvider.getString(R.string.issuance_qr_scan_title),
-                                    subTitle = resourceProvider.getString(R.string.issuance_qr_scan_subtitle),
-                                    qrScanFlow = QrScanFlow.Issuance(IssuanceFlowUiConfig.NO_DOCUMENT)
-                                ),
-                                QrScanUiConfig.Parser
-                            )
-                        )
-                    )
-                ),
+                screenRoute = OnboardingScreens.PassportScanIntro.screenRoute,
+                inclusive = false
+            )
+        }
+    }
+
+    private fun navigateToQRScanIntro() {
+        setEffect {
+            Effect.Navigation.SwitchScreen(
+                screenRoute = OnboardingScreens.QRScanIntro.screenRoute,
                 inclusive = false
             )
         }

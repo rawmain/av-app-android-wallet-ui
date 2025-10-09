@@ -124,9 +124,7 @@ fun ContentScreen(
         snackbarHost = snackbarHost,
     ) { padding ->
 
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
 
             if (contentErrorConfig != null) {
                 ContentError(
@@ -134,11 +132,10 @@ fun ContentScreen(
                     paddingValues = screenPaddings(padding)
                 )
             } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .navigationBarsPadding()
-                ) {
+
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding()) {
 
                     Box(modifier = Modifier.weight(1f)) {
                         bodyContent(screenPaddings(padding, topSpacing))
@@ -153,7 +150,7 @@ fun ContentScreen(
                         ) {
                             stickyBottomContent(
                                 stickyBottomPaddings(
-                                    contentScreenPaddings = screenPaddings(padding),
+                                    contentScreenPaddings = padding,
                                     layoutDirection = LocalLayoutDirection.current
                                 )
                             )
