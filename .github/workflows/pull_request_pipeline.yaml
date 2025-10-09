@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install Git LFS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+          git lfs install
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -58,7 +64,13 @@ jobs:
     runs-on: github-runner-dune
 
     steps:
-    - name: Checkout code
+      - name: Install Git LFS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+          git lfs install
+
+      - name: Checkout code
       uses: actions/checkout@v4
       with:
         lfs: true
