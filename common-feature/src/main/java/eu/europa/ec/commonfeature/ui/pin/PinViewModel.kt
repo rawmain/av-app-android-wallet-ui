@@ -16,8 +16,8 @@
 
 package eu.europa.ec.commonfeature.ui.pin
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.validator.Form
 import eu.europa.ec.businesslogic.validator.FormValidationResult
 import eu.europa.ec.businesslogic.validator.Rule
@@ -118,6 +118,7 @@ class PinViewModel(
     private val interactor: QuickPinInteractor,
     private val resourceProvider: ResourceProvider,
     private val uiSerializer: UiSerializer,
+    private val logController: LogController,
     @InjectedParam private val pinFlow: PinFlow,
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -144,7 +145,8 @@ class PinViewModel(
                 )
             else
                 resourceProvider.getString(R.string.quick_pin_change_lockout_countdown_seconds, seconds)
-        }
+        },
+        logController = logController
     )
 
     override fun setInitialState(): State {
@@ -192,7 +194,7 @@ class PinViewModel(
 
             is Event.NextButtonPressed -> {
                 val state = viewState.value
-                Log.i("PIN", "state on button pressed: $state")
+                logController.i("PIN") { "state on button pressed: $state" }
                 when (state.pinState) {
                     PinValidationState.ENTER -> {
                         // Set state for re-enter phase
@@ -379,7 +381,7 @@ class PinViewModel(
                     resetPin = false
                 )
             }
-            Log.i("PIN", "state after validation: ${viewState.value}")
+            logController.i("PIN") { "state after validation: ${viewState.value}" }
 
             // FFWD to next screen if the pin is valid
             if (validationResult.isValid) {

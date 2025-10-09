@@ -310,4 +310,10 @@ object AppIcons {
         contentDescriptionId = R.string.content_description_date_range_icon,
         imageVector = Icons.Default.DateRange
     )
+
+    val PassportBiometrics : IconData = IconData(
+        resourceId = R.drawable.img_passport_biometric,
+        contentDescriptionId = R.string.passport_biometrics_content_description,
+        imageVector = null
+    )
 }

@@ -21,6 +21,8 @@ import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.config.WalletCoreConfigImpl
+import eu.europa.ec.corelogic.controller.PassportScanningDocumentsController
+import eu.europa.ec.corelogic.controller.PassportScanningDocumentsControllerImpl
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsControllerImpl
 import eu.europa.ec.corelogic.controller.WalletCoreLogController
@@ -90,6 +92,20 @@ fun provideWalletCoreDocumentsController(
         bookmarkDao,
         transactionLogDao,
         revokedDocumentDao
+    )
+
+@Factory
+fun providePassportScanningDocumentsController(
+    walletCoreDocumentsController: WalletCoreDocumentsController,
+    resourceProvider: ResourceProvider,
+    eudiWallet: EudiWallet,
+    walletCoreConfig: WalletCoreConfig,
+): PassportScanningDocumentsController =
+    PassportScanningDocumentsControllerImpl(
+        walletCoreDocumentsController,
+        resourceProvider,
+        eudiWallet,
+        walletCoreConfig
     )
 
 /**

@@ -20,9 +20,13 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -75,6 +80,12 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
         text = stringResource(R.string.consent_screen_data_protection_checkbox),
     )
 
+    val personalDataCheckBoxData = CheckboxWithTextData(
+        isChecked = state.value.personalDataAccepted,
+        onCheckedChange = { viewModel.setEvent(Event.PersonalDataSelected) },
+        text = stringResource(R.string.consent_screen_personal_data_checkbox)
+    )
+
     val config = ButtonConfig(
         type = ButtonType.PRIMARY,
         onClick = { viewModel.setEvent(Event.GoNext) },
@@ -92,6 +103,7 @@ fun ConsentScreen(navController: NavController, viewModel: ConsentViewModel) {
             paddingValues = paddingValues,
             tosCheckBoxData = tosCheckBoxData,
             dataProtectionCheckBoxData = dataProtectionCheckBoxData,
+            personalDataCheckBoxData = personalDataCheckBoxData,
             effectFlow = viewModel.effect,
             onNavigationRequested = { navigationEffect ->
                 handleNavigationEffect(navigationEffect, navController)
@@ -107,7 +119,12 @@ private fun ContinueButton(
     WrapStickyBottomContent(
         stickyBottomModifier = Modifier
             .fillMaxWidth()
-            .padding(paddingValues),
+            .padding(
+                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                bottom = 8.dp,
+                top = 4.dp
+            ),
         stickyBottomConfig = StickyBottomConfig(
             type = StickyBottomType.OneButton(config = config), showDivider = false
         )
@@ -121,6 +138,7 @@ private fun Content(
     paddingValues: PaddingValues,
     tosCheckBoxData: CheckboxWithTextData,
     dataProtectionCheckBoxData: CheckboxWithTextData,
+    personalDataCheckBoxData: CheckboxWithTextData,
     effectFlow: Flow<Effect>,
     onNavigationRequested: (Effect.Navigation) -> Unit,
 ) {
@@ -133,6 +151,7 @@ private fun Content(
         ConsentAndTosSection(
             tosCheckBoxData = tosCheckBoxData,
             dataProtectionCheckBoxData = dataProtectionCheckBoxData,
+            personalDataCheckBoxData = personalDataCheckBoxData
         )
     }
 
@@ -164,12 +183,14 @@ private fun handleNavigationEffect(
 fun ConsentAndTosSection(
     tosCheckBoxData: CheckboxWithTextData,
     dataProtectionCheckBoxData: CheckboxWithTextData,
+    personalDataCheckBoxData : CheckboxWithTextData
 ) {
     val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 0.dp, vertical = SPACING_EXTRA_LARGE.dp),
+            .padding(horizontal = 0.dp, vertical = SPACING_EXTRA_LARGE.dp)
+            .verticalScroll(rememberScrollState()),
     ) {
         WrapText(
             modifier = Modifier.fillMaxWidth(),
@@ -179,10 +200,11 @@ fun ConsentAndTosSection(
             )
         )
 
-        VSpacer.XXLarge()
+        VSpacer.Small()
 
         WrapCheckboxWithText(checkboxData = tosCheckBoxData)
         WrapCheckboxWithText(checkboxData = dataProtectionCheckBoxData)
+        WrapCheckboxWithText(checkboxData = personalDataCheckBoxData)
 
         VSpacer.Small()
 
@@ -222,6 +244,12 @@ private fun ContentPreview() {
             text = "I accept the Data Protection Information",
         )
 
+        val personalDataCheckBoxData = CheckboxWithTextData(
+            isChecked = false,
+            onCheckedChange = { },
+            text = stringResource(R.string.consent_screen_personal_data_checkbox, "**********")
+        )
+
         val buttonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
             onClick = { },
@@ -241,7 +269,8 @@ private fun ContentPreview() {
                 tosCheckBoxData = tosCheckBoxData,
                 dataProtectionCheckBoxData = dataProtectionCheckBoxData,
                 effectFlow = flowOf(),
-                onNavigationRequested = {}
+                onNavigationRequested = {},
+                personalDataCheckBoxData = personalDataCheckBoxData
             )
         }
     }

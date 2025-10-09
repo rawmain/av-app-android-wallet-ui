@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -98,7 +100,8 @@ fun EnrollmentScreen(
             onMethodSelected = { method ->
                 viewModel.setEvent(Event.SelectEnrollmentMethod(method, context))
             },
-            showStepBar = state.isOnboarding
+            showStepBar = state.isOnboarding,
+            availableMethods = state.availableEnrollmentMethods
         )
     }
 
@@ -151,11 +154,13 @@ private fun Content(
     paddingValues: PaddingValues,
     onMethodSelected: (EnrollmentMethod) -> Unit,
     showStepBar: Boolean = true,
+    availableMethods: List<EnrollmentMethod> = EnrollmentMethod.entries,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
     ) {
         if (showStepBar) {
             TopStepBar(currentStep = 3)
@@ -183,7 +188,7 @@ private fun Content(
         Column(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            EnrollmentMethod.entries.forEach { method ->
+            availableMethods.forEach { method ->
                 EnrollmentMethodCard(
                     method = method,
                     onClick = { onMethodSelected(method) }
@@ -219,7 +224,8 @@ private fun EnrollmentMethodCard(
                 modifier = Modifier.size(24.dp),
                 iconData = when (method) {
                     EnrollmentMethod.NATIONAL_ID -> AppIcons.NationalEID
-//                    EnrollmentMethod.TOKEN_QR -> AppIcons.QrScanner
+                    EnrollmentMethod.PASSPORT_ID_CARD -> AppIcons.Id
+                    EnrollmentMethod.TOKEN_QR -> AppIcons.QrScanner
                 },
                 customTint = MaterialTheme.colorScheme.primary
             )
@@ -249,7 +255,8 @@ private fun getMethodTitle(method: EnrollmentMethod): String {
     return stringResource(
         when (method) {
             EnrollmentMethod.NATIONAL_ID -> R.string.onboarding_verification_national_id
-//            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_token
+            EnrollmentMethod.PASSPORT_ID_CARD -> R.string.onboarding_verification_passport_id_card
+            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_qr_code
         }
     )
 }
@@ -259,7 +266,8 @@ private fun getMethodDescription(method: EnrollmentMethod): String {
     return stringResource(
         when (method) {
             EnrollmentMethod.NATIONAL_ID -> R.string.onboarding_verification_national_id_description
-//            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_token_description
+            EnrollmentMethod.PASSPORT_ID_CARD -> R.string.onboarding_verification_passport_id_card_description
+            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_qr_code_description
         }
     )
 }

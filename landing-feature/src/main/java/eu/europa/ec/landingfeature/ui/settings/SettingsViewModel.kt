@@ -16,8 +16,8 @@
 
 package eu.europa.ec.landingfeature.ui.settings
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.commonfeature.model.PinFlow
 import eu.europa.ec.landingfeature.interactor.DeleteAgeDocumentsPartialState
 import eu.europa.ec.landingfeature.interactor.SettingsInteractor
@@ -57,7 +57,8 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class SettingsViewModel(
-    private val settingsInteractor: SettingsInteractor
+    private val settingsInteractor: SettingsInteractor,
+    private val logController: LogController,
 ) : MviViewModel<Event, State, Effect>() {
 
     private var job: Job? = null
@@ -96,15 +97,13 @@ class SettingsViewModel(
             settingsInteractor.deleteAllDocuments().collect { state ->
                 when (state) {
                     is DeleteAgeDocumentsPartialState.Success -> {
-                        Log.i("SettingsViM", "Successfully deleted documents")
+                        logController.d("SettingsViM") { "Successfully deleted documents" }
                         switchToEnrollmentPage()
                     }
 
                     is DeleteAgeDocumentsPartialState.Failure -> {
                         closeDialog()
-                        Log.e(
-                            "SettingsVM", "Error deleting documents: ${state.errorMessage}"
-                        )
+                        logController.e("SettingsVM") { "Error deleting documents: ${state.errorMessage}" }
                         // Optionally, show an error dialog or toast here
                     }
 

@@ -22,6 +22,7 @@ import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenti
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
+import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.controller.FetchScopedDocumentsPartialState
 import eu.europa.ec.corelogic.controller.IssuanceMethod
 import eu.europa.ec.corelogic.controller.IssueDocumentPartialState
@@ -65,6 +66,8 @@ interface EnrollmentInteractor {
     fun resumeOpenId4VciWithAuthorization(uri: String)
 
     fun hasDocuments(): Boolean
+
+    fun isPassportScanningAvailable(): Boolean
 }
 
 class EnrollmentInteractorImpl(
@@ -72,6 +75,7 @@ class EnrollmentInteractorImpl(
     private val deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
     private val resourceProvider: ResourceProvider,
     private val uiSerializer: UiSerializer,
+    private val walletCoreConfig: WalletCoreConfig,
 ) : EnrollmentInteractor {
 
     private val genericErrorMsg
@@ -206,5 +210,9 @@ class EnrollmentInteractorImpl(
 
     override fun hasDocuments(): Boolean {
         return walletCoreDocumentsController.getAgeOver18IssuedDocument() != null
+    }
+
+    override fun isPassportScanningAvailable(): Boolean {
+        return walletCoreConfig.passportScanningIssuerConfig != null
     }
 }

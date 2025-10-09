@@ -43,7 +43,7 @@ fun NavGraphBuilder.featureLandingGraph(navController: NavController) {
             )
         ) {
             LandingScreen(
-                hostNavController = navController,
+                controller = navController,
                 viewModel = koinViewModel(),
             )
         }

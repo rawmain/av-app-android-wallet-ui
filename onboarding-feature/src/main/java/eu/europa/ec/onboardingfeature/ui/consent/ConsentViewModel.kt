@@ -17,6 +17,7 @@
 package eu.europa.ec.onboardingfeature.ui.consent
 
 import eu.europa.ec.commonfeature.model.PinFlow
+import eu.europa.ec.onboardingfeature.ui.consent.Effect.Navigation.SwitchScreen
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -29,6 +30,7 @@ import org.koin.android.annotation.KoinViewModel
 data class State(
     val tosAccepted: Boolean = false,
     val dataProtectionAccepted: Boolean = false,
+    val personalDataAccepted : Boolean = false,
     val isButtonEnabled: Boolean = false,
 ) : ViewState
 
@@ -37,6 +39,7 @@ sealed class Event : ViewEvent {
     data object GoBack : Event()
     data object TosSelected : Event()
     data object DataProtectionSelected : Event()
+    data object PersonalDataSelected : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -54,7 +57,7 @@ class ConsentViewModel : MviViewModel<Event, State, Effect>() {
         when (event) {
             Event.GoNext -> {
                 val nextScreenRoute = getQuickPinConfig()
-                setEffect { Effect.Navigation.SwitchScreen(nextScreenRoute) }
+                setEffect { SwitchScreen(nextScreenRoute) }
             }
 
             Event.GoBack -> {
@@ -70,12 +73,17 @@ class ConsentViewModel : MviViewModel<Event, State, Effect>() {
                 setState { copy(dataProtectionAccepted = !dataProtectionAccepted) }
                 validateForm()
             }
+
+            Event.PersonalDataSelected -> {
+                setState { copy(personalDataAccepted = !personalDataAccepted) }
+                validateForm()
+            }
         }
     }
 
     private fun validateForm() {
         val isButtonEnabled = viewState.value.tosAccepted &&
-                viewState.value.dataProtectionAccepted
+                viewState.value.dataProtectionAccepted && viewState.value.personalDataAccepted
         setState { copy(isButtonEnabled = isButtonEnabled) }
     }
 
