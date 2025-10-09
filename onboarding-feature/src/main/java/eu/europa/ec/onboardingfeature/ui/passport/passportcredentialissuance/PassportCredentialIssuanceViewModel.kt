@@ -149,38 +149,31 @@ class PassportCredentialIssuanceViewModel(
     override fun handleEvents(event: Event) {
         when (event) {
             is Event.Init -> {
-                logController.i(TAG) { "Event invoked Init" }
                 issueCredential(event.context)
             }
 
             is Event.OnResume -> {
-                logController.i(TAG) { "Event invoked OnResume with deepLink: ${event.deepLink}" }
                 handleDeepLink(event.deepLink)
             }
 
             Event.OnBackPressed -> setEffect {
-                logController.i(TAG) { "Event invoked OnBackPressed" }
                 Effect.Navigation.GoBack
             }
 
             Event.OnRetry -> {
-                logController.i(tag = TAG) { "Event invoked OnRetry" }
                 setState { copy(error = null) }
             }
 
             is Event.OnPause -> {
-                logController.i(TAG) { "Event invoked OnPause" }
                 setState { copy(isLoading = false) }
             }
 
             is Event.OnResumeIssuance -> {
-                logController.i(TAG) { "Event invoked OnResumeIssuance with uri: ${event.uri}" }
                 setState { copy(isLoading = true) }
                 passportCredentialIssuanceInteractor.resumeOpenId4VciWithAuthorization(event.uri)
             }
 
             is Event.OnDynamicPresentation -> {
-                logController.i(TAG) { "Event invoked OnDynamicPresentation with uri: ${event.uri}" }
                 handleDynamicPresentation(event.uri)
             }
         }
