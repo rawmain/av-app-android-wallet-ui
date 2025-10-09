@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="cd_close_button">Indietro</string>
+    <string name="cd_flash_button">Attiva/disattiva il flash della fotocamera</string>
+    <string name="label_close">Chiudi</string>
+    <string name="label_turn_on">Attivare</string>
+    <string name="nfc_body_initial">Posiziona il tuo passaporto / Carta d\'identità direttamente sul retro dello smartphone, di solito in alto.</string>
+    <string name="nfc_body_reading">Il passaporto / Carta d\'identità è in fase di lettura</string>
+    <string name="nfc_help_link"><u>Hai bisogno di aiuto?</u></string>
+    <string name="nfc_title">Metti il ​​telefono sopra il passaporto / Carta d\'identità e non spostarlo</string>
+    <string name="nfc_title_initial">Leggi il tuo passaporto / Carta d\'identità</string>
+    <string name="nfc_title_reading">Leggi il tuo passaporto / Carta d\'identità tramite l\'interfaccia NFC</string>
+    <string name="required_nfc_not_supported">Errore: NFC non è supportato su questo dispositivo.</string>
+    <string name="required_perms_not_given">Errore: autorizzazioni negate.</string>
+    <string name="settings">Impostazioni</string>
+    <string name="warning_authentication_failed">L\'autenticazione non è riuscita! Prova a scansionare di nuovo il documento o a inserire i dati manualmente.</string>
+    <string name="warning_cla_not_supported">Impossibile leggere il documento. Il passaporto non supporta CLA.</string>
+    <string name="warning_enable_nfc">Devi abilitare l\'NFC</string>
+</resources>

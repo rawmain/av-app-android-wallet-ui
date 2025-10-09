@@ -77,6 +77,7 @@ class ThemeColors {
         internal const val eudiw_theme_light_warning: Long = 0xFFF39626
         internal const val eudiw_theme_light_pending: Long = 0xFFAB5200
         internal const val eudiw_theme_light_divider: Long = 0xFFD9D9D9
+        internal const val eudiw_theme_light_elevated: Long = 0xFFEBF1FD
 
         // Dark theme base colors palette.
         private const val eudiw_theme_dark_primary: Long = 0xFFB4C5FF
@@ -121,6 +122,7 @@ class ThemeColors {
         internal const val eudiw_theme_dark_warning: Long = 0xFFFFB689
         internal const val eudiw_theme_dark_pending: Long = 0xFFCC8B3F
         internal const val eudiw_theme_dark_divider: Long = 0xFFD9D9D9
+        internal const val eudiw_theme_dark_elevated: Long = 0xFF003399
 
         const val eudiw_theme_light_background_preview: Long =
             eudiw_theme_light_surface
@@ -275,4 +277,12 @@ val ColorScheme.divider: Color
         Color(ThemeColors.eudiw_theme_dark_divider)
     } else {
         Color(ThemeColors.eudiw_theme_light_divider)
+    }
+
+val ColorScheme.elevated : Color
+    @Composable get() = if (isSystemInDarkTheme()) {
+        // FIXME: Since we support only light mode, applying the light colors in dark mode
+        Color(ThemeColors.eudiw_theme_light_elevated) //Color(ThemeColors.eudiw_theme_dark_elevated)
+    } else {
+        Color(ThemeColors.eudiw_theme_light_elevated)
     }

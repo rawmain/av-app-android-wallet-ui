@@ -36,7 +36,14 @@ sealed class OnboardingScreens {
     data object PassportScanIntro : Screen(name = "PASSPORT_SCAN_INTRO")
     data object PassportIdentification : Screen(name = "PASSPORT_IDENTIFICATION")
     data object PassportBiometrics : Screen(name = "PASSPORT_BIOMETRICS")
-    data object PassportLiveVideo : Screen(name = "PASSPORT_LIVE_VIDEO")
+    data object PassportLiveVideo : Screen(
+        name = "PASSPORT_LIVE_VIDEO",
+        parameters = "?passportLiveVideoConfig={passportLiveVideoConfig}"
+    )
+    data object PassportCredentialIssuance : Screen(
+        name = "PASSPORT_CREDENTIAL_ISSUANCE",
+        parameters = "?passportCredentialIssuanceConfig={passportCredentialIssuanceConfig}"
+    )
 
     data object QRScanIntro : Screen(name = "QR_SCAN_INTRO")
 }

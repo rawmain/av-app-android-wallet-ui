@@ -16,12 +16,23 @@
 
 package eu.europa.ec.onboardingfeature.di
 
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
+import eu.europa.ec.corelogic.config.WalletCoreConfig
+import eu.europa.ec.corelogic.controller.PassportScanningDocumentsController
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
+import eu.europa.ec.onboardingfeature.controller.FaceMatchController
+import eu.europa.ec.onboardingfeature.controller.FaceMatchControllerImpl
 import eu.europa.ec.onboardingfeature.interactor.ConsentInteractor
 import eu.europa.ec.onboardingfeature.interactor.ConsentInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractor
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractorImpl
+import eu.europa.ec.onboardingfeature.interactor.PassportCredentialIssuanceInteractor
+import eu.europa.ec.onboardingfeature.interactor.PassportCredentialIssuanceInteractorImpl
+import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractor
+import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractorImpl
+import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
+import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractorImpl
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.core.annotation.ComponentScan
@@ -41,8 +52,46 @@ fun provideEnrollmentInteractor(
     deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
     resourceProvider: ResourceProvider,
     uiSerializer: UiSerializer,
+    walletCoreConfig: WalletCoreConfig,
 ): EnrollmentInteractor = EnrollmentInteractorImpl(
     walletCoreDocumentsController,
+    deviceAuthenticationInteractor,
+    resourceProvider,
+    uiSerializer,
+    walletCoreConfig
+)
+
+@Factory
+fun provideFaceMatchController(): FaceMatchController = FaceMatchControllerImpl()
+
+@Factory
+fun providePassportLiveVideoInteractor(
+    faceMatchController: FaceMatchController,
+    resourceProvider: ResourceProvider,
+    logController: LogController,
+): PassportLiveVideoInteractor = PassportLiveVideoInteractorImpl(
+    faceMatchController,
+    resourceProvider,
+    logController
+)
+
+@Factory
+fun providePassportIdentificationInteractor(
+    resourceProvider: ResourceProvider,
+    logController: LogController,
+): PassportIdentificationInteractor = PassportIdentificationInteractorImpl(
+    resourceProvider,
+    logController
+)
+
+@Factory
+fun providePassportCredentialIssuanceInteractor(
+    passportScanningDocumentsController: PassportScanningDocumentsController,
+    deviceAuthenticationInteractor: DeviceAuthenticationInteractor,
+    resourceProvider: ResourceProvider,
+    uiSerializer: UiSerializer,
+): PassportCredentialIssuanceInteractor = PassportCredentialIssuanceInteractorImpl(
+    passportScanningDocumentsController,
     deviceAuthenticationInteractor,
     resourceProvider,
     uiSerializer

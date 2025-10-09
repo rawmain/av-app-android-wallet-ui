@@ -18,11 +18,18 @@ package eu.europa.ec.onboardingfeature.router
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType.Companion.StringType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import eu.europa.ec.onboardingfeature.BuildConfig
+import eu.europa.ec.onboardingfeature.config.PassportCredentialIssuanceUiConfig
+import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.ui.consent.ConsentScreen
 import eu.europa.ec.onboardingfeature.ui.enrollment.EnrollmentScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportbiometrics.PassportBiometricScreen
+import eu.europa.ec.onboardingfeature.ui.passport.passportcredentialissuance.PassportCredentialIssuanceScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.PassportIdentificationScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.PassportLiveVideoScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportscanintro.PassportScanIntroScreen
@@ -31,6 +38,7 @@ import eu.europa.ec.onboardingfeature.ui.welcome.WelcomeScreen
 import eu.europa.ec.uilogic.navigation.ModuleRoute
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
     navigation(
@@ -62,8 +70,54 @@ fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
             PassportBiometricScreen(navController, koinViewModel())
         }
 
-        composable(route = OnboardingScreens.PassportLiveVideo.screenRoute) {
-            PassportLiveVideoScreen(navController, koinViewModel())
+        composable(
+            route = OnboardingScreens.PassportLiveVideo.screenRoute,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern =
+                        BuildConfig.DEEPLINK + OnboardingScreens.PassportLiveVideo.screenRoute
+                },
+            ),
+            arguments = listOf(
+                navArgument(PassportLiveVideoUiConfig.serializedKeyName) {
+                    type = StringType
+                }
+            )
+        ) {
+            PassportLiveVideoScreen(
+                navController, koinViewModel(
+                parameters = {
+                    parametersOf(
+                        it.arguments?.getString(PassportLiveVideoUiConfig.serializedKeyName)
+                            .orEmpty()
+                    )
+                }
+            ))
+        }
+
+        composable(
+            route = OnboardingScreens.PassportCredentialIssuance.screenRoute,
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern =
+                        BuildConfig.DEEPLINK + OnboardingScreens.PassportCredentialIssuance.screenRoute
+                },
+            ),
+            arguments = listOf(
+                navArgument(PassportCredentialIssuanceUiConfig.serializedKeyName) {
+                    type = StringType
+                }
+            )
+        ) {
+            PassportCredentialIssuanceScreen(
+                navController, koinViewModel(
+                    parameters = {
+                        parametersOf(
+                            it.arguments?.getString(PassportCredentialIssuanceUiConfig.serializedKeyName)
+                                .orEmpty()
+                        )
+                    }
+                ))
         }
 
         composable(route = OnboardingScreens.QRScanIntro.screenRoute) {

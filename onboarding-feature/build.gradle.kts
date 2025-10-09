@@ -30,6 +30,11 @@ moduleConfig {
     module = LibraryModule.OnboardingFeature
 }
 
+dependencies {
+    implementation(project(":passport-scanner"))
+    implementation(libs.gson)
+}
+
 excludeFromKoverReport(
     excludedClasses = KoverExclusionRules.OnboardingFeature.classes,
     excludedPackages = KoverExclusionRules.OnboardingFeature.packages,

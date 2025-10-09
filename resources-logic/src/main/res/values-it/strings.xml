@@ -1,4 +1,20 @@
 <?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2023 European Commission
+  ~
+  ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
+  ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
+  ~ except in compliance with the Licence.
+  ~
+  ~ You may obtain a copy of the Licence at:
+  ~ https://joinup.ec.europa.eu/software/page/eupl
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under
+  ~ the Licence is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF
+  ~ ANY KIND, either express or implied. See the Licence for the specific language
+  ~ governing permissions and limitations under the Licence.
+  -->
+
 <resources xmlns:tools="http://schemas.android.com/apk/res-auto">
     <string name="generic_error_message">Ops! Qualcosa è andato storto</string>
     <string name="generic_error_description">Se il problema persiste, contatta l\'assistenza clienti</string>
@@ -41,13 +57,15 @@
     <string name="qr_scan_intro_step_second">Scansiona questo codice QR con il tuo Wallet per ottenere la credenziale 18+.</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="passport_identification_title">Scatta una foto del tuo passaporto</string>
-    <string name="passport_identification_description">Per questo passaggio, scatta semplicemente una foto chiara del tuo passaporto. Assicurati che:</string>
-    <string name="passport_identification_step_first">L’intero passaporto sia visibile e ben illuminato.</string>
+    <string name="passport_identification_title">Scansiona il tuo passaporto / carta d\'identità</string>
+    <string name="passport_identification_description">Per questo passaggio, cattura l\'area MRZ (zona leggibile dalla macchina) nella parte inferiore della pagina foto del tuo passaporto / carta d\'identità. Assicurati che:</string>
+    <string name="passport_identification_step_first">L\'intera pagina foto del passaporto / carta d\'identità sia visibile e ben illuminata.</string>
     <string name="passport_identification_step_second">Nessun riflesso o sfocatura oscuri i dettagli.</string>
-    <string name="passport_identification_footer">Prendiamo un codice identificativo da questo passaporto per accedere alla parte leggibile dalla macchina del passaporto.</string>
+    <string name="passport_identification_footer">Prendiamo un codice identificativo da questo passaporto / carta d\'identità per accedere alla parte leggibile dalla macchina del documento.</string>
     <string name="passport_identification_back">Indietro</string>
-    <string name="passport_identification_capture">Scatta una foto</string>
+    <string name="passport_identification_capture">Scansiona</string>
+    <string name="passport_capture_title">Scansiona il tuo passaporto / carta d\'identità</string>
+    <string name="passport_capture_subtitle">Allinea la pagina con la foto del passaporto / carta d\'identità all\'interno della cornice</string>
 
     <!-- Passport live video instructions - Italian (it) -->
     <string name="passport_live_video_header">Registra un breve video di te stesso</string>
@@ -55,9 +73,24 @@
     <string name="passport_live_video_step_first">Guardare direttamente la fotocamera con una buona illuminazione.</string>
     <string name="passport_live_video_step_second">Seguire le istruzioni sullo schermo (ad esempio, battere le palpebre o girare la testa).</string>
     <string name="passport_live_video_step_third">Evitare filtri, maschere o ostacoli.</string>
-    <string name="passport_live_video_footer">Questo passaggio garantisce che tu sia il legittimo proprietario del passaporto e previene le frodi.</string>
+    <string name="passport_live_video_footer">Questo passaggio garantisce che tu sia il legittimo proprietario del passaporto / carta d\'identità.</string>
     <string name="passport_live_video_back">Indietro</string>
     <string name="passport_live_video_live_capture">Avvia video live</string>
+    <string name="passport_live_video_error_not_processed">La cattura video non è stata elaborata correttamente. Riprova.</string>
+    <string name="passport_live_video_error_not_live">Verifica della vitalità fallita. Assicurati di registrare un video dal vivo.</string>
+    <string name="passport_live_video_error_not_matching">Il volto non corrisponde alla foto del passaporto / carta d\'identità. Riprova.</string>
+    <string name="passport_validation_error_expired">Il tuo passaporto / carta d\'identità è scaduto. Utilizza un documento valido.</string>
+    <string name="passport_validation_error_underage">Devi avere almeno 18 anni per continuare.</string>
+    <string name="passport_validation_error_incomplete_data">I dati del passaporto / carta d\'identità sono incompleti. Scansiona nuovamente il tuo documento.</string>
+
+    <!-- Passport Consent Screen -->
+    <string name="passport_credential_issuance_title">Verification Complete</string>
+    <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
+    <string name="passport_consent_more_info">Ulteriori informazioni</string>
+    <string name="passport_consent_checkbox">Accetto</string>
+    <string name="passport_consent_reject_button">Rifiuta</string>
+    <string name="passport_consent_consent_button">Acconsenti</string>
+    <string name="consent_screen_personal_data_checkbox">Acconsento al trattamento dei miei dati personali da parte [del fornitore dell\'applicazione] al fine di ottenere un\'attestazione di verifica dell\'età. Questo processo richiede la scansione del mio documento d\'identità o passaporto e un video di me stesso per confermare la mia identità. Questi dati verranno elaborati solo sul mio dispositivo e non saranno accessibili [al fornitore dell\'applicazione] o a terze parti. Consultare l\'informativa sulla protezione dei dati per ulteriori informazioni</string>
 
     <!-- Passport verification steps procedures -->
     <string name="passport_identification">Identificazione</string>
@@ -68,26 +101,35 @@
     <string name="passport_biometrics_back">Indietro</string>
     <string name="passport_biometrics_next">Avanti</string>
     <string name="passport_biometrics_content_description">Descrizione del contenuto</string>
-    <string name="passport_biometrics_first_header">Leggi il tuo passaporto</string>
-    <string name="passport_biometrics_first_description">Posiziona il passaporto direttamente sul retro dello smartphone, di solito nella parte superiore.</string>
+    <string name="passport_biometrics_first_header">Scansiona il tuo passaporto / carta d\'identità</string>
+    <string name="passport_biometrics_first_description">Posiziona il passaporto / carta d\'identità direttamente sul retro dello smartphone, di solito nella parte superiore.</string>
     <string name="passport_biometrics_first_link">Hai bisogno di aiuto?</string>
+    <string name="passport_biometrics_verify_data">Si prega di verificare i dati</string>
+    <string name="passport_biometrics_try_again">Riprova</string>
+    <string name="passport_biometrics_passport">Passaporto / Carta d\'identità</string>
+    <string name="passport_biometrics_dob">Data di nascita</string>
+    <string name="passport_biometrics_doe">Data di scadenza</string>
+    <string name="passport_biometrics_no_availability">Non disponibile</string>
+    <string name="passport_biometrics_no_passport_data">Nessun dato del passaporto ricevuto</string>
+    <string name="passport_biometrics_scan_cancelled">Scansione del passaporto annullata</string>
+    <string name="passport_biometrics_unknown_error">Errore sconosciuto durante la scansione del passaporto</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="onboarding_verification_qr_code">Token / Codice QR</string>
-    <string name="onboarding_verification_qr_code_description">Descrizione</string>
+    <string name="onboarding_verification_qr_code_description">Scansiona un codice QR o inserisci un token per ricevere una credenziale di verifica dell\'età da un emittente autorizzato.</string>
     <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>
     <string name="passport_scan_intro_title">Passaporto o Carta d\'identità</string>
-    <string name="passport_scan_intro_description">Il metodo passaporto è veloce e sicuro! Scansiona il tuo documento, scatta una foto e registra un breve video—tre passaggi per la massima sicurezza e protezione dalle frodi.</string>
+    <string name="passport_scan_intro_description">Il metodo passaporto / carta d\'identità è veloce e sicuro! Scatta una foto del tuo passaporto / carta d\'identità, scansiona il tuo passaporto / carta d\'identità e registra un video di te stesso—tre passaggi per un onboarding sicuro.</string>
     <string name="passport_scan_intro_back_button">Indietro</string>
     <string name="passport_scan_intro_start_button">Inizia</string>
-    <string name="passport_scan_intro_step_1_title">Scatta una foto del passaporto</string>
-    <string name="passport_scan_intro_step_1_description">Cattura un\'immagine chiara del tuo passaporto.</string>
-    <string name="passport_scan_intro_step_2_title">Leggi il tuo passaporto</string>
-    <string name="passport_scan_intro_step_2_description">Posiziona il tuo passaporto sullo smartphone per leggere i dati.</string>
+    <string name="passport_scan_intro_step_1_title">Scatta una foto del tuo documento d\'identità</string>
+    <string name="passport_scan_intro_step_1_description">Cattura una foto chiara della pagina del tuo documento d\'identità con i dati personali.</string>
+    <string name="passport_scan_intro_step_2_title">Scansiona il tuo documento d\'identità</string>
+    <string name="passport_scan_intro_step_2_description">Posiziona il tuo documento d\'identità sullo smartphone per leggere i dati.</string>
     <string name="passport_scan_intro_step_3_title">Registra un video di te stesso</string>
     <string name="passport_scan_intro_step_3_description">Filmati per la verifica dell\'identità.</string>
     <string name="passport_scan_intro_step_4_title">Consenso</string>
-    <string name="passport_scan_intro_step_5_title">Emissione dell\'attestazione di verifica dell\'età</string>
+    <string name="passport_scan_intro_step_5_title">Ricevi la tua prova d\'età</string>
     <string name="welcome_page_1">Utilizzando quest\'app, puoi dimostrare in modo sicuro di avere almeno 18 anni quando accedi ai servizi riservati agli adulti.</string>
     <string name="welcome_page_2">Verifica di avere almeno 18 anni, e usa questa attestazione per accedere in modo sicuro a molti servizi riservati agli adulti.</string>
     <string name="welcome_page_3">Mantieni il controllo dei tuoi dati: solo l\'attestazione della tua maggiore età verrà condivisa. Nessun altro dettaglio personale sarà archiviato o condiviso con i servizi online.</string>
@@ -214,10 +256,10 @@ Prova con un metodo alternativo</string>
     <string name="document_details_boolean_item_false_readable_value">no</string>
     <string name="consent_screen_title">Per prima cosa abbiamo bisogno del tuo consenso</string>
     <string name="consent_screen_tos_checkbox">Accetto i Termini di servizio</string>
-    <string name="consent_screen_data_protection_checkbox">Accetto le Informazioni sulla protezione dei dati</string>
+    <string name="consent_screen_data_protection_checkbox">Ho letto l\'informativa sulla protezione dei dati</string>
     <string name="consent_screen_tos_button">Termini di servizio</string>
     <string name="consent_screen_data_protection_button">Informazioni sulla protezione dei dati</string>
-    <string name="consent_screen_confirm_button">Conferma</string>
+    <string name="consent_screen_confirm_button">Avanti</string>
     <string name="presentation_qr_scan_title">Presenta il documento online</string>
     <string name="presentation_qr_scan_subtitle">Scansiona il codice QR fornito dal servizio online per presentare l\'attestazione dell\'età.</string>
     <string name="issuance_add_document_title">Aggiungi un documento dall\'elenco</string>

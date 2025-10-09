@@ -16,6 +16,8 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,13 +31,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.Effect.Navigation
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.BulletHolder
-import eu.europa.ec.uilogic.component.PassportVerificationStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -48,53 +51,99 @@ import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
+import eu.europa.ec.uilogic.navigation.OnboardingScreens
 
 @Composable
-fun PassportLiveVideoScreen(controller: NavController, viewModel: PassportLiveVideoViewModel) {
+fun PassportLiveVideoScreen(
+    controller: NavController,
+    viewModel: PassportLiveVideoViewModel
+) {
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
-
-    ContentScreen(
-        isLoading = state.isLoading,
-        navigatableAction = ScreenNavigateAction.NONE,
-        onBack = { viewModel.setEvent(Event.OnBackPressed) },
-        stickyBottom = { paddingValues ->
-            ActionButtons(paddings = paddingValues,
-                onBack = { viewModel.setEvent(Event.OnBackPressed) },
-                onLiveVideo = { viewModel.setEvent(Event.OnLiveVideoCapture) }
-            )
-        }
-    ) { paddingValues -> Content(paddingValues = paddingValues) }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                is Effect.Navigation.GoBack -> controller.popBackStack()
-                is Effect.Navigation.SwitchScreen -> controller.navigate(effect.screenRoute)
-            }
+        viewModel.setEvent(Event.InitializeSdk(context))
+    }
+
+    ContentScreen(
+        isLoading = state.isLoading || state.isSdkInitializing,
+        navigatableAction = ScreenNavigateAction.NONE,
+        onBack = { viewModel.setEvent(Event.OnBackPressed) },
+        contentErrorConfig = state.error,
+        stickyBottom = { paddingValues ->
+            ActionButtons(
+                paddings = paddingValues,
+                onBack = { viewModel.setEvent(Event.OnBackPressed) },
+                onLiveVideo = { viewModel.setEvent(Event.OnLiveVideoCapture) },
+                isEnabled = state.isSdkReady
+            )
         }
+    ) { paddingValues ->
+        Content(
+            paddingValues = paddingValues,
+            sdkInitProgress = state.sdkInitProgress,
+            sdkInitMessage = state.sdkInitMessage,
+            isSdkInitializing = state.isSdkInitializing
+        )
     }
 
     LaunchedEffect(Unit) {
-        viewModel.setEvent(Event.Init)
+        viewModel.effect.collect { effect ->
+            handleEffect(effect, controller, context)
+        }
+    }
+}
+
+private fun handleEffect(
+    effect: Effect,
+    controller: NavController,
+    context: Context
+) {
+    when (effect) {
+        is Navigation.GoBack -> controller.popBackStack()
+        is Effect.Failure -> {
+            Toast.makeText(context, effect.message, Toast.LENGTH_LONG).show()
+        }
+
+        is Effect.CaptureSuccess -> {
+            Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+        }
+
+        is Navigation.SwitchScreen -> {
+            controller.navigate(effect.screenRoute) {
+                popUpTo(OnboardingScreens.PassportLiveVideo.screenRoute) {
+                    inclusive = effect.inclusive
+                }
+            }
+        }
     }
 }
 
 @Composable
-private fun ActionButtons(onBack : () -> Unit, onLiveVideo : () -> Unit, paddings: PaddingValues) {
+private fun ActionButtons(
+    onBack: () -> Unit,
+    onLiveVideo: () -> Unit,
+    paddings: PaddingValues,
+    isEnabled: Boolean = true
+) {
 
     val buttons = StickyBottomType.TwoButtons(
         primaryButtonConfig = ButtonConfig(
             type = ButtonType.SECONDARY,
-            onClick = { onBack }
+            onClick = onBack
         ),
         secondaryButtonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
-            onClick = { onLiveVideo }
+            onClick = onLiveVideo,
+            enabled = isEnabled
         )
     )
 
-    WrapStickyBottomContent(stickyBottomModifier = Modifier.fillMaxWidth().padding(paddings),
+    WrapStickyBottomContent(
+        stickyBottomModifier = Modifier
+            .fillMaxWidth()
+            .padding(paddings),
         stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)
     ) { buttonConfigs ->
         buttonConfigs?.let { buttonConfig ->
@@ -107,16 +156,19 @@ private fun ActionButtons(onBack : () -> Unit, onLiveVideo : () -> Unit, padding
 }
 
 @Composable
-private fun Content(paddingValues: PaddingValues) {
+private fun Content(
+    paddingValues: PaddingValues,
+    sdkInitProgress: Int = 0,
+    sdkInitMessage: String = "",
+    isSdkInitializing: Boolean = false
+) {
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(paddingValues)
-        .verticalScroll(rememberScrollState())) {
-
-        PassportVerificationStepBar(2)
-
-        VSpacer.ExtraLarge()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .verticalScroll(rememberScrollState())
+    ) {
         WrapText(
             text = stringResource(R.string.passport_live_video_header),
             textConfig = TextConfig(
@@ -130,14 +182,14 @@ private fun Content(paddingValues: PaddingValues) {
         WrapText(
             text = stringResource(R.string.passport_live_video_description),
             textConfig = TextConfig(
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = Int.MAX_VALUE
             )
         )
 
         VSpacer.Large()
         BulletHolder(
             stringResource(R.string.passport_live_video_step_first),
-            stringResource(R.string.passport_live_video_step_second),
             stringResource(R.string.passport_live_video_step_third)
         )
 
@@ -147,6 +199,42 @@ private fun Content(paddingValues: PaddingValues) {
             textConfig = TextConfig(
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = Int.MAX_VALUE
+            )
+        )
+
+        if (isSdkInitializing && sdkInitProgress > 0) {
+            DownloadProgress(
+                progress = sdkInitProgress,
+                message = sdkInitMessage
+            )
+        }
+    }
+}
+
+@Composable
+private fun DownloadProgress(
+    progress: Int,
+    message: String
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        VSpacer.Large()
+        WrapText(
+            text = message,
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                color = MaterialTheme.colorScheme.primary
+            )
+        )
+        VSpacer.Small()
+        WrapText(
+            text = "$progress%",
+            textConfig = TextConfig(
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
     }
@@ -161,11 +249,20 @@ private fun PassportLiveVideoScreenPreview() {
             navigatableAction = ScreenNavigateAction.NONE,
             onBack = {},
             stickyBottom = { paddingValues ->
-                ActionButtons(paddings = paddingValues,
+                ActionButtons(
+                    paddings = paddingValues,
                     onBack = {},
-                    onLiveVideo = {}
+                    onLiveVideo = {},
+                    isEnabled = true
                 )
             }
-        ) { paddingValues -> Content(paddingValues = paddingValues) }
+        ) { paddingValues ->
+            Content(
+                paddingValues = paddingValues,
+                sdkInitProgress = 45,
+                sdkInitMessage = "Downloading model... 120 / 260 MB",
+                isSdkInitializing = true
+            )
+        }
     }
 }
