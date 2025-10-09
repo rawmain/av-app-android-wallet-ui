@@ -26,7 +26,6 @@ import eu.europa.ec.corelogic.model.FormatType
 import eu.europa.ec.corelogic.model.ScopedDocument
 import eu.europa.ec.corelogic.model.toDocumentIdentifier
 import eu.europa.ec.eudi.openid4vci.MsoMdocCredential
-import eu.europa.ec.eudi.openid4vci.SdJwtVcCredential
 import eu.europa.ec.eudi.wallet.EudiWallet
 import eu.europa.ec.eudi.wallet.document.DocumentExtensions.DefaultKeyUnlockData
 import eu.europa.ec.eudi.wallet.document.DocumentExtensions.getDefaultCreateDocumentSettings
@@ -120,7 +119,6 @@ class PassportScanningDocumentsControllerImpl(
 
                         val isPid: Boolean = when (config) {
                             is MsoMdocCredential -> config.docType.toDocumentIdentifier() == DocumentIdentifier.MdocPid
-                            is SdJwtVcCredential -> config.type.toDocumentIdentifier() == DocumentIdentifier.SdJwtPid
                             else -> false
                         }
 
