@@ -106,8 +106,8 @@
     <string name="passport_validation_error_incomplete_data">Die Reisepass / Personalausweis Daten sind unvollständig. Bitte scannen Sie Ihr Dokument erneut.</string>
 
     <!-- Passport Consent Screen -->
-    <string name="passport_consent_title">Einwilligung</string>
-    <string name="passport_consent_description">Mit Ihrer Zustimmung erklären Sie sich damit einverstanden, Ihre Identität durch den Vergleich Ihres Reisepass / Personalausweis Fotos mit dem Video zu überprüfen. Weitere Informationen zur Datenverarbeitung und zum Datenschutz finden Sie unter dem unten stehenden Link.</string>
+    <string name="passport_credential_issuance_title">Verification Complete</string>
+    <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
     <string name="passport_consent_more_info">Weitere informationen</string>
     <string name="passport_consent_checkbox">Ich stimme zu</string>
     <string name="passport_consent_reject_button">Ablehnen</string>

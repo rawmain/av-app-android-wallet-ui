@@ -84,8 +84,8 @@
     <string name="passport_validation_error_incomplete_data">I dati del passaporto / carta d\'identità sono incompleti. Scansiona nuovamente il tuo documento.</string>
 
     <!-- Passport Consent Screen -->
-    <string name="passport_consent_title">Consenso</string>
-    <string name="passport_consent_description">Accettando, dai il consenso a verificare la tua identità confrontando il ritratto del passaporto / carta d\'identità con il video. Per informazioni più dettagliate sul trattamento dei dati e sulla protezione dei dati, clicca sul link sottostante.</string>
+    <string name="passport_credential_issuance_title">Verification Complete</string>
+    <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
     <string name="passport_consent_more_info">Ulteriori informazioni</string>
     <string name="passport_consent_checkbox">Accetto</string>
     <string name="passport_consent_reject_button">Rifiuta</string>

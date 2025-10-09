@@ -23,12 +23,12 @@ import eu.europa.ec.uilogic.serializer.UiSerializable
 import eu.europa.ec.uilogic.serializer.UiSerializableParser
 import eu.europa.ec.uilogic.serializer.adapter.SerializableTypeAdapter
 
-data class PassportConsentUiConfig(
+data class PassportCredentialIssuanceUiConfig(
     val faceImageTempPath: String,
 ) : UiSerializable {
 
     companion object Parser : UiSerializableParser {
-        override val serializedKeyName = "passportConsentConfig"
+        override val serializedKeyName = "passportCredentialIssuanceConfig"
         override fun provideParser(): Gson {
             return GsonBuilder()
                 .registerTypeAdapter(

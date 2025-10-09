@@ -14,20 +14,17 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.onboardingfeature.ui.passport.passportconsent
+package eu.europa.ec.onboardingfeature.ui.passport.passportcredentialissuance
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,12 +32,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.corelogic.util.CoreActions
-import eu.europa.ec.onboardingfeature.ui.passport.passportconsent.Effect.Navigation
+import eu.europa.ec.onboardingfeature.ui.passport.passportcredentialissuance.Effect.Navigation
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.content.BroadcastAction
 import eu.europa.ec.uilogic.component.content.ContentScreen
@@ -50,16 +48,7 @@ import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.LifecycleEffect
 import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_LARGE
 import eu.europa.ec.uilogic.component.utils.VSpacer
-import eu.europa.ec.uilogic.component.wrap.ButtonConfig
-import eu.europa.ec.uilogic.component.wrap.ButtonType
-import eu.europa.ec.uilogic.component.wrap.CheckboxWithTextData
-import eu.europa.ec.uilogic.component.wrap.StickyBottomConfig
-import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
-import eu.europa.ec.uilogic.component.wrap.WrapCheckboxWithText
-import eu.europa.ec.uilogic.component.wrap.WrapLink
-import eu.europa.ec.uilogic.component.wrap.WrapLinkData
-import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import eu.europa.ec.uilogic.extension.getPendingDeepLink
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
@@ -68,9 +57,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
 @Composable
-fun PassportConsentScreen(
+fun PassportCredentialIssuanceScreen(
     controller: NavController,
-    viewModel: PassportConsentViewModel,
+    viewModel: PassportCredentialIssuanceViewModel,
 ) {
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -99,24 +88,14 @@ fun PassportConsentScreen(
                 }
             }
         ),
-        stickyBottom = { paddingValues ->
-            ActionButtons(
-                paddings = paddingValues,
-                onReject = { viewModel.setEvent(Event.OnBackPressed) },
-                onConsent = { viewModel.setEvent(Event.OnConsentClicked(context)) },
-                isConsentEnabled = state.isConsentChecked
-            )
-        }
     ) { paddingValues ->
         Content(
             paddingValues = paddingValues,
-            isConsentChecked = state.isConsentChecked,
-            onConsentChecked = { viewModel.setEvent(Event.OnConsentChecked(it)) },
-            onMoreInfoClicked = { viewModel.setEvent(Event.OnMoreInfoClicked) }
         )
     }
 
     LaunchedEffect(Unit) {
+        viewModel.setEvent(Event.Init(context))
         viewModel.effect.onEach { effect ->
             handleEffect(effect, controller, context)
         }.collect()
@@ -133,7 +112,7 @@ fun PassportConsentScreen(
         lifecycleOwner = LocalLifecycleOwner.current,
         lifecycleEvent = Lifecycle.Event.ON_RESUME
     ) {
-        viewModel.setEvent(Event.Init(context.getPendingDeepLink()))
+        viewModel.setEvent(Event.OnResume(context.getPendingDeepLink()))
     }
 }
 
@@ -147,7 +126,7 @@ private fun handleEffect(
 
         is Navigation.SwitchScreen -> {
             controller.navigate(effect.screenRoute) {
-                popUpTo(OnboardingScreens.PassportConsent.screenRoute) {
+                popUpTo(OnboardingScreens.PassportCredentialIssuance.screenRoute) {
                     inclusive = effect.inclusive
                 }
             }
@@ -162,43 +141,8 @@ private fun handleEffect(
         }
 
         is Navigation.OpenExternalLink -> {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(effect.url))
+            val intent = Intent(Intent.ACTION_VIEW, effect.url.toUri())
             context.startActivity(intent)
-        }
-    }
-}
-
-@Composable
-private fun ActionButtons(
-    onReject: () -> Unit,
-    onConsent: () -> Unit,
-    isConsentEnabled: Boolean,
-    paddings: PaddingValues,
-) {
-
-    val buttons = StickyBottomType.TwoButtons(
-        primaryButtonConfig = ButtonConfig(
-            type = ButtonType.SECONDARY,
-            onClick = onReject
-        ),
-        secondaryButtonConfig = ButtonConfig(
-            type = ButtonType.PRIMARY,
-            onClick = onConsent,
-            enabled = isConsentEnabled
-        )
-    )
-
-    WrapStickyBottomContent(
-        stickyBottomModifier = Modifier
-            .fillMaxWidth()
-            .padding(paddings),
-        stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)
-    ) { buttonConfigs ->
-        buttonConfigs?.let { buttonConfig ->
-            when (buttonConfig.type) {
-                ButtonType.PRIMARY -> Text(stringResource(R.string.passport_consent_consent_button))
-                ButtonType.SECONDARY -> Text(stringResource(R.string.passport_consent_reject_button))
-            }
         }
     }
 }
@@ -206,9 +150,6 @@ private fun ActionButtons(
 @Composable
 private fun Content(
     paddingValues: PaddingValues,
-    isConsentChecked: Boolean,
-    onConsentChecked: (Boolean) -> Unit,
-    onMoreInfoClicked: () -> Unit,
 ) {
 
     Column(
@@ -218,7 +159,7 @@ private fun Content(
             .verticalScroll(rememberScrollState())
     ) {
         WrapText(
-            text = stringResource(R.string.passport_consent_title),
+            text = stringResource(R.string.passport_credential_issuance_title),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.SemiBold
@@ -228,28 +169,10 @@ private fun Content(
 
         VSpacer.Custom(SIZE_EXTRA_LARGE)
         WrapText(
-            text = stringResource(R.string.passport_consent_description),
+            text = stringResource(R.string.passport_credential_issuance_description),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.bodyLarge,
                 maxLines = Int.MAX_VALUE
-            )
-        )
-
-        VSpacer.Large()
-        WrapLink(
-            data = WrapLinkData(
-                textId = R.string.passport_consent_more_info,
-                isExternal = true
-            ),
-            onClick = onMoreInfoClicked
-        )
-
-        VSpacer.Custom(SIZE_EXTRA_LARGE)
-        WrapCheckboxWithText(
-            checkboxData = CheckboxWithTextData(
-                isChecked = isConsentChecked,
-                onCheckedChange = onConsentChecked,
-                text = stringResource(R.string.passport_consent_checkbox)
             )
         )
     }
@@ -257,26 +180,15 @@ private fun Content(
 
 @Composable
 @ThemeModePreviews
-private fun PassportConsentScreenPreview() {
+private fun PassportCredentialIssuanceScreenPreview() {
     PreviewTheme {
         ContentScreen(
             isLoading = false,
             navigatableAction = ScreenNavigateAction.NONE,
             onBack = {},
-            stickyBottom = { paddingValues ->
-                ActionButtons(
-                    paddings = paddingValues,
-                    onReject = {},
-                    onConsent = {},
-                    isConsentEnabled = true
-                )
-            }
         ) { paddingValues ->
             Content(
                 paddingValues = paddingValues,
-                isConsentChecked = false,
-                onConsentChecked = {},
-                onMoreInfoClicked = {}
             )
         }
     }
