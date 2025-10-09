@@ -77,7 +77,7 @@ fun WrapCheckboxWithText(
             val textConfig = TextConfig(
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Start,
-                maxLines = 4
+                maxLines = Int.MAX_VALUE
             )
             WrapText(text = checkboxData.text, textConfig = textConfig)
         }
