@@ -104,6 +104,7 @@
     <string name="passport_validation_error_expired">Ihr Reisepass / Personalausweis ist abgelaufen. Bitte verwenden Sie ein gültiges Dokument.</string>
     <string name="passport_validation_error_underage">Sie müssen mindestens 18 Jahre alt sein, um fortzufahren.</string>
     <string name="passport_validation_error_incomplete_data">Die Reisepass / Personalausweis Daten sind unvollständig. Bitte scannen Sie Ihr Dokument erneut.</string>
+    <string name="passport_live_video_model_downloading">Wird heruntergeladen</string>
 
     <!-- Passport Consent Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>

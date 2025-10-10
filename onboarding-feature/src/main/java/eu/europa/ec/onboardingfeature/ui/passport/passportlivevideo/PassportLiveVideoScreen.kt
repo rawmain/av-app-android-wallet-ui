@@ -221,7 +221,7 @@ private fun DownloadProgress(
     ) {
         VSpacer.Large()
         WrapText(
-            text = message,
+            text = stringResource(R.string.passport_live_video_model_downloading) + message,
             textConfig = TextConfig(
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Medium

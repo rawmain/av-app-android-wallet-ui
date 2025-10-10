@@ -129,6 +129,7 @@
     <string name="passport_validation_error_expired">Your passport / ID card has expired. Please use a valid document.</string>
     <string name="passport_validation_error_underage">You must be at least 18 years old to proceed.</string>
     <string name="passport_validation_error_incomplete_data">Passport / ID card data is incomplete. Please scan your document again.</string>
+    <string name="passport_live_video_model_downloading">Downloading</string>
 
     <!-- Passport Consent Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>
