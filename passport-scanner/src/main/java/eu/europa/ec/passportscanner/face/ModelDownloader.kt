@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -18,7 +18,6 @@ package eu.europa.ec.passportscanner.face
 
 import android.content.Context
 import android.util.Log
-import eu.europa.ec.passportscanner.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -70,9 +69,6 @@ class ModelDownloader(private val context: Context) {
             connection.readTimeout = 60000 // 60 seconds
             connection.instanceFollowRedirects = true
             connection.setRequestProperty("User-Agent", "Mozilla/5.0")
-
-            val token = BuildConfig.GITHUB_TOKEN
-            connection.setRequestProperty("Authorization", "token $token")
 
             connection.connect()
 

@@ -14,17 +14,6 @@
  * governing permissions and limitations under the Licence.
  */
 
-import java.io.FileInputStream
-import java.util.Properties
-
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localProperties.load(FileInputStream(localPropertiesFile))
-}
-
-val githubToken: String = localProperties.getProperty("github.token") ?: ""
-
 plugins {
     id("com.android.library")
     id("kotlin-android")
@@ -38,7 +27,6 @@ android {
     defaultConfig {
         minSdk = 28
         vectorDrawables.useSupportLibrary = true
-        buildConfigField("String", "GITHUB_TOKEN", "\"$githubToken\"")
     }
 
     buildFeatures {
