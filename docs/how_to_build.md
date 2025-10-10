@@ -5,7 +5,6 @@ This guide aims to assist developers build and test the Android Age Verification
 ## Table of contents
 * [Overview](#overview)
 * [Prerequisites](#prerequisites)
-* [Git LFS Setup](#git-lfs-setup)
 * [Building the app](#building-the-app)
 * [How to work with self signed certificates](#how-to-work-with-self-signed-certificates)
 ## Overview
@@ -17,61 +16,6 @@ This guide aims to assist developers in building the Android Wallet application.
 * **Android Studio:** The official IDE for Android development, which includes essential tools like the Android SDK, build tools, and an emulator
 * **Android SDK Tools:** These provide libraries, debuggers, and other utilities needed for building Android apps
 * **Gradle:** The build automation system used to compile, package, and manage dependencies for your app
-* **Git LFS (Large File Storage):** Required to download ONNX model files used for liveness
-  detection and biometric comparison. See [Git LFS Setup](#git-lfs-setup) below for installation
-  instructions
-
-## Git LFS Setup
-
-This repository uses **Git LFS** (Large File Storage) to manage large ONNX model files that are
-essential for passport scanning functionality, specifically for liveness detection and biometric
-comparison.
-
-### Model Files Tracked by Git LFS
-
-The following ONNX model files are stored in `passport-scanner/src/main/assets/` and tracked with
-Git LFS:
-
-| File                  | Size    | Purpose                    |
-|-----------------------|---------|----------------------------|
-| `glintr100.onnx`      | ~249 MB | Biometric comparison model |
-| `mediapipe_long.onnx` | ~636 KB | Face detection model       |
-| `silentface27.onnx`   | ~2.1 MB | Liveness detection model   |
-| `silentface40.onnx`   | ~2.2 MB | Liveness detection model   |
-
-### Installing Git LFS
-
-Before cloning the repository, you must install Git LFS on your system:
-
-**macOS (using Homebrew):**
-
-```bash
-brew install git-lfs
-```
-
-**Ubuntu/Debian:**
-
-```bash
-sudo apt-get install git-lfs
-```
-
-**Windows (using Chocolatey):**
-
-```bash
-choco install git-lfs
-```
-
-**Windows (manual installation):**
-Download the installer from [git-lfs.github.com](https://git-lfs.github.com/)
-
-### Initializing Git LFS
-
-After installing Git LFS, initialize it for your user account (only needs to be done once per
-machine):
-
-```bash
-git lfs install
-```
 
 ### Cloning the Repository.
 
@@ -84,8 +28,7 @@ cd av-app-android-wallet-ui
 
 ## Building the app
 
-After ensuring Git LFS is properly set up and the model files are downloaded, open the project in
-Android Studio.
+Open the project in Android Studio.
 
 The application has two product flavors:
 - "Dev", which communicates with the services deployed in an environment based on the latest main branch.
