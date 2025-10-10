@@ -108,7 +108,7 @@ class ModelDownloader(private val context: Context) {
                             // Report progress every 5%
                             if (percentage >= lastReportedPercentage + 5 && contentLength > 0) {
                                 val sizeMB = contentLength / (1024 * 1024)
-                                onProgress?.invoke(percentage, "Downloading model... $currentMB / $sizeMB MB")
+                                onProgress?.invoke(percentage, " $currentMB / $sizeMB MB")
                                 lastReportedPercentage = percentage
                             }
                         }

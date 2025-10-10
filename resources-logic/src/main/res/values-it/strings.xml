@@ -82,6 +82,7 @@
     <string name="passport_validation_error_expired">Il tuo passaporto / carta d\'identità è scaduto. Utilizza un documento valido.</string>
     <string name="passport_validation_error_underage">Devi avere almeno 18 anni per continuare.</string>
     <string name="passport_validation_error_incomplete_data">I dati del passaporto / carta d\'identità sono incompleti. Scansiona nuovamente il tuo documento.</string>
+    <string name="passport_live_video_model_downloading">Download in corso</string>
 
     <!-- Passport Consent Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>
