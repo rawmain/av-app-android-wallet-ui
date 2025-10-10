@@ -111,7 +111,7 @@ Whether you cloned or downloaded the 'zipped' sources you will either find the s
 In either case open a terminal pointing to the directory you put the sources in. The local build process is described [here](./docs/how_to_build.md) and the configuration options are described [here](./docs/configuration.md).
 
 > [!NOTE]
-> The minimum device requirement for this application is  Android API level 28.
+> The minimum device requirement for this application is  Android API level 29.
 
 ### Testing
 
