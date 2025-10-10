@@ -73,70 +73,14 @@ machine):
 git lfs install
 ```
 
-### Cloning the Repository with Git LFS
+### Cloning the Repository.
 
-Once Git LFS is installed and initialized, clone the repository normally:
+Clone the repository normally:
 
 ```bash
 git clone https://github.com/eu-digital-identity-wallet/av-app-android-wallet-ui.git
 cd av-app-android-wallet-ui
 ```
-
-Git LFS will automatically download the actual ONNX model files during the clone operation.
-
-### If You Already Cloned Without Git LFS
-
-If you cloned the repository before installing Git LFS, the ONNX files will be small pointer files
-instead of the actual models. To fix this:
-
-1. Install and initialize Git LFS (see above)
-2. Pull the actual LFS files:
-   ```bash
-   git lfs pull
-   ```
-
-### Verifying the Model Files
-
-After cloning or pulling, verify that the ONNX model files were downloaded correctly by checking
-their sizes:
-
-```bash
-ls -lh passport-scanner/src/main/assets/*.onnx
-```
-
-Expected output should show:
-
-- `glintr100.onnx` at approximately **249 MB**
-- Other model files at their respective sizes listed in the table above
-
-**Warning:** If `glintr100.onnx` is only a few kilobytes (or bytes), Git LFS did not download the
-actual files. Run `git lfs pull` to fetch them.
-
-### Troubleshooting
-
-If you encounter issues with Git LFS:
-
-1. **Check Git LFS is installed:**
-   ```bash
-   git lfs version
-   ```
-
-2. **Check which files are tracked by LFS:**
-   ```bash
-   git lfs ls-files
-   ```
-
-3. **Force re-download of LFS files:**
-   ```bash
-   git lfs fetch --all
-   git lfs checkout
-   ```
-
-4. **Check LFS configuration:**
-   ```bash
-   cat .gitattributes
-   ```
-   Should show: `*.onnx filter=lfs diff=lfs merge=lfs -text`
 
 ## Building the app
 
