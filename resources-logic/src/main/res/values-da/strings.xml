@@ -104,6 +104,7 @@
     <string name="passport_validation_error_expired">Dit pas / ID-kort er udløbet. Brug venligst et gyldigt dokument.</string>
     <string name="passport_validation_error_underage">Du skal være mindst 18 år gammel for at fortsætte.</string>
     <string name="passport_validation_error_incomplete_data">Pas / ID-kort data er ufuldstændige. Scan venligst dit dokument igen.</string>
+    <string name="passport_live_video_model_downloading">Downloader</string>
 
     <!-- Passport Consent Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>

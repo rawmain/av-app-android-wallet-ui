@@ -66,7 +66,9 @@ internal class WalletCoreConfigImpl(
                             listOf(
                                 BuildConfig.OPENID4VP_SCHEME,
                                 BuildConfig.EUDI_OPENID4VP_SCHEME,
-                                BuildConfig.MDOC_OPENID4VP_SCHEME
+                                BuildConfig.MDOC_OPENID4VP_SCHEME,
+                                BuildConfig.AVSP_SCHEME,
+                                BuildConfig.AV_SCHEME
                             )
                         )
                         withFormats(
@@ -86,6 +88,10 @@ internal class WalletCoreConfigImpl(
                         context,
                         R.raw.av_issuer_ca01
                     )
+
+                    configureDCAPI {
+                        withEnabled(true)
+                    }
                 }
             }
             return _config!!
