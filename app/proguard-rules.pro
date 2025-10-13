@@ -119,3 +119,11 @@
 # Core Libs
 -keep class com.nimbusds.jwt.**{ *; }
 -keep class com.nimbusds.jose.**{ *; }
+
+# NFC/Passport Scanning Libraries (JMRTD, SCUBA)
+-keep class org.jmrtd.** { *; }
+-keep class net.sf.scuba.** { *; }
+-keep class org.ejbca.cvc.** { *; }
+-dontwarn org.jmrtd.**
+-dontwarn net.sf.scuba.**
+-dontwarn org.ejbca.cvc.**
