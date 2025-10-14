@@ -84,13 +84,9 @@
     <string name="passport_validation_error_incomplete_data">I dati del passaporto / carta d\'identità sono incompleti. Scansiona nuovamente il tuo documento.</string>
     <string name="passport_live_video_model_downloading">Download in corso</string>
 
-    <!-- Passport Consent Screen -->
+    <!-- Passport Credential Issuance Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>
     <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
-    <string name="passport_consent_more_info">Ulteriori informazioni</string>
-    <string name="passport_consent_checkbox">Accetto</string>
-    <string name="passport_consent_reject_button">Rifiuta</string>
-    <string name="passport_consent_consent_button">Acconsenti</string>
     <string name="consent_screen_personal_data_checkbox">Acconsento al trattamento dei miei dati personali da parte [del fornitore dell\'applicazione] al fine di ottenere un\'attestazione di verifica dell\'età. Questo processo richiede la scansione del mio documento d\'identità o passaporto e un video di me stesso per confermare la mia identità. Questi dati verranno elaborati solo sul mio dispositivo e non saranno accessibili [al fornitore dell\'applicazione] o a terze parti. Consultare l\'informativa sulla protezione dei dati per ulteriori informazioni</string>
 
     <!-- Passport verification steps procedures -->
@@ -116,8 +112,6 @@
     <string name="passport_biometrics_unknown_error">Errore sconosciuto durante la scansione del passaporto</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="onboarding_verification_qr_code">Token / Codice QR</string>
-    <string name="onboarding_verification_qr_code_description">Scansiona un codice QR o inserisci un token per ricevere una credenziale di verifica dell\'età da un emittente autorizzato.</string>
     <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>
     <string name="passport_scan_intro_title">Passaporto o Carta d\'identità</string>
     <string name="passport_scan_intro_description">Il metodo passaporto / carta d\'identità è veloce e sicuro! Scatta una foto del tuo passaporto / carta d\'identità, scansiona il tuo passaporto / carta d\'identità e registra un video di te stesso—tre passaggi per un onboarding sicuro.</string>

@@ -106,18 +106,12 @@
     <string name="passport_validation_error_incomplete_data">Die Reisepass / Personalausweis Daten sind unvollständig. Bitte scannen Sie Ihr Dokument erneut.</string>
     <string name="passport_live_video_model_downloading">Wird heruntergeladen</string>
 
-    <!-- Passport Consent Screen -->
+    <!-- Passport Credential Issuance Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>
     <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
-    <string name="passport_consent_more_info">Weitere informationen</string>
-    <string name="passport_consent_checkbox">Ich stimme zu</string>
-    <string name="passport_consent_reject_button">Ablehnen</string>
-    <string name="passport_consent_consent_button">Zustimmen</string>
     <string name="consent_screen_personal_data_checkbox">Ich stimme der Verarbeitung meiner personenbezogenen Daten durch [den Anwendungsanbieter] zu, um eine Altersverifizierungsbescheinigung zu erhalten. Dieser Vorgang erfordert das Scannen meines Ausweises oder Reisepasses und ein Video von mir zur Bestätigung meiner Identität. Diese Daten werden nur auf meinem Gerät verarbeitet und sind weder für [den Anwendungsanbieter] noch für Dritte zugänglich. Weitere Informationen finden Sie in den Datenschutzhinweisen</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="onboarding_verification_qr_code">Token / QR‑Code</string>
-    <string name="onboarding_verification_qr_code_description">Scannen Sie einen QR-Code oder geben Sie ein Token ein, um eine Altersverifizierungsbescheinigung von einem autorisierten Aussteller zu erhalten.</string>
     <string name="passport_scan_intro_enrollment_method">Altersverifizierungsmethode</string>
     <string name="passport_scan_intro_title">Reisepass oder Personalausweis</string>
     <string name="passport_scan_intro_description">Die Reisepass / Personalausweis Methode ist schnell und sicher! Foto Ihres Reisepasses / Personalausweises aufnehmen, Reisepass / Personalausweis scannen und Video von sich selbst aufnehmen—drei Schritte für sicheres Onboarding.</string>
