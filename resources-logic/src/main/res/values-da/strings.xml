@@ -46,16 +46,6 @@
     <string name="onboarding_verification_passport_id_card">Pas eller ID-kort</string>
     <string name="onboarding_verification_passport_id_card_description">Scanner dit pas eller ID-kort til verifikation</string>
 
-    <!-- QR Scan Introduction Screen -->
-    <string name="qr_scan_intro_enrollment_method">Aldersbekræftelse-tilmeldingsmetode</string>
-    <string name="qr_scan_intro_title">Token / QR-kode</string>
-    <string name="qr_scan_intro_description">Token-/QR-kode-metoden er en sikker proces på stedet:</string>
-    <string name="qr_scan_intro_hyperlink">Har du brug for hjælp?</string>
-    <string name="qr_scan_intro_back_button">Tilbage</string>
-    <string name="qr_scan_intro_scan_button">Scan</string>
-    <string name="qr_scan_intro_step_first">Du viser dit ID til en autoriseret person og modtager en QR-kode</string>
-    <string name="qr_scan_intro_step_second">Scan denne QR-kode med din Wallet for at få dit 18+-legitimationsbevis.</string>
-
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scan dit pas / ID-kort</string>
     <string name="passport_identification_description">For dette trin skal du tage MRZ-området (maskinlæsbar zone) nederst på fotosiden af dit pas / ID-kort. Sørg for:</string>
@@ -109,15 +99,9 @@
     <!-- Passport Consent Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>
     <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
-    <string name="passport_consent_more_info">Mere information</string>
-    <string name="passport_consent_checkbox">Jeg accepterer</string>
-    <string name="passport_consent_reject_button">Afvis</string>
-    <string name="passport_consent_consent_button">Accepter</string>
     <string name="consent_screen_personal_data_checkbox">Jeg giver mit samtykke til behandling af mine personoplysninger af [applikationsudbyderen] med det formål at opnå en aldersverifikationserklæring. Denne proces kræver scanning af mit ID eller pas og en video af mig selv for at bekræfte min identitet. Disse data vil kun blive behandlet på min enhed og vil ikke være tilgængelige for [applikationsudbyderen] eller nogen tredjepart. Se databeskyttelsesmeddelelsen for mere information</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="onboarding_verification_qr_code">Token / QR‑kode</string>
-    <string name="onboarding_verification_qr_code_description">Scan en QR-kode eller indtast et token for at modtage en aldersverifikationslegitimation fra en autoriseret udsteder.</string>
     <string name="passport_scan_intro_enrollment_method">Aldersverifikationsmetode</string>
     <string name="passport_scan_intro_title">Pas eller ID-kort</string>
     <string name="passport_scan_intro_description">Pas / ID-kort metoden er hurtig og sikker! Tag et billede af dit pas / ID-kort, scan dit pas / ID-kort og optag en video af dig selv—tre trin for sikker onboarding.</string>
