@@ -46,16 +46,6 @@
     <string name="onboarding_verification_passport_id_card">Pas eller ID-kort</string>
     <string name="onboarding_verification_passport_id_card_description">Scanner dit pas eller ID-kort til verifikation</string>
 
-    <!-- QR Scan Introduction Screen -->
-    <string name="qr_scan_intro_enrollment_method">Aldersbekræftelse-tilmeldingsmetode</string>
-    <string name="qr_scan_intro_title">Token / QR-kode</string>
-    <string name="qr_scan_intro_description">Token-/QR-kode-metoden er en sikker proces på stedet:</string>
-    <string name="qr_scan_intro_hyperlink">Har du brug for hjælp?</string>
-    <string name="qr_scan_intro_back_button">Tilbage</string>
-    <string name="qr_scan_intro_scan_button">Scan</string>
-    <string name="qr_scan_intro_step_first">Du viser dit ID til en autoriseret person og modtager en QR-kode</string>
-    <string name="qr_scan_intro_step_second">Scan denne QR-kode med din Wallet for at få dit 18+-legitimationsbevis.</string>
-
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scan dit pas / ID-kort</string>
     <string name="passport_identification_description">For dette trin skal du tage MRZ-området (maskinlæsbar zone) nederst på fotosiden af dit pas / ID-kort. Sørg for:</string>

@@ -46,16 +46,6 @@
     <string name="onboarding_verification_passport_id_card">Passeport ou Carte d\'identité</string>
     <string name="onboarding_verification_passport_id_card_description">Scannez votre passeport ou carte d\'identité pour la vérification</string>
 
-    <!-- QR Scan Introduction Screen -->
-    <string name="qr_scan_intro_enrollment_method">Méthode denregistrement pour la vérification de lâge</string>
-    <string name="qr_scan_intro_title">Jeton / Code QR</string>
-    <string name="qr_scan_intro_description">La méthode par jeton/code QR est un processus sécurisé sur place :</string>
-    <string name="qr_scan_intro_hyperlink">Besoin daide ?</string>
-    <string name="qr_scan_intro_back_button">Retour</string>
-    <string name="qr_scan_intro_scan_button">Scanner</string>
-    <string name="qr_scan_intro_step_first">Vous montrez votre pièce didentité à une personne autorisée et recevez un code QR</string>
-    <string name="qr_scan_intro_step_second">Scannez ce code QR avec votre portefeuille pour obtenir votre justificatif 18+.</string>
-
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scannez votre passeport / carte d\'identité</string>
     <string name="passport_identification_description">Pour cette étape, capturez la zone MRZ (zone de lecture automatique) en bas de la page photo de votre passeport / carte d\'identité. Assurez-vous :</string>

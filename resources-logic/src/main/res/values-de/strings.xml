@@ -46,16 +46,6 @@
     <string name="onboarding_verification_passport_id_card">Reisepass oder Personalausweis</string>
     <string name="onboarding_verification_passport_id_card_description">Scannen Sie Ihren Reisepass oder Personalausweis zur Verifizierung</string>
 
-    <!-- QR Scan Introduction Screen -->
-    <string name="qr_scan_intro_enrollment_method">Anmeldemethode zur Altersverifikation</string>
-    <string name="qr_scan_intro_title">Token / QR-Code</string>
-    <string name="qr_scan_intro_description">Die Token-/QR-Code-Methode ist ein sicherer Vor-Ort-Prozess:</string>
-    <string name="qr_scan_intro_hyperlink">Brauchen Sie Hilfe?</string>
-    <string name="qr_scan_intro_back_button">Zurück</string>
-    <string name="qr_scan_intro_scan_button">Scannen</string>
-    <string name="qr_scan_intro_step_first">Sie zeigen Ihren Ausweis einer autorisierten Person und erhalten einen QR-Code</string>
-    <string name="qr_scan_intro_step_second">Scannen Sie diesen QR-Code mit Ihrer Wallet, um Ihren 18+-Nachweis zu erhalten.</string>
-
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scannen Sie Ihren Reisepass / Personalausweis</string>
     <string name="passport_identification_description">Für diesen Schritt erfassen Sie den MRZ-Bereich (maschinenlesbare Zone) am unteren Rand der Fotoseite Ihres Reisepasses / Personalausweises. Stellen Sie sicher:</string>

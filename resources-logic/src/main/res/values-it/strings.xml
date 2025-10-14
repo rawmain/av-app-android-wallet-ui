@@ -46,16 +46,6 @@
     <string name="onboarding_verification_passport_id_card">Passaporto o Carta d\'identità</string>
     <string name="onboarding_verification_passport_id_card_description">Scansiona il tuo passaporto o carta d\'identità per la verifica</string>
 
-    <!-- QR Scan Introduction Screen -->
-    <string name="qr_scan_intro_enrollment_method">Metodo di registrazione per la verifica dell\'età</string>
-    <string name="qr_scan_intro_title">Token / Codice QR</string>
-    <string name="qr_scan_intro_description">Il metodo con token/codice QR è un processo sicuro in loco:</string>
-    <string name="qr_scan_intro_hyperlink">Hai bisogno di aiuto?</string>
-    <string name="qr_scan_intro_back_button">Indietro</string>
-    <string name="qr_scan_intro_scan_button">Scansiona</string>
-    <string name="qr_scan_intro_step_first">Mostra il tuo documento a una persona autorizzata e ricevi un codice QR</string>
-    <string name="qr_scan_intro_step_second">Scansiona questo codice QR con il tuo Wallet per ottenere la credenziale 18+.</string>
-
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scansiona il tuo passaporto / carta d\'identità</string>
     <string name="passport_identification_description">Per questo passaggio, cattura l\'area MRZ (zona leggibile dalla macchina) nella parte inferiore della pagina foto del tuo passaporto / carta d\'identità. Assicurati che:</string>
