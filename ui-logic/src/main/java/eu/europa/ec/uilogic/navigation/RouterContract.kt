@@ -44,8 +44,6 @@ sealed class OnboardingScreens {
         name = "PASSPORT_CREDENTIAL_ISSUANCE",
         parameters = "?passportCredentialIssuanceConfig={passportCredentialIssuanceConfig}"
     )
-
-    data object QRScanIntro : Screen(name = "QR_SCAN_INTRO")
 }
 
 sealed class CommonScreens {
