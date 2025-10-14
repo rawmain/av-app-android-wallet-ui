@@ -33,7 +33,6 @@ import eu.europa.ec.onboardingfeature.ui.passport.passportcredentialissuance.Pas
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.PassportIdentificationScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.PassportLiveVideoScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportscanintro.PassportScanIntroScreen
-import eu.europa.ec.onboardingfeature.ui.qrscanintro.QRScanIntroScreen
 import eu.europa.ec.onboardingfeature.ui.welcome.WelcomeScreen
 import eu.europa.ec.uilogic.navigation.ModuleRoute
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
@@ -118,10 +117,6 @@ fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
                         )
                     }
                 ))
-        }
-
-        composable(route = OnboardingScreens.QRScanIntro.screenRoute) {
-            QRScanIntroScreen(navController, koinViewModel())
         }
     }
 }
