@@ -46,16 +46,6 @@
     <string name="onboarding_verification_passport_id_card">Passeport ou Carte d\'identité</string>
     <string name="onboarding_verification_passport_id_card_description">Scannez votre passeport ou carte d\'identité pour la vérification</string>
 
-    <!-- QR Scan Introduction Screen -->
-    <string name="qr_scan_intro_enrollment_method">Méthode denregistrement pour la vérification de lâge</string>
-    <string name="qr_scan_intro_title">Jeton / Code QR</string>
-    <string name="qr_scan_intro_description">La méthode par jeton/code QR est un processus sécurisé sur place :</string>
-    <string name="qr_scan_intro_hyperlink">Besoin daide ?</string>
-    <string name="qr_scan_intro_back_button">Retour</string>
-    <string name="qr_scan_intro_scan_button">Scanner</string>
-    <string name="qr_scan_intro_step_first">Vous montrez votre pièce didentité à une personne autorisée et recevez un code QR</string>
-    <string name="qr_scan_intro_step_second">Scannez ce code QR avec votre portefeuille pour obtenir votre justificatif 18+.</string>
-
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scannez votre passeport / carte d\'identité</string>
     <string name="passport_identification_description">Pour cette étape, capturez la zone MRZ (zone de lecture automatique) en bas de la page photo de votre passeport / carte d\'identité. Assurez-vous :</string>
@@ -104,19 +94,14 @@
     <string name="passport_validation_error_expired">Votre passeport / carte d\'identité a expiré. Veuillez utiliser un document valide.</string>
     <string name="passport_validation_error_underage">Vous devez avoir au moins 18 ans pour continuer.</string>
     <string name="passport_validation_error_incomplete_data">Les données du passeport / carte d\'identité sont incomplètes. Veuillez scanner à nouveau votre document.</string>
+    <string name="passport_live_video_model_downloading">Téléchargement</string>
 
-    <!-- Passport Consent Screen -->
+    <!-- Passport Credential Issuance Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>
     <string name="passport_credential_issuance_description">We are now issuing your proof of age. This might take up to 30 seconds</string>
-    <string name="passport_consent_more_info">Plus d\'informations</string>
-    <string name="passport_consent_checkbox">J\'accepte</string>
-    <string name="passport_consent_reject_button">Refuser</string>
-    <string name="passport_consent_consent_button">Consentir</string>
     <string name="consent_screen_personal_data_checkbox">Je consens au traitement de mes données personnelles par [le fournisseur de l\'application] dans le but d\'obtenir une attestation de vérification d\'âge. Ce processus nécessite la numérisation de ma carte d\'identité ou de mon passeport et une vidéo de moi-même pour confirmer mon identité. Ces données seront traitées uniquement sur mon appareil et ne seront pas accessibles par [le fournisseur de l\'application] ou par un tiers. Consultez l\'avis de protection des données pour plus d\'informations</string>
 
     <!-- Passport Scan Intro Screen -->
-    <string name="onboarding_verification_qr_code">Jeton / Code QR</string>
-    <string name="onboarding_verification_qr_code_description">Scannez un code QR ou saisissez un jeton pour recevoir une attestation de vérification d\'âge d\'un émetteur autorisé.</string>
     <string name="passport_scan_intro_enrollment_method">Méthode de vérification d\'âge</string>
     <string name="passport_scan_intro_title">Passeport ou Carte d\'identité</string>
     <string name="passport_scan_intro_description">La méthode passeport / carte d\'identité est rapide et sécurisée ! Prendre une photo de votre passeport / carte d\'identité, scannez votre passeport / carte d\'identité et enregistrer une vidéo de vous-même—trois étapes pour un onboarding sécurisé.</string>
