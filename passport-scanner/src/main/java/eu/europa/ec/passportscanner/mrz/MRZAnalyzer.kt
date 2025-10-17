@@ -170,7 +170,6 @@ abstract class MRZAnalyzer(
             Log.d("${SmartScannerActivity.TAG}/SmartScanner", "MRZ MLKit: start")
             val image = InputImage.fromBitmap(inputBitmap, inputRot)
             val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-            Log.d("${SmartScannerActivity.TAG}/SmartScanner", "MRZ MLKit TextRecognition: process")
 
             recognizer.process(image)
 
@@ -183,18 +182,16 @@ abstract class MRZAnalyzer(
                     for (i in blocks.indices) {
                         val lines = blocks[i].lines
                         for (j in lines.indices) {
-                            if (lines[j].text.contains('<')) {
-                                rawFullRead += lines[j].text + "\n"
+                            rawFullRead += lines[j].text + "\n"
 
-                                blocks[i].boundingBox?.let { boundingBox ->
-                                    addBoundingBoxToView(
-                                        boundingBox,
-                                        bdParent,
-                                        rotatedBF,
-                                        viewFinder,
-                                        rectGuide
-                                    )
-                                }
+                            blocks[i].boundingBox?.let { boundingBox ->
+                                addBoundingBoxToView(
+                                    boundingBox,
+                                    bdParent,
+                                    rotatedBF,
+                                    viewFinder,
+                                    rectGuide
+                                )
                             }
                         }
                     }
@@ -207,10 +204,7 @@ abstract class MRZAnalyzer(
                         val nlCount = encoded.count { it == '↩' }
                         Log.d(
                             "${SmartScannerActivity.TAG}/SmartScanner",
-                            "Before cleaner: [${
-                                encoded
-
-                            }], with  NL = $nlCount"
+                            "Before cleaner: [${encoded}], with  NL = $nlCount"
                         )
 
                         val cleanMRZ = MRZCleaner.clean(rawFullRead)
