@@ -29,8 +29,8 @@ import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractor
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.PassportCredentialIssuanceInteractor
 import eu.europa.ec.onboardingfeature.interactor.PassportCredentialIssuanceInteractorImpl
-import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractor
-import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractorImpl
+import eu.europa.ec.onboardingfeature.interactor.DocumentIdentificationInteractor
+import eu.europa.ec.onboardingfeature.interactor.DocumentIdentificationInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractorImpl
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
@@ -76,10 +76,10 @@ fun providePassportLiveVideoInteractor(
 )
 
 @Factory
-fun providePassportIdentificationInteractor(
+fun provideDocumentIdentificationInteractor(
     resourceProvider: ResourceProvider,
     logController: LogController,
-): PassportIdentificationInteractor = PassportIdentificationInteractorImpl(
+): DocumentIdentificationInteractor = DocumentIdentificationInteractorImpl(
     resourceProvider,
     logController
 )

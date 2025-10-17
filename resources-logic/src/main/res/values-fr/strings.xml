@@ -75,9 +75,9 @@
     <string name="passport_biometrics_dob">Date de naissance</string>
     <string name="passport_biometrics_doe">Date de expiration</string>
     <string name="passport_biometrics_no_availability">Non disponible</string>
-    <string name="passport_biometrics_no_passport_data">Aucune donnée de passeport reçue</string>
-    <string name="passport_biometrics_scan_cancelled">Analyse du passeport annulée</string>
-    <string name="passport_biometrics_unknown_error">Erreur inconnue lors de l’analyse du passeport</string>
+    <string name="passport_biometrics_no_passport_data">Aucune donnée de document reçue</string>
+    <string name="passport_biometrics_scan_cancelled">Analyse du document annulée</string>
+    <string name="passport_biometrics_unknown_error">Erreur inconnue lors de l\'analyse du document</string>
 
     <!-- Passport live video instructions -->
     <string name="passport_live_video_header">Enregistrez une courte vidéo de vous-même</string>

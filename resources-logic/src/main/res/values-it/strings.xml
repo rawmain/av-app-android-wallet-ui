@@ -97,9 +97,9 @@
     <string name="passport_biometrics_dob">Data di nascita</string>
     <string name="passport_biometrics_doe">Data di scadenza</string>
     <string name="passport_biometrics_no_availability">Non disponibile</string>
-    <string name="passport_biometrics_no_passport_data">Nessun dato del passaporto ricevuto</string>
-    <string name="passport_biometrics_scan_cancelled">Scansione del passaporto annullata</string>
-    <string name="passport_biometrics_unknown_error">Errore sconosciuto durante la scansione del passaporto</string>
+    <string name="passport_biometrics_no_passport_data">Nessun dato del documento ricevuto</string>
+    <string name="passport_biometrics_scan_cancelled">Scansione del documento annullata</string>
+    <string name="passport_biometrics_unknown_error">Errore sconosciuto durante la scansione del documento</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>

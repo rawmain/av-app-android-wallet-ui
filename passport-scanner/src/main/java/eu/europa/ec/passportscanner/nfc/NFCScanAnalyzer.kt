@@ -71,8 +71,8 @@ open class NFCScanAnalyzer(
 
         val data = Intent()
         data.putExtra(SmartScannerActivity.SCANNER_RESULT, Gson().toJson(nfcResult))
-        data.putExtra(ScannerConstants.NFC_DATE_OF_BIRTH, nfcResult.dateOfBirth)
-        data.putExtra(ScannerConstants.NFC_EXPIRY_DATE, nfcResult.dateOfExpiry)
+        data.putExtra(ScannerConstants.DATE_OF_BIRTH, nfcResult.dateOfBirth)
+        data.putExtra(ScannerConstants.EXPIRY_DATE, nfcResult.dateOfExpiry)
 
         activity.setResult(Activity.RESULT_OK, data)
         activity.finish()

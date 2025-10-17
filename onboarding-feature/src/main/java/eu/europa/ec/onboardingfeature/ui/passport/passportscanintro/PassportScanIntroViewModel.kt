@@ -63,7 +63,7 @@ class PassportScanIntroViewModel(
             is Event.OnStartProcedure -> {
                 setEffect {
                     Effect.Navigation.SwitchScreen(
-                        OnboardingScreens.PassportIdentification.screenRoute,
+                        OnboardingScreens.DocumentIdentification.screenRoute,
                         inclusive = false
                     )
                 }

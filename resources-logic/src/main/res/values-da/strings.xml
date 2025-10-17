@@ -75,9 +75,9 @@
     <string name="passport_biometrics_dob">Fødselsdato</string>
     <string name="passport_biometrics_doe">Udløbsdato</string>
     <string name="passport_biometrics_no_availability">Ikke tilgængelig</string>
-    <string name="passport_biometrics_no_passport_data">Ingen pasdata modtaget</string>
-    <string name="passport_biometrics_scan_cancelled">Passcanning blev annulleret</string>
-    <string name="passport_biometrics_unknown_error">Ukendt fejl opstod under passcanning</string>
+    <string name="passport_biometrics_no_passport_data">Ingen dokumentdata modtaget</string>
+    <string name="passport_biometrics_scan_cancelled">Dokumentscanning blev annulleret</string>
+    <string name="passport_biometrics_unknown_error">Ukendt fejl opstod under dokumentscanning</string>
 
     <!-- Passport live video instructions - Danish (da) -->
     <string name="passport_live_video_header">Optag en hurtig video af dig selv</string>

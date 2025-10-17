@@ -75,9 +75,9 @@
     <string name="passport_biometrics_dob">Geburtsdatum</string>
     <string name="passport_biometrics_doe">Ablaufdatum</string>
     <string name="passport_biometrics_no_availability">Nicht verfügbar</string>
-    <string name="passport_biometrics_no_passport_data">Keine Passdaten empfangen</string>
-    <string name="passport_biometrics_scan_cancelled">Pass-Scan wurde abgebrochen</string>
-    <string name="passport_biometrics_unknown_error">Unbekannter Fehler beim Pass-Scan aufgetreten</string>
+    <string name="passport_biometrics_no_passport_data">Keine Dokumentdaten empfangen</string>
+    <string name="passport_biometrics_scan_cancelled">Dokument-Scan wurde abgebrochen</string>
+    <string name="passport_biometrics_unknown_error">Unbekannter Fehler beim Dokument-Scan aufgetreten</string>
 
     <!-- Passport live video instructions - German (de) -->
     <string name="passport_live_video_header">Nehmen Sie ein kurzes Video von sich auf</string>

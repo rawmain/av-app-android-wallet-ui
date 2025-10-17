@@ -19,7 +19,6 @@ package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.onboardingfeature.config.PassportCredentialIssuanceUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
@@ -31,14 +30,13 @@ import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
-import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
-import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
+import java.io.File
 
 private const val TAG = "PassportLiveVideoViewModel"
 
@@ -170,7 +168,8 @@ class PassportLiveVideoViewModel(
                     is FaceMatchPartialState.Success -> {
                         logController.i(TAG) { "Face match successful, navigating to consent screen" }
                         setState { copy(isLoading = false) }
-                        navigateToConsentScreen(config.faceImageTempPath)
+                        deleteTempFile(config.faceImageTempPath)
+                        navigateToNextScreen()
                     }
 
                     is FaceMatchPartialState.Failure -> {
@@ -187,29 +186,34 @@ class PassportLiveVideoViewModel(
         }
     }
 
-    private fun navigateToConsentScreen(faceImageTempPath: String) {
-        logController.i(TAG) { "Building navigation to consent screen" }
-        val screenRoute = generateComposableNavigationLink(
-            screen = OnboardingScreens.PassportCredentialIssuance,
-            arguments = generateComposableArguments(
-                mapOf(
-                    PassportCredentialIssuanceUiConfig.serializedKeyName to uiSerializer.toBase64(
-                        model = PassportCredentialIssuanceUiConfig(
-                            faceImageTempPath = faceImageTempPath
-                        ),
-                        parser = PassportCredentialIssuanceUiConfig.Parser
-                    ).orEmpty()
-                )
-            )
-        )
-        logController.i(TAG) { "Setting navigation effect to screenRoute: $screenRoute" }
+    private fun navigateToNextScreen() {
         setEffect {
             Effect.Navigation.SwitchScreen(
-                screenRoute = screenRoute,
+                screenRoute = OnboardingScreens.IdentityDocumentCredentialIssuance.screenRoute,
                 inclusive = false
             )
         }
     }
+
+
+    private fun deleteTempFile(filePath: String) {
+        try {
+            val file = File(filePath)
+            if (file.exists()) {
+                val deleted = file.delete()
+                if (deleted) {
+                    logController.i(TAG) { "Successfully deleted temp file: $filePath" }
+                } else {
+                    logController.w(TAG) { "Failed to delete temp file: $filePath" }
+                }
+            } else {
+                logController.w(TAG) { "Temp file does not exist: $filePath" }
+            }
+        } catch (e: Exception) {
+            logController.e(TAG) { "Exception while deleting temp file: ${e.message}" }
+        }
+    }
+
 
     private fun showError(errorMessage: String) {
         setState {
