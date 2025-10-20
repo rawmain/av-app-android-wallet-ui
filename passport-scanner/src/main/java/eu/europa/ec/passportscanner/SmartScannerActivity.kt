@@ -55,6 +55,7 @@ import androidx.constraintlayout.widget.Guideline
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
+import eu.europa.ec.passportscanner.mrz.MRZAnalyzer.Companion.GUIDE_HEIGHT_IN_PX
 import eu.europa.ec.passportscanner.nfc.NFCScanAnalyzer
 import eu.europa.ec.passportscanner.scanner.BaseActivity
 import eu.europa.ec.passportscanner.scanner.SmartScannerException
@@ -73,7 +74,6 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         val TAG: String = SmartScannerActivity::class.java.simpleName
         const val SCANNER_OPTIONS = "scanner_options"
         const val SCANNER_RESULT = "scanner_result"
-        val GUIDE_HEIGHT_IN_DP = 90.toPx
     }
 
     private val REQUEST_CODE_PERMISSIONS = 10
@@ -412,7 +412,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                 guideWidth?.layoutParams?.width = width
 
                 //set height
-                val nHeight = GUIDE_HEIGHT_IN_DP
+                val nHeight = GUIDE_HEIGHT_IN_PX
                 rectangleGuide?.layoutParams?.height = nHeight
 
                 //set default position

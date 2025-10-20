@@ -47,6 +47,7 @@ abstract class MRZAnalyzer(
 
     companion object {
         private const val SHOW_DEBUG_BOUNDING_BOXES = true
+        val GUIDE_HEIGHT_IN_PX = 75.toPx
     }
 
     private fun initializeBoundingBoxes(): RelativeLayout? {
@@ -81,8 +82,8 @@ abstract class MRZAnalyzer(
         )
 
         // Calculate offsets for where the MRZ crop area starts in the preview
-        val mrzCropX = (25 - 16).toPx
-        val mrzCropY = (viewFinder.height - 60.toPx - rectGuide.height)
+        val mrzCropX = 9.toPx
+        val mrzCropY = viewFinder.height - rectGuide.height - GUIDE_HEIGHT_IN_PX/4
 
         // Apply offsets to position the boxes correctly in the preview
         scaledRect.offset(mrzCropX, mrzCropY)
