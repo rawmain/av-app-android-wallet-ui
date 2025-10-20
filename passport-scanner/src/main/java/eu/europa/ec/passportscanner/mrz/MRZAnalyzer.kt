@@ -21,6 +21,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
@@ -42,7 +43,6 @@ import java.net.URLEncoder
 abstract class MRZAnalyzer(
     override val activity: Activity,
     override val intent: Intent,
-    private val isShowGuide: Boolean = false
 ) : BaseImageAnalyzer() {
 
     companion object {
@@ -54,7 +54,7 @@ abstract class MRZAnalyzer(
 
         val bdParent = activity.findViewById<RelativeLayout>(R.id.rect_bounding_layout)
 
-        if (bdParent.childCount > 1) {
+        if (bdParent!= null && bdParent.childCount > 1) {
             bdParent.removeAllViews()
         }
 
@@ -62,40 +62,36 @@ abstract class MRZAnalyzer(
     }
 
     private fun calculateAdjustedBoundingBox(
-        boundingBox: android.graphics.Rect,
+        boundingBox: Rect,
         rotatedBF: Bitmap,
         viewFinder: View,
         rectGuide: ImageView
-    ): android.graphics.Rect {
-        if (isShowGuide) {
-            // Scale factors between the cropped MRZ image and preview view
-            val imageToViewRatio = rotatedBF.width.toFloat() / viewFinder.width.toFloat()
-            val scaleX = 1.0f / imageToViewRatio
-            val scaleY = 1.0f / imageToViewRatio
+    ): Rect {
+        // Scale factors between the cropped MRZ image and preview view
+        val imageToViewRatio = rotatedBF.width.toFloat() / viewFinder.width.toFloat()
+        val scaleX = 1.0f / imageToViewRatio
+        val scaleY = 1.0f / imageToViewRatio
 
-            // Scale the bounding box coordinates from cropped image to preview coordinates
-            val scaledRect = android.graphics.Rect(
-                (boundingBox.left * scaleX).toInt(),
-                (boundingBox.top * scaleY).toInt(),
-                (boundingBox.right * scaleX).toInt(),
-                (boundingBox.bottom * scaleY).toInt()
-            )
+        // Scale the bounding box coordinates from cropped image to preview coordinates
+        val scaledRect = Rect(
+            (boundingBox.left * scaleX).toInt(),
+            (boundingBox.top * scaleY).toInt(),
+            (boundingBox.right * scaleX).toInt(),
+            (boundingBox.bottom * scaleY).toInt()
+        )
 
-            // Calculate offsets for where the MRZ crop area starts in the preview
-            val mrzCropX = (25 - 16).toPx
-            val mrzCropY = (viewFinder.height - 30.toPx - rectGuide.height)
+        // Calculate offsets for where the MRZ crop area starts in the preview
+        val mrzCropX = (25 - 16).toPx
+        val mrzCropY = (viewFinder.height - 60.toPx - rectGuide.height)
 
-            // Apply offsets to position the boxes correctly in the preview
-            scaledRect.offset(mrzCropX, mrzCropY)
+        // Apply offsets to position the boxes correctly in the preview
+        scaledRect.offset(mrzCropX, mrzCropY)
 
-            return scaledRect
-        }
-
-        return android.graphics.Rect(boundingBox)
+        return scaledRect
     }
 
     private fun addBoundingBoxToView(
-        boundingBox: android.graphics.Rect,
+        boundingBox: Rect,
         bdParent: RelativeLayout?,
         rotatedBF: Bitmap,
         viewFinder: View,
@@ -122,48 +118,46 @@ abstract class MRZAnalyzer(
 
             val rectGuide = activity.findViewById<ImageView>(R.id.scanner_overlay)
             val viewFinder = activity.findViewById<View>(R.id.view_finder)
-            var inputBitmap = bf
-            var inputRot = rotation
+            var inputBitmap: Bitmap
+            var inputRot: Int
             var rotatedBF = BitmapUtils.rotateImage(bf, rotation)
 
-            if (isShowGuide != null && isShowGuide) {
-                // try to cropped forcefully
+            // try to cropped forcefully
 
-                // Crop preview area
-                val cropHeight = if (rotatedBF.width < viewFinder.width) {
-                    // if preview area larger than analysing image
-                    val koeff = rotatedBF.width.toFloat() / viewFinder!!.width.toFloat()
-                    viewFinder.height.toFloat() * koeff
-                } else {
-                    // if preview area smaller than analysing image
-                    val prc =
-                        100 - (viewFinder.width.toFloat() / (rotatedBF.width.toFloat() / 100f))
-                    viewFinder.height + ((viewFinder.height.toFloat() / 100f) * prc)
-                }
-                val cropTop = (rotatedBF.height / 2) - (cropHeight / 2)
-                rotatedBF = Bitmap.createBitmap(
-                    rotatedBF,
-                    0,
-                    cropTop.toInt(),
-                    rotatedBF.width,
-                    cropHeight.toInt()
-                )
-
-                // Crop MRZ area
-                val imageToViewRatio = rotatedBF.width.toFloat() / viewFinder.width.toFloat()
-                val mrzCropX = (25 - 16).toPx * imageToViewRatio
-                val mrzCropY = (viewFinder.height - 30.toPx - rectGuide.height) * imageToViewRatio
-                val mrzCropWidth = rectGuide.width * imageToViewRatio
-                val mrzCropHeight = rectGuide.height * imageToViewRatio
-                inputBitmap = Bitmap.createBitmap(
-                    rotatedBF,
-                    mrzCropX.toInt(),
-                    mrzCropY.toInt(),
-                    mrzCropWidth.toInt(),
-                    mrzCropHeight.toInt()
-                )
-                inputRot = 0
+            // Crop preview area
+            val cropHeight = if (rotatedBF.width < viewFinder.width) {
+                // if preview area larger than analysing image
+                val koeff = rotatedBF.width.toFloat() / viewFinder!!.width.toFloat()
+                viewFinder.height.toFloat() * koeff
+            } else {
+                // if preview area smaller than analysing image
+                val prc =
+                    100 - (viewFinder.width.toFloat() / (rotatedBF.width.toFloat() / 100f))
+                viewFinder.height + ((viewFinder.height.toFloat() / 100f) * prc)
             }
+            val cropTop = (rotatedBF.height / 2) - (cropHeight / 2)
+            rotatedBF = Bitmap.createBitmap(
+                rotatedBF,
+                0,
+                if (cropTop < 0) 0 else cropTop.toInt(),// fix crash
+                rotatedBF.width,
+                cropHeight.toInt()
+            )
+
+            // Crop MRZ area
+            val imageToViewRatio = rotatedBF.width.toFloat() / viewFinder.width.toFloat()
+            val mrzCropX = (25 - 16).toPx * imageToViewRatio
+            val mrzCropY = (viewFinder.height - 30.toPx - rectGuide.height) * imageToViewRatio
+            val mrzCropWidth = rectGuide.width * imageToViewRatio
+            val mrzCropHeight = rectGuide.height * imageToViewRatio
+            inputBitmap = Bitmap.createBitmap(
+                rotatedBF,
+                mrzCropX.toInt(),
+                mrzCropY.toInt(),
+                mrzCropWidth.toInt(),
+                mrzCropHeight.toInt()
+            )
+            inputRot = 0
 
 
             // Pass image to an ML Kit Vision API

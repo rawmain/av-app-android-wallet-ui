@@ -29,7 +29,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.util.Size
-import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.OrientationEventListener
 import android.view.Surface
@@ -62,12 +61,10 @@ import eu.europa.ec.passportscanner.scanner.SmartScannerException
 import eu.europa.ec.passportscanner.scanner.config.Config
 import eu.europa.ec.passportscanner.scanner.config.Orientation
 import eu.europa.ec.passportscanner.scanner.config.ScannerOptions
-import eu.europa.ec.passportscanner.scanner.config.ScannerSize
 import eu.europa.ec.passportscanner.utils.CameraUtils.isLedFlashAvailable
 import eu.europa.ec.passportscanner.utils.extension.toPx
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.math.roundToInt
 
 
 class SmartScannerActivity : BaseActivity(), OnClickListener {
@@ -76,6 +73,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         val TAG: String = SmartScannerActivity::class.java.simpleName
         const val SCANNER_OPTIONS = "scanner_options"
         const val SCANNER_RESULT = "scanner_result"
+        val GUIDE_HEIGHT_IN_DP = 90.toPx
     }
 
     private val REQUEST_CODE_PERMISSIONS = 10
@@ -150,17 +148,13 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
 
         // Scanner setup from intent
         hideActionBar()
-        if (intent.action == null) {
-            // Use scanner options directly if no scanner type is called
-            val options: ScannerOptions? = intent.getParcelableExtra(SCANNER_OPTIONS)
-            options?.let {
-                Log.d(TAG, "scannerOptions: $it")
-                scannerOptions = options
-            } ?: run {
-                throw SmartScannerException("Please set proper scanner options to be able to use ID PASS Smart Scanner.")
-            }
-        } else {
-            scannerOptions = ScannerOptions.defaultForODK()
+        // Use scanner options directly if no scanner type is called
+        val options: ScannerOptions? = intent.getParcelableExtra(SCANNER_OPTIONS)
+        options?.let {
+            Log.d(TAG, "scannerOptions: $it")
+            scannerOptions = options
+        } ?: run {
+            throw SmartScannerException("Please set proper scanner options to be able to use ID PASS Smart Scanner.")
         }
         config = scannerOptions?.config ?: Config.default
         // Set orientation to PORTRAIT as default
@@ -176,13 +170,9 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
 
     private fun setupConfiguration() {
         runOnUiThread {
-            checkGuideView()
+            showMRZGuide()
 
-            val analyzer = NFCScanAnalyzer(
-                activity = this,
-                intent = intent,
-                isShowGuide = config?.showGuide ?: false
-            )
+            val analyzer = NFCScanAnalyzer(activity = this, intent = intent)
             viewFinder.visibility = VISIBLE
             // Set Analyzer and start camera
             startCamera(analyzer)
@@ -320,22 +310,8 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         val bottomGuideline = findViewById<Guideline>(R.id.bottom)
         // scanner sizes available for Portrait only
         if (orientation == Orientation.PORTRAIT.value) {
-            when (scannerOptions?.scannerSize) {
-                ScannerSize.LARGE.value -> {
-                    bottomGuideline.setGuidelinePercent(0.7F)
-                    topGuideline.setGuidelinePercent(0.25F)
-                }
-
-                ScannerSize.SMALL.value -> {
-                    bottomGuideline.setGuidelinePercent(0.6F)
-                    topGuideline.setGuidelinePercent(0.375F)
-                }
-
-                else -> {
-                    bottomGuideline.setGuidelinePercent(0.625F)
-                    topGuideline.setGuidelinePercent(0.275F)
-                }
-            }
+            bottomGuideline.setGuidelinePercent(0.625F)
+            topGuideline.setGuidelinePercent(0.275F)
         }
         // flash
         flashButton?.visibility = if (isLedFlashAvailable(this)) VISIBLE else GONE
@@ -425,39 +401,18 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         }
     }
 
-    private fun checkGuideView() {
-        if (config?.showGuide == true) {
-            showMRZGuide()
-        } else {
-            guideContainer?.alpha = 0f
-        }
-    }
-
     private fun showMRZGuide() {
         guideContainer?.alpha = 1f
 
         config?.let { conf ->
             viewFinder.post {
-                val width = if (conf.widthGuide == 0) {
-                    //set the default width
-                    (viewFinder.width - 21.toPx)
-                } else {
-                    TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP,
-                        conf.widthGuide.toFloat(),
-                        resources.displayMetrics
-                    ).roundToInt()
-                }
+                val width = viewFinder.width - 21.toPx
 
                 rectangleGuide?.layoutParams?.width = width
                 guideWidth?.layoutParams?.width = width
 
                 //set height
-                val nHeight = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP,
-                    conf.heightGuide.toFloat(),
-                    resources.displayMetrics
-                ).roundToInt()
+                val nHeight = GUIDE_HEIGHT_IN_DP
                 rectangleGuide?.layoutParams?.height = nHeight
 
                 //set default position

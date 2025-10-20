@@ -34,11 +34,7 @@ import eu.europa.ec.passportscanner.parser.types.MrzFormat
 open class NFCScanAnalyzer(
     override val activity: Activity,
     override val intent: Intent,
-    isShowGuide: Boolean = false
-) : MRZAnalyzer(
-    activity, intent,
-    isShowGuide
-) {
+) : MRZAnalyzer(activity, intent) {
 
     override fun processResult(result: String, bitmap: Bitmap, rotation: Int) {
         // Validate the MRZ is parseable (but don't store the parsed result)
@@ -46,11 +42,10 @@ open class NFCScanAnalyzer(
 
         Log.d(SmartScannerActivity.TAG, "Got MRZ result: $mrzRecord")
 
-        when (mrzRecord.format )
-        {
+        when (mrzRecord.format) {
             MrzFormat.PASSPORT -> startNFCScanActivity(result)
             MrzFormat.MRTD_TD1 -> deliverEIDResult(mrzRecord as MrtdTd1)
-            null -> throw MrzParseException("Unrecognized MRZ format", result,null,null)
+            null -> throw MrzParseException("Unrecognized MRZ format", result, null, null)
         }
     }
 

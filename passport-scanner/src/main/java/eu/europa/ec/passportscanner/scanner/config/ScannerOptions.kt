@@ -25,15 +25,6 @@ data class ScannerOptions(
     val config: Config? = null,
     val nfcLocale: String? = null,
     val mrzFormat: String? = null,
-    val scannerSize: String? = null,
     val captureOptions: CaptureOptions? = null,
     val nfcOptions: NFCOptions? = null,
-) : Parcelable {
-    companion object {
-
-        fun defaultForODK() : ScannerOptions = ScannerOptions(
-            nfcOptions = NFCOptions.default,
-            config = Config()
-        )
-    }
-}
+) : Parcelable

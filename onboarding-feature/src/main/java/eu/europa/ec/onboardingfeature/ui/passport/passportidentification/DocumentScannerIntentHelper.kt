@@ -62,7 +62,6 @@ object DocumentScannerIntentHelper {
                     config = Config(
                         header = context.getString(R.string.passport_identification_title),
                         subHeader = context.getString(R.string.passport_capture_subtitle),
-                        showGuide = true,
                     ),
                     captureOptions = CaptureOptions(
                         type = CaptureType.DOCUMENT.value,
