@@ -94,7 +94,7 @@
     <string name="passport_validation_error_expired">Ihr Reisepass / Personalausweis ist abgelaufen. Bitte verwenden Sie ein gültiges Dokument.</string>
     <string name="passport_validation_error_underage">Sie müssen mindestens 18 Jahre alt sein, um fortzufahren.</string>
     <string name="passport_validation_error_incomplete_data">Die Reisepass / Personalausweis Daten sind unvollständig. Bitte scannen Sie Ihr Dokument erneut.</string>
-    <string name="passport_live_video_model_downloading">Wird heruntergeladen</string>
+    <string name="passport_live_video_downloading_progress">Verifizierungsdaten werden heruntergeladen… %d%%</string>
 
     <!-- Passport Credential Issuance Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>
@@ -115,6 +115,7 @@
     <string name="passport_scan_intro_step_3_description">Filmen Sie sich selbst zur Identitätsprüfung.</string>
     <string name="passport_scan_intro_step_4_title">Einverständnis</string>
     <string name="passport_scan_intro_step_5_title">Erhalten Sie Ihren Altersnachweis</string>
+    <string name="passport_scan_intro_data_download_notice">Verifizierung erfordert zusätzliche Daten. Wenn Sie auf Starten tippen, werden ca. 250MB an Dateien für den Gesichtsabgleich heruntergeladen.</string>
     <string name="welcome_page_1">Mit dieser App können Sie Ihre Volljährigkeit sicher nachweisen, wenn Sie auf Dienste zugreifen, die Erwachsenen vorbehalten sind.</string>
     <string name="welcome_page_2">Bestätigen Sie einmal, dass Sie über 18 Jahre alt sind. Nutzen Sie diesen Nachweis, um sicher auf viele Dienste zuzugreifen, die Erwachsenen vorbehalten sind.</string>
     <string name="welcome_page_3">Sie behalten die Kontrolle über Ihre Daten: Nur der Nachweis, dass Sie über 18 Jahre alt sind, wird weitergegeben. Es werden keine weiteren personenbezogenen Daten gespeichert oder an Online-Dienste weitergegeben.</string>

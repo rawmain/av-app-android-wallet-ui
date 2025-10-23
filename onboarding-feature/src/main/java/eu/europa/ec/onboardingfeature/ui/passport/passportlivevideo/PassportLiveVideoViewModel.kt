@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
+import eu.europa.ec.onboardingfeature.interactor.FaceMatchSDKPartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
@@ -32,6 +33,7 @@ import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
@@ -43,9 +45,8 @@ private const val TAG = "PassportLiveVideoViewModel"
 data class State(
     val isLoading: Boolean = false,
     val config: PassportLiveVideoUiConfig? = null,
-    val sdkInitProgress: Int = 0, // 0-100 percentage
-    val sdkInitMessage: String = "",
-    val isSdkInitializing: Boolean = false,
+    val progress: Int = 0, // 0-100 percentage for initialization
+    val isInitializing: Boolean = false,
     val isSdkReady: Boolean = false,
     val error: ContentErrorConfig? = null,
 ) : ViewState
@@ -55,7 +56,6 @@ sealed class Event : ViewEvent {
     data object OnLiveVideoCapture : Event()
     data object OnRetry : Event()
     data class InitializeSdk(val context: Context) : Event()
-    data class UpdateSdkInitProgress(val progress: Int, val message: String) : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -102,14 +102,6 @@ class PassportLiveVideoViewModel(
                 initializeSdk(event.context)
             }
 
-            is Event.UpdateSdkInitProgress -> {
-                setState {
-                    copy(
-                        sdkInitProgress = event.progress,
-                        sdkInitMessage = event.message
-                    )
-                }
-            }
             Event.OnRetry -> {
                 logController.i(tag = TAG) { "Event invoked OnRetry" }
                 setState { copy(error = null) }
@@ -118,34 +110,45 @@ class PassportLiveVideoViewModel(
     }
 
     private fun initializeSdk(context: Context) {
-        setState { copy(isSdkInitializing = true, error = null) }
+        setState { copy(error = null) }
 
         viewModelScope.launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    logController.d(TAG) { "Initializing SDK via interactor..." }
-
-                    val success = passportLiveVideoInteractor.init(context) { progress, message ->
-                        logController.d(TAG) { "Init progress: $progress% - $message" }
-                        setEvent(Event.UpdateSdkInitProgress(progress, message))
-                    }
-
-                    if (success) {
-                        setState {
-                            copy(
-                                isSdkInitializing = false,
-                                isSdkReady = true
-                            )
+            passportLiveVideoInteractor.initFaceMatchSDK(context).collectLatest { initState ->
+                withContext(Dispatchers.Main) {
+                    when (initState) {
+                        is FaceMatchSDKPartialState.NotInitialized -> {
+                            logController.d(TAG) { "SDK not initialized" }
+                            setState { copy(isInitializing = false, progress = 0) }
                         }
-                    } else {
-                        setState { copy(isSdkInitializing = false) }
-                        setEffect { Effect.Failure("SDK initialization failed") }
+
+                        is FaceMatchSDKPartialState.Preparing -> {
+                            logController.d(TAG) { "Preparing models: ${initState.progress}%" }
+                            setState { copy(isInitializing = true, progress = initState.progress) }
+                        }
+
+                        is FaceMatchSDKPartialState.Initializing -> {
+                            logController.d(TAG) { "Initializing SDK" }
+                            setState { copy(isInitializing = true, progress = 100) }
+                        }
+
+                        is FaceMatchSDKPartialState.Ready -> {
+                            logController.i(TAG) { "SDK ready" }
+                            setState {
+                                copy(
+                                    isInitializing = false,
+                                    isSdkReady = true,
+                                    progress = 100
+                                )
+                            }
+                        }
+
+                        is FaceMatchSDKPartialState.Error -> {
+                            logController.e(TAG) { "SDK initialization error: ${initState.message}" }
+                            setState { copy(isInitializing = false, progress = 0) }
+                            showError(initState.message)
+                        }
                     }
                 }
-            } catch (e: Exception) {
-                logController.e(TAG) { "Exception during SDK initialization: ${e.javaClass.simpleName}: ${e.message}" }
-                setState { copy(isSdkInitializing = false) }
-                setEffect { Effect.Failure("Failed to initialize SDK: ${e.message}") }
             }
         }
     }
@@ -200,14 +203,7 @@ class PassportLiveVideoViewModel(
         try {
             val file = File(filePath)
             if (file.exists()) {
-                val deleted = file.delete()
-                if (deleted) {
-                    logController.i(TAG) { "Successfully deleted temp file: $filePath" }
-                } else {
-                    logController.w(TAG) { "Failed to delete temp file: $filePath" }
-                }
-            } else {
-                logController.w(TAG) { "Temp file does not exist: $filePath" }
+                file.delete()
             }
         } catch (e: Exception) {
             logController.e(TAG) { "Exception while deleting temp file: ${e.message}" }
