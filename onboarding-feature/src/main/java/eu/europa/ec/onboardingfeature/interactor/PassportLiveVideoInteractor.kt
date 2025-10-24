@@ -20,10 +20,21 @@ import android.content.Context
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchResult
+import eu.europa.ec.passportscanner.face.SdkInitStatus
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 private const val TAG = "PassportLiveVideoInteractor"
+
+sealed class FaceMatchSDKPartialState {
+    data object NotInitialized : FaceMatchSDKPartialState()
+    data class Preparing(val progress: Int) : FaceMatchSDKPartialState()
+    data object Initializing : FaceMatchSDKPartialState()
+    data object Ready : FaceMatchSDKPartialState()
+    data class Error(val message: String) : FaceMatchSDKPartialState()
+}
 
 sealed class FaceMatchPartialState {
     data object Success : FaceMatchPartialState()
@@ -31,7 +42,7 @@ sealed class FaceMatchPartialState {
 }
 
 interface PassportLiveVideoInteractor {
-    suspend fun init(context: Context, onProgress: ((Int, String) -> Unit)? = null): Boolean
+    fun initFaceMatchSDK(context: Context): Flow<FaceMatchSDKPartialState>
     suspend fun captureAndMatchFace(faceImageTempPath: String): FaceMatchPartialState
 }
 
@@ -41,41 +52,40 @@ class PassportLiveVideoInteractorImpl(
     private val logController: LogController,
 ) : PassportLiveVideoInteractor {
 
-    private var sdkInitialized = false
+    override fun initFaceMatchSDK(context: Context): Flow<FaceMatchSDKPartialState> {
+        logController.d(TAG) { "Initializing face match SDK..." }
 
-    override suspend fun init(context: Context, onProgress: ((Int, String) -> Unit)?): Boolean {
-        if (sdkInitialized) {
-            logController.d(TAG) { "SDK already initialized" }
-            return true
-        }
+        return faceMatchController.init(context).map { sdkStatus ->
+            when (sdkStatus) {
+                is SdkInitStatus.NotInitialized -> {
+                    logController.d(TAG) { "SDK not initialized" }
+                    FaceMatchSDKPartialState.NotInitialized
+                }
 
-        logController.d(TAG) { "Initializing SDK in interactor..." }
+                is SdkInitStatus.Preparing -> {
+                    logController.d(TAG) { "SDK preparing models: ${sdkStatus.progress}%" }
+                    FaceMatchSDKPartialState.Preparing(sdkStatus.progress)
+                }
 
-        return try {
-            val success = faceMatchController.init(context, onProgress)
+                is SdkInitStatus.Initializing -> {
+                    logController.d(TAG) { "SDK initializing" }
+                    FaceMatchSDKPartialState.Initializing
+                }
 
-            if (success) {
-                sdkInitialized = true
-                logController.i(TAG) { "SDK initialization complete" }
-                true
-            } else {
-                logController.e(TAG) { "SDK initialization failed" }
-                false
+                is SdkInitStatus.Ready -> {
+                    logController.i(TAG) { "SDK ready" }
+                    FaceMatchSDKPartialState.Ready
+                }
+
+                is SdkInitStatus.Error -> {
+                    logController.e(TAG) { "SDK error: ${sdkStatus.message}" }
+                    FaceMatchSDKPartialState.Error(sdkStatus.message)
+                }
             }
-        } catch (e: Exception) {
-            logController.e(TAG) { "Exception during SDK initialization: ${e.message}" }
-            false
         }
     }
 
     override suspend fun captureAndMatchFace(faceImageTempPath: String): FaceMatchPartialState {
-        if (!sdkInitialized) {
-            logController.e(TAG) { "SDK not initialized" }
-            return FaceMatchPartialState.Failure(
-                resourceProvider.getString(R.string.generic_error_retry)
-            )
-        }
-
         logController.d(TAG) { "Starting face capture and match using image: $faceImageTempPath" }
 
         val matchResult: FaceMatchResult = try {

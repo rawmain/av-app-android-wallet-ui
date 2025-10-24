@@ -24,6 +24,18 @@ import eu.europa.ec.eudi.wallet.document.CreateDocumentSettings.CredentialPolicy
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import java.time.Duration
 
+/**
+ * Configuration for Face Match SDK used in passport verification
+ */
+data class FaceMatchConfig(
+    val faceDetectorModel: String,
+    val embeddingExtractorModel: String,
+    val livenessModel0: String,
+    val livenessModel1: String,
+    val livenessThreshold: Double,
+    val matchingThreshold: Double,
+)
+
 interface WalletCoreConfig {
 
 
@@ -182,4 +194,14 @@ interface WalletCoreConfig {
      */
     val passportScanningIssuerConfig: OpenId4VciManager.Config?
         get() = null
+
+    /**
+     * Configuration for the face match SDK used in passport verification.
+     *
+     * This configuration defines the model files (local assets or remote URLs) and thresholds
+     * used for face liveness detection and matching during passport verification.
+     *
+     * @return The FaceMatchConfig with model paths and thresholds
+     */
+    val faceMatchConfig: FaceMatchConfig
 }

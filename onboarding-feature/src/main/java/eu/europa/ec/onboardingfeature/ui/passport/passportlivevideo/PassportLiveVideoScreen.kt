@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -67,7 +67,7 @@ fun PassportLiveVideoScreen(
     }
 
     ContentScreen(
-        isLoading = state.isLoading || state.isSdkInitializing,
+        isLoading = state.isLoading || state.isInitializing,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.OnBackPressed) },
         contentErrorConfig = state.error,
@@ -82,9 +82,8 @@ fun PassportLiveVideoScreen(
     ) { paddingValues ->
         Content(
             paddingValues = paddingValues,
-            sdkInitProgress = state.sdkInitProgress,
-            sdkInitMessage = state.sdkInitMessage,
-            isSdkInitializing = state.isSdkInitializing
+            progress = state.progress,
+            isInitializing = state.isInitializing
         )
     }
 
@@ -158,9 +157,8 @@ private fun ActionButtons(
 @Composable
 private fun Content(
     paddingValues: PaddingValues,
-    sdkInitProgress: Int = 0,
-    sdkInitMessage: String = "",
-    isSdkInitializing: Boolean = false
+    progress: Int = 0,
+    isInitializing: Boolean = false,
 ) {
 
     Column(
@@ -202,39 +200,25 @@ private fun Content(
             )
         )
 
-        if (isSdkInitializing && sdkInitProgress > 0) {
-            DownloadProgress(
-                progress = sdkInitProgress,
-                message = sdkInitMessage
-            )
+        if (isInitializing && progress > 0) {
+            DownloadProgress(progress = progress)
         }
     }
 }
 
 @Composable
-private fun DownloadProgress(
-    progress: Int,
-    message: String
-) {
+private fun DownloadProgress(progress: Int) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         VSpacer.Large()
         WrapText(
-            text = stringResource(R.string.passport_live_video_model_downloading) + message,
+            text = stringResource(R.string.passport_live_video_downloading_progress, progress),
             textConfig = TextConfig(
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Medium
                 ),
                 color = MaterialTheme.colorScheme.primary
-            )
-        )
-        VSpacer.Small()
-        WrapText(
-            text = "$progress%",
-            textConfig = TextConfig(
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
     }
@@ -259,9 +243,8 @@ private fun PassportLiveVideoScreenPreview() {
         ) { paddingValues ->
             Content(
                 paddingValues = paddingValues,
-                sdkInitProgress = 45,
-                sdkInitMessage = "Downloading model... 120 / 260 MB",
-                isSdkInitializing = true
+                progress = 45,
+                isInitializing = true
             )
         }
     }

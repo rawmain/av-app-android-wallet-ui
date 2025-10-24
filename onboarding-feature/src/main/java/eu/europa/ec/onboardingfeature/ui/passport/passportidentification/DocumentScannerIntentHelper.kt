@@ -28,14 +28,26 @@ import eu.europa.ec.passportscanner.scanner.config.Config
 import eu.europa.ec.passportscanner.scanner.config.ScannerOptions
 import eu.europa.ec.passportscanner.utils.ImageUtils
 import eu.europa.ec.resourceslogic.R
+import java.io.ByteArrayInputStream
 
-data class PassportData(
-    val dateOfBirth: String?,
-    val expiryDate: String?,
-    val faceImage: Bitmap?
-)
+sealed class ScannedDocument(open val dateOfBirth: String?,
+                             open  val expiryDate: String?,) {
+    data class Passport(
+        override val dateOfBirth: String?,
+        override val expiryDate: String?,
+        val faceImage: Bitmap?,
+    ) : ScannedDocument(
+        dateOfBirth = dateOfBirth,
+        expiryDate = expiryDate
+    )
 
-object PassportScannerIntentHelper {
+    data class EID(override val dateOfBirth: String?, override val expiryDate: String?) : ScannedDocument(
+        dateOfBirth = dateOfBirth,
+        expiryDate = expiryDate
+    )
+}
+
+object DocumentScannerIntentHelper {
 
     /**
      * Creates an MRZ scanner intent with the appropriate configuration
@@ -50,7 +62,6 @@ object PassportScannerIntentHelper {
                     config = Config(
                         header = context.getString(R.string.passport_identification_title),
                         subHeader = context.getString(R.string.passport_capture_subtitle),
-                        showGuide = true,
                     ),
                     captureOptions = CaptureOptions(
                         type = CaptureType.DOCUMENT.value,
@@ -60,59 +71,72 @@ object PassportScannerIntentHelper {
                 )
             )
         }
+    
+    fun extractScannedDocumentFromIntent(intent: Intent): ScannedDocument {
+        val dateOfBirth = intent.getStringExtra(ScannerConstants.DATE_OF_BIRTH)
+        val expiryDate = intent.getStringExtra(ScannerConstants.EXPIRY_DATE)
+        val isPassport = intent.getBooleanExtra(ScannerConstants.IS_PASSPORT, false)
 
-    /**
-     * Extracts passport data from Intent extras
-     * @param intent The intent containing passport scan results
-     * @return PassportData object with extracted information
-     */
-    fun extractPassportDataFromIntent(intent: Intent): PassportData {
-        val dateOfBirth = intent.getStringExtra(ScannerConstants.NFC_DATE_OF_BIRTH)
-        val expiryDate = intent.getStringExtra(ScannerConstants.NFC_EXPIRY_DATE)
+        Log.d("DocumentScan", "Extracted from Intent extras:")
+        Log.d("DocumentScan", "dateOfBirth: $dateOfBirth")
+        Log.d("DocumentScan", "expiryDate: $expiryDate")
 
-        Log.d("PassportScan", "Extracting from Intent extras:")
-        Log.d("PassportScan", "dateOfBirth: $dateOfBirth")
-        Log.d("PassportScan", "expiryDate: $expiryDate")
-
-        // Extract raw image data
-        val faceImageBytes = intent.getByteArrayExtra(ScannerConstants.NFC_FACE_IMAGE)
-        val mimeType = intent.getStringExtra(ScannerConstants.NFC_FACE_IMAGE_MIME_TYPE)
-        val imageLength = intent.getIntExtra(ScannerConstants.NFC_FACE_IMAGE_LENGTH, 0)
-
-        Log.d("PassportScan", "faceImageBytes: ${faceImageBytes?.size} bytes")
-        Log.d("PassportScan", "mimeType: $mimeType")
-        Log.d("PassportScan", "imageLength: $imageLength")
-
-        val faceImage = if (faceImageBytes != null && mimeType != null && imageLength > 0) {
-            Log.d("PassportScan", "Converting raw image bytes to bitmap...")
-            convertRawImageBytesToBitmap(faceImageBytes, mimeType, imageLength)
-        } else {
-            Log.w("PassportScan", "Missing face image data - bytes: ${faceImageBytes != null}, mime: $mimeType, length: $imageLength")
-            null
+        if (!isPassport) {
+            return ScannedDocument.EID(
+                dateOfBirth = dateOfBirth,
+                expiryDate = expiryDate
+            )
         }
 
-        Log.d("PassportScan", "faceImage result: ${if (faceImage != null) "Available (${faceImage.width}x${faceImage.height})" else "null"}")
+        val faceImage = extractImageAsBitmap(intent)
 
-        return PassportData(
+        return ScannedDocument.Passport(
             dateOfBirth = dateOfBirth,
             expiryDate = expiryDate,
             faceImage = faceImage
         )
     }
 
+    private fun extractImageAsBitmap(intent: Intent): Bitmap? {
+        val faceImageBytes = intent.getByteArrayExtra(ScannerConstants.NFC_FACE_IMAGE)
+        val mimeType = intent.getStringExtra(ScannerConstants.NFC_FACE_IMAGE_MIME_TYPE)
+        val imageLength = intent.getIntExtra(ScannerConstants.NFC_FACE_IMAGE_LENGTH, 0)
+
+        Log.d("DocumentScan", "faceImageBytes: ${faceImageBytes?.size} bytes")
+        Log.d("DocumentScan", "mimeType: $mimeType")
+        Log.d("DocumentScan", "imageLength: $imageLength")
+
+        val faceImage = if (faceImageBytes != null && mimeType != null && imageLength > 0) {
+            Log.d("DocumentScan", "Converting raw image bytes to bitmap...")
+            convertRawImageBytesToBitmap(faceImageBytes, mimeType, imageLength)
+        } else {
+            Log.w(
+                "DocumentScan",
+                "Missing face image data - bytes: ${faceImageBytes != null}, mime: $mimeType, length: $imageLength"
+            )
+            null
+        }
+
+        Log.d(
+            "DocumentScan",
+            "faceImage result: ${if (faceImage != null) "Available (${faceImage.width}x${faceImage.height})" else "null"}"
+        )
+        return faceImage
+    }
+
     private fun convertRawImageBytesToBitmap(imageBytes: ByteArray, mimeType: String, imageLength: Int): Bitmap? {
         return try {
-            Log.d("PassportScan", "Decoding image - mimeType: $mimeType, length: $imageLength, actual bytes: ${imageBytes.size}")
+            Log.d("DocumentScan", "Decoding image - mimeType: $mimeType, length: $imageLength, actual bytes: ${imageBytes.size}")
 
-            val inputStream = java.io.ByteArrayInputStream(imageBytes, 0, imageLength)
-            Log.d("PassportScan", "Using ImageUtils.decodeImage for format: $mimeType")
+            val inputStream = ByteArrayInputStream(imageBytes, 0, imageLength)
+            Log.d("DocumentScan", "Using ImageUtils.decodeImage for format: $mimeType")
 
             val bitmap = ImageUtils.decodeImage(inputStream, imageLength, mimeType)
 
-            Log.d("PassportScan", "Decoded bitmap: ${bitmap.width}x${bitmap.height}")
+            Log.d("DocumentScan", "Decoded bitmap: ${bitmap.width}x${bitmap.height}")
             bitmap
         } catch (e: Exception) {
-            Log.e("PassportScan", "Failed to decode face image from raw compressed bytes", e)
+            Log.e("DocumentScan", "Failed to decode face image from raw compressed bytes", e)
             null
         }
     }
