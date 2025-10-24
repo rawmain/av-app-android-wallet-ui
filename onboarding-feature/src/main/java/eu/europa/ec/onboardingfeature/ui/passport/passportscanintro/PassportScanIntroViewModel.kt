@@ -16,14 +16,16 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportscanintro
 
+import android.content.Context
+import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.resourceslogic.provider.ResourceProvider
+import eu.europa.ec.onboardingfeature.interactor.PassportScanIntroInteractor
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
-import eu.europa.ec.uilogic.serializer.UiSerializer
+import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
 private const val TAG = "PassportScanIntroViewModel"
@@ -35,7 +37,7 @@ data class State(
 sealed class Event : ViewEvent {
     data object Init : Event()
     data object OnBackPressed : Event()
-    data object OnStartProcedure : Event()
+    data class OnStartProcedure(val context: Context) : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -47,9 +49,8 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class PassportScanIntroViewModel(
-    private val resourceProvider: ResourceProvider,
-    private val uiSerializer: UiSerializer,
-    private val logController: LogController
+    private val logController: LogController,
+    private val passportScanIntroInteractor: PassportScanIntroInteractor,
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State = State()
@@ -61,9 +62,13 @@ class PassportScanIntroViewModel(
             is Event.OnBackPressed -> setEffect { Effect.Navigation.GoBack }
 
             is Event.OnStartProcedure -> {
+                viewModelScope.launch {
+                    passportScanIntroInteractor.init(event.context)
+                }
+
                 setEffect {
                     Effect.Navigation.SwitchScreen(
-                        OnboardingScreens.PassportIdentification.screenRoute,
+                        OnboardingScreens.DocumentIdentification.screenRoute,
                         inclusive = false
                     )
                 }

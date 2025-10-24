@@ -210,4 +210,14 @@ sealed interface KoverExclusionRules {
                 "eu.europa.ec.landingfeature.ui.scanner.component",
             )
     }
+
+    object PassportScanner : LogicModule {
+        override val classes: List<String>
+            get() = commonClasses
+
+        override val packages: List<String>
+            get() = commonPackages + listOf(
+                "eu.europa.ec.passportscanner"
+            )
+    }
 }

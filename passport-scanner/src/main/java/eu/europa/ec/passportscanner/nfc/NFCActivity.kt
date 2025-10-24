@@ -32,6 +32,7 @@ import com.google.gson.Gson
 import eu.europa.ec.passportscanner.R
 import eu.europa.ec.passportscanner.SmartScannerActivity
 import eu.europa.ec.passportscanner.api.ScannerConstants
+import eu.europa.ec.passportscanner.api.ScannerConstants.IS_PASSPORT
 import eu.europa.ec.passportscanner.nfc.passport.Passport
 import org.jmrtd.lds.icao.MRZInfo
 
@@ -168,8 +169,9 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
         } ?: run {
             Log.w(TAG, "No rawFaceImageData found in passport")
         }
-        data.putExtra(ScannerConstants.NFC_EXPIRY_DATE, nfcResult.dateOfExpiry)
-        data.putExtra(ScannerConstants.NFC_DATE_OF_BIRTH, nfcResult.dateOfBirth)
+        data.putExtra(ScannerConstants.EXPIRY_DATE, nfcResult.dateOfExpiry)
+        data.putExtra(ScannerConstants.DATE_OF_BIRTH, nfcResult.dateOfBirth)
+        data.putExtra(IS_PASSPORT, true)
 
         setResult(RESULT_OK, data)
         finish()

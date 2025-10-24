@@ -25,19 +25,22 @@ import eu.europa.ec.onboardingfeature.controller.FaceMatchController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchControllerImpl
 import eu.europa.ec.onboardingfeature.interactor.ConsentInteractor
 import eu.europa.ec.onboardingfeature.interactor.ConsentInteractorImpl
+import eu.europa.ec.onboardingfeature.interactor.DocumentIdentificationInteractor
+import eu.europa.ec.onboardingfeature.interactor.DocumentIdentificationInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractor
 import eu.europa.ec.onboardingfeature.interactor.EnrollmentInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.PassportCredentialIssuanceInteractor
 import eu.europa.ec.onboardingfeature.interactor.PassportCredentialIssuanceInteractorImpl
-import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractor
-import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractorImpl
+import eu.europa.ec.onboardingfeature.interactor.PassportScanIntroInteractor
+import eu.europa.ec.onboardingfeature.interactor.PassportScanIntroInteractorImpl
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
+import org.koin.core.annotation.Single
 
 @Module
 @ComponentScan("eu.europa.ec.onboardingfeature")
@@ -61,8 +64,20 @@ fun provideEnrollmentInteractor(
     walletCoreConfig
 )
 
+@Single
+fun provideFaceMatchController(
+    walletCoreConfig: WalletCoreConfig,
+    logController: LogController,
+): FaceMatchController = FaceMatchControllerImpl(walletCoreConfig, logController)
+
 @Factory
-fun provideFaceMatchController(): FaceMatchController = FaceMatchControllerImpl()
+fun providePassportScanIntroInteractor(
+    faceMatchController: FaceMatchController,
+    logController: LogController,
+): PassportScanIntroInteractor = PassportScanIntroInteractorImpl(
+    faceMatchController,
+    logController
+)
 
 @Factory
 fun providePassportLiveVideoInteractor(
@@ -76,10 +91,10 @@ fun providePassportLiveVideoInteractor(
 )
 
 @Factory
-fun providePassportIdentificationInteractor(
+fun provideDocumentIdentificationInteractor(
     resourceProvider: ResourceProvider,
     logController: LogController,
-): PassportIdentificationInteractor = PassportIdentificationInteractorImpl(
+): DocumentIdentificationInteractor = DocumentIdentificationInteractorImpl(
     resourceProvider,
     logController
 )

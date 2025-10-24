@@ -66,6 +66,7 @@
     <string name="passport_scan_intro_step_3_description">Film yourself for identity verification.</string>
     <string name="passport_scan_intro_step_4_title">Consent</string>
     <string name="passport_scan_intro_step_5_title">Receive your proof of age</string>
+    <string name="passport_scan_intro_data_download_notice">Verification requires additional data. When you tap Start, approximately 250MB of assets will be downloaded for face matching.</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="passport_identification_title">Scan your passport / ID card</string>
@@ -98,9 +99,9 @@
     <string name="passport_biometrics_dob">Date of birth</string>
     <string name="passport_biometrics_doe">Date of expiry</string>
     <string name="passport_biometrics_no_availability">Not available</string>
-    <string name="passport_biometrics_no_passport_data">No passport data received</string>
-    <string name="passport_biometrics_scan_cancelled">Passport scan was cancelled</string>
-    <string name="passport_biometrics_unknown_error">Unknown error occurred during passport scan</string>
+    <string name="passport_biometrics_no_passport_data">No document data received</string>
+    <string name="passport_biometrics_scan_cancelled">Document scan was cancelled</string>
+    <string name="passport_biometrics_unknown_error">Unknown error occurred during document scan</string>
 
     <!-- Passport live video instructions -->
     <string name="passport_live_video_header">Record a quick video of yourself</string>
@@ -117,7 +118,7 @@
     <string name="passport_validation_error_expired">Your passport / ID card has expired. Please use a valid document.</string>
     <string name="passport_validation_error_underage">You must be at least 18 years old to proceed.</string>
     <string name="passport_validation_error_incomplete_data">Passport / ID card data is incomplete. Please scan your document again.</string>
-    <string name="passport_live_video_model_downloading">Downloading</string>
+    <string name="passport_live_video_downloading_progress">Downloading verification assets… %d%%</string>
 
     <!-- Passport Credential Issuance Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>
