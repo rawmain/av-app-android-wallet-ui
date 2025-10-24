@@ -26,16 +26,8 @@ package eu.europa.ec.passportscanner.face
 
 import android.content.Context
 import android.content.Intent
-import eu.europa.ec.businesslogic.controller.log.LogController
+import android.util.Log
 import kl.open.fmandroid.NativeBridge
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.File
 
@@ -43,19 +35,9 @@ import java.io.File
  * Implementation of AVFaceMatchSDK for passport face verification
  * Integrates with native face matching library for liveness detection and face comparison
  */
-class AVFaceMatchSdkImpl(
-    private val context: Context,
-    private val logController: LogController,
-) : AVFaceMatchSDK {
+class AVFaceMatchSdkImpl(private val context: Context) : AVFaceMatchSDK {
 
-    private val sdkScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val modelDownloader = ModelDownloader(context, logController)
-    private var modelsPrepared = false
-    private var sdkInitialized = false
-    private val embeddingOutputFilename = "embedding.onnx"
-
-    private val _initStatus = MutableStateFlow<SdkInitStatus>(SdkInitStatus.NotInitialized)
-    private val initStatusFlow: StateFlow<SdkInitStatus> = _initStatus.asStateFlow()
+    private val modelDownloader = ModelDownloader(context)
 
     companion object {
         private const val TAG = "AVFaceMatchSdk"
@@ -65,126 +47,62 @@ class AVFaceMatchSdkImpl(
         }
     }
 
-    override fun init(
-        config: FaceMatchConfig,
-        context: Context,
-    ): Flow<SdkInitStatus> {
-        // Check if already initialized or in progress
-        when (_initStatus.value) {
-            is SdkInitStatus.Ready -> {
-                logController.d(TAG) { "init: SDK already initialized, returning existing flow" }
-                return initStatusFlow
-            }
+    override suspend fun init(onProgress: ((Int, String) -> Unit)?): Boolean {
+        Log.d(TAG, "init: Starting SDK initialization")
 
-            is SdkInitStatus.Preparing, is SdkInitStatus.Initializing -> {
-                logController.d(TAG) { "init: Initialization already in progress, returning existing flow" }
-                return initStatusFlow
-            }
-
-            is SdkInitStatus.Error, is SdkInitStatus.NotInitialized -> {
-                // Continue with initialization
-                logController.d(TAG) { "init: Starting SDK initialization" }
-            }
-        }
-
-        // Launch initialization in background
-        sdkScope.launch {
-            performInitialization(config, context)
-        }
-
-        return initStatusFlow
-    }
-
-    private suspend fun performInitialization(config: FaceMatchConfig, context: Context) {
         val modelBasePath = context.filesDir.absolutePath
+        Log.d(TAG, "init: Model base path: $modelBasePath")
 
-        try {
-            // Prepare models if not already prepared
-            if (!modelsPrepared) {
-                logController.d(TAG) { "init: Preparing models..." }
-
-                // Prepare small models instantly (no progress updates)
-                modelDownloader.prepareModel(config.livenessModel0, modelBasePath)
-                    ?: return failWithError("Failed to prepare liveness model 0")
-
-                modelDownloader.prepareModel(config.livenessModel1, modelBasePath)
-                    ?: return failWithError("Failed to prepare liveness model 1")
-
-                modelDownloader.prepareModel(config.faceDetectorModel, modelBasePath)
-                    ?: return failWithError("Failed to prepare face detector model")
-
-                // Embedding model might be a URL - only this shows progress
-                val embeddingResult = if (config.embeddingExtractorModel.startsWith("http://") ||
-                    config.embeddingExtractorModel.startsWith("https://")
-                ) {
-                    modelDownloader.prepareModel(
-                        config.embeddingExtractorModel,
-                        modelBasePath,
-                        embeddingOutputFilename
-                    ) { progress ->
-                        _initStatus.value = SdkInitStatus.Preparing(progress)
-                    }
-                } else {
-                    modelDownloader.prepareModel(config.embeddingExtractorModel, modelBasePath)
-                }
-
-                if (embeddingResult == null) {
-                    return failWithError("Failed to prepare embedding extractor model")
-                }
-
-                modelsPrepared = true
-                logController.d(TAG) { "init: Model preparation succeeded" }
-            }
-
-            // Initialize native SDK
-            _initStatus.value = SdkInitStatus.Initializing
-            logController.d(TAG) { "init: Initializing native SDK..." }
-
-            // Build config JSON from FaceMatchConfig
-            val configJson = JSONObject().apply {
-                put("face_detector_model", config.faceDetectorModel)
-                put("liveness_model0", config.livenessModel0)
-                put("liveness_model1", config.livenessModel1)
-                put("liveness_threshold", config.livenessThreshold)
-                put("matching_threshold", config.matchingThreshold)
-
-                // Use local filename for embedding model if it was downloaded from URL
-                if (config.embeddingExtractorModel.startsWith("http://") ||
-                    config.embeddingExtractorModel.startsWith("https://")
-                ) {
-                    put("embedding_extractor_model", embeddingOutputFilename)
-                } else {
-                    put("embedding_extractor_model", config.embeddingExtractorModel)
-                }
-            }
-
-            logController.d(TAG) { "init: Calling native initialization..." }
-            val result = NativeBridge.safeInit(configJson.toString(), modelBasePath)
-            logController.d(TAG) { "init: Native initialization result: $result" }
-
-            if (result) {
-                sdkInitialized = true
-                _initStatus.value = SdkInitStatus.Ready
-                logController.i(TAG) { "init: SDK initialization completed successfully" }
-            } else {
-                failWithError("Native SDK initialization failed. Check that all model files are valid and compatible.")
-            }
+        // Load config from assets
+        Log.d(TAG, "init: Loading config from assets...")
+        val configJson = try {
+            context.assets.open("keyless_config.json").bufferedReader().use { it.readText() }
         } catch (e: Exception) {
-            logController.e(TAG) { "init: Exception during initialization: ${e.message}" }
-            failWithError("Initialization failed: ${e.message}")
+            Log.e(TAG, "init: Failed to load config from assets", e)
+            return false
         }
-    }
+        Log.d(TAG, "init: Config loaded: ${configJson.take(100)}...")
 
-    private fun failWithError(message: String) {
-        _initStatus.value = SdkInitStatus.Error(message)
+        val parsedConfig = JSONObject(configJson)
+
+        // Extract model file names/URLs from configuration
+        val livenessModel0 = parsedConfig.optString("liveness_model0")
+        val livenessModel1 = parsedConfig.optString("liveness_model1")
+        val faceDetectorModel = parsedConfig.optString("face_detector_model")
+        val embeddingModel = parsedConfig.optString("embedding_extractor_model")
+
+        Log.d(TAG, "init: Models - liveness0: $livenessModel0, liveness1: $livenessModel1, faceDetector: $faceDetectorModel, embedding: $embeddingModel")
+        val embeddingOutputFilename = "embedding.onnx"
+
+        // Prepare models (download from URL or copy from assets) to internal storage
+        modelDownloader.prepareModel(livenessModel0, modelBasePath)
+        modelDownloader.prepareModel(livenessModel1, modelBasePath)
+        modelDownloader.prepareModel(faceDetectorModel, modelBasePath)
+        modelDownloader.prepareModel(embeddingModel, modelBasePath, embeddingOutputFilename, onProgress)
+
+        // Update config to use local filename for embedding model (since it's downloaded from URL)
+        if (embeddingModel.startsWith("http")|| embeddingModel.startsWith("https")) {
+            onProgress?.invoke(0, "Preparing models...")
+            parsedConfig.put("embedding_extractor_model", embeddingOutputFilename)
+            Log.d(TAG, "init: Updated embedding model path to $embeddingOutputFilename")
+        }
+
+        // Set debug save path for development builds
+//        NativeBridge.jni_setDebugSavePath(context.cacheDir.absolutePath)
+
+        Log.d(TAG, "init: Calling native initialization...")
+        val result = NativeBridge.safeInit(parsedConfig.toString(), modelBasePath)
+        Log.d(TAG, "init: Native initialization result: $result")
+
+        return result
     }
 
     override fun captureAndMatch(referenceImagePath: String, onResult: (AVMatchResult) -> Unit) {
-        logController.d(TAG) { "captureAndMatch: Starting with reference image: $referenceImagePath" }
+        Log.d(TAG, "captureAndMatch: Starting with reference image: $referenceImagePath")
 
         // Validate reference image path
         if (referenceImagePath.isEmpty() || !File(referenceImagePath).exists()) {
-            logController.e(TAG) { "captureAndMatch: Invalid reference image path: $referenceImagePath" }
+            Log.e(TAG, "captureAndMatch: Invalid reference image path: $referenceImagePath")
             onResult(
                 AVMatchResult(
                     processed = true,
@@ -197,12 +115,12 @@ class AVFaceMatchSdkImpl(
             return
         }
 
-        logController.d(TAG) { "captureAndMatch: Processing reference image..." }
+        Log.d(TAG, "captureAndMatch: Processing reference image...")
 
         try {
             // Process reference image first
             val originalResult = NativeBridge.safeProcess(referenceImagePath, true)
-            logController.d(TAG) { "captureAndMatch: Reference processing result - embeddingExtracted: ${originalResult.embeddingExtracted}, faceDetected: ${originalResult.faceDetected}" }
+            Log.d(TAG, "captureAndMatch: Reference processing result - embeddingExtracted: ${originalResult.embeddingExtracted}, faceDetected: ${originalResult.faceDetected}")
 
             val referenceResult = AVProcessResult(
                 livenessChecked = originalResult.livenessChecked,
@@ -213,7 +131,7 @@ class AVFaceMatchSdkImpl(
             )
 
             if (!referenceResult.embeddingExtracted) {
-                logController.e(TAG) { "captureAndMatch: Failed to extract embedding from reference image" }
+                Log.e(TAG, "captureAndMatch: Failed to extract embedding from reference image")
                 // Fail fast if reference image is invalid
                 onResult(
                     AVMatchResult(
@@ -227,30 +145,30 @@ class AVFaceMatchSdkImpl(
                 return
             }
 
-            logController.d(TAG) { "captureAndMatch: Reference image processed successfully, embedding size: ${referenceResult.embedding.size}" }
+            Log.d(TAG, "captureAndMatch: Reference image processed successfully, embedding size: ${referenceResult.embedding.size}")
 
             // Initialize decision maker for multiple samples
             val decisor = AVDecisor(numSamples = 3)
-            logController.d(TAG) { "captureAndMatch: Created decisor with ${decisor.getSampleCount()}/${3} samples" }
+            Log.d(TAG, "captureAndMatch: Created decisor with ${decisor.getSampleCount()}/${3} samples")
 
             // Set up callback holder for camera activity
             AVCameraCallbackHolder.referenceResult = referenceResult
             AVCameraCallbackHolder.decisor = decisor
             AVCameraCallbackHolder.onFinalResult = { result ->
-                logController.d(TAG) { "captureAndMatch: Final callback triggered with result: $result" }
+                Log.d(TAG, "captureAndMatch: Final callback triggered with result: $result")
                 onResult(result)
             }
 
-            logController.d(TAG) { "captureAndMatch: Callback holder setup complete, ready: ${AVCameraCallbackHolder.isReady()}" }
+            Log.d(TAG, "captureAndMatch: Callback holder setup complete, ready: ${AVCameraCallbackHolder.isReady()}")
 
             // Start camera activity for live capture
-            logController.d(TAG) { "captureAndMatch: Starting CameraActivity..." }
+            Log.d(TAG, "captureAndMatch: Starting CameraActivity...")
             val intent = Intent(context, kl.open.fmandroid.CameraActivity::class.java)
             context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            logController.d(TAG) { "captureAndMatch: CameraActivity started" }
+            Log.d(TAG, "captureAndMatch: CameraActivity started")
 
         } catch (e: Exception) {
-            logController.e(TAG) { "captureAndMatch: Exception occurred: ${e.message}" }
+            Log.e(TAG, "captureAndMatch: Exception occurred", e)
             onResult(
                 AVMatchResult(
                     processed = false,
@@ -264,13 +182,10 @@ class AVFaceMatchSdkImpl(
     }
 
     override fun reset() {
-        logController.d(TAG) { "reset: Resetting SDK state" }
+        Log.d(TAG, "reset: Resetting SDK state")
         AVCameraCallbackHolder.reset()
         NativeBridge.jni_release()
-        sdkInitialized = false
-        _initStatus.value = SdkInitStatus.NotInitialized
-        // Note: modelsPrepared stays true as models are still in storage
-        logController.d(TAG) { "reset: SDK reset complete" }
+        Log.d(TAG, "reset: SDK reset complete")
     }
 
     /**
@@ -360,7 +275,7 @@ class AVFaceMatchSdkImpl(
             )
 
         } catch (e: Exception) {
-            logController.e(TAG) { "Error in testDirectMatch: ${e.message}" }
+            Log.e("AVFaceMatchSdk", "Error in testDirectMatch", e)
             return AVMatchResult(
                 processed = false,
                 referenceIsValid = false,

@@ -40,18 +40,19 @@ class LockoutCountdownManager(
             while (getIsLockedOut()) {
                 val currentTime = System.currentTimeMillis()
                 val lockoutEndTime = getLockoutEndTime()
+                logController.i("PIN") { "Current time: $currentTime, Lockout end time: $lockoutEndTime" }
 
                 if (currentTime >= lockoutEndTime) {
                     onLockoutEnd()
                     break
+                } else {
+                    val remainingSeconds = (lockoutEndTime - currentTime) / 1000
+                    val minutes = remainingSeconds / 60
+                    val seconds = remainingSeconds % 60
+                    val message = getTimeMessage(minutes, seconds)
+                    onCountdownUpdate(message)
+                    delay(1.seconds)
                 }
-
-                val remainingSeconds = (lockoutEndTime - currentTime) / 1000
-                val minutes = remainingSeconds / 60
-                val seconds = remainingSeconds % 60
-                val message = getTimeMessage(minutes, seconds)
-                onCountdownUpdate(message)
-                delay(1.seconds)
             }
         }
     }

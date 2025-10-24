@@ -274,7 +274,7 @@ class EnrollmentViewModel(
     private fun navigateToPassportScanIntro() {
         setEffect {
             Effect.Navigation.SwitchScreen(
-                screenRoute = OnboardingScreens.DocumentScanIntro.screenRoute,
+                screenRoute = OnboardingScreens.PassportScanIntro.screenRoute,
                 inclusive = false
             )
         }

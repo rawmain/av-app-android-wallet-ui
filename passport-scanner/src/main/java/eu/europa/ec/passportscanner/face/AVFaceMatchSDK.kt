@@ -24,88 +24,21 @@
 
 package eu.europa.ec.passportscanner.face
 
-import android.content.Context
-import kotlinx.coroutines.flow.Flow
-
-/**
- * Configuration for Face Match SDK
- */
-data class FaceMatchConfig(
-    val faceDetectorModel: String,
-    val embeddingExtractorModel: String,
-    val livenessModel0: String,
-    val livenessModel1: String,
-    val livenessThreshold: Double,
-    val matchingThreshold: Double,
-)
-
-/**
- * Represents the current status of SDK initialization
- */
-sealed class SdkInitStatus {
-    /**
-     * SDK has not been initialized yet
-     */
-    data object NotInitialized : SdkInitStatus()
-
-    /**
-     * SDK is currently preparing models (downloading/extracting)
-     * @param progress Progress percentage (0-100)
-     */
-    data class Preparing(val progress: Int) : SdkInitStatus()
-
-    /**
-     * Models prepared, SDK is now initializing
-     */
-    data object Initializing : SdkInitStatus()
-
-    /**
-     * SDK is fully initialized and ready to use
-     */
-    data object Ready : SdkInitStatus()
-
-    /**
-     * Initialization failed with an error
-     * @param message Error message describing the failure
-     */
-    data class Error(val message: String) : SdkInitStatus()
-}
-
 /**
  * Interface for Age Verification Face Matching SDK
  * Provides face liveness detection and matching capabilities for passport verification
- *
- * Unified initialization:
- * - Call init() to get a flow of initialization status
- * - init() is idempotent - multiple calls return the same flow
- * - Flow emits progress from NotInitialized → Preparing → Initializing → Ready
- * - Calling init() after an error automatically retries
  */
 interface AVFaceMatchSDK {
 
     /**
-     * Initialize the SDK with configuration.
-     * Handles both model preparation and SDK initialization internally.
-     *
-     * This method is idempotent:
-     * - First call: starts initialization and returns flow
-     * - Subsequent calls: return the same flow (shared state)
-     * - Flow emits status updates: NotInitialized → Preparing(progress) → Initializing → Ready/Error
-     * - Calls after error: retry initialization
-     *
-     * @param config Configuration containing model paths and thresholds
-     * @param context Android context for accessing assets and storage
-     * @return Flow emitting initialization status updates
+     * Initialize the SDK with configuration
+     * @param onProgress Optional callback for initialization progress (percentage: 0-100, message)
+     * @return true if initialization was successful, false otherwise
      */
-    fun init(
-        config: FaceMatchConfig,
-        context: Context,
-    ): Flow<SdkInitStatus>
+    suspend fun init(onProgress: ((Int, String) -> Unit)? = null): Boolean
 
     /**
      * Capture live face and match against reference image
-     * SDK must be in Ready state before calling this method
-     *
      * @param referenceImagePath Path to the reference image from passport
      * @param onResult Callback with the matching result
      */
@@ -113,7 +46,6 @@ interface AVFaceMatchSDK {
 
     /**
      * Reset the SDK state
-     * Returns initialization status to NotInitialized
      */
     fun reset()
 }

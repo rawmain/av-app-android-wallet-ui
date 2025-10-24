@@ -27,32 +27,32 @@ import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.periodUntil
 import kotlinx.datetime.todayIn
 
-private const val TAG = "DocumentIdentificationInteractor"
+private const val TAG = "PassportIdentificationInteractor"
 
-sealed class DocumentValidationState {
-    data object Success : DocumentValidationState()
-    data class Failure(val error: String) : DocumentValidationState()
+sealed class PassportValidationState {
+    data object Success : PassportValidationState()
+    data class Failure(val error: String) : PassportValidationState()
 }
 
-interface DocumentIdentificationInteractor {
-    fun validateDocument(dateOfBirth: String, expiryDate: String): DocumentValidationState
+interface PassportIdentificationInteractor {
+    fun validatePassport(dateOfBirth: String, expiryDate: String): PassportValidationState
 }
 
-class DocumentIdentificationInteractorImpl(
+class PassportIdentificationInteractorImpl(
     private val resourceProvider: ResourceProvider,
     private val logController: LogController,
     private val clock: Clock = Clock.System,
-) : DocumentIdentificationInteractor {
+) : PassportIdentificationInteractor {
 
     private val genericErrorMsg
         get() = resourceProvider.genericErrorMessage()
 
     @OptIn(FormatStringsInDatetimeFormats::class)
-    override fun validateDocument(
+    override fun validatePassport(
         dateOfBirth: String,
         expiryDate: String,
-    ): DocumentValidationState {
-        logController.d(TAG) { "Validating document - DOB: $dateOfBirth, Expiry: $expiryDate" }
+    ): PassportValidationState {
+        logController.d(TAG) { "Validating passport - DOB: $dateOfBirth, Expiry: $expiryDate" }
 
         return try {
             val today = clock.todayIn(TimeZone.currentSystemDefault())
@@ -62,12 +62,12 @@ class DocumentIdentificationInteractorImpl(
             val dobDate = LocalDate.parse(dateOfBirth, dateFormatter)
             val expiry = LocalDate.parse(expiryDate, dateFormatter)
 
-            // Check if document is expired
+            // Check if passport is expired
             if (expiry < today) {
                 val errorMessage =
                     resourceProvider.getString(R.string.passport_validation_error_expired)
-                logController.w(TAG) { "Document validation failed: expired" }
-                return DocumentValidationState.Failure(errorMessage)
+                logController.w(TAG) { "Passport validation failed: expired" }
+                return PassportValidationState.Failure(errorMessage)
             }
 
             // Check if user is at least 18 years old
@@ -75,15 +75,15 @@ class DocumentIdentificationInteractorImpl(
             if (age < 18) {
                 val errorMessage =
                     resourceProvider.getString(R.string.passport_validation_error_underage)
-                logController.w(TAG) { "Document validation failed: user is $age years old" }
-                return DocumentValidationState.Failure(errorMessage)
+                logController.w(TAG) { "Passport validation failed: user is $age years old" }
+                return PassportValidationState.Failure(errorMessage)
             }
 
-            logController.i(TAG) { "Document validation successful - age: $age, expires: $expiry" }
-            DocumentValidationState.Success
+            logController.i(TAG) { "Passport validation successful - age: $age, expires: $expiry" }
+            PassportValidationState.Success
         } catch (e: Exception) {
-            logController.e(TAG) { "Error parsing document dates: ${e.message}" }
-            DocumentValidationState.Failure(genericErrorMsg)
+            logController.e(TAG) { "Error parsing passport dates: ${e.message}" }
+            PassportValidationState.Failure(genericErrorMsg)
         }
     }
 }

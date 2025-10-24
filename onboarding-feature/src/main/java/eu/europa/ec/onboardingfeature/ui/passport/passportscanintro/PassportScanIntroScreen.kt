@@ -32,9 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -64,7 +62,6 @@ fun PassportScanIntroScreen(
     viewModel: PassportScanIntroViewModel,
 ) {
     val state by viewModel.viewState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     ContentScreen(
         isLoading = state.isLoading,
@@ -73,7 +70,7 @@ fun PassportScanIntroScreen(
         stickyBottom = { paddingValues ->
             ActionButtons(
                 onBackPressed = { viewModel.setEvent(Event.OnBackPressed) },
-                onStartProcedure = { viewModel.setEvent(Event.OnStartProcedure(context)) },
+                onStartProcedure = { viewModel.setEvent(Event.OnStartProcedure) },
                 paddingValues = paddingValues
             )
         }
@@ -108,30 +105,16 @@ private fun ActionButtons(
             onClick = { onStartProcedure() }
         )
     )
-    Column {
-        WrapText(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues),
-            text = stringResource(R.string.passport_scan_intro_data_download_notice),
-            textConfig = TextConfig(
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                textAlign = TextAlign.Center,
-                maxLines = Int.MAX_VALUE
-            ),
-        )
-        WrapStickyBottomContent(
-            stickyBottomModifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues),
-            stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)
-        ) {
-            when (it?.type) {
-                ButtonType.PRIMARY -> Text(text = stringResource(R.string.passport_scan_intro_start_button))
-                ButtonType.SECONDARY -> Text(text = stringResource(R.string.passport_scan_intro_back_button))
-                else -> {}
-            }
+    WrapStickyBottomContent(
+        stickyBottomModifier = Modifier
+            .fillMaxWidth()
+            .padding(paddingValues),
+        stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)
+    ) {
+        when (it?.type) {
+            ButtonType.PRIMARY -> Text(text = stringResource(R.string.passport_scan_intro_start_button))
+            ButtonType.SECONDARY -> Text(text = stringResource(R.string.passport_scan_intro_back_button))
+            else -> {}
         }
     }
 }

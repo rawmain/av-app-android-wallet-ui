@@ -57,9 +57,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
 @Composable
-fun IdentityDocumentCredentialIssuanceScreen(
+fun PassportCredentialIssuanceScreen(
     controller: NavController,
-    viewModel: IdentityDocumentCredentialIssuanceViewModel,
+    viewModel: PassportCredentialIssuanceViewModel,
 ) {
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -126,7 +126,7 @@ private fun handleEffect(
 
         is Navigation.SwitchScreen -> {
             controller.navigate(effect.screenRoute) {
-                popUpTo(OnboardingScreens.IdentityDocumentCredentialIssuance.screenRoute) {
+                popUpTo(OnboardingScreens.PassportCredentialIssuance.screenRoute) {
                     inclusive = effect.inclusive
                 }
             }

@@ -17,7 +17,7 @@
 package eu.europa.ec.passportscanner.face
 
 import android.content.Context
-import eu.europa.ec.businesslogic.controller.log.LogController
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -28,10 +28,7 @@ import java.net.URL
  * Handles downloading and preparing model files for face matching SDK
  * Supports both local assets and remote HTTP(S) URLs
  */
-class ModelDownloader(
-    private val context: Context,
-    private val logController: LogController,
-) {
+class ModelDownloader(private val context: Context) {
 
     companion object {
         private const val TAG = "ModelDownloader"
@@ -42,28 +39,28 @@ class ModelDownloader(
      * @param urlString URL to download from
      * @param destDir Destination directory path
      * @param outputFilename Optional custom filename for the downloaded file. If null, extracts from URL
-     * @param onProgress Optional callback for download progress (percentage: 0-100)
+     * @param onProgress Optional callback for download progress (percentage: 0-100, message)
      * @return The local filename of the downloaded file, or null if failed
      */
     suspend fun downloadModelFromUrl(
         urlString: String,
         destDir: String,
         outputFilename: String? = null,
-        onProgress: ((Int) -> Unit)? = null,
+        onProgress: ((Int, String) -> Unit)? = null
     ): String? = withContext(Dispatchers.IO) {
         try {
-            logController.d(TAG) { "downloadModelFromUrl: Starting download from $urlString" }
+            Log.d(TAG, "downloadModelFromUrl: Starting download from $urlString")
 
             val url = URL(urlString)
             val filename = outputFilename ?: url.path.substringAfterLast('/').ifEmpty { "model.onnx" }
             val destFile = File(destDir, filename)
 
             if (destFile.exists()) {
-                logController.d(TAG) { "File already exists. Not downloading." }
+                Log.i(TAG, "File already exists. Not downloading.")
                 return@withContext filename
             }
 
-            logController.d(TAG) { "downloadModelFromUrl: Downloading to ${destFile.absolutePath}" }
+            Log.d(TAG, "downloadModelFromUrl: Downloading to ${destFile.absolutePath}")
 
             // Use HttpURLConnection with proper configuration
             val connection = url.openConnection() as HttpURLConnection
@@ -76,11 +73,11 @@ class ModelDownloader(
             connection.connect()
 
             val responseCode = connection.responseCode
-            logController.d(TAG) { "downloadModelFromUrl: Response code: $responseCode" }
+            Log.d(TAG, "downloadModelFromUrl: Response code: $responseCode")
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 val contentLength = connection.contentLength
-                logController.d(TAG) { "downloadModelFromUrl: Content length: $contentLength bytes" }
+                Log.d(TAG, "downloadModelFromUrl: Content length: $contentLength bytes")
 
                 connection.inputStream.use { input ->
                     destFile.outputStream().use { output ->
@@ -103,30 +100,32 @@ class ModelDownloader(
 
                             // Log progress every 10MB
                             if (currentMB >= lastLoggedMB + 10) {
-                                logController.d(TAG) { "downloadModelFromUrl: Downloaded $currentMB MB" }
+                                val progressMsg = if (contentLength > 0) " ($percentage%)" else ""
+                                Log.d(TAG, "downloadModelFromUrl: Downloaded $currentMB MB$progressMsg")
                                 lastLoggedMB = currentMB
                             }
 
                             // Report progress every 5%
                             if (percentage >= lastReportedPercentage + 5 && contentLength > 0) {
-                                onProgress?.invoke(percentage)
+                                val sizeMB = contentLength / (1024 * 1024)
+                                onProgress?.invoke(percentage, " $currentMB / $sizeMB MB")
                                 lastReportedPercentage = percentage
                             }
                         }
 
-                        logController.d(TAG) { "downloadModelFromUrl: Download complete: ${totalBytesRead / (1024 * 1024)} MB total" }
-                        onProgress?.invoke(100)
+                        Log.d(TAG, "downloadModelFromUrl: Download complete: ${totalBytesRead / (1024 * 1024)} MB total")
+                        onProgress?.invoke(100, "Download complete")
                     }
                 }
 
-                logController.d(TAG) { "downloadModelFromUrl: Download complete: ${destFile.length()} bytes" }
+                Log.d(TAG, "downloadModelFromUrl: Download complete: ${destFile.length()} bytes")
                 filename
             } else {
-                logController.e(TAG) { "downloadModelFromUrl: HTTP error code: $responseCode" }
+                Log.e(TAG, "downloadModelFromUrl: HTTP error code: $responseCode")
                 null
             }
         } catch (e: Exception) {
-            logController.e(TAG) { "downloadModelFromUrl: Failed to download from $urlString: ${e.message}" }
+            Log.e(TAG, "downloadModelFromUrl: Failed to download from $urlString", e)
             null
         }
     }
@@ -147,9 +146,10 @@ class ModelDownloader(
                         input.copyTo(output)
                     }
                 }
-                logController.d(TAG) { "copyAssetIfNeeded: Copied asset $assetName to ${destFile.absolutePath}" }
+                Log.d(TAG, "copyAssetIfNeeded: Copied asset $assetName to ${destFile.absolutePath}")
             } catch (e: Exception) {
-                logController.e(TAG) { "Failed to copy asset: $assetName - ${e.message}" }
+                // Log error but don't fail initialization
+                Log.e(TAG, "Failed to copy asset: $assetName", e)
             }
         }
     }
@@ -159,14 +159,14 @@ class ModelDownloader(
      * @param modelPath Either an asset filename or HTTP(S) URL
      * @param destDir Destination directory path
      * @param outputFilename Optional custom filename for downloaded files. Only used for URLs
-     * @param onProgress Optional callback for download progress (percentage: 0-100)
+     * @param onProgress Optional callback for download progress (percentage: 0-100, message)
      * @return The local filename, or null if preparation failed
      */
     suspend fun prepareModel(
         modelPath: String,
         destDir: String,
         outputFilename: String? = null,
-        onProgress: ((Int) -> Unit)? = null,
+        onProgress: ((Int, String) -> Unit)? = null
     ): String? {
         if (modelPath.isEmpty()) return null
 

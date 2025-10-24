@@ -19,9 +19,9 @@ package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.onboardingfeature.config.PassportCredentialIssuanceUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
-import eu.europa.ec.onboardingfeature.interactor.FaceMatchSDKPartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
@@ -31,22 +31,23 @@ import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
+import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
+import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
 import org.koin.core.annotation.InjectedParam
-import java.io.File
 
 private const val TAG = "PassportLiveVideoViewModel"
 
 data class State(
     val isLoading: Boolean = false,
     val config: PassportLiveVideoUiConfig? = null,
-    val progress: Int = 0, // 0-100 percentage for initialization
-    val isInitializing: Boolean = false,
+    val sdkInitProgress: Int = 0, // 0-100 percentage
+    val sdkInitMessage: String = "",
+    val isSdkInitializing: Boolean = false,
     val isSdkReady: Boolean = false,
     val error: ContentErrorConfig? = null,
 ) : ViewState
@@ -56,6 +57,7 @@ sealed class Event : ViewEvent {
     data object OnLiveVideoCapture : Event()
     data object OnRetry : Event()
     data class InitializeSdk(val context: Context) : Event()
+    data class UpdateSdkInitProgress(val progress: Int, val message: String) : Event()
 }
 
 sealed class Effect : ViewSideEffect {
@@ -102,6 +104,14 @@ class PassportLiveVideoViewModel(
                 initializeSdk(event.context)
             }
 
+            is Event.UpdateSdkInitProgress -> {
+                setState {
+                    copy(
+                        sdkInitProgress = event.progress,
+                        sdkInitMessage = event.message
+                    )
+                }
+            }
             Event.OnRetry -> {
                 logController.i(tag = TAG) { "Event invoked OnRetry" }
                 setState { copy(error = null) }
@@ -110,45 +120,34 @@ class PassportLiveVideoViewModel(
     }
 
     private fun initializeSdk(context: Context) {
-        setState { copy(error = null) }
+        setState { copy(isSdkInitializing = true, error = null) }
 
         viewModelScope.launch {
-            passportLiveVideoInteractor.initFaceMatchSDK(context).collectLatest { initState ->
-                withContext(Dispatchers.Main) {
-                    when (initState) {
-                        is FaceMatchSDKPartialState.NotInitialized -> {
-                            logController.d(TAG) { "SDK not initialized" }
-                            setState { copy(isInitializing = false, progress = 0) }
-                        }
+            try {
+                withContext(Dispatchers.IO) {
+                    logController.d(TAG) { "Initializing SDK via interactor..." }
 
-                        is FaceMatchSDKPartialState.Preparing -> {
-                            logController.d(TAG) { "Preparing models: ${initState.progress}%" }
-                            setState { copy(isInitializing = true, progress = initState.progress) }
-                        }
+                    val success = passportLiveVideoInteractor.init(context) { progress, message ->
+                        logController.d(TAG) { "Init progress: $progress% - $message" }
+                        setEvent(Event.UpdateSdkInitProgress(progress, message))
+                    }
 
-                        is FaceMatchSDKPartialState.Initializing -> {
-                            logController.d(TAG) { "Initializing SDK" }
-                            setState { copy(isInitializing = true, progress = 100) }
+                    if (success) {
+                        setState {
+                            copy(
+                                isSdkInitializing = false,
+                                isSdkReady = true
+                            )
                         }
-
-                        is FaceMatchSDKPartialState.Ready -> {
-                            logController.i(TAG) { "SDK ready" }
-                            setState {
-                                copy(
-                                    isInitializing = false,
-                                    isSdkReady = true,
-                                    progress = 100
-                                )
-                            }
-                        }
-
-                        is FaceMatchSDKPartialState.Error -> {
-                            logController.e(TAG) { "SDK initialization error: ${initState.message}" }
-                            setState { copy(isInitializing = false, progress = 0) }
-                            showError(initState.message)
-                        }
+                    } else {
+                        setState { copy(isSdkInitializing = false) }
+                        setEffect { Effect.Failure("SDK initialization failed") }
                     }
                 }
+            } catch (e: Exception) {
+                logController.e(TAG) { "Exception during SDK initialization: ${e.javaClass.simpleName}: ${e.message}" }
+                setState { copy(isSdkInitializing = false) }
+                setEffect { Effect.Failure("Failed to initialize SDK: ${e.message}") }
             }
         }
     }
@@ -171,8 +170,7 @@ class PassportLiveVideoViewModel(
                     is FaceMatchPartialState.Success -> {
                         logController.i(TAG) { "Face match successful, navigating to consent screen" }
                         setState { copy(isLoading = false) }
-                        deleteTempFile(config.faceImageTempPath)
-                        navigateToNextScreen()
+                        navigateToConsentScreen(config.faceImageTempPath)
                     }
 
                     is FaceMatchPartialState.Failure -> {
@@ -189,27 +187,29 @@ class PassportLiveVideoViewModel(
         }
     }
 
-    private fun navigateToNextScreen() {
+    private fun navigateToConsentScreen(faceImageTempPath: String) {
+        logController.i(TAG) { "Building navigation to consent screen" }
+        val screenRoute = generateComposableNavigationLink(
+            screen = OnboardingScreens.PassportCredentialIssuance,
+            arguments = generateComposableArguments(
+                mapOf(
+                    PassportCredentialIssuanceUiConfig.serializedKeyName to uiSerializer.toBase64(
+                        model = PassportCredentialIssuanceUiConfig(
+                            faceImageTempPath = faceImageTempPath
+                        ),
+                        parser = PassportCredentialIssuanceUiConfig.Parser
+                    ).orEmpty()
+                )
+            )
+        )
+        logController.i(TAG) { "Setting navigation effect to screenRoute: $screenRoute" }
         setEffect {
             Effect.Navigation.SwitchScreen(
-                screenRoute = OnboardingScreens.IdentityDocumentCredentialIssuance.screenRoute,
+                screenRoute = screenRoute,
                 inclusive = false
             )
         }
     }
-
-
-    private fun deleteTempFile(filePath: String) {
-        try {
-            val file = File(filePath)
-            if (file.exists()) {
-                file.delete()
-            }
-        } catch (e: Exception) {
-            logController.e(TAG) { "Exception while deleting temp file: ${e.message}" }
-        }
-    }
-
 
     private fun showError(errorMessage: String) {
         setState {
