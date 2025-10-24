@@ -32,16 +32,17 @@ sealed class OnboardingScreens {
     data object Consent : Screen(name = "CONSENT")
     data object Enrollment : Screen(name = "ENROLLMENT")
 
-    // Identity Document Verification
-    data object DocumentScanIntro : Screen(name = "DOCUMENT_SCAN_INTRO")
-    data object DocumentIdentification : Screen(name = "DOCUMENT_IDENTIFICATION")
+    // Passport Verification
+    data object PassportScanIntro : Screen(name = "PASSPORT_SCAN_INTRO")
+    data object PassportIdentification : Screen(name = "PASSPORT_IDENTIFICATION")
     data object PassportBiometrics : Screen(name = "PASSPORT_BIOMETRICS")
     data object PassportLiveVideo : Screen(
         name = "PASSPORT_LIVE_VIDEO",
         parameters = "?passportLiveVideoConfig={passportLiveVideoConfig}"
     )
-    data object IdentityDocumentCredentialIssuance : Screen(
-        name = "IDENTITY_DOCUMENT_CREDENTIAL_ISSUANCE"
+    data object PassportCredentialIssuance : Screen(
+        name = "PASSPORT_CREDENTIAL_ISSUANCE",
+        parameters = "?passportCredentialIssuanceConfig={passportCredentialIssuanceConfig}"
     )
 }
 

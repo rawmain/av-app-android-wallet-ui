@@ -17,13 +17,8 @@
 package eu.europa.ec.onboardingfeature.controller
 
 import android.content.Context
-import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
 import eu.europa.ec.passportscanner.face.AVFaceMatchSdkImpl
-import eu.europa.ec.passportscanner.face.FaceMatchConfig
-import eu.europa.ec.passportscanner.face.SdkInitStatus
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -34,45 +29,26 @@ data class FaceMatchResult(
 )
 
 interface FaceMatchController {
-    /**
-     * Initialize the SDK. Idempotent - safe to call multiple times.
-     * Returns a flow that emits SDK initialization status updates.
-     *
-     * @param context Android context
-     * @return Flow emitting SdkInitStatus updates
-     */
-    fun init(context: Context): Flow<SdkInitStatus>
-
-    /**
-     * Capture and match face against reference image
-     * @param faceImagePath Path to the reference face image
-     * @return FaceMatchResult with matching details
-     */
+    suspend fun init(context: Context, onProgress: ((Int, String) -> Unit)? = null): Boolean
     suspend fun captureAndMatch(faceImagePath: String): FaceMatchResult
 }
 
-class FaceMatchControllerImpl(
-    private val walletCoreConfig: WalletCoreConfig,
-    private val logController: LogController,
-) : FaceMatchController {
+class FaceMatchControllerImpl : FaceMatchController {
 
     private var faceMatchSDK: AVFaceMatchSDK? = null
 
-    private fun convertConfig(): FaceMatchConfig {
-        val coreConfig = walletCoreConfig.faceMatchConfig
-        return FaceMatchConfig(
-            faceDetectorModel = coreConfig.faceDetectorModel,
-            embeddingExtractorModel = coreConfig.embeddingExtractorModel,
-            livenessModel0 = coreConfig.livenessModel0,
-            livenessModel1 = coreConfig.livenessModel1,
-            livenessThreshold = coreConfig.livenessThreshold,
-            matchingThreshold = coreConfig.matchingThreshold
-        )
-    }
-
-    override fun init(context: Context): Flow<SdkInitStatus> {
-        val sdk = getOrCreateSdk(context)
-        return sdk.init(convertConfig(), context.applicationContext)
+    override suspend fun init(context: Context, onProgress: ((Int, String) -> Unit)?): Boolean {
+        return try {
+            val sdk = AVFaceMatchSdkImpl(context.applicationContext)
+            val success = sdk.init(onProgress)
+            if (success) {
+                faceMatchSDK = sdk
+            }
+            success
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 
     override suspend fun captureAndMatch(faceImagePath: String): FaceMatchResult {
@@ -88,12 +64,6 @@ class FaceMatchControllerImpl(
                     )
                 )
             }
-        }
-    }
-
-    private fun getOrCreateSdk(context: Context): AVFaceMatchSDK {
-        return faceMatchSDK ?: AVFaceMatchSdkImpl(context.applicationContext, logController).also {
-            faceMatchSDK = it
         }
     }
 }

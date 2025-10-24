@@ -7,7 +7,7 @@
     <string name="nfc_body_initial">Posiziona il tuo passaporto / Carta d\'identità direttamente sul retro dello smartphone, di solito in alto.</string>
     <string name="nfc_body_reading">Il passaporto / Carta d\'identità è in fase di lettura</string>
     <string name="nfc_help_link"><u>Hai bisogno di aiuto?</u></string>
-    <string name="nfc_title">Metti il telefono sopra il passaporto / Carta d\'identità e non spostarlo</string>
+    <string name="nfc_title">Metti il ​​telefono sopra il passaporto / Carta d\'identità e non spostarlo</string>
     <string name="nfc_title_initial">Leggi il tuo passaporto / Carta d\'identità</string>
     <string name="nfc_title_reading">Leggi il tuo passaporto / Carta d\'identità tramite l\'interfaccia NFC</string>
     <string name="required_nfc_not_supported">Errore: NFC non è supportato su questo dispositivo.</string>

@@ -72,7 +72,7 @@
     <string name="passport_validation_error_expired">Il tuo passaporto / carta d\'identità è scaduto. Utilizza un documento valido.</string>
     <string name="passport_validation_error_underage">Devi avere almeno 18 anni per continuare.</string>
     <string name="passport_validation_error_incomplete_data">I dati del passaporto / carta d\'identità sono incompleti. Scansiona nuovamente il tuo documento.</string>
-    <string name="passport_live_video_downloading_progress">Download risorse di verifica… %d%%</string>
+    <string name="passport_live_video_model_downloading">Download in corso</string>
 
     <!-- Passport Credential Issuance Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>
@@ -97,9 +97,9 @@
     <string name="passport_biometrics_dob">Data di nascita</string>
     <string name="passport_biometrics_doe">Data di scadenza</string>
     <string name="passport_biometrics_no_availability">Non disponibile</string>
-    <string name="passport_biometrics_no_passport_data">Nessun dato del documento ricevuto</string>
-    <string name="passport_biometrics_scan_cancelled">Scansione del documento annullata</string>
-    <string name="passport_biometrics_unknown_error">Errore sconosciuto durante la scansione del documento</string>
+    <string name="passport_biometrics_no_passport_data">Nessun dato del passaporto ricevuto</string>
+    <string name="passport_biometrics_scan_cancelled">Scansione del passaporto annullata</string>
+    <string name="passport_biometrics_unknown_error">Errore sconosciuto durante la scansione del passaporto</string>
 
     <!-- Passport Scan Intro Screen -->
     <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>
@@ -115,7 +115,6 @@
     <string name="passport_scan_intro_step_3_description">Filmati per la verifica dell\'identità.</string>
     <string name="passport_scan_intro_step_4_title">Consenso</string>
     <string name="passport_scan_intro_step_5_title">Ricevi la tua prova d\'età</string>
-    <string name="passport_scan_intro_data_download_notice">La verifica richiede dati aggiuntivi. Quando tocchi Inizia, verranno scaricati circa 250MB di risorse per il riconoscimento facciale.</string>
     <string name="welcome_page_1">Utilizzando quest\'app, puoi dimostrare in modo sicuro di avere almeno 18 anni quando accedi ai servizi riservati agli adulti.</string>
     <string name="welcome_page_2">Verifica di avere almeno 18 anni, e usa questa attestazione per accedere in modo sicuro a molti servizi riservati agli adulti.</string>
     <string name="welcome_page_3">Mantieni il controllo dei tuoi dati: solo l\'attestazione della tua maggiore età verrà condivisa. Nessun altro dettaglio personale sarà archiviato o condiviso con i servizi online.</string>

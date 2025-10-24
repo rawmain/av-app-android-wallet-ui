@@ -17,23 +17,7 @@
  */
 package eu.europa.ec.passportscanner.scanner.config
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
-@Parcelize
-data class Config(
-    val header: String? = null,
-    val subHeader: String? = null,
-    val orientation: String? = null,
-    val showGuide: Boolean = false,
-    val widthGuide: Int = 0,
-    val heightGuide: Int = 60
-) : Parcelable {
-    companion object {
-        val default = Config(
-            header = "",
-            subHeader = "",
-            orientation = Orientation.PORTRAIT.value,
-        )
-    }
+enum class ScannerSize (val value : String) {
+    SMALL("SMALL"),
+    LARGE("LARGE")
 }

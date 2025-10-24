@@ -5,10 +5,7 @@
 * [General configuration](#general-configuration)
 * [DeepLink Schemas configuration](#deeplink-schemas-configuration)
 * [Scoped Issuance Document Configuration](#scoped-issuance-document-configuration)
-    * [Passport Scanning Issuer Configuration](#passport-scanning-issuer-configuration)
-    * [Face Match Configuration](#face-match-configuration)
 * [How to work with self-signed certificates](#how-to-work-with-self-signed-certificates)
-* [Batch Document Issuance Configuration](#batch-document-issuance-configuration)
 * [Theme configuration](#theme-configuration)
 * [Pin Storage configuration](#pin-storage-configuration)
 * [Analytics configuration](#analytics-configuration)
@@ -282,63 +279,6 @@ override val passportScanningIssuerConfig: OpenId4VciManager.Config =
 
 The passport scanning issuer configuration is optional. If set to `null` in the interface, passport
 scanning issuance will not be available.
-
-### Face Match Configuration
-
-The application uses AI models for face liveness detection and face matching during passport
-verification flows. These models are configured via the `faceMatchConfig` property in the
-*WalletCoreConfig* interface.
-
-The configuration is flavor-specific and defined in src/demo/config/WalletCoreConfigImpl and
-src/dev/config/WalletCoreConfigImpl.
-
-**Configuration Structure:**
-
-```Kotlin
-data class FaceMatchConfig(
-    val faceDetectorModel: String,        // Model for detecting faces in images
-    val embeddingExtractorModel: String,  // Model for extracting face embeddings
-    val livenessModel0: String,           // First liveness detection model
-    val livenessModel1: String,           // Second liveness detection model
-    val livenessThreshold: Double,        // Threshold for liveness detection (0.0-1.0)
-    val matchingThreshold: Double,        // Threshold for face matching (0.0-1.0)
-)
-```
-
-**Example Configuration:**
-
-```Kotlin
-override val faceMatchConfig: FaceMatchConfig = FaceMatchConfig(
-    faceDetectorModel = "https://github.com/your-org/models/releases/download/v1.0/face_detector.tflite",
-    embeddingExtractorModel = "https://github.com/your-org/models/releases/download/v1.0/embedding_extractor.tflite",
-    livenessModel0 = "https://github.com/your-org/models/releases/download/v1.0/liveness_model_0.tflite",
-    livenessModel1 = "https://github.com/your-org/models/releases/download/v1.0/liveness_model_1.tflite",
-    livenessThreshold = 0.85,  // 85% confidence for liveness
-    matchingThreshold = 0.75,  // 75% confidence for face matching
-)
-```
-
-**Model Path Options:**
-
-The model paths can be specified as:
-
-- Remote URLs (HTTP/HTTPS) for downloading models at runtime
-- Local asset paths (e.g., `file:///android_asset/models/face_detector.tflite`)
-- Local file paths on device storage
-
-**Threshold Configuration:**
-
-- `livenessThreshold`: Controls the sensitivity of liveness detection. Higher values (e.g., 0.9) are
-  more strict and may reject more legitimate faces, while lower values (e.g., 0.7) are more lenient
-  but may accept more spoofing attempts.
-- `matchingThreshold`: Controls the sensitivity of face matching between the passport photo and
-  selfie. Higher values require a closer match, while lower values are more forgiving of lighting
-  and angle differences.
-
-> **⚠️ SECURITY WARNING:**
->
-> The models referenced in the default configuration are currently hosted on GitHub Releases for
-> development and testing purposes only. **This is NOT recommended for production environments.**
 
 ## How to work with self-signed certificates
 

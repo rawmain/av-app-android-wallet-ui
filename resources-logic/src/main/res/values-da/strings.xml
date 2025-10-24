@@ -75,9 +75,9 @@
     <string name="passport_biometrics_dob">Fødselsdato</string>
     <string name="passport_biometrics_doe">Udløbsdato</string>
     <string name="passport_biometrics_no_availability">Ikke tilgængelig</string>
-    <string name="passport_biometrics_no_passport_data">Ingen dokumentdata modtaget</string>
-    <string name="passport_biometrics_scan_cancelled">Dokumentscanning blev annulleret</string>
-    <string name="passport_biometrics_unknown_error">Ukendt fejl opstod under dokumentscanning</string>
+    <string name="passport_biometrics_no_passport_data">Ingen pasdata modtaget</string>
+    <string name="passport_biometrics_scan_cancelled">Passcanning blev annulleret</string>
+    <string name="passport_biometrics_unknown_error">Ukendt fejl opstod under passcanning</string>
 
     <!-- Passport live video instructions - Danish (da) -->
     <string name="passport_live_video_header">Optag en hurtig video af dig selv</string>
@@ -94,7 +94,7 @@
     <string name="passport_validation_error_expired">Dit pas / ID-kort er udløbet. Brug venligst et gyldigt dokument.</string>
     <string name="passport_validation_error_underage">Du skal være mindst 18 år gammel for at fortsætte.</string>
     <string name="passport_validation_error_incomplete_data">Pas / ID-kort data er ufuldstændige. Scan venligst dit dokument igen.</string>
-    <string name="passport_live_video_downloading_progress">Downloader verifikationsdata… %d%%</string>
+    <string name="passport_live_video_model_downloading">Downloader</string>
 
     <!-- Passport Consent Screen -->
     <string name="passport_credential_issuance_title">Verification Complete</string>
@@ -115,7 +115,6 @@
     <string name="passport_scan_intro_step_3_description">Film dig selv til identitetsverifikation.</string>
     <string name="passport_scan_intro_step_4_title">Samtykke</string>
     <string name="passport_scan_intro_step_5_title">Modtag dit aldersbevis</string>
-    <string name="passport_scan_intro_data_download_notice">Verifikation kræver yderligere data. Når du trykker på Start, downloades ca. 250MB til ansigtsmatching.</string>
     <string name="welcome_page_1">Med denne app kan du sikkert bevise, at du er over 18 år, når du får adgang til tjenester der er begrænset til voksne.</string>
     <string name="welcome_page_2">Verificér din alder én gang og brug dette bevis til sikker adgang til mange tjenester, der er begrænset til voksne.</string>
     <string name="welcome_page_3">Du bevarer kontrollen over dine data: Det er kun beviset for, at du er over 18 år, som deles. Ingen andre personlige oplysninger gemmes eller deles med onlinetjenester.</string>

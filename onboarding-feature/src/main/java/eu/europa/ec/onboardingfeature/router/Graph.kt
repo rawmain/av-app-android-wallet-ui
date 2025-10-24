@@ -24,12 +24,13 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import eu.europa.ec.onboardingfeature.BuildConfig
+import eu.europa.ec.onboardingfeature.config.PassportCredentialIssuanceUiConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.ui.consent.ConsentScreen
 import eu.europa.ec.onboardingfeature.ui.enrollment.EnrollmentScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportbiometrics.PassportBiometricScreen
-import eu.europa.ec.onboardingfeature.ui.passport.passportcredentialissuance.IdentityDocumentCredentialIssuanceScreen
-import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.DocumentIdentificationScreen
+import eu.europa.ec.onboardingfeature.ui.passport.passportcredentialissuance.PassportCredentialIssuanceScreen
+import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.PassportIdentificationScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo.PassportLiveVideoScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportscanintro.PassportScanIntroScreen
 import eu.europa.ec.onboardingfeature.ui.welcome.WelcomeScreen
@@ -56,12 +57,12 @@ fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
             EnrollmentScreen(navController, koinViewModel())
         }
 
-        composable(route = OnboardingScreens.DocumentScanIntro.screenRoute) {
+        composable(route = OnboardingScreens.PassportScanIntro.screenRoute) {
             PassportScanIntroScreen(navController, koinViewModel())
         }
 
-        composable(route = OnboardingScreens.DocumentIdentification.screenRoute) {
-            DocumentIdentificationScreen(navController, koinViewModel())
+        composable(route = OnboardingScreens.PassportIdentification.screenRoute) {
+            PassportIdentificationScreen(navController, koinViewModel())
         }
 
         composable(route = OnboardingScreens.PassportBiometrics.screenRoute) {
@@ -94,15 +95,28 @@ fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
         }
 
         composable(
-            route = OnboardingScreens.IdentityDocumentCredentialIssuance.screenRoute,
+            route = OnboardingScreens.PassportCredentialIssuance.screenRoute,
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern =
-                        BuildConfig.DEEPLINK + OnboardingScreens.IdentityDocumentCredentialIssuance.screenRoute
+                        BuildConfig.DEEPLINK + OnboardingScreens.PassportCredentialIssuance.screenRoute
                 },
+            ),
+            arguments = listOf(
+                navArgument(PassportCredentialIssuanceUiConfig.serializedKeyName) {
+                    type = StringType
+                }
             )
         ) {
-            IdentityDocumentCredentialIssuanceScreen(navController, koinViewModel())
+            PassportCredentialIssuanceScreen(
+                navController, koinViewModel(
+                    parameters = {
+                        parametersOf(
+                            it.arguments?.getString(PassportCredentialIssuanceUiConfig.serializedKeyName)
+                                .orEmpty()
+                        )
+                    }
+                ))
         }
     }
 }
