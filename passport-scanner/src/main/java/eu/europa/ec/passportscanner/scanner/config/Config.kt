@@ -22,12 +22,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Config(
-    val header: String? = null,
-    val subHeader: String? = null,
+    val header: String,
+    val subHeader: String,
     val orientation: String? = null,
-    val showGuide: Boolean = false,
-    val widthGuide: Int = 0,
-    val heightGuide: Int = 60
 ) : Parcelable {
     companion object {
         val default = Config(

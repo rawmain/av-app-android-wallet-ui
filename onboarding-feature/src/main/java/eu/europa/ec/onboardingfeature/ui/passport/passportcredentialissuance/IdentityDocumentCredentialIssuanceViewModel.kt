@@ -25,7 +25,6 @@ import eu.europa.ec.commonfeature.config.OfferUiConfig
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
-import eu.europa.ec.onboardingfeature.config.PassportCredentialIssuanceUiConfig
 import eu.europa.ec.onboardingfeature.interactor.CredentialIssuancePartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportCredentialIssuanceInteractor
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
@@ -46,15 +45,12 @@ import eu.europa.ec.uilogic.navigation.helper.hasDeepLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
-import org.koin.core.annotation.InjectedParam
-import java.io.File
 import java.security.Security
 
 private const val TAG = "PassportCredentialIssuanceViewModel"
 
 data class State(
     val isLoading: Boolean = false,
-    val config: PassportCredentialIssuanceUiConfig? = null,
     val error: ContentErrorConfig? = null,
 ) : ViewState
 
@@ -78,25 +74,16 @@ sealed class Effect : ViewSideEffect {
 }
 
 @KoinViewModel
-class PassportCredentialIssuanceViewModel(
+class IdentityDocumentCredentialIssuanceViewModel(
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
     private val passportCredentialIssuanceInteractor: PassportCredentialIssuanceInteractor,
-    @InjectedParam private val passportCredentialIssuanceSerializedConfig: String,
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State {
-        logController.i { "get the following param=$passportCredentialIssuanceSerializedConfig" }
-
         // Clean up Security providers left by passport scanning
         cleanupSecurityProviders()
-
-        val config: PassportCredentialIssuanceUiConfig? = uiSerializer.fromBase64(
-            passportCredentialIssuanceSerializedConfig,
-            PassportCredentialIssuanceUiConfig::class.java,
-            PassportCredentialIssuanceUiConfig.Parser
-        )
-        return State(config = config)
+        return State()
     }
 
     /**
@@ -180,13 +167,6 @@ class PassportCredentialIssuanceViewModel(
     }
 
     private fun issueCredential(context: Context) {
-        val config = viewState.value.config
-        if (config == null) {
-            logController.e(TAG) { "Config is null, cannot proceed with issuance" }
-            showError("Configuration error. Please try again.")
-            return
-        }
-
         setState { copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
@@ -197,16 +177,12 @@ class PassportCredentialIssuanceViewModel(
                     when (issueState) {
                         is CredentialIssuancePartialState.Success -> {
                             setState { copy(isLoading = false) }
-                            // Delete temp file after successful issuance
-                            deleteTempFile(config.faceImageTempPath)
                             navigateToSuccessScreen(issueState.documentId)
                         }
 
                         is CredentialIssuancePartialState.DeferredSuccess -> {
                             logController.i(TAG) { "Document issuance deferred, navigating to success route: ${issueState.successRoute}" }
                             setState { copy(isLoading = false) }
-                            // Delete temp file after deferred success
-                            deleteTempFile(config.faceImageTempPath)
                             navigateToDeferredSuccessScreen(issueState.successRoute)
                         }
 
@@ -232,24 +208,6 @@ class PassportCredentialIssuanceViewModel(
                 setState { copy(isLoading = false) }
                 showError(e.message)
             }
-        }
-    }
-
-    private fun deleteTempFile(filePath: String) {
-        try {
-            val file = File(filePath)
-            if (file.exists()) {
-                val deleted = file.delete()
-                if (deleted) {
-                    logController.i(TAG) { "Successfully deleted temp file: $filePath" }
-                } else {
-                    logController.w(TAG) { "Failed to delete temp file: $filePath" }
-                }
-            } else {
-                logController.w(TAG) { "Temp file does not exist: $filePath" }
-            }
-        } catch (e: Exception) {
-            logController.e(TAG) { "Exception while deleting temp file: ${e.message}" }
         }
     }
 

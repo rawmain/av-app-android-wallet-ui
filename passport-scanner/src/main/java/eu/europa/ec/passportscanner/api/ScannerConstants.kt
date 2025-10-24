@@ -24,8 +24,9 @@ object ScannerConstants {
 
     // NFC
     const val NFC_MRZ_STRING = "nfc_mrz_string"
-    const val NFC_EXPIRY_DATE = "expiry_date"
-    const val NFC_DATE_OF_BIRTH = "date_of_birth"
+    const val EXPIRY_DATE = "expiry_date"
+    const val DATE_OF_BIRTH = "date_of_birth"
+    const val IS_PASSPORT = "is_passport"
 
     // Face Image
     const val NFC_FACE_IMAGE = "face_image"

@@ -20,11 +20,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
-import eu.europa.ec.onboardingfeature.interactor.PassportIdentificationInteractor
-import eu.europa.ec.onboardingfeature.interactor.PassportValidationState
+import eu.europa.ec.onboardingfeature.interactor.DocumentIdentificationInteractor
+import eu.europa.ec.onboardingfeature.interactor.DocumentValidationState
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.GoBack
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.StartMRZScanner
-import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.StartPassportLiveCheck
+import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation.SwitchScreen
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
@@ -40,27 +40,26 @@ import org.koin.android.annotation.KoinViewModel
 import java.io.File
 import java.io.FileOutputStream
 
-sealed class PassportErrors(val errorMessage: Int) {
-    data object NoPassportDataReceived : PassportErrors(R.string.passport_biometrics_no_passport_data)
-    data object ScanCancelled : PassportErrors(R.string.passport_biometrics_scan_cancelled)
-    data object UnknownError: PassportErrors(R.string.passport_biometrics_unknown_error)
+sealed class DocumentErrors(val errorMessage: Int) {
+    data object NoDocumentDataReceived : DocumentErrors(R.string.passport_biometrics_no_passport_data)
+    data object ScanCancelled : DocumentErrors(R.string.passport_biometrics_scan_cancelled)
+    data object UnknownError: DocumentErrors(R.string.passport_biometrics_unknown_error)
 }
 
 data class State(
     val isLoading: Boolean = false,
     val scanComplete: Boolean = false,
-    val passportData: PassportData? = null,
+    val scannedDocument: ScannedDocument? = null,
     val error: ContentErrorConfig? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
-    data object Init : Event()
     data object OnBackPressed : Event()
     data object OnStartPassportScan : Event()
     data object OnProcessRestartRequest : Event()
     data object OnPassportVerificationCompletion : Event()
-    data class OnPassportScanSuccessful(val passportData: PassportData) : Event()
-    data class OnPassportScanFailed(var errors: PassportErrors) : Event()
+    data class OnDocumentScanSuccessful(val scannedDocument: ScannedDocument) : Event()
+    data class OnDocumentScanFailed(var errors: DocumentErrors) : Event()
     data object OnRetry : Event()
 }
 
@@ -68,16 +67,16 @@ sealed class Effect : ViewSideEffect {
     sealed class Navigation : Effect() {
         data object GoBack : Navigation()
         data object StartMRZScanner : Navigation()
-        data class StartPassportLiveCheck(val screenRoute: String) : Navigation()
+        data class SwitchScreen(val screenRoute: String) : Navigation()
     }
 }
 
 @KoinViewModel
-class PassportIdentificationViewModel(
+class DocumentIdentificationViewModel(
     private val context: Context,
     private val logController: LogController,
     private val uiSerializer: UiSerializer,
-    private val passportIdentificationInteractor: PassportIdentificationInteractor,
+    private val documentIdentificationInteractor: DocumentIdentificationInteractor,
     private val resourceProvider: ResourceProvider,
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -85,21 +84,20 @@ class PassportIdentificationViewModel(
 
     override fun handleEvents(event: Event) {
         when (event) {
-            Event.Init -> logController.i { "Init -- PassportIdentificationViewModel " }
             Event.OnBackPressed -> setEffect { GoBack }
             Event.OnStartPassportScan -> setEffect { StartMRZScanner }
             Event.OnPassportVerificationCompletion -> handlePassportVerification()
             Event.OnProcessRestartRequest -> setEffect { GoBack }
-            is Event.OnPassportScanSuccessful -> setState {
+            is Event.OnDocumentScanSuccessful -> setState {
                 copy(
                     scanComplete = true,
-                    passportData = event.passportData
+                    scannedDocument = event.scannedDocument
                 )
             }
 
-            is Event.OnPassportScanFailed -> {
-                logController.e { "Passport scan failed: ${resourceProvider.getString(event.errors.errorMessage)}" }
-                setState { copy(scanComplete = false, passportData = null) }
+            is Event.OnDocumentScanFailed -> {
+                logController.e { "Document scan failed: ${resourceProvider.getString(event.errors.errorMessage)}" }
+                setState { copy(scanComplete = false, scannedDocument = null) }
             }
 
             Event.OnRetry -> setState { copy(error = null) }
@@ -107,45 +105,60 @@ class PassportIdentificationViewModel(
     }
 
     private fun handlePassportVerification() {
-        val passportData = viewState.value.passportData
-        if (passportData == null ||
-            passportData.dateOfBirth.isNullOrEmpty() ||
-            passportData.expiryDate.isNullOrEmpty() ||
-            passportData.faceImage == null
+        val scannedDocument = viewState.value.scannedDocument
+        if (scannedDocument == null ||
+            scannedDocument.dateOfBirth.isNullOrEmpty() ||
+            scannedDocument.expiryDate.isNullOrEmpty() ||
+            (scannedDocument is ScannedDocument.Passport && scannedDocument.faceImage == null)
         ) {
-            logController.e { "Passport data is incomplete, cannot verify" }
+            logController.e { "Document data is incomplete, cannot verify" }
             showError(resourceProvider.getString(R.string.passport_validation_error_incomplete_data))
             return
         }
 
         setState { copy(isLoading = true, error = null) }
 
-        when (val validationResult = passportIdentificationInteractor.validatePassport(
-            dateOfBirth = passportData.dateOfBirth,
-            expiryDate = passportData.expiryDate
+        when (val validationResult = documentIdentificationInteractor.validateDocument(
+            dateOfBirth = scannedDocument.dateOfBirth!!,
+            expiryDate = scannedDocument.expiryDate!!
         )) {
-            is PassportValidationState.Success -> {
-                logController.i { "Passport validation successful, navigating to live video" }
+            is DocumentValidationState.Success -> {
+                logController.i { "Document validation successful, navigating to live video" }
                 setState { copy(isLoading = false) }
-                setEffect { generatePasswordLiveLink(passportData) }
+                var link : Effect.Navigation
+                if (scannedDocument is ScannedDocument.Passport) {
+                    link = generatePasswordLiveLink(scannedDocument)
+                }
+                else{
+                    // todo go to issuance flow for eid
+                    link = generateCredentialIssuanceScreenLink()
+                }
+
+                setEffect {
+                    link
+                }
             }
 
-            is PassportValidationState.Failure -> {
-                logController.e { "Passport validation failed: ${validationResult.error}" }
+            is DocumentValidationState.Failure -> {
+                logController.e { "Document validation failed: ${validationResult.error}" }
                 setState { copy(isLoading = false) }
                 showError(validationResult.error)
             }
         }
     }
 
-    private fun generatePasswordLiveLink(passportData: PassportData): StartPassportLiveCheck =
-        StartPassportLiveCheck(
+    private fun generateCredentialIssuanceScreenLink(): Effect.Navigation {
+        return SwitchScreen(OnboardingScreens.IdentityDocumentCredentialIssuance.screenRoute)
+    }
+
+    private fun generatePasswordLiveLink(passport: ScannedDocument.Passport): SwitchScreen =
+        SwitchScreen(
             generateComposableNavigationLink(
                 OnboardingScreens.PassportLiveVideo,
                 generateComposableArguments(
                     mapOf(
                         PassportLiveVideoUiConfig.serializedKeyName to uiSerializer.toBase64(
-                            generateUiConfig(passportData),
+                            generateUiConfig(passport),
                             PassportLiveVideoUiConfig.Parser
                         )
                     )
@@ -153,14 +166,14 @@ class PassportIdentificationViewModel(
             )
         )
 
-    private fun generateUiConfig(passportData: PassportData): PassportLiveVideoUiConfig {
+    private fun generateUiConfig(passport: ScannedDocument.Passport): PassportLiveVideoUiConfig {
         val tempFile = File(context.cacheDir, "passport_face_${System.currentTimeMillis()}.png")
         FileOutputStream(tempFile).use { fos ->
-            passportData.faceImage!!.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            passport.faceImage!!.compress(Bitmap.CompressFormat.PNG, 100, fos)
         }
         return PassportLiveVideoUiConfig(
-            dateOfBirth = passportData.dateOfBirth!!,
-            expiryDate = passportData.expiryDate!!,
+            dateOfBirth = passport.dateOfBirth!!,
+            expiryDate = passport.expiryDate!!,
             faceImageTempPath = tempFile.absolutePath,
         )
     }

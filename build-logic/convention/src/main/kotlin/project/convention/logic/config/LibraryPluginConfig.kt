@@ -35,7 +35,8 @@ enum class LibraryModule(val path: String) {
     OnboardingFeature(":onboarding-feature"),
     PresentationFeature(":presentation-feature"),
     IssuanceFeature(":issuance-feature"),
-    LandingFeature(":landing-feature");
+    LandingFeature(":landing-feature"),
+    PassportScanner(":passport-scanner");
 
     val isLogicModule: Boolean
         get() {

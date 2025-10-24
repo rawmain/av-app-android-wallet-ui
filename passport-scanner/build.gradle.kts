@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -14,48 +14,24 @@
  * governing permissions and limitations under the Licence.
  */
 
+import project.convention.logic.config.LibraryModule
+import project.convention.logic.kover.KoverExclusionRules
+import project.convention.logic.kover.excludeFromKoverReport
+
 plugins {
-    id("com.android.library")
-    id("kotlin-android")
-    id("kotlin-parcelize")
+    id("project.android.library")
 }
 
 android {
     namespace = "eu.europa.ec.passportscanner"
-    compileSdk = 35
-
-    defaultConfig {
-        minSdk = 28
-        vectorDrawables.useSupportLibrary = true
-    }
 
     buildFeatures {
         viewBinding = true
-        buildConfig = true
     }
+}
 
-    lint {
-        abortOnError = false
-    }
-
-    buildTypes {
-        debug {
-            isMinifyEnabled = false
-            isJniDebuggable = true
-        }
-        release {
-            isMinifyEnabled = false
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+moduleConfig {
+    module = LibraryModule.PassportScanner
 }
 
 configurations.all {
@@ -63,6 +39,9 @@ configurations.all {
 }
 
 dependencies {
+    // Project dependencies
+    implementation(project(LibraryModule.BusinessLogic.path))
+
     implementation(files("libs/jj2000_imageutil.jar"))
 
     // Core Android dependencies
@@ -80,6 +59,9 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+
+    // Guava for ListenableFuture (required by CameraX with flavors)
+    implementation("com.google.guava:guava:31.1-android")
 
     // MRZ (logging replaced slf4j with Timber)
     implementation(libs.timber)
@@ -105,9 +87,6 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
 
-    // WorkManager
-    implementation(libs.androidx.work.ktx)
-
     // Browser (for Custom Tabs)
     implementation(libs.androidx.browser)
 
@@ -119,3 +98,8 @@ dependencies {
     }
     implementation("io.jsonwebtoken:jjwt-gson:0.13.0")
 }
+
+excludeFromKoverReport(
+    excludedClasses = KoverExclusionRules.PassportScanner.classes,
+    excludedPackages = KoverExclusionRules.PassportScanner.packages,
+)
