@@ -118,4 +118,16 @@ internal class WalletCoreConfigImpl(
             useDPoPIfSupported = true,
             parUsage = OpenId4VciManager.Config.ParUsage.IF_SUPPORTED
         )
+
+    /**
+     * Configuration for the face match SDK.
+     */
+    override val faceMatchConfig: FaceMatchConfig = FaceMatchConfig(
+        faceDetectorModel = "mediapipe_long.onnx",
+        embeddingExtractorModel = "https://github.com/eu-digital-identity-wallet/av-app-android-wallet-ui/releases/download/2025.10-2/glintr100.onnx",
+        livenessModel0 = "silentface40.onnx",
+        livenessModel1 = "silentface27.onnx",
+        livenessThreshold = 0.972017,
+        matchingThreshold = 0.5
+    )
 }

@@ -53,9 +53,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation
-import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Event.OnPassportScanSuccessful
+import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Event.OnDocumentScanSuccessful
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.theme.values.elevated
+import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.BulletHolder
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
@@ -70,6 +71,7 @@ import eu.europa.ec.uilogic.component.wrap.ButtonType
 import eu.europa.ec.uilogic.component.wrap.StickyBottomConfig
 import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.TextConfig
+import eu.europa.ec.uilogic.component.wrap.WrapImage
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
 import java.time.LocalDate
@@ -78,9 +80,9 @@ import java.time.format.FormatStyle
 import java.util.Locale
 
 @Composable
-fun PassportIdentificationScreen(
+fun DocumentIdentificationScreen(
     controller: NavController,
-    viewModel: PassportIdentificationViewModel
+    viewModel: DocumentIdentificationViewModel
 ) {
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
@@ -92,22 +94,22 @@ fun PassportIdentificationScreen(
         when (result.resultCode) {
             Activity.RESULT_OK -> {
                 result.data?.let { intent ->
-                    val passportData =
-                        PassportScannerIntentHelper.extractPassportDataFromIntent(intent)
-                    if (passportData.dateOfBirth == null && passportData.expiryDate == null && passportData.faceImage == null) {
-                        viewModel.setEvent(Event.OnPassportScanFailed(PassportErrors.NoPassportDataReceived))
+                    val scannedDocument =
+                        DocumentScannerIntentHelper.extractScannedDocumentFromIntent(intent)
+                    if (scannedDocument.dateOfBirth == null && scannedDocument.expiryDate == null ) {
+                        viewModel.setEvent(Event.OnDocumentScanFailed(DocumentErrors.NoDocumentDataReceived))
                     } else {
-                        viewModel.setEvent(OnPassportScanSuccessful(passportData))
+                        viewModel.setEvent(OnDocumentScanSuccessful(scannedDocument))
                     }
                 }
             }
 
             Activity.RESULT_CANCELED -> {
-                viewModel.setEvent(Event.OnPassportScanFailed(PassportErrors.ScanCancelled))
+                viewModel.setEvent(Event.OnDocumentScanFailed(DocumentErrors.ScanCancelled))
             }
 
             else -> {
-                viewModel.setEvent(Event.OnPassportScanFailed(PassportErrors.UnknownError))
+                viewModel.setEvent(Event.OnDocumentScanFailed(DocumentErrors.UnknownError))
             }
         }
     }
@@ -129,7 +131,7 @@ fun PassportIdentificationScreen(
         }
     ) { paddingValues ->
         if (state.scanComplete) {
-            VerifyYourDataContent(passportData = state.passportData!!, paddingValues = paddingValues)
+            VerifyYourDataContent(scannedDocument = state.scannedDocument!!, paddingValues = paddingValues)
         } else {
             Content(paddingValues = paddingValues)
         }
@@ -141,9 +143,6 @@ fun PassportIdentificationScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.setEvent(Event.Init)
-    }
 }
 
 @Composable
@@ -160,7 +159,7 @@ private fun ActionButtons(
         primaryButtonConfig = ButtonConfig(
         type = ButtonType.SECONDARY,
         onClick = {
-            if (state.scanComplete && state.passportData == null)
+            if (state.scanComplete && state.scannedDocument == null)
                 onTryAgain()
             else
                 onBack()
@@ -175,7 +174,7 @@ private fun ActionButtons(
         R.string.passport_identification_capture
     }
 
-    val secondaryButtonText = if (state.scanComplete && state.passportData == null) {
+    val secondaryButtonText = if (state.scanComplete && state.scannedDocument == null) {
         R.string.passport_biometrics_try_again
     } else {
         R.string.passport_identification_back
@@ -205,12 +204,12 @@ private fun handleEffect(
     when (effect) {
         is Navigation.GoBack -> hostNavController.popBackStack()
         is Navigation.StartMRZScanner -> mrzScannerLauncher.launch(
-            PassportScannerIntentHelper.createMrzScannerIntent(
+            DocumentScannerIntentHelper.createMrzScannerIntent(
                 context
             )
         )
 
-        is Navigation.StartPassportLiveCheck -> {
+        is Navigation.SwitchScreen -> {
             hostNavController.navigate(effect.screenRoute)
         }
     }
@@ -264,7 +263,7 @@ private fun Content(paddingValues: PaddingValues) {
 
 
 @Composable
-fun VerifyYourDataContent(passportData: PassportData, paddingValues: PaddingValues) {
+fun VerifyYourDataContent(scannedDocument: ScannedDocument, paddingValues: PaddingValues) {
 
     Column(
         modifier = Modifier
@@ -302,15 +301,15 @@ fun VerifyYourDataContent(passportData: PassportData, paddingValues: PaddingValu
 
                 VSpacer.ExtraLarge()
 
-                PassportImageOrFallback(passportData)
+                PassportImageOrFallback(scannedDocument)
 
                 VSpacer.ExtraLarge()
                 val labelId = R.string.passport_biometrics_dob
-                PassportInfoWithLabel(labelId, formatDateForLocale(passportData.dateOfBirth))
+                PassportInfoWithLabel(labelId, formatDateForLocale(scannedDocument.dateOfBirth))
 
                 VSpacer.ExtraLarge()
                 val labelExpiry = R.string.passport_biometrics_doe
-                PassportInfoWithLabel(labelExpiry, formatDateForLocale(passportData.expiryDate))
+                PassportInfoWithLabel(labelExpiry, formatDateForLocale(scannedDocument.expiryDate))
             }
         }
     }
@@ -349,26 +348,33 @@ private fun PassportInfoWithLabel(
 }
 
 @Composable
-private fun PassportImageOrFallback(passportData: PassportData) {
-    passportData.faceImage?.let { faceImage ->
-        Image(
-            painter = BitmapPainter(faceImage.asImageBitmap()),
-            contentDescription = "Passport Face Image",
+private fun PassportImageOrFallback(scannedDocument: ScannedDocument) {
+    if (scannedDocument is ScannedDocument.Passport) {
+        scannedDocument.faceImage?.let { faceImage ->
+            Image(
+                painter = BitmapPainter(faceImage.asImageBitmap()),
+                contentDescription = "Passport Face Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .size(150.dp),
+                contentScale = ContentScale.Fit
+            )
+        } ?: Image(
+            painter = painterResource(R.drawable.ic_logo_plain),
+            contentDescription = "Placeholder Image",
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .size(150.dp),
             contentScale = ContentScale.Fit
         )
-    } ?: Image(
-        painter = painterResource(R.drawable.ic_logo_plain),
-        contentDescription = "Placeholder Image",
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .size(150.dp),
-        contentScale = ContentScale.Fit
-    )
+    } else {
+        WrapImage(
+            modifier = Modifier.size(64.dp),
+            iconData = AppIcons.Id,
+        )
+    }
 }
 
 @Composable
@@ -402,7 +408,7 @@ fun VerifyYourDataContentPreview() {
                 )
             }
         ) { paddingValues ->
-            VerifyYourDataContent(passportData = PassportData("10/28/1983", "1/31/2033", null), paddingValues = paddingValues)
+            VerifyYourDataContent(scannedDocument = ScannedDocument.Passport("10/28/1983", "01/31/2033", null), paddingValues = paddingValues)
         }
     }
 }
