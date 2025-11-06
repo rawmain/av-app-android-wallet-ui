@@ -32,9 +32,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
-import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
 import eu.europa.ec.uilogic.component.utils.ALPHA_DISABLED
-import eu.europa.ec.uilogic.component.utils.SIZE_100
+import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 
 enum class ButtonType {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -22,8 +22,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,10 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.resourceslogic.R
-import eu.europa.ec.uilogic.component.AppIconAndTextData
-import eu.europa.ec.uilogic.component.ListItemData
-import eu.europa.ec.uilogic.component.ListItemMainContentData
-import eu.europa.ec.uilogic.component.RelyingPartyData
+import eu.europa.ec.uilogic.component.AppIconAndTextDataUi
+import eu.europa.ec.uilogic.component.ListItemDataUi
+import eu.europa.ec.uilogic.component.ListItemMainContentDataUi
+import eu.europa.ec.uilogic.component.RelyingPartyDataUi
 import eu.europa.ec.uilogic.component.content.ContentHeader
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
 import eu.europa.ec.uilogic.component.content.ContentScreen
@@ -52,7 +50,7 @@ import eu.europa.ec.uilogic.component.utils.SPACING_MEDIUM
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.wrap.ButtonConfig
 import eu.europa.ec.uilogic.component.wrap.ButtonType
-import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
+import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
 import eu.europa.ec.uilogic.component.wrap.StickyBottomConfig
 import eu.europa.ec.uilogic.component.wrap.StickyBottomType
 import eu.europa.ec.uilogic.component.wrap.WrapExpandableListItem
@@ -75,7 +73,7 @@ fun DocumentSuccessScreen(
         isLoading = false,
         stickyBottom = { paddingValues ->
             WrapStickyBottomContent(
-                stickyBottomModifier = Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(paddingValues),
                 stickyBottomConfig = StickyBottomConfig(
@@ -147,7 +145,6 @@ private fun Content(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
             .padding(paddingValues)
     ) {
         ContentHeader(
@@ -158,7 +155,7 @@ private fun Content(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = SPACING_SMALL.dp),
+                .padding(vertical = SPACING_SMALL.dp),
             verticalArrangement = Arrangement.spacedBy(SPACING_MEDIUM.dp)
         ) {
             state.items.forEach { successItem ->
@@ -198,12 +195,12 @@ fun DocumentSuccessScreenPreview() {
             state = State(
                 isLoading = false,
                 headerConfig = ContentHeaderConfig(
-                    appIconAndTextData = AppIconAndTextData(),
+                    appIconAndTextData = AppIconAndTextDataUi(),
                     description = null,
                     descriptionTextConfig = null,
                     mainText = stringResource(R.string.issuance_success_header_description),
                     mainTextConfig = null,
-                    relyingPartyData = RelyingPartyData(
+                    relyingPartyData = RelyingPartyDataUi(
                         logo = null,
                         isVerified = true,
                         name = "Test Issuer",
@@ -213,10 +210,10 @@ fun DocumentSuccessScreenPreview() {
                     )
                 ),
                 items = listOf(
-                    ExpandableListItem.NestedListItemData(
-                        header = ListItemData(
+                    ExpandableListItemUi.NestedListItem(
+                        header = ListItemDataUi(
                             itemId = "1",
-                            mainContentData = ListItemMainContentData.Text(
+                            mainContentData = ListItemMainContentDataUi.Text(
                                 text = "True"
                             ),
                             overlineText = "Age over 18",

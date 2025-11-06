@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -16,7 +16,6 @@
 
 package eu.europa.ec.presentationfeature.ui.loading
 
-import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
@@ -114,11 +113,8 @@ class PresentationLoadingViewModel(
                         )
                     }
 
-                    is PresentationLoadingObserveResponsePartialState.IntentToSent -> {
-                        if (context is Activity) {
-                            context.setResult(Activity.RESULT_OK, it.intent)
-                            context.finish()
-                        }
+                    is PresentationLoadingObserveResponsePartialState.IntentToSend -> {
+                        onIntentToSend(context, it.intent)
                     }
                 }
             }
@@ -193,5 +189,12 @@ class PresentationLoadingViewModel(
             )
         }
         doNavigation(NavigationType.PushRoute(getNextScreen()))
+    }
+
+    private fun onIntentToSend(context: Context, intent: android.content.Intent) {
+        (context as? android.app.Activity)?.let { activity ->
+            activity.setResult(android.app.Activity.RESULT_OK, intent)
+            activity.finish()
+        }
     }
 }

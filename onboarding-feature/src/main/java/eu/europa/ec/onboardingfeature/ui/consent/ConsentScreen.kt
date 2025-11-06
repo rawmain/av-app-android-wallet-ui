@@ -25,8 +25,6 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -117,7 +115,7 @@ private fun ContinueButton(
     config: ButtonConfig,
 ) {
     WrapStickyBottomContent(
-        stickyBottomModifier = Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(
                 start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
@@ -189,8 +187,7 @@ fun ConsentAndTosSection(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 0.dp, vertical = SPACING_EXTRA_LARGE.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(horizontal = 0.dp, vertical = SPACING_EXTRA_LARGE.dp),
     ) {
         WrapText(
             modifier = Modifier.fillMaxWidth(),

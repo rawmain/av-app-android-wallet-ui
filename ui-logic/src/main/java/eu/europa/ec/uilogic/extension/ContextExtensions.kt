@@ -45,9 +45,11 @@ fun Context.getPendingDeepLink(): Uri? {
 }
 
 fun Context.getPendingIntentAction(): IntentAction? {
-    return (this as? EudiComponentActivity)?.pendingIntentAction?.let { action ->
+    val activity = this as? EudiComponentActivity
+    val pendingIntent = activity?.pendingIntent
+    return pendingIntent?.let { intent ->
         clearPendingIntent()
-        action
+        IntentAction(intent)
     }
 }
 
@@ -56,6 +58,10 @@ fun Context.cacheDeepLink(uri: Uri) {
         data = uri
     }
     (this as? EudiComponentActivity)?.cacheDeepLink(intent)
+}
+
+fun Context.cacheIntent(intent: Intent?) {
+    (this as? EudiComponentActivity)?.cacheIntent(intent)
 }
 
 fun Context.finish() {
@@ -76,7 +82,7 @@ private fun Context.clearPendingDeepLink() {
 }
 
 private fun Context.clearPendingIntent() {
-    (this as? EudiComponentActivity)?.pendingIntentAction = null
+    (this as? EudiComponentActivity)?.pendingIntent = null
 }
 
 /**

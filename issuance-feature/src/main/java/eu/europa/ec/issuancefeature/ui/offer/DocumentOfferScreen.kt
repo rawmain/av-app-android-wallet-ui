@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -40,9 +40,9 @@ import eu.europa.ec.commonfeature.config.OfferUiConfig
 import eu.europa.ec.corelogic.util.CoreActions
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.ErrorInfo
-import eu.europa.ec.uilogic.component.ListItemData
-import eu.europa.ec.uilogic.component.ListItemMainContentData
-import eu.europa.ec.uilogic.component.RelyingPartyData
+import eu.europa.ec.uilogic.component.ListItemDataUi
+import eu.europa.ec.uilogic.component.ListItemMainContentDataUi
+import eu.europa.ec.uilogic.component.RelyingPartyDataUi
 import eu.europa.ec.uilogic.component.content.BroadcastAction
 import eu.europa.ec.uilogic.component.content.ContentHeader
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
@@ -88,7 +88,7 @@ fun DocumentOfferScreen(
         onBack = { viewModel.setEvent(Event.BackButtonPressed) },
         stickyBottom = { paddingValues ->
             WrapStickyBottomContent(
-                stickyBottomModifier = Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(paddingValues),
                 stickyBottomConfig = StickyBottomConfig(
@@ -191,7 +191,7 @@ private fun Content(
 @Composable
 private fun MainContent(
     modifier: Modifier = Modifier,
-    documents: List<ListItemData>,
+    documents: List<ListItemDataUi>,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -255,16 +255,16 @@ private fun ContentPreview() {
             error = null,
             isInitialised = true,
             documents = listOf(
-                ListItemData(
+                ListItemDataUi(
                     itemId = "doc_1",
-                    mainContentData = ListItemMainContentData.Text(text = "PID")
+                    mainContentData = ListItemMainContentDataUi.Text(text = "PID")
                 )
             ),
             noDocument = false,
             headerConfig = ContentHeaderConfig(
                 description = stringResource(R.string.issuance_document_offer_description),
                 mainText = stringResource(R.string.issuance_document_offer_header_main_text),
-                relyingPartyData = RelyingPartyData(
+                relyingPartyData = RelyingPartyDataUi(
                     isVerified = true,
                     name = stringResource(R.string.issuance_document_offer_relying_party_default_name),
                     description = stringResource(R.string.issuance_document_offer_relying_party_description)

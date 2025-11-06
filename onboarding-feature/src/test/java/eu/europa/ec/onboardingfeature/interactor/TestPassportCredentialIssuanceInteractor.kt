@@ -21,18 +21,18 @@ import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvai
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
-import eu.europa.ec.commonfeature.util.TestsData.mockedUriPath1
 import eu.europa.ec.corelogic.controller.FetchScopedDocumentsPartialState
 import eu.europa.ec.corelogic.controller.IssuanceMethod
 import eu.europa.ec.corelogic.controller.IssueDocumentPartialState
 import eu.europa.ec.corelogic.controller.PassportScanningDocumentsController
-import eu.europa.ec.corelogic.model.ScopedDocument
+import eu.europa.ec.corelogic.model.ScopedDocumentDomain
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.testfeature.mockedDefaultLocale
-import eu.europa.ec.testfeature.mockedGenericErrorMessage
-import eu.europa.ec.testfeature.mockedNotifyOnAuthenticationFailure
-import eu.europa.ec.testfeature.mockedPlainFailureMessage
+import eu.europa.ec.testfeature.util.mockedDefaultLocale
+import eu.europa.ec.testfeature.util.mockedGenericErrorMessage
+import eu.europa.ec.testfeature.util.mockedNotifyOnAuthenticationFailure
+import eu.europa.ec.testfeature.util.mockedPlainFailureMessage
+import eu.europa.ec.testfeature.util.mockedUriPath1
 import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.extension.toFlow
@@ -81,18 +81,22 @@ class TestPassportCredentialIssuanceInteractor {
 
     private lateinit var crypto: BiometricCrypto
 
-    private val mockedAgeVerificationDocument = ScopedDocument(
+    private val mockedAgeVerificationDocument = ScopedDocumentDomain(
         name = "Age Verification",
         configurationId = "age-verification-config",
+        credentialIssuerId = "issuer-id",
+        formatType = null,
         isPid = false,
         isAgeVerification = true
     )
 
     private val mockedScopedDocumentsWithAgeVerification = listOf(
         mockedAgeVerificationDocument,
-        ScopedDocument(
+        ScopedDocumentDomain(
             name = "Other Document",
             configurationId = "other-config",
+            credentialIssuerId = "issuer-id",
+            formatType = null,
             isPid = false,
             isAgeVerification = false
         )
@@ -156,9 +160,11 @@ class TestPassportCredentialIssuanceInteractor {
         coroutineRule.runTest {
             // Given
             val documentsWithoutAgeVerification = listOf(
-                ScopedDocument(
+                ScopedDocumentDomain(
                     name = "Other Document",
                     configurationId = "other-config",
+                    credentialIssuerId = "issuer-id",
+                    formatType = null,
                     isPid = false,
                     isAgeVerification = false
                 )

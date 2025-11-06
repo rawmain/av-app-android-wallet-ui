@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -16,16 +16,16 @@
 
 package eu.europa.ec.issuancefeature.ui.offer.transformer
 
-import eu.europa.ec.issuancefeature.ui.offer.model.DocumentOfferItemUi
-import eu.europa.ec.uilogic.component.ListItemData
-import eu.europa.ec.uilogic.component.ListItemMainContentData
+import eu.europa.ec.issuancefeature.ui.offer.model.DocumentOfferUi
+import eu.europa.ec.uilogic.component.ListItemDataUi
+import eu.europa.ec.uilogic.component.ListItemMainContentDataUi
 
 internal object DocumentOfferTransformer {
-    fun List<DocumentOfferItemUi>.toListItemDataList(): List<ListItemData> {
+    fun List<DocumentOfferUi>.toListItemDataUiList(): List<ListItemDataUi> {
         return this.mapIndexed { index, item ->
-            ListItemData(
+            ListItemDataUi(
                 itemId = index.toString(),
-                mainContentData = ListItemMainContentData.Text(text = item.title)
+                mainContentData = ListItemMainContentDataUi.Text(text = item.title)
             )
         }
     }

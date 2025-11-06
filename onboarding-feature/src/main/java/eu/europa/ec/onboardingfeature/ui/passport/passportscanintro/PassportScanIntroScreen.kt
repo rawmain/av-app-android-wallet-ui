@@ -122,7 +122,7 @@ private fun ActionButtons(
             ),
         )
         WrapStickyBottomContent(
-            stickyBottomModifier = Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(paddingValues),
             stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)

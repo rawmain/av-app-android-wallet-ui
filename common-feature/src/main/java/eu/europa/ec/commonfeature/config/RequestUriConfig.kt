@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -19,7 +19,6 @@ package eu.europa.ec.commonfeature.config
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import eu.europa.ec.corelogic.controller.PresentationControllerConfig
-import eu.europa.ec.uilogic.navigation.PresentationScreens
 import eu.europa.ec.uilogic.serializer.UiSerializable
 import eu.europa.ec.uilogic.serializer.UiSerializableParser
 import eu.europa.ec.uilogic.serializer.adapter.SerializableTypeAdapter
@@ -31,8 +30,11 @@ sealed interface PresentationMode {
 }
 
 data class RequestUriConfig(
-    val mode: PresentationMode
+    val presentationMode: PresentationMode,
 ) : UiSerializable {
+
+    @Deprecated("Use presentationMode instead", ReplaceWith("presentationMode"))
+    val mode: PresentationMode get() = presentationMode
 
     companion object Parser : UiSerializableParser {
         override val serializedKeyName = "requestUriConfig"
@@ -47,12 +49,13 @@ data class RequestUriConfig(
 }
 
 fun RequestUriConfig.toDomainConfig(): PresentationControllerConfig {
-    return when (mode) {
-        is PresentationMode.Ble -> PresentationControllerConfig.Ble(mode.initiatorRoute)
+    return when (presentationMode) {
+        is PresentationMode.Ble -> PresentationControllerConfig.Ble(presentationMode.initiatorRoute)
         is PresentationMode.OpenId4Vp -> PresentationControllerConfig.OpenId4VP(
-            mode.uri,
-            mode.initiatorRoute
+            presentationMode.uri,
+            presentationMode.initiatorRoute
         )
-        is PresentationMode.DcApi -> PresentationControllerConfig.DcApi( PresentationScreens.DcApiPresentationRequest.screenRoute)
+
+        is PresentationMode.DcApi -> PresentationControllerConfig.DcApi("", null)
     }
 }

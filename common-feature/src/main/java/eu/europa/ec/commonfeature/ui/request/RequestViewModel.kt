@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -16,25 +16,13 @@
 
 package eu.europa.ec.commonfeature.ui.request
 
-import androidx.lifecycle.viewModelScope
-import eu.europa.ec.businesslogic.extension.ifEmptyOrNull
-import eu.europa.ec.commonfeature.config.BiometricMode
-import eu.europa.ec.commonfeature.config.BiometricUiConfig
-import eu.europa.ec.commonfeature.config.OnBackNavigationConfig
-import eu.europa.ec.commonfeature.config.RequestUriConfig
-import eu.europa.ec.commonfeature.interactor.PresentationRequestInteractor
-import eu.europa.ec.commonfeature.interactor.PresentationRequestInteractorPartialState
 import eu.europa.ec.commonfeature.ui.request.model.RequestDocumentItemUi
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
-import eu.europa.ec.resourceslogic.R
-import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.AppIcons
-import eu.europa.ec.uilogic.component.ListItemTrailingContentData
-import eu.europa.ec.uilogic.component.RelyingPartyData
+import eu.europa.ec.uilogic.component.ListItemTrailingContentDataUi
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
-import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
-import eu.europa.ec.uilogic.config.ConfigNavigation
+import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.extension.toggleCheckboxState
 import eu.europa.ec.uilogic.extension.toggleExpansionState
@@ -42,14 +30,7 @@ import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
-import eu.europa.ec.uilogic.navigation.CommonScreens
-import eu.europa.ec.uilogic.navigation.PresentationScreens
-import eu.europa.ec.uilogic.navigation.Screen
-import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
-import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
-import eu.europa.ec.uilogic.serializer.UiSerializer
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 data class State(
     val isLoading: Boolean = true,
@@ -68,7 +49,6 @@ data class State(
 sealed class Event : ViewEvent {
     data object DoWork : Event()
     data object DismissError : Event()
-    data object Init : Event()
     data object Pop : Event()
     data object StickyButtonPressed : Event()
 
@@ -100,40 +80,13 @@ enum class RequestBottomSheetContent {
     WARNING,
 }
 
-abstract class RequestViewModel(
-    protected val interactor: PresentationRequestInteractor,
-    protected val resourceProvider: ResourceProvider,
-    protected val uiSerializer: UiSerializer,
-) : MviViewModel<Event, State, Effect>() {
+abstract class RequestViewModel : MviViewModel<Event, State, Effect>() {
     protected var viewModelJob: Job? = null
 
+    abstract fun getHeaderConfig(): ContentHeaderConfig
     abstract fun getNextScreen(): String
-    abstract fun requestUriConfig(): RequestUriConfig
+    abstract fun doWork()
 
-    fun doWork() {
-        setState {
-            copy(
-                isLoading = true,
-                error = null
-            )
-        }
-
-        interactor.setConfig(requestUriConfig())
-        handleInteractorResponse()
-    }
-
-    open fun init() {}
-
-    open fun getHeaderConfig(): ContentHeaderConfig {
-        return ContentHeaderConfig(
-            description = resourceProvider.getString(R.string.request_header_description),
-            mainText = resourceProvider.getString(R.string.request_header_main_text),
-            relyingPartyData = getRelyingPartyData(
-                name = null,
-                isVerified = false,
-            ),
-        )
-    }
     /**
      * Called during [NavigationType.Pop].
      *
@@ -142,7 +95,6 @@ abstract class RequestViewModel(
      * */
     open fun cleanUp() {
         getOrCreatePresentationScope().close()
-        interactor.stopPresentation()
     }
 
     open fun updateData(
@@ -159,7 +111,6 @@ abstract class RequestViewModel(
                 allowShare = allowShare ?: hasAtLeastOneFieldSelected
             )
         }
-        interactor.updateRequestedDocuments(updatedItems)
     }
 
     override fun setInitialState(): State {
@@ -210,115 +161,6 @@ abstract class RequestViewModel(
                     copy(isBottomSheetOpen = event.isOpen)
                 }
             }
-
-            Event.Init -> init()
-        }
-    }
-
-    protected fun getRelyingPartyData(
-        name: String?,
-        isVerified: Boolean,
-    ): RelyingPartyData {
-        return RelyingPartyData(
-            isVerified = isVerified,
-            name = name.ifEmptyOrNull(
-                default = resourceProvider.getString(R.string.request_relying_party_default_name)
-            ),
-            description = resourceProvider.getString(R.string.request_relying_party_description),
-        )
-    }
-
-    protected fun createBiometricScreen(backScreen: Screen): String {
-        return generateComposableNavigationLink(
-            screen = CommonScreens.Biometric,
-            arguments = generateComposableArguments(
-                mapOf(
-                    BiometricUiConfig.serializedKeyName to uiSerializer.toBase64(
-                        BiometricUiConfig(
-                            mode = BiometricMode.Default(
-                                descriptionWhenBiometricsEnabled = resourceProvider.getString(R.string.loading_biometry_biometrics_enabled_description),
-                                descriptionWhenBiometricsNotEnabled = resourceProvider.getString(R.string.loading_biometry_biometrics_not_enabled_description),
-                                textAbovePin = resourceProvider.getString(R.string.biometric_default_mode_text_above_pin_field),
-                            ),
-                            isPreAuthorization = false,
-                            shouldInitializeBiometricAuthOnCreate = true,
-                            onSuccessNavigation = ConfigNavigation(
-                                navigationType = NavigationType.PushScreen(PresentationScreens.PresentationLoading),
-                            ),
-                            onBackNavigationConfig = OnBackNavigationConfig(
-                                onBackNavigation = ConfigNavigation(
-                                    navigationType = NavigationType.PopTo(backScreen),
-                                ),
-                                hasToolbarBackIcon = true
-                            )
-                        ),
-                        BiometricUiConfig.Parser
-                    ).orEmpty()
-                )
-            )
-        )
-    }
-
-    protected fun handleInteractorResponse() {
-        viewModelJob = viewModelScope.launch {
-            interactor.getRequestDocuments().collect { response ->
-                when (response) {
-                    is PresentationRequestInteractorPartialState.Failure -> {
-                        setState {
-                            copy(
-                                isLoading = false,
-                                error = ContentErrorConfig(
-                                    onRetry = { setEvent(Event.DoWork) },
-                                    errorSubTitle = response.error,
-                                    onCancel = { setEvent(Event.Pop) }
-                                )
-                            )
-                        }
-                    }
-
-                    is PresentationRequestInteractorPartialState.Success -> {
-                        updateData(response.requestDocuments)
-
-                        val updatedHeaderConfig = viewState.value.headerConfig.copy(
-                            relyingPartyData = getRelyingPartyData(
-                                name = response.verifierName,
-                                isVerified = response.verifierIsTrusted,
-                            )
-                        )
-
-                        setState {
-                            copy(
-                                isLoading = false,
-                                error = null,
-                                headerConfig = updatedHeaderConfig,
-                                items = response.requestDocuments,
-                            )
-                        }
-                    }
-
-                    is PresentationRequestInteractorPartialState.Disconnect -> {
-                        setEvent(Event.Pop)
-                    }
-
-                    is PresentationRequestInteractorPartialState.NoData -> {
-                        val updatedHeaderConfig = viewState.value.headerConfig.copy(
-                            relyingPartyData = getRelyingPartyData(
-                                name = response.verifierName,
-                                isVerified = response.verifierIsTrusted,
-                            )
-                        )
-
-                        setState {
-                            copy(
-                                isLoading = false,
-                                error = null,
-                                headerConfig = updatedHeaderConfig,
-                                noItems = true,
-                            )
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -353,7 +195,7 @@ abstract class RequestViewModel(
             val newHeader = if (requestDocument.headerUi.header.itemId == id) {
                 val newIsExpanded = !requestDocument.headerUi.isExpanded
                 val newCollapsed = requestDocument.headerUi.header.copy(
-                    trailingContentData = ListItemTrailingContentData.Icon(
+                    trailingContentData = ListItemTrailingContentDataUi.Icon(
                         iconData = if (newIsExpanded) {
                             AppIcons.KeyboardArrowUp
                         } else {
@@ -431,16 +273,16 @@ abstract class RequestViewModel(
         return hasAtLeastOneFieldSelected
     }
 
-    private fun List<ExpandableListItem>.hasAnySingleSelected(): Boolean {
+    private fun List<ExpandableListItemUi>.hasAnySingleSelected(): Boolean {
         return this.any { expandableItem ->
             when (expandableItem) {
-                is ExpandableListItem.NestedListItemData -> {
+                is ExpandableListItemUi.NestedListItem -> {
                     expandableItem.nestedItems.hasAnySingleSelected()
                 }
 
-                is ExpandableListItem.SingleListItemData -> {
+                is ExpandableListItemUi.SingleListItem -> {
                     val trailingContentData = expandableItem.header.trailingContentData
-                    trailingContentData is ListItemTrailingContentData.Checkbox && trailingContentData.checkboxData.isChecked
+                    trailingContentData is ListItemTrailingContentDataUi.Checkbox && trailingContentData.checkboxData.isChecked
                 }
             }
         }
