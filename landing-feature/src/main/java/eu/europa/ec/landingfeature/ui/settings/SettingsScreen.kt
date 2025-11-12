@@ -49,7 +49,7 @@ import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.SIZE_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_LARGE
 import eu.europa.ec.uilogic.component.utils.VSpacer
-import eu.europa.ec.uilogic.component.wrap.BottomSheetTextData
+import eu.europa.ec.uilogic.component.wrap.BottomSheetTextDataUi
 import eu.europa.ec.uilogic.component.wrap.DialogBottomSheet
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapImage
@@ -263,7 +263,7 @@ private fun ConfirmDeleteDialogContent(
     onEvent: (event: Event) -> Unit
 ) {
     DialogBottomSheet(
-        textData = BottomSheetTextData(
+        textData = BottomSheetTextDataUi(
             title = stringResource(id = R.string.confirm_doc_removal_dialog_title),
             message = stringResource(id = R.string.confirm_doc_removal_dialog_text),
             positiveButtonText = stringResource(id = R.string.confirm_doc_removal_dialog_delete),

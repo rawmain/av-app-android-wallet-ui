@@ -43,14 +43,9 @@ The AV Android is the application that allows users to:
 
 The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.com/eu-digital-identity-wallet/eudi-lib-android-wallet-core) and a list of available libraries to facilitate remote presentation and issuing test/demo functionality following partially the specification of the [ARF](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework), including:
 
-- OpenID4VP - draft 24 (remote presentation)
+- OpenID4VP - v1 (remote presentation), DCQL
 
 - OpenID4VCI draft 15 (issuing)
-
-As an experimental feature the app has support for [Digital Credential API](https://w3c-fedid.github.io/digital-credentials/) (DCAPI) for presentation of org-iso-mdoc with protocol [W3C 18013-7 Annex C](https://www.iso.org/standard/91154.html). This feature could
-be tested against https://dc-openwallet-verifier-backend-gmfrdchkavechkbj.westeurope-01.azurewebsites.net/ which is our version of multipaz verifier supporting document type `eu.europa.ec.av.1`. Enable the DCAPI flag in Chrome browser `chrome://flags/#web-identity-digital-credentials`. 
-On the verifier webpage choose "EU Personal ID (mdoc)" and from the protocol dropdown choose "W3C 18013-7 Annex C", then click "Age Over 18" to start the DCAPI flow.
-
   
 ### Build
 

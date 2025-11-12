@@ -17,11 +17,9 @@
 package eu.europa.ec.corelogic.controller
 
 import android.content.Intent
-import android.util.Log
 import androidx.activity.ComponentActivity
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.addOrReplace
-import eu.europa.ec.businesslogic.extension.ifEmptyOrNull
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.corelogic.di.WalletPresentationScope
@@ -33,7 +31,6 @@ import eu.europa.ec.eudi.iso18013.transfer.response.RequestProcessor
 import eu.europa.ec.eudi.iso18013.transfer.response.RequestedDocument
 import eu.europa.ec.eudi.iso18013.transfer.toKotlinResult
 import eu.europa.ec.eudi.wallet.EudiWallet
-import eu.europa.ec.eudi.wallet.dcapi.DCAPIException
 import eu.europa.ec.eudi.wallet.document.DocumentExtensions.getDefaultKeyUnlockData
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import kotlinx.coroutines.CoroutineDispatcher
@@ -61,7 +58,8 @@ sealed class PresentationControllerConfig(val initiatorRoute: String) {
         PresentationControllerConfig(initiator)
 
     data class Ble(val initiator: String) : PresentationControllerConfig(initiator)
-    data class DcApi(val initiator: String) : PresentationControllerConfig(initiator)
+    data class DcApi(val initiator: String, val intent: Intent?) :
+        PresentationControllerConfig(initiator)
 }
 
 sealed class TransferEventPartialState {
@@ -78,7 +76,7 @@ sealed class TransferEventPartialState {
 
     data object ResponseSent : TransferEventPartialState()
     data class Redirect(val uri: URI) : TransferEventPartialState()
-    data class IntentToSent(val intent: Intent) : TransferEventPartialState()
+    data class IntentToSend(val intent: Intent) : TransferEventPartialState()
 }
 
 sealed class CheckKeyUnlockPartialState {
@@ -99,7 +97,7 @@ sealed class ResponseReceivedPartialState {
     data object Success : ResponseReceivedPartialState()
     data class Redirect(val uri: URI) : ResponseReceivedPartialState()
     data class Failure(val error: String) : ResponseReceivedPartialState()
-    data class IntentToSent(val intent: Intent) : ResponseReceivedPartialState()
+    data class IntentToSend(val intent: Intent) : ResponseReceivedPartialState()
 }
 
 sealed class WalletCorePartialState {
@@ -111,7 +109,7 @@ sealed class WalletCorePartialState {
     data object Success : WalletCorePartialState()
     data class Redirect(val uri: URI) : WalletCorePartialState()
     data object RequestIsReadyToBeSent : WalletCorePartialState()
-    data class IntentToSent(val intent: Intent) : WalletCorePartialState()
+    data class IntentToSend(val intent: Intent) : WalletCorePartialState()
 }
 
 /**
@@ -199,6 +197,11 @@ interface WalletCorePresentationController {
      * @return flow that emits the create, sent, receive states
      * */
     fun observeSentDocumentsRequest(): Flow<WalletCorePartialState>
+
+    /**
+     * Starts DCAPI presentation flow with the provided intent
+     * @param intent The DCAPI intent from the credential request
+     * */
     fun startDCAPIPresentation(intent: Intent)
 }
 
@@ -258,27 +261,18 @@ class WalletCorePresentationControllerImpl(
                     TransferEventPartialState.Disconnected
                 )
             },
-            onError = { error ->
-                Log.e("WalletCorePresentationController", "error: $error")
+            onError = { errorMessage ->
                 trySendBlocking(
-
-                    if (error is DCAPIException) {
-                        Log.e(
-                            "WalletCorePresentationController",
-                            "DCAPIException, continue as IntentToSent"
-                        )
-                        TransferEventPartialState.IntentToSent(error.toIntent())
-                    } else {
-                        TransferEventPartialState.Error(
-                            error = error.message.ifEmptyOrNull(genericErrorMessage)
-                        )
-                    }
+                    TransferEventPartialState.Error(
+                        error = errorMessage.ifEmpty { genericErrorMessage }
+                    )
                 )
             },
             onRequestReceived = { requestedDocumentData ->
                 trySendBlocking(
                     requestedDocumentData.getOrNull()?.let { requestedDocuments ->
-                        processedRequest = requestedDocuments
+
+                    processedRequest = requestedDocuments
 
                         verifierName = requestedDocuments.requestedDocuments
                             .firstOrNull()?.readerAuth?.readerCommonName
@@ -309,9 +303,10 @@ class WalletCorePresentationControllerImpl(
                     )
                 )
             },
-            onIntentToSend = { intent ->
+
+            intentToSend = { intent ->
                 trySendBlocking(
-                    TransferEventPartialState.IntentToSent(intent)
+                    TransferEventPartialState.IntentToSend(intent)
                 )
             }
         )
@@ -349,18 +344,24 @@ class WalletCorePresentationControllerImpl(
 
             if (eudiWallet.config.userAuthenticationRequired) {
 
-                val keyUnlockDataMap = documents.associateWith {
-                    eudiWallet.getDefaultKeyUnlockData(it.documentId)
+                val keyUnlockDataMap = documents.associateWith { disclosedDocument ->
+                    eudiWallet.getDefaultKeyUnlockData(documentId = disclosedDocument.documentId)
                 }
 
                 for ((doc, kud) in keyUnlockDataMap) {
+
+                    val cryptoObject = kud?.getCryptoObjectForSigning()
+
                     authenticationData.add(
                         AuthenticationData(
-                            BiometricCrypto(kud?.getCryptoObjectForSigning()),
+                            crypto = BiometricCrypto(cryptoObject),
                             onAuthenticationSuccess = {
-                                disclosedDocuments?.addOrReplace(doc.copy(keyUnlockData = kud)) {
-                                    it.documentId == doc.documentId
-                                }
+                                disclosedDocuments?.addOrReplace(
+                                    value = doc.copy(keyUnlockData = kud),
+                                    replaceCondition = { disclosedDocument ->
+                                        disclosedDocument.documentId == doc.documentId
+                                    }
+                                )
                             }
                         )
                     )
@@ -434,7 +435,9 @@ class WalletCorePresentationControllerImpl(
 
                 is TransferEventPartialState.ResponseSent -> ResponseReceivedPartialState.Success
 
-                is TransferEventPartialState.IntentToSent -> ResponseReceivedPartialState.IntentToSent(response.intent)
+                is TransferEventPartialState.IntentToSend -> ResponseReceivedPartialState.IntentToSend(
+                    response.intent
+                )
 
                 else -> null
             }
@@ -465,12 +468,13 @@ class WalletCorePresentationControllerImpl(
                         uri = it.uri
                     )
                 }
-                is ResponseReceivedPartialState.IntentToSent-> {
-                    WalletCorePartialState.IntentToSent(it.intent)
-                }
 
                 is CheckKeyUnlockPartialState.RequestIsReadyToBeSent -> {
                     WalletCorePartialState.RequestIsReadyToBeSent
+                }
+
+                is ResponseReceivedPartialState.IntentToSend -> {
+                    WalletCorePartialState.IntentToSend(it.intent)
                 }
 
                 else -> {
@@ -501,8 +505,20 @@ class WalletCorePresentationControllerImpl(
     private fun addListener(listener: EudiWalletListenerWrapper) {
         val config = requireInit { _config }
         eudiWallet.addTransferEventListener(listener)
-        if (config is PresentationControllerConfig.OpenId4VP) {
-            eudiWallet.startRemotePresentation(config.uri.toUri())
+        when (config) {
+            is PresentationControllerConfig.OpenId4VP -> {
+                eudiWallet.startRemotePresentation(config.uri.toUri())
+            }
+
+            is PresentationControllerConfig.DcApi -> {
+                config.intent?.let {
+                    eudiWallet.startDCAPIPresentation(it)
+                }
+            }
+
+            else -> {
+                // BLE or other modes don't require automatic start
+            }
         }
     }
 

@@ -26,7 +26,7 @@ import eu.europa.ec.corelogic.controller.FetchScopedDocumentsPartialState
 import eu.europa.ec.corelogic.controller.IssuanceMethod
 import eu.europa.ec.corelogic.controller.IssueDocumentPartialState
 import eu.europa.ec.corelogic.controller.PassportScanningDocumentsController
-import eu.europa.ec.corelogic.model.ScopedDocument
+import eu.europa.ec.corelogic.model.ScopedDocumentDomain
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.resourceslogic.theme.values.ThemeColors
@@ -82,7 +82,7 @@ class PassportCredentialIssuanceInteractorImpl(
                     resourceProvider.getLocale()
                 )) {
                 is FetchScopedDocumentsPartialState.Success -> {
-                    val ageVerificationDocument: ScopedDocument? = state.documents
+                    val ageVerificationDocument: ScopedDocumentDomain? = state.documents
                         .firstOrNull { it.isAgeVerification }
 
                     if (ageVerificationDocument == null) {

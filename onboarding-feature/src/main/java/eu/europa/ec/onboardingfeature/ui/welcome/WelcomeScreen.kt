@@ -44,7 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
-import eu.europa.ec.uilogic.component.IconData
+import eu.europa.ec.uilogic.component.IconDataUi
 import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
@@ -79,7 +79,7 @@ fun WelcomeScreen(navController: NavController, viewModel: WelcomeViewModel) {
         onBack = { viewModel.setEvent(Event.Pop) },
         stickyBottom = { paddingValues ->
             WrapStickyBottomContent(
-                stickyBottomModifier = Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(paddingValues),
                 stickyBottomConfig = StickyBottomConfig(
@@ -163,7 +163,7 @@ private fun handleNavigationEffect(
     }
 }
 
-data class SinglePageConfig(val title: Int, val description: Int, val icon: IconData)
+data class SinglePageConfig(val title: Int, val description: Int, val icon: IconDataUi)
 
 @Composable
 private fun SinglePage(

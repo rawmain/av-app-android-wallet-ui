@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2023 European Commission
+  ~ Copyright (c) 2025 European Commission
   ~
   ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
   ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -282,6 +282,7 @@
     <!-- Issuance Add Document Screen -->
     <string name="issuance_add_document_title">Add document from list</string>
     <string name="issuance_add_document_subtitle">Choose a digital document from the list below to add to your application.</string>
+    <string name="issuance_add_document_no_options">No available documents</string>
     <string name="issuance_add_document_scan_qr_footer_text">@string/generic_or</string>
     <string name="issuance_add_document_scan_qr_footer_button_text">@string/generic_scan_qr</string>
     <string name="issuance_add_document_deferred_success_text">@string/generic_deferred_success_text</string>
@@ -335,7 +336,7 @@
     <string name="confirm_doc_removal_dialog_title">Confirm documents deletion</string>
     <string name="confirm_doc_removal_dialog_text">Are you sure you want to delete all the stored proofs?</string>
     <string name="confirm_doc_removal_dialog_delete">Yes, delete</string>
-    
+
     <!-- Landing Screen -->
     <string name="landing_screen_title">Age Verification</string>
     <string name="landing_screen_subtitle">You can share your proof of age with services restricted to adults. This proof confirms that you are over 18 without revealing any other personal information.</string>

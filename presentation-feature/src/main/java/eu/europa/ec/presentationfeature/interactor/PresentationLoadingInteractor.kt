@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -17,6 +17,7 @@
 package eu.europa.ec.presentationfeature.interactor
 
 import android.content.Context
+import android.content.Intent
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
@@ -38,7 +39,7 @@ sealed class PresentationLoadingObserveResponsePartialState {
     data object Success : PresentationLoadingObserveResponsePartialState()
     data class Redirect(val uri: URI) : PresentationLoadingObserveResponsePartialState()
     data object RequestReadyToBeSent : PresentationLoadingObserveResponsePartialState()
-    data class IntentToSent(val intent: android.content.Intent) : PresentationLoadingObserveResponsePartialState()
+    data class IntentToSend(val intent: Intent) : PresentationLoadingObserveResponsePartialState()
 }
 
 sealed class PresentationLoadingSendRequestedDocumentPartialState {
@@ -85,7 +86,9 @@ class PresentationLoadingInteractorImpl(
 
                 is WalletCorePartialState.RequestIsReadyToBeSent -> PresentationLoadingObserveResponsePartialState.RequestReadyToBeSent
 
-                is WalletCorePartialState.IntentToSent -> PresentationLoadingObserveResponsePartialState.IntentToSent(response.intent)
+                is WalletCorePartialState.IntentToSend -> {
+                    PresentationLoadingObserveResponsePartialState.IntentToSend(response.intent)
+                }
             }
         }
 

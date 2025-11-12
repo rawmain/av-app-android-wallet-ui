@@ -24,12 +24,13 @@ import eu.europa.ec.landingfeature.interactor.LandingPageInteractor.GetAgeCreden
 import eu.europa.ec.landingfeature.model.AgeCredentialUi
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.testfeature.createMockedIssuedDocument
-import eu.europa.ec.testfeature.mockedDefaultLocale
-import eu.europa.ec.testfeature.mockedExceptionWithMessage
-import eu.europa.ec.testfeature.mockedExceptionWithNoMessage
-import eu.europa.ec.testfeature.mockedGenericErrorMessage
-import eu.europa.ec.testfeature.mockedPlainFailureMessage
+import eu.europa.ec.testfeature.util.copy
+import eu.europa.ec.testfeature.util.getMockedMainPid
+import eu.europa.ec.testfeature.util.mockedDefaultLocale
+import eu.europa.ec.testfeature.util.mockedExceptionWithMessage
+import eu.europa.ec.testfeature.util.mockedExceptionWithNoMessage
+import eu.europa.ec.testfeature.util.mockedGenericErrorMessage
+import eu.europa.ec.testfeature.util.mockedPlainFailureMessage
 import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.rule.CoroutineTestRule
@@ -94,7 +95,7 @@ class TestLandingPageInteractor {
     @Test
     fun `Given Case 1, When getAgeCredential is called, Then Case 1 Expected Result is returned`() {
         coroutineRule.runTest {
-            val mockedDoc = createMockedIssuedDocument(credentialsCount = 2)
+            val mockedDoc = getMockedMainPid().copy(availableCredentials = 2)
 
             // Given
             whenever(walletCoreDocumentsController.getAgeOver18IssuedDocument())
