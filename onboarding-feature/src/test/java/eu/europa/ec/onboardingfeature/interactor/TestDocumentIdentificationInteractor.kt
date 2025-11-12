@@ -19,7 +19,7 @@ package eu.europa.ec.onboardingfeature.interactor
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.testfeature.mockedGenericErrorMessage
+import eu.europa.ec.testfeature.util.mockedGenericErrorMessage
 import junit.framework.TestCase.assertEquals
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant

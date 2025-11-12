@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -20,25 +20,23 @@ import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.commonfeature.config.toDomainConfig
-import eu.europa.ec.commonfeature.interactor.PresentationRequestInteractor
-import eu.europa.ec.commonfeature.interactor.PresentationRequestInteractorPartialState
 import eu.europa.ec.commonfeature.ui.request.transformer.RequestTransformer
-import eu.europa.ec.commonfeature.util.TestsData.mockedValidMdlWithBasicFieldsRequestDocument
-import eu.europa.ec.commonfeature.util.TestsData.mockedValidPidWithBasicFieldsRequestDocument
-import eu.europa.ec.commonfeature.util.TestsData.mockedVerifierName
 import eu.europa.ec.corelogic.controller.TransferEventPartialState
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.controller.WalletCorePresentationController
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.testfeature.MockResourceProviderForStringCalls.mockTransformToUiItemsCall
-import eu.europa.ec.testfeature.createMockedMdlWithBasicFields
-import eu.europa.ec.testfeature.createMockedPidWithBasicFields
-import eu.europa.ec.testfeature.mockedExceptionWithMessage
-import eu.europa.ec.testfeature.mockedExceptionWithNoMessage
-import eu.europa.ec.testfeature.mockedGenericErrorMessage
-import eu.europa.ec.testfeature.mockedPlainFailureMessage
-import eu.europa.ec.testfeature.mockedVerifierIsTrusted
+import eu.europa.ec.testfeature.util.StringResourceProviderMocker.mockTransformToUiItemsStrings
+import eu.europa.ec.testfeature.util.getMockedMdlWithBasicFields
+import eu.europa.ec.testfeature.util.getMockedPidWithBasicFields
+import eu.europa.ec.testfeature.util.mockedExceptionWithMessage
+import eu.europa.ec.testfeature.util.mockedExceptionWithNoMessage
+import eu.europa.ec.testfeature.util.mockedGenericErrorMessage
+import eu.europa.ec.testfeature.util.mockedPlainFailureMessage
+import eu.europa.ec.testfeature.util.mockedValidMdlWithBasicFieldsRequestDocument
+import eu.europa.ec.testfeature.util.mockedValidPidWithBasicFieldsRequestDocument
+import eu.europa.ec.testfeature.util.mockedVerifierIsTrusted
+import eu.europa.ec.testfeature.util.mockedVerifierName
 import eu.europa.ec.testlogic.extension.expectNoEvents
 import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
@@ -240,8 +238,9 @@ class TestPresentationRequestInteractor {
     fun `Given Case 5, When getRequestDocuments is called, Then Case 5 expected result is returned`() =
         coroutineRule.runTest {
             // Given
-            val mockedPidWithBasicFields = createMockedPidWithBasicFields()
-            val mockedMdlWithBasicFields = createMockedMdlWithBasicFields()
+
+            val mockedPidWithBasicFields = getMockedPidWithBasicFields()
+            val mockedMdlWithBasicFields = getMockedMdlWithBasicFields()
             mockGetAllIssuedDocumentsCall(
                 response = listOf(
                     mockedPidWithBasicFields,
@@ -249,8 +248,8 @@ class TestPresentationRequestInteractor {
                 )
             )
             mockIsDocumentRevoked(isRevoked = false)
-            mockTransformToUiItemsCall(
-                resourceProvider = resourceProvider
+            mockTransformToUiItemsStrings(
+                resourceProvider = resourceProvider,
             )
             mockWalletCorePresentationControllerEventEmission(
                 event = TransferEventPartialState.RequestReceived(

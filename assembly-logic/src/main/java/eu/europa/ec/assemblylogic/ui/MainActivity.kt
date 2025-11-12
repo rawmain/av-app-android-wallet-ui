@@ -46,6 +46,7 @@ class MainActivity : EudiComponentActivity() {
         )
 
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             Content(intent) {
                 featureStartupGraph(it)

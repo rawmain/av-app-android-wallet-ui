@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -41,10 +41,11 @@ import eu.europa.ec.commonfeature.model.PinFlow
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
+import eu.europa.ec.uilogic.component.content.ImePaddingConfig
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.VSpacer
-import eu.europa.ec.uilogic.component.wrap.BottomSheetTextData
+import eu.europa.ec.uilogic.component.wrap.BottomSheetTextDataUi
 import eu.europa.ec.uilogic.component.wrap.ButtonConfig
 import eu.europa.ec.uilogic.component.wrap.ButtonType
 import eu.europa.ec.uilogic.component.wrap.DialogBottomSheet
@@ -76,16 +77,17 @@ fun PinScreen(
     val isBottomSheetOpen = state.isBottomSheetOpen
     val scope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false
+        skipPartiallyExpanded = true
     )
 
     ContentScreen(
         isLoading = state.isLoading,
         navigatableAction = state.action,
         onBack = { viewModel.setEvent(state.onBackEvent) },
+        imePaddingConfig = ImePaddingConfig.ONLY_CONTENT,
         stickyBottom = { paddingValues ->
             WrapStickyBottomContent(
-                stickyBottomModifier = Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(paddingValues),
 
@@ -225,7 +227,7 @@ private fun SheetContent(
     onEventSent: (event: Event) -> Unit
 ) {
     DialogBottomSheet(
-        textData = BottomSheetTextData(
+        textData = BottomSheetTextDataUi(
             title = stringResource(id = R.string.quick_pin_bottom_sheet_cancel_title),
             message = stringResource(id = R.string.quick_pin_bottom_sheet_cancel_subtitle),
             positiveButtonText = stringResource(id = R.string.quick_pin_bottom_sheet_cancel_primary_button_text),

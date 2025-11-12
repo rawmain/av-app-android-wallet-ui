@@ -17,32 +17,44 @@
 package eu.europa.ec.uilogic.component.utils
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+
+private const val BOTTOM_SCREEN_PADDING = SPACING_MEDIUM
+private const val HORIZONTAL_SCREEN_PADDING = SPACING_LARGE
 
 enum class TopSpacing {
     WithToolbar, WithoutToolbar
 }
 
-fun screenPaddings(
+internal fun screenPaddings(
+    hasStickyBottom: Boolean,
     append: PaddingValues? = null,
-    topSpacing: TopSpacing = TopSpacing.WithToolbar
+    topSpacing: TopSpacing = TopSpacing.WithToolbar,
 ) = PaddingValues(
-    start = SPACING_LARGE.dp,
+    start = HORIZONTAL_SCREEN_PADDING.dp,
     top = calculateTopSpacing(topSpacing).dp + (append?.calculateTopPadding() ?: 0.dp),
-    end = SPACING_LARGE.dp,
-    bottom = SPACING_LARGE.dp + (append?.calculateBottomPadding() ?: 0.dp)
+    end = HORIZONTAL_SCREEN_PADDING.dp,
+    bottom = if (!hasStickyBottom) {
+        BOTTOM_SCREEN_PADDING.dp + (append?.calculateBottomPadding() ?: 0.dp)
+    } else {
+        0.dp
+    }
 )
 
 internal fun stickyBottomPaddings(
     contentScreenPaddings: PaddingValues,
-    layoutDirection: LayoutDirection
-) = PaddingValues(
-    start = SPACING_LARGE.dp + contentScreenPaddings.calculateLeftPadding(layoutDirection),
-    end = SPACING_LARGE.dp + contentScreenPaddings.calculateRightPadding(layoutDirection),
-    top = SPACING_SMALL.dp,
-    bottom = if (contentScreenPaddings.calculateBottomPadding() > 0.dp) contentScreenPaddings.calculateBottomPadding() + SPACING_EXTRA_SMALL.dp else SPACING_LARGE.dp
-)
+    layoutDirection: LayoutDirection,
+): PaddingValues {
+    return PaddingValues(
+        start = contentScreenPaddings.calculateStartPadding(layoutDirection),
+        top = BOTTOM_SCREEN_PADDING.dp,
+        end = contentScreenPaddings.calculateEndPadding(layoutDirection),
+        bottom = BOTTOM_SCREEN_PADDING.dp
+    )
+}
 
 private fun calculateTopSpacing(topSpacing: TopSpacing): Int = when (topSpacing) {
     TopSpacing.WithToolbar -> SPACING_SMALL

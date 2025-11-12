@@ -33,15 +33,12 @@ import eu.europa.ec.uilogic.navigation.IssuanceScreens
 import eu.europa.ec.uilogic.navigation.RouterHost
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkAction
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkType
-import eu.europa.ec.uilogic.navigation.helper.IntentAction
-import eu.europa.ec.uilogic.navigation.helper.IntentType
 import eu.europa.ec.uilogic.navigation.helper.handleDeepLinkAction
-import eu.europa.ec.uilogic.navigation.helper.handleIntentAction
 import eu.europa.ec.uilogic.navigation.helper.hasDeepLink
+import eu.europa.ec.uilogic.navigation.helper.isDCAPIIntent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.core.annotation.KoinExperimentalAPI
 
 open class EudiComponentActivity : FragmentActivity() {
@@ -52,14 +49,14 @@ open class EudiComponentActivity : FragmentActivity() {
     private var flowStarted: Boolean = false
 
     internal var pendingDeepLink: Uri? = null
-    internal var pendingIntentAction: IntentAction? = null
+    internal var pendingIntent: Intent? = null
 
     internal fun cacheDeepLink(intent: Intent?) {
         pendingDeepLink = intent?.data
     }
 
-    internal fun cacheIntentAction(action: IntentAction?) {
-        pendingIntentAction = action
+    internal fun cacheIntent(intent: Intent?) {
+        pendingIntent = intent
     }
 
     @OptIn(KoinExperimentalAPI::class)
@@ -68,18 +65,18 @@ open class EudiComponentActivity : FragmentActivity() {
         intent: Intent?,
         builder: NavGraphBuilder.(NavController) -> Unit
     ) {
+        logController.i("DCAPI") { "Content called with intent: $intent, action: ${intent?.action}" }
         ThemeManager.instance.Theme(darkTheme = false) {
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.surface
             ) {
-                KoinAndroidContext {
-                    routerHost.StartFlow {
-                        builder(it)
-                    }
-                    flowStarted = true
-                    handleDeepLink(intent, coldBoot = true)
+                routerHost.StartFlow {
+                    builder(it)
                 }
+                flowStarted = true
+                logController.i("DCAPI") { "Flow started, calling handleDeepLink" }
+                handleDeepLink(intent, coldBoot = true)
             }
         }
     }
@@ -107,7 +104,28 @@ open class EudiComponentActivity : FragmentActivity() {
     }
 
     private fun handleDeepLink(intent: Intent?, coldBoot: Boolean = false) {
-        logController.i("DeepLink") { "Handling deep link: ${intent?.data}" }
+        logController.i("DeepLink") { "Handling deep link: ${intent?.data}, action: ${intent?.action}" }
+
+        // Handle DCAPI intents
+        if (isDCAPIIntent(intent)) {
+            logController.i("DCAPI") { "Detected DCAPI intent: ${intent?.action}" }
+
+            // Cache the intent BEFORE checking if user is logged in
+            // This ensures it survives the PIN entry flow
+            cacheIntent(intent)
+            logController.i("DCAPI") { "Cached DCAPI intent for later retrieval" }
+
+            logController.i("DCAPI") { "User logged in with documents: ${routerHost.userIsLoggedInWithDocuments()}" }
+            if (routerHost.userIsLoggedInWithDocuments()) {
+                logController.i("DCAPI") { "Navigating to landing screen" }
+                routerHost.popToLandingScreen()
+            } else {
+                logController.i("DCAPI") { "User needs to login first, intent is cached for after PIN entry" }
+            }
+            setIntent(Intent())
+            return
+        }
+
         hasDeepLink(intent?.data)?.let {
             if (it.type == DeepLinkType.ISSUANCE && !coldBoot) {
                 handleDeepLinkAction(
@@ -136,48 +154,7 @@ open class EudiComponentActivity : FragmentActivity() {
                     routerHost.popToLandingScreen()
                 }
             }
-
             setIntent(Intent())
         }
-
-        if (intent != null && isDcApiAction(intent)) {
-            val intentAction = IntentAction(intent, IntentType.DC_API_PRESENTATION)
-            if (routerHost.userIsLoggedInWithDocuments()) {
-                handleIntentAction(routerHost.getNavController(), intentAction)
-            } else {
-                logController.i("DCAPI") { "Caching DC API intent for after login" }
-                cacheIntentAction(intentAction)
-                routerHost.popToLandingScreen()
-            }
-        }
-
-        checkAndResumePendingIntentAction()
     }
-
-    private fun checkAndResumePendingIntentAction() {
-        if (pendingIntentAction != null && routerHost.userIsLoggedInWithDocuments()) {
-            logController.i("DCAPI") { "Resuming pending DC API intent after login" }
-            handleIntentAction(routerHost.getNavController(), pendingIntentAction!!)
-            pendingIntentAction = null
-        }
-    }
-
-    // Add this method to be called when user logs in or when navigation happens
-    fun resumePendingIntents() {
-        logController.i("DCAPI") { "Checking for pending intents to resume" }
-        checkAndResumePendingIntentAction()
-
-        // Also check for pending deeplinks (existing logic)
-        pendingDeepLink?.let { uri ->
-            if (routerHost.userIsLoggedInWithDocuments()) {
-                logController.i("DeepLink") { "Resuming pending deeplink after login: $uri" }
-                handleDeepLinkAction(routerHost.getNavController(), uri)
-                pendingDeepLink = null
-            }
-        }
-    }
-
-    private fun isDcApiAction(intent: Intent): Boolean =
-        intent.action == "androidx.credentials.registry.provider.action.GET_CREDENTIAL" ||
-                intent.action == "androidx.identitycredentials.action.GET_CREDENTIALS"
 }

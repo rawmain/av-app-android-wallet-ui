@@ -19,22 +19,28 @@ The application allows the configuration of:
 
 1. Issuing API
 
-Via the *WalletCoreConfig* interface inside the business-logic module.
+Via the *WalletCoreConfig* interface inside the core-logic module.
 
 ```Kotlin
-interface WalletCoreConfig {
-    val config: EudiWalletConfig
+interface WalletCoreConfig { 
+    val vciConfig: List<OpenId4VciManager.Config>
 }
 ```
 
-You can configure the *EudiWalletConfig* per flavor. You can find both implementations inside the core-logic module at src/demo/config/WalletCoreConfigImpl and src/dev/config/WalletCoreConfigImpl
+You can configure the *vciConfig* per flavor. You can find both implementations inside the
+core-logic module at src/demo/config/WalletCoreConfigImpl and src/dev/config/WalletCoreConfigImpl
 
 ```Kotlin
-    private companion object {
-        const val VCI_ISSUER_URL = "https://issuer.ageverification.dev/"
-        const val VCI_CLIENT_ID = "wallet-demo"
-        const val AUTHENTICATION_REQUIRED = false
-    }
+override val vciConfig: List<OpenId4VciManager.Config>
+    get() = listOf(
+       OpenId4VciManager.Config.Builder()
+      .withIssuerUrl(issuerUrl = "https://issuer.eudiw.dev")
+      .withClientId(clientId = "wallet-dev")
+      .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
+      .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
+      .withUseDPoPIfSupported(false)
+      .build()
+)
 ```
 
 2. Trusted certificates
@@ -66,7 +72,7 @@ const val OPENID4VP_VERIFIER_API_URI = "your_verifier_url"
 const val OPENID4VP_VERIFIER_LEGAL_NAME = "your_verifier_legal_name"
 const val OPENID4VP_VERIFIER_CLIENT_ID = "your_verifier_client_id"
 
-.openId4VpConfig {
+configureOpenId4Vp {
     withClientIdSchemes(
         listOf(
             ClientIdScheme.Preregistered(
@@ -214,22 +220,24 @@ enum class DeepLinkType(val schemas: List<String>, val host: String? = null) {
 In the case of an additive change regarding OpenID4VP, you also need to update the *EudiWalletConfig* for each flavor inside the core-logic module.
 
 ```Kotlin
-.openId4VpConfig {
-    withScheme(
-        listOf(
-                BuildConfig.OPENID4VP_SCHEME,
-                BuildConfig.EUDI_OPENID4VP_SCHEME,
-                BuildConfig.MDOC_OPENID4VP_SCHEME,
-                BuildConfig.AVSP_SCHEME,
-                BuildConfig.YOUR_OWN_OPENID4VP_SCHEME
-            )
-    )
+configureOpenId4Vp {
+   withSchemes(
+      listOf(
+         BuildConfig.OPENID4VP_SCHEME,
+         BuildConfig.EUDI_OPENID4VP_SCHEME,
+         BuildConfig.MDOC_OPENID4VP_SCHEME,
+         BuildConfig.AVSP_SCHEME,
+         BuildConfig.YOUR_OWN_OPENID4VP_SCHEME
+      )
+   )
 }
 ```
 
 ## Scoped Issuance Document Configuration
 
-The credential configuration is derived directly from the issuer's metadata. The issuer URL is configured per flavor via the *configureOpenId4Vci* method inside the core-logic module at src/demo/config/WalletCoreConfigImpl and src/dev/config/WalletCoreConfigImpl.
+The credential configuration is derived directly from the issuer's metadata. The issuer URL is
+configured per flavor via the *vciConfig* property inside the core-logic module at
+src/demo/config/WalletCoreConfigImpl and src/dev/config/WalletCoreConfigImpl.
 If you want to add or adjust the displayed scoped documents, you must modify the issuer's metadata, and the wallet will automatically resolve your changes.
 
 ### Passport Scanning Issuer Configuration
@@ -256,8 +264,8 @@ override val passportScanningIssuerConfig: OpenId4VciManager.Config =
         issuerUrl = PASSPORT_SCANNING_ISSUER_URL,
         clientId = VCI_CLIENT_ID,
         authFlowRedirectionURI = BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK,
-        useDPoPIfSupported = true,
-        parUsage = OpenId4VciManager.Config.ParUsage.IF_SUPPORTED
+        useDPoPIfSupported = false,
+        parUsage = OpenId4VciManager.Config.ParUsage.NEVER
     )
 ```
 
@@ -275,13 +283,20 @@ override val passportScanningIssuerConfig: OpenId4VciManager.Config =
         issuerUrl = PASSPORT_SCANNING_ISSUER_URL,
         clientId = VCI_CLIENT_ID,
         authFlowRedirectionURI = BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK,
-        useDPoPIfSupported = true,
-        parUsage = OpenId4VciManager.Config.ParUsage.IF_SUPPORTED
+        useDPoPIfSupported = false,
+        parUsage = OpenId4VciManager.Config.ParUsage.NEVER
     )
 ```
 
 The passport scanning issuer configuration is optional. If set to `null` in the interface, passport
 scanning issuance will not be available.
+
+**Important Note:** PAR (Pushed Authorization Request) and DPoP (Demonstration of
+Proof-of-Possession)
+are not supported in the AV profile. Both features must be disabled by setting:
+
+- `parUsage = OpenId4VciManager.Config.ParUsage.NEVER`
+- `useDPoPIfSupported = false`
 
 ### Face Match Configuration
 
@@ -505,15 +520,14 @@ The project utilizes Koin for Dependency Injection (DI), thus requiring adjustme
 Implementation Example:
 ```Kotlin
 class PrefsPinStorageProvider(
-    private val prefsController: PrefsController
+    private val prefsController: PrefsController,
+    private val cryptoController: CryptoController
 ) : PinStorageProvider {
 
-    override fun retrievePin(): String {
-        return prefsController.getString("DevicePin", "")
-    }
+    override fun retrievePin(): String = decryptedAndLoad()
 
     override fun setPin(pin: String) {
-        prefsController.setString("DevicePin", pin)
+       encryptAndStore(pin)
     }
 
     override fun isPinValid(pin: String): Boolean = retrievePin() == pin
@@ -537,9 +551,10 @@ Config Construction via Koin DI Example:
 ```Kotlin
 @Single
 fun provideStorageConfig(
-    prefsController: PrefsController
+    prefsController: PrefsController,
+    cryptoController: CryptoController
 ): StorageConfig = StorageConfigImpl(
-    pinImpl = PrefsPinStorageProvider(prefsController),
+    pinImpl = PrefsPinStorageProvider(prefsController, cryptoController),
     biometryImpl = PrefsBiometryStorageProvider(prefsController)
 )
 ```
