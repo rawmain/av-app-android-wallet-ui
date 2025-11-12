@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -191,7 +191,7 @@ class BiometricAuthenticationControllerImpl(
     private suspend fun retrieveCrypto(): Pair<BiometricAuthentication?, Cipher?> =
         withContext(dispatcher) {
             val biometricData = biometryStorageController.getBiometricAuthentication()
-            val cipher = cryptoController.getBiometricCipher(
+            val cipher = cryptoController.getCipher(
                 encrypt = biometricData == null,
                 ivBytes = biometricData?.ivString?.decodeFromPemBase64String() ?: ByteArray(0)
             )
@@ -209,7 +209,7 @@ class BiometricAuthenticationControllerImpl(
                 biometryStorageController.setBiometricAuthentication(
                     BiometricAuthentication(
                         randomString = randomString,
-                        encryptedString = cryptoController.encryptDecryptBiometric(
+                        encryptedString = cryptoController.encryptDecrypt(
                             cipher = it,
                             byteArray = randomString.toByteArray(StandardCharsets.UTF_8)
                         ).encodeToPemBase64String().orEmpty(),
@@ -221,7 +221,7 @@ class BiometricAuthenticationControllerImpl(
                 if (biometricAuthentication.randomString
                         .toByteArray(StandardCharsets.UTF_8)
                         .contentEquals(
-                            cryptoController.encryptDecryptBiometric(
+                            cryptoController.encryptDecrypt(
                                 cipher = it,
                                 byteArray = biometricAuthentication.encryptedString
                                     .decodeFromPemBase64String() ?: ByteArray(0)

@@ -57,10 +57,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import eu.europa.ec.commonfeature.navigation.helper.handleIntentAction
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
-import eu.europa.ec.uilogic.component.ListItemData
-import eu.europa.ec.uilogic.component.ListItemMainContentData
+import eu.europa.ec.uilogic.component.ListItemDataUi
+import eu.europa.ec.uilogic.component.ListItemMainContentDataUi
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
@@ -72,7 +73,7 @@ import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.utils.VSpacer
-import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
+import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
 import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapIcon
 import eu.europa.ec.uilogic.component.wrap.WrapIconButton
@@ -83,7 +84,6 @@ import eu.europa.ec.uilogic.extension.finish
 import eu.europa.ec.uilogic.extension.getPendingDeepLink
 import eu.europa.ec.uilogic.extension.getPendingIntentAction
 import eu.europa.ec.uilogic.navigation.helper.handleDeepLinkAction
-import eu.europa.ec.uilogic.navigation.helper.handleIntentAction
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 
@@ -180,9 +180,12 @@ private fun handleNavigationEffect(
             )
         }
 
-        is Effect.Navigation.OpenIntentAction -> handleIntentAction(
-            navController, navigationEffect.intentAction
-        )
+        is Effect.Navigation.OpenIntentAction -> {
+            handleIntentAction(
+                navController,
+                navigationEffect.intentAction
+            )
+        }
     }
 }
 
@@ -216,12 +219,15 @@ private fun TopBar(onEventSend: (Event) -> Unit) = Box(
 @Composable
 private fun Content(
     paddingValues: PaddingValues,
-    documentClaims: List<ExpandableListItem>?,
+    documentClaims: List<ExpandableListItemUi>?,
     credentialCount: Int?,
     onAddCredential: () -> Unit,
 ) {
 
-    Column(modifier = Modifier.fillMaxSize().padding(paddingValues).verticalScroll(rememberScrollState())) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues)
+        .verticalScroll(rememberScrollState())) {
 
         WrapText(
             text = stringResource(R.string.landing_screen_title),
@@ -249,7 +255,7 @@ private fun Content(
 }
 
 @Composable
-private fun CredentialDetails(documentClaims: List<ExpandableListItem>) {
+private fun CredentialDetails(documentClaims: List<ExpandableListItemUi>) {
     VSpacer.ExtraLarge()
 
     WrapText(
@@ -410,18 +416,18 @@ private fun LandingScreenPreview() {
         ) { paddingValues ->
             Content(
                 documentClaims = listOf(
-                    ExpandableListItem.SingleListItemData(
-                        header = ListItemData(
+                    ExpandableListItemUi.SingleListItem(
+                        header = ListItemDataUi(
                             itemId = "0",
                             overlineText = "Age over 18",
-                            mainContentData = ListItemMainContentData.Text(text = "True"),
+                            mainContentData = ListItemMainContentDataUi.Text(text = "True"),
                         )
                     ),
-                    ExpandableListItem.SingleListItemData(
-                        header = ListItemData(
+                    ExpandableListItemUi.SingleListItem(
+                        header = ListItemDataUi(
                             itemId = "1",
                             overlineText = "Expiration Date",
-                            mainContentData = ListItemMainContentData.Text(text = "30/12/2025"),
+                            mainContentData = ListItemMainContentDataUi.Text(text = "30/12/2025"),
                         )
                     )
                 ),

@@ -21,23 +21,23 @@ import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvai
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
-import eu.europa.ec.commonfeature.util.TestsData.mockedPrimaryButtonText
-import eu.europa.ec.commonfeature.util.TestsData.mockedScopedDocuments
-import eu.europa.ec.commonfeature.util.TestsData.mockedSuccessContentDescription
-import eu.europa.ec.commonfeature.util.TestsData.mockedSuccessDescription
-import eu.europa.ec.commonfeature.util.TestsData.mockedSuccessText
-import eu.europa.ec.commonfeature.util.TestsData.mockedUriPath1
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.controller.FetchScopedDocumentsPartialState
 import eu.europa.ec.corelogic.controller.IssuanceMethod
 import eu.europa.ec.corelogic.controller.IssueDocumentPartialState
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
+import eu.europa.ec.onboardingfeature.util.mockedPrimaryButtonText
+import eu.europa.ec.onboardingfeature.util.mockedScopedDocuments
+import eu.europa.ec.onboardingfeature.util.mockedSuccessContentDescription
+import eu.europa.ec.onboardingfeature.util.mockedSuccessDescription
+import eu.europa.ec.onboardingfeature.util.mockedSuccessText
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.testfeature.mockedDefaultLocale
-import eu.europa.ec.testfeature.mockedGenericErrorMessage
-import eu.europa.ec.testfeature.mockedNotifyOnAuthenticationFailure
-import eu.europa.ec.testfeature.mockedPlainFailureMessage
+import eu.europa.ec.testfeature.util.mockedDefaultLocale
+import eu.europa.ec.testfeature.util.mockedGenericErrorMessage
+import eu.europa.ec.testfeature.util.mockedNotifyOnAuthenticationFailure
+import eu.europa.ec.testfeature.util.mockedPlainFailureMessage
+import eu.europa.ec.testfeature.util.mockedUriPath1
 import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.extension.toFlow
@@ -125,7 +125,8 @@ class TestEnrollmentInteractor {
             whenever(
                 walletCoreDocumentsController.issueDocument(
                     issuanceMethod = eq(IssuanceMethod.OPENID4VCI),
-                    configId = any()
+                    configId = any(),
+                    issuerId = any()
                 )
             ).thenReturn(IssueDocumentPartialState.Success("documentId").toFlow())
 
@@ -192,7 +193,8 @@ class TestEnrollmentInteractor {
             whenever(
                 walletCoreDocumentsController.issueDocument(
                     issuanceMethod = eq(IssuanceMethod.OPENID4VCI),
-                    configId = any()
+                    configId = any(),
+                    issuerId = any()
                 )
             ).thenReturn(
                 IssueDocumentPartialState.DeferredSuccess(
@@ -227,7 +229,8 @@ class TestEnrollmentInteractor {
             whenever(
                 walletCoreDocumentsController.issueDocument(
                     issuanceMethod = eq(IssuanceMethod.OPENID4VCI),
-                    configId = any()
+                    configId = any(),
+                    issuerId = any()
                 )
             ).thenReturn(IssueDocumentPartialState.UserAuthRequired(crypto, resultHandler).toFlow())
 

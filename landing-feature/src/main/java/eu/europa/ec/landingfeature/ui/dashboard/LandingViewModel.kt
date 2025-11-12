@@ -30,7 +30,7 @@ import eu.europa.ec.landingfeature.interactor.LandingPageInteractor.GetAgeCreden
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
-import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
+import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.mvi.MviViewModel
@@ -53,7 +53,7 @@ import org.koin.android.annotation.KoinViewModel
 data class State(
     val isLoading: Boolean = false,
     val error: ContentErrorConfig? = null,
-    val documentClaims: List<ExpandableListItem>? = null,
+    val documentClaims: List<ExpandableListItemUi>? = null,
     val credentialCount: Int? = null,
 ) : ViewState
 
@@ -75,8 +75,7 @@ sealed class Effect : ViewSideEffect {
 
         data object Pop : Navigation()
         data class OpenDeepLinkAction(val deepLinkUri: Uri, val arguments: String?) : Navigation()
-
-        data class OpenIntentAction(val intentAction: IntentAction, ) : Navigation()
+        data class OpenIntentAction(val intentAction: IntentAction) : Navigation()
     }
 }
 
@@ -209,9 +208,10 @@ class LandingViewModel(
     }
 
     private fun handleIntentAction(intentAction: IntentAction?) {
-        intentAction?.let { intentAction ->
+        intentAction?.let {
+            getOrCreatePresentationScope()
             setEffect {
-                Effect.Navigation.OpenIntentAction(intentAction)
+                Effect.Navigation.OpenIntentAction(it)
             }
         }
     }

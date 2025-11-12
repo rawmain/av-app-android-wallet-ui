@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -16,10 +16,10 @@
 
 package eu.europa.ec.landingfeature.model
 
-import eu.europa.ec.corelogic.model.DomainClaim
+import eu.europa.ec.corelogic.model.ClaimDomain
 
 data class AgeCredentialUi(
     val docId: String,
-    val claims: List<DomainClaim>,
+    val claims: List<ClaimDomain>,
     val credentialCount: Int,
 )

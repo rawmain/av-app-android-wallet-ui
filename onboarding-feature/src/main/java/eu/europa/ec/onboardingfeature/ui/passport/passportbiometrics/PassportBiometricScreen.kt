@@ -98,7 +98,7 @@ private fun ActionButtons(onBack: () -> Unit = {}, onCapture: () -> Unit = {}, p
     )
 
     WrapStickyBottomContent(
-        stickyBottomModifier = Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(paddings),
         stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)

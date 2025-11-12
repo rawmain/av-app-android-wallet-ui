@@ -20,15 +20,17 @@ import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenti
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.corelogic.config.WalletCoreConfig
+import eu.europa.ec.corelogic.extension.documentIdentifier
 import eu.europa.ec.corelogic.extension.getLocalizedDisplayName
 import eu.europa.ec.corelogic.model.DocumentIdentifier
 import eu.europa.ec.corelogic.model.FormatType
-import eu.europa.ec.corelogic.model.ScopedDocument
+import eu.europa.ec.corelogic.model.ScopedDocumentDomain
 import eu.europa.ec.corelogic.model.toDocumentIdentifier
 import eu.europa.ec.eudi.openid4vci.MsoMdocCredential
+import eu.europa.ec.eudi.openid4vci.SdJwtVcCredential
 import eu.europa.ec.eudi.wallet.EudiWallet
-import eu.europa.ec.eudi.wallet.document.DocumentExtensions.DefaultKeyUnlockData
 import eu.europa.ec.eudi.wallet.document.DocumentExtensions.getDefaultCreateDocumentSettings
+import eu.europa.ec.eudi.wallet.document.DocumentExtensions.getDefaultKeyUnlockData
 import eu.europa.ec.eudi.wallet.document.DocumentId
 import eu.europa.ec.eudi.wallet.issue.openid4vci.IssueEvent
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
@@ -42,7 +44,7 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
@@ -112,25 +114,36 @@ class PassportScanningDocumentsControllerImpl(
                 val documents =
                     metadata.credentialConfigurationsSupported.map { (id, config) ->
 
-                        val name: String = config.display.getLocalizedDisplayName(
+                        val name = config.display.getLocalizedDisplayName(
                             userLocale = locale,
                             fallback = id.value
                         )
 
-                        val isPid: Boolean = when (config) {
+                        val isPid = when (config) {
                             is MsoMdocCredential -> config.docType.toDocumentIdentifier() == DocumentIdentifier.MdocPid
+                            is SdJwtVcCredential -> config.type.toDocumentIdentifier() == DocumentIdentifier.SdJwtPid
                             else -> false
                         }
 
                         val isAgeVerification: Boolean = when (config) {
                             is MsoMdocCredential -> config.docType.toDocumentIdentifier() == DocumentIdentifier.MdocEUDIAgeOver18 ||
                                     config.docType.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18
+
+                            is SdJwtVcCredential -> config.type.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18
                             else -> false
                         }
 
-                        ScopedDocument(
+                        val formatType = when (config) {
+                            is MsoMdocCredential -> config.docType
+                            is SdJwtVcCredential -> config.type
+                            else -> null
+                        }
+
+                        ScopedDocumentDomain(
                             name = name,
                             configurationId = id.value,
+                            credentialIssuerId = "passport_issuer",
+                            formatType = formatType,
                             isPid = isPid,
                             isAgeVerification = isAgeVerification
                         )
@@ -234,23 +247,40 @@ class PassportScanningDocumentsControllerImpl(
                 }
 
                 is IssueEvent.DocumentRequiresCreateSettings -> {
-                    event.resume(
-                        eudiWallet.getDefaultCreateDocumentSettings(
-                            offeredDocument = event.offeredDocument,
-                            numberOfCredentials = walletCoreConfig.credentialBatchSize,
-                            credentialPolicy = walletCoreConfig.credentialPolicy
+                    launch {
+                        val offeredDocIdentifier = event.offeredDocument.documentIdentifier
+
+                        val documentIssuanceRule = walletCoreConfig
+                            .documentIssuanceConfig
+                            .getRuleForDocument(documentIdentifier = offeredDocIdentifier)
+
+                        event.resume(
+                            eudiWallet.getDefaultCreateDocumentSettings(
+                                offeredDocument = event.offeredDocument,
+                                credentialPolicy = documentIssuanceRule.policy,
+                                numberOfCredentials = documentIssuanceRule.numberOfCredentials,
+                            )
                         )
-                    )
+                    }
                 }
 
                 is IssueEvent.DocumentRequiresUserAuth -> {
-                    val keyUnlockData = event.document.DefaultKeyUnlockData
-                    runBlocking {
+                    launch {
+                        val keyUnlockDataMap =
+                            event.keysRequireAuth.mapValues { (keyAlias, secureArea) ->
+                                getDefaultKeyUnlockData(secureArea, keyAlias)
+                            }
+
+                        val keyUnlockData =
+                            keyUnlockDataMap.values.first() //TODO: Revisit this once Core adds support.
+
+                        val cryptoObject = keyUnlockData?.getCryptoObjectForSigning()
+
                         trySendBlocking(
                             IssueDocumentsPartialState.UserAuthRequired(
-                                BiometricCrypto(keyUnlockData?.getCryptoObjectForSigning()),
-                                DeviceAuthenticationResult(
-                                    onAuthenticationSuccess = { event.resume(mapOf(keyUnlockData!!.alias to keyUnlockData)) },
+                                crypto = BiometricCrypto(cryptoObject),
+                                resultHandler = DeviceAuthenticationResult(
+                                    onAuthenticationSuccess = { event.resume(keyUnlockDataMap) },
                                     onAuthenticationError = { event.cancel(null) }
                                 )
                             )

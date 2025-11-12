@@ -44,8 +44,8 @@ open class NFCScanAnalyzer(
 
         when (mrzRecord.format) {
             MrzFormat.PASSPORT -> startNFCScanActivity(result)
-            MrzFormat.MRTD_TD1 -> deliverEIDResult(mrzRecord as MrtdTd1)
-            null -> throw MrzParseException("Unrecognized MRZ format", result, null, null)
+            //MrzFormat.MRTD_TD1 -> deliverEIDResult(mrzRecord as MrtdTd1)
+            else -> throw MrzParseException("Unrecognized MRZ format", result, null, null)
         }
     }
 

@@ -64,8 +64,6 @@ sealed class CommonScreens {
 }
 
 sealed class PresentationScreens {
-    data object DcApiPresentationRequest : Screen(name = "DC_API_PRESENTATION_REQUEST")
-
     data object PresentationRequest : Screen(
         name = "PRESENTATION_REQUEST",
         parameters = "?requestUriConfig={requestUriConfig}"
@@ -79,7 +77,7 @@ sealed class PresentationScreens {
 sealed class IssuanceScreens {
     data object AddDocument : Screen(
         name = "ISSUANCE_ADD_DOCUMENT",
-        parameters = "?flowType={flowType}"
+        parameters = "?issuanceConfig={issuanceConfig}"
     )
 
     data object DocumentOffer : Screen(

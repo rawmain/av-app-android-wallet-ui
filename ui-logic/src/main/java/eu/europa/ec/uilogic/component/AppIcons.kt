@@ -37,7 +37,7 @@ import eu.europa.ec.resourceslogic.R
  * @throws IllegalArgumentException If both [resourceId] AND [imageVector] are null.
  */
 @Stable
-data class IconData(
+data class IconDataUi(
     @param:DrawableRes val resourceId: Int?,
     @param:StringRes val contentDescriptionId: Int,
     val imageVector: ImageVector? = null,
@@ -58,260 +58,260 @@ data class IconData(
  */
 object AppIcons {
 
-    val ArrowBack: IconData = IconData(
+    val ArrowBack: IconDataUi = IconDataUi(
         resourceId = null,
         contentDescriptionId = R.string.content_description_arrow_back_icon,
         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
     )
 
-    val Close: IconData = IconData(
+    val Close: IconDataUi = IconDataUi(
         resourceId = null,
         contentDescriptionId = R.string.content_description_close_icon,
         imageVector = Icons.Filled.Close
     )
 
-    val VerticalMore: IconData = IconData(
+    val VerticalMore: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_more,
         contentDescriptionId = R.string.content_description_more_vert_icon,
         imageVector = null
     )
 
-    val Warning: IconData = IconData(
+    val Warning: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_warning,
         contentDescriptionId = R.string.content_description_warning_icon,
         imageVector = null
     )
 
-    val Error: IconData = IconData(
+    val Error: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_error,
         contentDescriptionId = R.string.content_description_error_icon,
         imageVector = null
     )
 
-    val TouchId: IconData = IconData(
+    val TouchId: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_touch_id,
         contentDescriptionId = R.string.content_description_touch_id_icon,
         imageVector = null
     )
 
-    val QR: IconData = IconData(
+    val QR: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_qr,
         contentDescriptionId = R.string.content_description_qr_icon,
         imageVector = null
     )
 
-    val User: IconData = IconData(
+    val User: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_user,
         contentDescriptionId = R.string.content_description_user_icon,
         imageVector = null
     )
 
-    val Id: IconData = IconData(
+    val Id: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_id,
         contentDescriptionId = R.string.content_description_id_icon,
         imageVector = null
     )
 
-    val LogoPlain: IconData = IconData(
+    val LogoPlain: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_logo_plain,
         contentDescriptionId = R.string.content_description_logo_plain_icon,
         imageVector = null
     )
 
-    val LogoText: IconData = IconData(
+    val LogoText: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_logo_text,
         contentDescriptionId = R.string.content_description_logo_text_icon,
         imageVector = null
     )
 
-    val KeyboardArrowDown: IconData = IconData(
+    val KeyboardArrowDown: IconDataUi = IconDataUi(
         resourceId = null,
         contentDescriptionId = R.string.content_description_arrow_down_icon,
         imageVector = Icons.Default.KeyboardArrowDown
     )
 
-    val KeyboardArrowUp: IconData = IconData(
+    val KeyboardArrowUp: IconDataUi = IconDataUi(
         resourceId = null,
         contentDescriptionId = R.string.content_description_arrow_up_icon,
         imageVector = Icons.Default.KeyboardArrowUp
     )
 
-    val Add: IconData = IconData(
+    val Add: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_add,
         contentDescriptionId = R.string.content_description_add_icon,
         imageVector = null
     )
 
-    val Edit: IconData = IconData(
+    val Edit: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_edit,
         contentDescriptionId = R.string.content_description_edit_icon,
         imageVector = null
     )
 
-    val Sign: IconData = IconData(
+    val Sign: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_sign_document,
         contentDescriptionId = R.string.content_description_edit_icon,
         imageVector = null
     )
 
-    val QrScanner: IconData = IconData(
+    val QrScanner: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_qr_scanner,
         contentDescriptionId = R.string.content_description_qr_scanner_icon,
         imageVector = null
     )
 
-    val Verified: IconData = IconData(
+    val Verified: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_verified,
         contentDescriptionId = R.string.content_description_verified_icon,
         imageVector = null
     )
 
-    val Message: IconData = IconData(
+    val Message: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_message,
         contentDescriptionId = R.string.content_description_message_icon,
         imageVector = null
     )
 
-    val ClockTimer: IconData = IconData(
+    val ClockTimer: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_clock_timer,
         contentDescriptionId = R.string.content_description_clock_timer_icon,
         imageVector = null
     )
 
-    val OpenNew: IconData = IconData(
+    val OpenNew: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_open_new,
         contentDescriptionId = R.string.content_description_open_new_icon,
         imageVector = null
     )
 
-    val KeyboardArrowRight: IconData = IconData(
+    val KeyboardArrowRight: IconDataUi = IconDataUi(
         resourceId = null,
         contentDescriptionId = R.string.content_description_arrow_right_icon,
         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight
     )
 
-    val HandleBar: IconData = IconData(
+    val HandleBar: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_handle_bar,
         contentDescriptionId = R.string.content_description_handle_bar_icon,
         imageVector = null
     )
 
-    val Search: IconData = IconData(
+    val Search: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_search,
         contentDescriptionId = R.string.content_description_search_icon,
         imageVector = null
     )
 
-    val PresentDocumentInPerson: IconData = IconData(
+    val PresentDocumentInPerson: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_present_document_same_device,
         contentDescriptionId = R.string.content_description_present_document_same_device_icon,
         imageVector = null
     )
 
-    val AddDocumentFromQr: IconData = IconData(
+    val AddDocumentFromQr: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_add_document_from_qr,
         contentDescriptionId = R.string.content_description_add_document_from_qr_icon,
         imageVector = null
     )
 
-    val Success: IconData = IconData(
+    val Success: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_success,
         contentDescriptionId = R.string.content_description_success_icon,
         imageVector = null
     )
 
-    val Documents: IconData = IconData(
+    val Documents: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_documents,
         contentDescriptionId = R.string.content_description_documents_icon,
         imageVector = null
     )
 
-    val Filters: IconData = IconData(
+    val Filters: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_filters,
         contentDescriptionId = R.string.content_description_filters_icon,
         imageVector = null
     )
 
-    val InProgress: IconData = IconData(
+    val InProgress: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_in_progress,
         contentDescriptionId = R.string.content_description_in_progress_icon,
         imageVector = null
     )
 
-    val WalletActivated: IconData = IconData(
+    val WalletActivated: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_wallet_activated,
         contentDescriptionId = R.string.content_description_wallet_activated_icon,
         imageVector = null
     )
 
-    val WalletSecured: IconData = IconData(
+    val WalletSecured: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_wallet_secured,
         contentDescriptionId = R.string.content_description_wallet_secured_icon,
         imageVector = null
     )
 
-    val Info: IconData = IconData(
+    val Info: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_info,
         contentDescriptionId = R.string.content_description_info_icon,
         imageVector = null
     )
 
 
-    val Check: IconData = IconData(
+    val Check: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_check,
         contentDescriptionId = R.string.content_description_check_icon,
         imageVector = null
     )
 
-    val Settings: IconData = IconData(
+    val Settings: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_settings,
         contentDescriptionId = R.string.content_description_settings_icon,
         imageVector = null
     )
 
-    val EuFlag: IconData = IconData(
+    val EuFlag: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_eu_flag,
         contentDescriptionId = R.string.content_description_eu_flag_icon,
         imageVector = null
     )
 
-    val Over18: IconData = IconData(
+    val Over18: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_over_18,
         contentDescriptionId = R.string.content_description_over_18_icon,
         imageVector = null
     )
 
-    val NationalEID: IconData = IconData(
+    val NationalEID: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_national_eid,
         contentDescriptionId = R.string.content_description_national_eid_icon,
         imageVector = null
     )
 
-    val EuMap: IconData = IconData(
+    val EuMap: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_eu_map,
         contentDescriptionId = R.string.content_description_eu_map_icon,
         imageVector = null
     )
 
-    val TelekomLogo: IconData = IconData(
+    val TelekomLogo: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_telekom_logo,
         contentDescriptionId = R.string.content_description_telekom_logo_icon,
         imageVector = null
     )
 
-    val ScytalesLogo: IconData = IconData(
+    val ScytalesLogo: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_scytales_logo,
         contentDescriptionId = R.string.content_description_scytales_logo_icon,
         imageVector = null
     )
 
-    val DateRange: IconData = IconData(
+    val DateRange: IconDataUi = IconDataUi(
         resourceId = null,
         contentDescriptionId = R.string.content_description_date_range_icon,
         imageVector = Icons.Default.DateRange
     )
 
-    val PassportBiometrics : IconData = IconData(
+    val PassportBiometrics: IconDataUi = IconDataUi(
         resourceId = R.drawable.img_passport_biometric,
         contentDescriptionId = R.string.passport_biometrics_content_description,
         imageVector = null

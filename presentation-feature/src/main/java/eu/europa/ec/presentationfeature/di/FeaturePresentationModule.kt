@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -18,12 +18,12 @@ package eu.europa.ec.presentationfeature.di
 
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
-import eu.europa.ec.commonfeature.interactor.PresentationRequestInteractor
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.controller.WalletCorePresentationController
 import eu.europa.ec.corelogic.di.PRESENTATION_SCOPE_ID
 import eu.europa.ec.presentationfeature.interactor.PresentationLoadingInteractor
 import eu.europa.ec.presentationfeature.interactor.PresentationLoadingInteractorImpl
+import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractor
 import eu.europa.ec.presentationfeature.interactor.PresentationRequestInteractorImpl
 import eu.europa.ec.presentationfeature.interactor.PresentationSuccessInteractor
 import eu.europa.ec.presentationfeature.interactor.PresentationSuccessInteractorImpl

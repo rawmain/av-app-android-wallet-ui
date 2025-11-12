@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.validator.Form
 import eu.europa.ec.businesslogic.validator.FormValidator
 import eu.europa.ec.businesslogic.validator.Rule
-import eu.europa.ec.commonfeature.config.IssuanceFlowUiConfig
+import eu.europa.ec.commonfeature.config.IssuanceFlowType
 import eu.europa.ec.commonfeature.config.OfferUiConfig
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.QrScanFlow
@@ -182,7 +182,10 @@ class QrScanViewModel(
     ) {
         when (qrScanFlow) {
             is QrScanFlow.Presentation -> navigateToPresentationRequest(scanResult)
-            is QrScanFlow.Issuance -> navigateToDocumentOffer(scanResult, qrScanFlow.issuanceFlow)
+            is QrScanFlow.Issuance -> navigateToDocumentOffer(
+                scanResult = scanResult,
+                issuanceFlowType = qrScanFlow.issuanceFlowType
+            )
         }
     }
 
@@ -221,7 +224,7 @@ class QrScanViewModel(
         }
     }
 
-    private fun navigateToDocumentOffer(scanResult: String, issuanceFLow: IssuanceFlowUiConfig) {
+    private fun navigateToDocumentOffer(scanResult: String, issuanceFlowType: IssuanceFlowType) {
         setEffect {
             Effect.Navigation.SwitchScreen(
                 screenRoute = generateComposableNavigationLink(
@@ -231,8 +234,12 @@ class QrScanViewModel(
                             OfferUiConfig.serializedKeyName to uiSerializer.toBase64(
                                 OfferUiConfig(
                                     offerURI = scanResult,
-                                    onSuccessNavigation = calculateOnSuccessNavigation(issuanceFLow),
-                                    onCancelNavigation = calculateOnCancelNavigation(issuanceFLow)
+                                    onSuccessNavigation = calculateOnSuccessNavigation(
+                                        issuanceFlowType
+                                    ),
+                                    onCancelNavigation = calculateOnCancelNavigation(
+                                        issuanceFlowType
+                                    )
                                 ),
                                 OfferUiConfig.Parser
                             )
@@ -243,9 +250,9 @@ class QrScanViewModel(
         }
     }
 
-    private fun calculateOnSuccessNavigation(issuanceFlowUiConfig: IssuanceFlowUiConfig): ConfigNavigation {
-        return when (issuanceFlowUiConfig) {
-            IssuanceFlowUiConfig.NO_DOCUMENT -> {
+    private fun calculateOnSuccessNavigation(issuanceFlowType: IssuanceFlowType): ConfigNavigation {
+        return when (issuanceFlowType) {
+            is IssuanceFlowType.NoDocument -> {
                 ConfigNavigation(
                     navigationType = NavigationType.PushRoute(
                         route = LandingScreens.Landing.screenRoute,
@@ -254,7 +261,7 @@ class QrScanViewModel(
                 )
             }
 
-            IssuanceFlowUiConfig.EXTRA_DOCUMENT -> {
+            is IssuanceFlowType.ExtraDocument -> {
                 ConfigNavigation(
                     navigationType = NavigationType.PopTo(
                         screen = LandingScreens.Landing
@@ -264,15 +271,15 @@ class QrScanViewModel(
         }
     }
 
-    private fun calculateOnCancelNavigation(issuanceFlowUiConfig: IssuanceFlowUiConfig): ConfigNavigation {
-        return when (issuanceFlowUiConfig) {
-            IssuanceFlowUiConfig.NO_DOCUMENT -> {
+    private fun calculateOnCancelNavigation(issuanceFlowType: IssuanceFlowType): ConfigNavigation {
+        return when (issuanceFlowType) {
+            is IssuanceFlowType.NoDocument -> {
                 ConfigNavigation(
                     navigationType = NavigationType.Pop
                 )
             }
 
-            IssuanceFlowUiConfig.EXTRA_DOCUMENT -> {
+            is IssuanceFlowType.ExtraDocument -> {
                 ConfigNavigation(
                     navigationType = NavigationType.PopTo(
                         screen = LandingScreens.Landing

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -18,11 +18,14 @@ package eu.europa.ec.commonfeature.ui.document_success
 
 import android.net.Uri
 import eu.europa.ec.businesslogic.extension.toUri
-import eu.europa.ec.uilogic.component.AppIconAndTextData
+import eu.europa.ec.uilogic.component.AppIconAndTextDataUi
+import eu.europa.ec.uilogic.component.AppIcons
+import eu.europa.ec.uilogic.component.ListItemTrailingContentDataUi
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
-import eu.europa.ec.uilogic.component.wrap.ExpandableListItem
+import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
+import eu.europa.ec.uilogic.extension.toggleExpansionState
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -34,7 +37,7 @@ data class State(
     val isLoading: Boolean = false,
     val headerConfig: ContentHeaderConfig,
 
-    val items: List<ExpandableListItem.NestedListItemData> = emptyList(),
+    val items: List<ExpandableListItemUi.NestedListItem> = emptyList(),
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -71,7 +74,7 @@ abstract class DocumentSuccessViewModel : MviViewModel<Event, State, Effect>() {
     override fun setInitialState(): State {
         return State(
             headerConfig = ContentHeaderConfig(
-                appIconAndTextData = AppIconAndTextData(),
+                appIconAndTextData = AppIconAndTextDataUi(),
                 description = null,
             )
         )
@@ -83,6 +86,44 @@ abstract class DocumentSuccessViewModel : MviViewModel<Event, State, Effect>() {
 
             is Event.StickyButtonPressed -> doNavigation(
                 navigation = getNextScreenConfigNavigation()
+            )
+        }
+    }
+
+    private fun expandOrCollapseSuccessDocumentItem(id: String) {
+        val currentItems = viewState.value.items
+
+        val updatedItems = currentItems.map { successDocument ->
+            val newHeader = if (successDocument.header.itemId == id) {
+                val newIsExpanded = !successDocument.isExpanded
+                val newCollapsed = successDocument.header.copy(
+                    trailingContentData = ListItemTrailingContentDataUi.Icon(
+                        iconData = if (newIsExpanded) {
+                            AppIcons.KeyboardArrowUp
+                        } else {
+                            AppIcons.KeyboardArrowDown
+                        }
+                    )
+                )
+
+                successDocument.copy(
+                    header = newCollapsed,
+                    isExpanded = newIsExpanded
+                )
+            } else {
+                successDocument
+            }
+
+            successDocument.copy(
+                header = newHeader.header,
+                isExpanded = newHeader.isExpanded,
+                nestedItems = newHeader.nestedItems.toggleExpansionState(id)
+            )
+        }
+
+        setState {
+            copy(
+                items = updatedItems
             )
         }
     }

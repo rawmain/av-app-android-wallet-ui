@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -21,9 +21,9 @@ import eu.europa.ec.authenticationlogic.controller.storage.PinValidationResult
 import eu.europa.ec.businesslogic.validator.FormValidator
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.testfeature.mockedExceptionWithMessage
-import eu.europa.ec.testfeature.mockedExceptionWithNoMessage
-import eu.europa.ec.testfeature.mockedGenericErrorMessage
+import eu.europa.ec.testfeature.util.mockedExceptionWithMessage
+import eu.europa.ec.testfeature.util.mockedExceptionWithNoMessage
+import eu.europa.ec.testfeature.util.mockedGenericErrorMessage
 import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.rule.CoroutineTestRule

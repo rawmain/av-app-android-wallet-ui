@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -307,27 +307,35 @@ class PrefsControllerImpl(
 }
 
 interface PrefKeys {
-    fun getBiometricAlias(): String
-    fun setBiometricAlias(value: String)
+    fun getCryptoAlias(): String
+    fun setCryptoAlias(value: String)
 }
 
 class PrefKeysImpl(
     private val prefsController: PrefsController
 ) : PrefKeys {
 
-    /**
-     * Returns the biometric alias in order to find the biometric secret key in android keystore.
-     */
-    override fun getBiometricAlias(): String {
-        return prefsController.getString("BiometricAlias", "")
-    }
 
     /**
-     * Stores the biometric alias used for the secret key in android keystore.
+     * Retrieves the alias used for cryptographic operations from SharedPreferences.
+     * This alias is typically used to identify a specific key or set of keys
+     * stored in the Android Keystore system.
      *
-     * @param value the biometric alias value.
+     * @return The crypto alias string. Returns an empty string if the alias is not found
+     *         or has not been set.
      */
-    override fun setBiometricAlias(value: String) {
-        prefsController.setString("BiometricAlias", value)
+    override fun getCryptoAlias(): String {
+        return prefsController.getString("CryptoAlias", "")
+    }
+
+
+    /**
+     * Stores the crypto alias used for the secret key in android keystore.
+     * This is used for cryptographic operations not related to biometrics.
+     *
+     * @param value the crypto alias value.
+     */
+    override fun setCryptoAlias(value: String) {
+        prefsController.setString("CryptoAlias", value)
     }
 }

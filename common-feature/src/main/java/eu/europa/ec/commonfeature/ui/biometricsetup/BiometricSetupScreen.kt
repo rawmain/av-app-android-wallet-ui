@@ -106,7 +106,7 @@ private fun ActionButtons(
             onClick = { viewModel.setEvent(Event.NextButtonPressed(context)) })
     )
     WrapStickyBottomContent(
-        stickyBottomModifier = Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(paddingValues),
         stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)
