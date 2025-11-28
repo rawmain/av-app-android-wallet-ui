@@ -247,6 +247,7 @@ Für weitere Informationen wenden Sie sich bitte an den autorisierten Aussteller
     <string name="presentation_qr_scan_subtitle">Scannen Sie einen von einer vertrauenden Partei bereitgestellten QR-Code, um ein digitales Dokument zu präsentieren.</string>
     <string name="issuance_add_document_title">Dokument aus Liste hinzufügen</string>
     <string name="issuance_add_document_subtitle">Wählen Sie ein digitales Dokument aus der Liste unten aus, um es Ihrer Brieftasche hinzuzufügen.</string>
+    <string name="issuance_add_document_no_options">Keine Dokumente verfügbar</string>
     <string name="issuance_add_document_scan_qr_footer_text">@string/generic_or</string>
     <string name="issuance_add_document_scan_qr_footer_button_text">@string/generic_scan_qr</string>
     <string name="issuance_add_document_deferred_success_text">@string/generic_deferred_success_text</string>
@@ -298,4 +299,22 @@ Für weitere Informationen wenden Sie sich bitte an den autorisierten Aussteller
     <string name="landing_screen_add_credentials">Mehr hinzufügen</string>
     <string name="settings_screen_version">Version</string>
     <string name="settings_screen_app_info">App-Informationen</string>
+
+    <!-- Passport Scanner -->
+    <string name="cd_close_button">Zurück</string>
+    <string name="cd_flash_button">Kamerablitz umschalten</string>
+    <string name="label_close">Schließen</string>
+    <string name="label_turn_on">Einschalten</string>
+    <string name="nfc_body_initial">Legen Sie Ihren Reisepass/Personalausweis direkt auf die Rückseite des Smartphones, in der Regel oben.</string>
+    <string name="nfc_body_reading">Reisepass/Personalausweis wird gelesen</string>
+    <string name="nfc_help_link"><u>Benötigen Sie Hilfe?</u></string>
+    <string name="nfc_title">Legen Sie Ihr Telefon über Ihren Reisepass/Personalausweis und bewegen Sie es nicht</string>
+    <string name="nfc_title_initial">Lesen Sie Ihren Reisepass/Personalausweis ein</string>
+    <string name="nfc_title_reading">Lesen Sie Ihren Reisepass/Personalausweis über die NFC-Schnittstelle ein</string>
+    <string name="required_nfc_not_supported">Fehler: NFC wird auf diesem Gerät nicht unterstützt.</string>
+    <string name="required_perms_not_given">Fehler: Berechtigungen verweigert.</string>
+    <string name="settings">Einstellungen</string>
+    <string name="warning_authentication_failed">Authentifizierung fehlgeschlagen! Bitte versuchen Sie, das Dokument erneut zu scannen oder die Daten manuell einzugeben.</string>
+    <string name="warning_cla_not_supported">Das Dokument kann nicht gelesen werden. Der Reisepass unterstützt CLA nicht.</string>
+    <string name="warning_enable_nfc">Sie müssen NFC aktivieren</string>
 </resources>

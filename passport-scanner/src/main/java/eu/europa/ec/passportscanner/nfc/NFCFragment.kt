@@ -20,7 +20,6 @@ package eu.europa.ec.passportscanner.nfc
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
@@ -35,12 +34,14 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import eu.europa.ec.passportscanner.R
 import eu.europa.ec.passportscanner.nfc.details.IntentData
 import eu.europa.ec.passportscanner.nfc.details.NFCDocumentTag
 import eu.europa.ec.passportscanner.nfc.passport.Passport
 import eu.europa.ec.passportscanner.utils.KeyStoreUtils
+import eu.europa.ec.resourceslogic.R.string
 import io.reactivex.disposables.CompositeDisposable
 import net.sf.scuba.smartcards.CardServiceException
 import net.sf.scuba.smartcards.ISO7816
@@ -51,7 +52,6 @@ import org.jmrtd.PACEException
 import org.jmrtd.lds.icao.MRZInfo
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
-import androidx.core.net.toUri
 
 class NFCFragment : Fragment() {
 
@@ -123,7 +123,7 @@ class NFCFragment : Fragment() {
                 override fun onAccessDeniedException(exception: AccessDeniedException) {
                     Toast.makeText(
                         context,
-                        getString(R.string.warning_authentication_failed),
+                        getString(string.warning_authentication_failed),
                         Toast.LENGTH_SHORT
                     ).show()
                     exception.printStackTrace()
@@ -146,7 +146,7 @@ class NFCFragment : Fragment() {
                         ISO7816.SW_CLA_NOT_SUPPORTED -> {
                             Toast.makeText(
                                 context,
-                                getString(R.string.warning_cla_not_supported),
+                                getString(string.warning_cla_not_supported),
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -184,8 +184,8 @@ class NFCFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // Set initial UI state
-        textViewNfcTitle?.text = getString(R.string.nfc_title_initial)
-        textViewNfcBody?.text = getString(R.string.nfc_body_initial)
+        textViewNfcTitle?.text = getString(string.nfc_title_initial)
+        textViewNfcBody?.text = getString(string.nfc_body_initial)
 
         if (nfcFragmentListener != null) {
             nfcFragmentListener?.onEnableNfc()
@@ -211,8 +211,8 @@ class NFCFragment : Fragment() {
         Log.d(TAG, "onNFCSReadStart")
         mHandler.post {
             // Update UI for reading state
-            textViewNfcTitle?.text = getString(R.string.nfc_title_reading)
-            textViewNfcBody?.text = getString(R.string.nfc_body_reading)
+            textViewNfcTitle?.text = getString(string.nfc_title_reading)
+            textViewNfcBody?.text = getString(string.nfc_body_reading)
             textViewNfcBody?.gravity = android.view.Gravity.CENTER
             textViewHelpLink?.visibility = View.GONE
 
@@ -246,8 +246,8 @@ class NFCFragment : Fragment() {
             progressBar?.visibility = View.GONE
 
             // Reset UI to initial state
-            textViewNfcTitle?.text = getString(R.string.nfc_title_initial)
-            textViewNfcBody?.text = getString(R.string.nfc_body_initial)
+            textViewNfcTitle?.text = getString(string.nfc_title_initial)
+            textViewNfcBody?.text = getString(string.nfc_body_initial)
             textViewNfcBody?.gravity = android.view.Gravity.START
             textViewHelpLink?.visibility = View.VISIBLE
 
