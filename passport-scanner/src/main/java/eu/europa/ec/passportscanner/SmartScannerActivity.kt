@@ -64,6 +64,7 @@ import eu.europa.ec.passportscanner.scanner.config.Orientation
 import eu.europa.ec.passportscanner.scanner.config.ScannerOptions
 import eu.europa.ec.passportscanner.utils.CameraUtils.isLedFlashAvailable
 import eu.europa.ec.passportscanner.utils.extension.toPx
+import eu.europa.ec.resourceslogic.R.string
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -341,10 +342,10 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                 } else {
                     val snackBar: Snackbar = Snackbar.make(
                         coordinatorLayoutView,
-                        R.string.required_perms_not_given,
+                        string.required_perms_not_given,
                         Snackbar.LENGTH_INDEFINITE
                     )
-                    snackBar.setAction(R.string.settings) {
+                    snackBar.setAction(string.settings) {
                         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                         val uri = Uri.fromParts("package", packageName, null)
                         intent.data = uri
