@@ -13,6 +13,11 @@
  * ANY KIND, either express or implied. See the Licence for the specific language
  * governing permissions and limitations under the Licence.
  */
+import com.github.jk1.license.filter.DependencyFilter
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.github.jk1.license.render.CsvReportRenderer
+import com.github.jk1.license.render.InventoryHtmlReportRenderer
+import com.github.jk1.license.render.ReportRenderer
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -31,5 +36,26 @@ plugins {
     alias(libs.plugins.baselineprofile) apply false
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.androidx.room) apply false
+    id("com.github.jk1.dependency-license-report") version "3.0.1"
 }
-true
+
+licenseReport {
+    renderers = arrayOf<ReportRenderer>(
+        CsvReportRenderer(),
+        InventoryHtmlReportRenderer("report.html", "Age Verification Android App")
+    )
+
+    excludeOwnGroup = true
+
+    configurations = arrayOf("demoReleaseRuntimeClasspath")
+
+    excludes = arrayOf(":test-logic", "test-logic", ":test-feature", "test-feature")
+
+    filters =
+        arrayOf<DependencyFilter>(
+            LicenseBundleNormalizer(
+                "$projectDir/config/license-normalizer-bundle.json",
+                true
+            )
+        )
+}

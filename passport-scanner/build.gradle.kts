@@ -41,6 +41,7 @@ configurations.all {
 dependencies {
     // Project dependencies
     implementation(project(LibraryModule.BusinessLogic.path))
+    implementation(project(LibraryModule.ResourcesLogic.path))
 
     implementation(files("libs/jj2000_imageutil.jar"))
 

@@ -119,11 +119,15 @@
     <string name="welcome_page_1">Med denne app kan du sikkert bevise, at du er over 18 år, når du får adgang til tjenester der er begrænset til voksne.</string>
     <string name="welcome_page_2">Verificér din alder én gang og brug dette bevis til sikker adgang til mange tjenester, der er begrænset til voksne.</string>
     <string name="welcome_page_3">Du bevarer kontrollen over dine data: Det er kun beviset for, at du er over 18 år, som deles. Ingen andre personlige oplysninger gemmes eller deles med onlinetjenester.</string>
+
     <string name="welcome_title_1">Velkommen</string>
     <string name="welcome_title_2">Enkel aldersverifikation</string>
     <string name="welcome_title_3">Beskyttelse af personlige oplysninger</string>
+
     <string name="welcome_screen_next">Næste</string>
     <string name="welcome_screen_skip">Spring over</string>
+
+    <!-- Content Description -->
     <string name="content_description_image_or_placeholder_icon">Ikon eller pladsholderikon</string>
     <string name="content_description_more_vert_icon">Flere emner</string>
     <string name="content_description_arrow_back_icon">Gå tilbage</string>
@@ -151,6 +155,7 @@
     <string name="content_description_search_icon">Søg</string>
     <string name="content_description_present_document_same_device_icon">Fremvis dokument ved personligt fremmøde</string>
     <string name="content_description_add_document_from_qr_icon">Tilføj dokument fra QR-kode</string>
+
     <string name="content_description_documents_icon">Dokumenter</string>
     <string name="content_description_filters_icon">Filtre</string>
     <string name="content_description_in_progress_icon">I gang</string>
@@ -250,6 +255,7 @@ Prøv en alternativ måde</string>
     <string name="presentation_qr_scan_subtitle">Scan en QR-kode leveret af onlinetjenesten  for at vise et bevis på alder.</string>
     <string name="issuance_add_document_title">Tilføj dokument fra listen</string>
     <string name="issuance_add_document_subtitle">Vælg et digitalt dokument  som skal føjes til din applikation på listen nedenfor.</string>
+    <string name="issuance_add_document_no_options">Ingen tilgængelige dokumenter</string>
     <string name="issuance_add_document_scan_qr_footer_text">@string/generic_or</string>
     <string name="issuance_add_document_scan_qr_footer_button_text">@string/generic_scan_qr</string>
     <string name="issuance_add_document_deferred_success_text">@string/generic_deferred_success_text</string>
@@ -305,4 +311,22 @@ Union</string>
     <string name="landing_screen_add_credentials">Tilføj flere</string>
     <string name="settings_screen_version">Version</string>
     <string name="settings_screen_app_info">App-information</string>
+
+    <!-- Passport Scanner -->
+    <string name="cd_close_button">Tilbage</string>
+    <string name="cd_flash_button">Slå kameraets blitz til/fra</string>
+    <string name="label_close">Luk</string>
+    <string name="label_turn_on">Tænd</string>
+    <string name="nfc_body_initial">Placer dit pas/ID-kort direkte på bagsiden af smartphonen, normalt øverst.</string>
+    <string name="nfc_body_reading">Pas / ID-kort læses</string>
+    <string name="nfc_help_link"><u>Har du brug for hjælp?</u></string>
+    <string name="nfc_title">Placer din telefon over dit pas/ID-kort og flyt den ikke</string>
+    <string name="nfc_title_initial">Læs i dit pas / ID-kort</string>
+    <string name="nfc_title_reading">Læs i dit pas / ID-kort via NFC-interface</string>
+    <string name="required_nfc_not_supported">Fejl: NFC understøttes ikke på denne enhed.</string>
+    <string name="required_perms_not_given">Fejl: Tilladelser nægtet.</string>
+    <string name="settings">Indstillinger</string>
+    <string name="warning_authentication_failed">Godkendelse mislykkedes! Prøv at scanne dokumentet igen, eller indtast dataene manuelt.</string>
+    <string name="warning_cla_not_supported">Umuligt at læse dokumentet. Pas understøtter ikke CLA .</string>
+    <string name="warning_enable_nfc">Du skal aktivere NFC</string>
 </resources>
