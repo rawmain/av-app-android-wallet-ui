@@ -250,6 +250,7 @@ Prova con un metodo alternativo</string>
     <string name="presentation_qr_scan_subtitle">Scansiona il codice QR fornito dal servizio online per presentare l\'attestazione dell\'età.</string>
     <string name="issuance_add_document_title">Aggiungi un documento dall\'elenco</string>
     <string name="issuance_add_document_subtitle">Scegli un documento digitale dall\'elenco qui sotto da aggiungere alla tua applicazione.</string>
+    <string name="issuance_add_document_no_options">Nessun documento disponibile</string>
     <string name="issuance_add_document_scan_qr_footer_text">@string/generic_or</string>
     <string name="issuance_add_document_scan_qr_footer_button_text">@string/generic_scan_qr</string>
     <string name="issuance_add_document_deferred_success_text">@string/generic_deferred_success_text</string>
@@ -304,4 +305,22 @@ europea</string>
     <string name="landing_screen_add_credentials">Aggiungi altri</string>
     <string name="settings_screen_version">Versione</string>
     <string name="settings_screen_app_info">Informazioni sull\'app</string>
+
+    <!-- Passport Scanner -->
+    <string name="cd_close_button">Indietro</string>
+    <string name="cd_flash_button">Attiva/disattiva il flash della fotocamera</string>
+    <string name="label_close">Chiudi</string>
+    <string name="label_turn_on">Accendi</string>
+    <string name="nfc_body_initial">Posiziona il tuo passaporto/carta d\'identità direttamente sul retro dello smartphone, di solito in alto.</string>
+    <string name="nfc_body_reading">Lettura del passaporto/carta d\'identità in corso</string>
+    <string name="nfc_help_link"><u>Hai bisogno di aiuto?</u></string>
+    <string name="nfc_title">Metti il telefono sopra il passaporto/carta d\'identità e non spostarlo</string>
+    <string name="nfc_title_initial">Leggi il tuo passaporto/carta d\'identità</string>
+    <string name="nfc_title_reading">Leggi il tuo passaporto/carta d\'identità tramite l\'interfaccia NFC</string>
+    <string name="required_nfc_not_supported">Errore: NFC non è supportato su questo dispositivo.</string>
+    <string name="required_perms_not_given">Errore: autorizzazioni negate.</string>
+    <string name="settings">Impostazioni</string>
+    <string name="warning_authentication_failed">Autenticazione non riuscita! Prova a scansionare di nuovo il documento o inserisci i dati manualmente.</string>
+    <string name="warning_cla_not_supported">Impossibile leggere il documento. Il passaporto non supporta il CLA.</string>
+    <string name="warning_enable_nfc">Devi abilitare l\'NFC</string>
 </resources>

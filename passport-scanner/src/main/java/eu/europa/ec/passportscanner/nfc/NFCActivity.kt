@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
 import eu.europa.ec.passportscanner.R
+import eu.europa.ec.resourceslogic.R.string
 import eu.europa.ec.passportscanner.SmartScannerActivity
 import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.api.ScannerConstants.IS_PASSPORT
@@ -112,12 +113,12 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
 
     private fun checkNFC() {
         val dialog: AlertDialog.Builder = AlertDialog.Builder(this)
-        dialog.setMessage(getString(R.string.warning_enable_nfc))
-        dialog.setPositiveButton(R.string.label_turn_on) { alert, which ->
+        dialog.setMessage(getString(string.warning_enable_nfc))
+        dialog.setPositiveButton(string.label_turn_on) { _, _ ->
             val intent = Intent(Settings.ACTION_NFC_SETTINGS)
             startActivity(intent)
         }
-        dialog.setNegativeButton(R.string.label_close) { alert, which -> }
+        dialog.setNegativeButton(string.label_close) { _, _ -> }
         dialog.show()
     }
 
@@ -135,7 +136,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
             }
             nfcAdapter?.enableForegroundDispatch(this@NFCActivity, pendingIntent, null, null)
         } else {
-            Toast.makeText(this, R.string.required_nfc_not_supported, Toast.LENGTH_LONG).show()
+            Toast.makeText(this, string.required_nfc_not_supported, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -182,7 +183,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
     }
 
     private fun showWirelessSettings() {
-        Toast.makeText(this, getString(R.string.warning_enable_nfc), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(string.warning_enable_nfc), Toast.LENGTH_SHORT).show()
         val intent = Intent(Settings.ACTION_WIRELESS_SETTINGS)
         startActivity(intent)
     }
