@@ -21,14 +21,12 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
-import com.google.gson.Gson
 import eu.europa.ec.passportscanner.SmartScannerActivity
 import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.mrz.MRZAnalyzer
 import eu.europa.ec.passportscanner.mrz.MRZCleaner
 import eu.europa.ec.passportscanner.parser.MrzParseException
 import eu.europa.ec.passportscanner.parser.MrzRecord
-import eu.europa.ec.passportscanner.parser.records.MrtdTd1
 import eu.europa.ec.passportscanner.parser.types.MrzFormat
 
 open class NFCScanAnalyzer(
@@ -44,7 +42,7 @@ open class NFCScanAnalyzer(
 
         when (mrzRecord.format) {
             MrzFormat.PASSPORT -> startNFCScanActivity(result)
-            //MrzFormat.MRTD_TD1 -> deliverEIDResult(mrzRecord as MrtdTd1)
+            MrzFormat.MRTD_TD1 -> startNFCScanActivity(result)
             else -> throw MrzParseException("Unrecognized MRZ format", result, null, null)
         }
     }
@@ -57,19 +55,4 @@ open class NFCScanAnalyzer(
         activity.finish()
     }
 
-    private fun deliverEIDResult(mrzRecord: MrtdTd1) {
-        Log.d(SmartScannerActivity.TAG, "Delivering TD1 MRZ result: $mrzRecord")
-
-        val nfcResult = NFCResult.fromEID(mrzRecord)
-
-        Log.d(SmartScannerActivity.TAG, "Formatted NFCResult: $nfcResult")
-
-        val data = Intent()
-        data.putExtra(SmartScannerActivity.SCANNER_RESULT, Gson().toJson(nfcResult))
-        data.putExtra(ScannerConstants.DATE_OF_BIRTH, nfcResult.dateOfBirth)
-        data.putExtra(ScannerConstants.EXPIRY_DATE, nfcResult.dateOfExpiry)
-
-        activity.setResult(Activity.RESULT_OK, data)
-        activity.finish()
-    }
 }
