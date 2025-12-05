@@ -43,6 +43,11 @@ override val vciConfig: List<OpenId4VciManager.Config>
 )
 ```
 
+There's also a dedicated OpenId4VciManager.Config for the passport scanning issuer
+```Kotlin
+val passportScanningIssuerConfig: OpenId4VciManager.Config?
+    get() = null
+```
 2. Trusted certificates
 
 Via the *WalletCoreConfig* interface.
@@ -442,10 +447,10 @@ This section describes configuring the application to interact with services uti
 The app is configured to use batch document issuance by default, requesting a batch of credentials
 at once and handling them according to a defined policy.
 
-You can configure the following aspects of batch document issuance:
+You can configure the following aspects of batch document issuance in DocumentIssuanceRule:
 
-1. Batch size (how many credentials to request at once)
-2. Credential policy (whether to use each credential once or rotate through them)
+1. number of credentials (formerly batch size) - The number of credentials to be issued for the document at once
+2. Credential policy - whether to use each credential once or rotate through them
 
 These settings are configured in your flavor's implementation of `WalletCoreConfigImpl`. For
 example, in the demo flavor:
@@ -454,22 +459,17 @@ example, in the demo flavor:
 internal class WalletCoreConfigImpl(
     private val context: Context
 ) : WalletCoreConfig {
-
-    private companion object {
-        const val DEFAULT_CREDENTIAL_BATCH_SIZE = 30
-    }
     
     // ...other configuration...
-    
-    /**
-     * The number of credentials to request in a batch during document issuance.
-     */
-    override val credentialBatchSize: Int = DEFAULT_CREDENTIAL_BATCH_SIZE
-    
-    /**
-     * The credential usage policy for issued documents.
-     */
-    override val credentialPolicy: CredentialPolicy = CredentialPolicy.OneTimeUse
+
+    val documentIssuanceConfig: DocumentIssuanceConfig
+        get() = DocumentIssuanceConfig(
+            defaultRule = DocumentIssuanceRule(
+                policy = CredentialPolicy.OneTimeUse,
+                numberOfCredentials = 30
+            ),
+            documentSpecificRules = mapOf()
+        )
 }
 ```
 
