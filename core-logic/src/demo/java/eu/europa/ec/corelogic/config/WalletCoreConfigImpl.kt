@@ -23,6 +23,7 @@ import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.ClientIdScheme
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.Format
 import eu.europa.ec.resourceslogic.R
+import kotlin.time.Duration.Companion.seconds
 
 internal class WalletCoreConfigImpl(
     private val context: Context
@@ -36,7 +37,7 @@ internal class WalletCoreConfigImpl(
                 _config = EudiWalletConfig {
                     configureDocumentKeyCreation(
                         userAuthenticationRequired = false,
-                        userAuthenticationTimeout = 30_000L,
+                        userAuthenticationTimeout = 30.seconds,
                         useStrongBoxForKeys = true
                     )
                     configureOpenId4Vp {
@@ -76,25 +77,33 @@ internal class WalletCoreConfigImpl(
     override val vciConfig: List<OpenId4VciManager.Config>
         get() = listOf(
             OpenId4VciManager.Config.Builder()
-                .withIssuerUrl(issuerUrl = "https://issuer.ageverification.dev")
-                .withClientId(clientId = "wallet-dev")
+                .withIssuerUrl(issuerUrl = "https://test.issuer.dev.ageverification.dev") // no end slash
+                .withClientAuthenticationType(
+                    OpenId4VciManager.ClientAuthenticationType.None(
+                        clientId = "wallet-dev"
+                    )
+                )
                 .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
                 .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-                .withUseDPoPIfSupported(false)
-                .build(),
+                .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
+                .build()
         )
 
     /**
      * Configuration for the passport scanning issuer.
      */
     override val passportScanningIssuerConfig: OpenId4VciManager.Config =
-        OpenId4VciManager.Config(
-            issuerUrl = "https://issuer.dev.ageverification.dev",
-            clientId = "wallet-dev",
-            authFlowRedirectionURI = BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK,
-            useDPoPIfSupported = false,
-            parUsage = OpenId4VciManager.Config.ParUsage.NEVER
-        )
+        OpenId4VciManager.Config.Builder()
+            .withIssuerUrl(issuerUrl = "https://passport.issuer.dev.ageverification.dev") // no end slash
+            .withClientAuthenticationType(
+                OpenId4VciManager.ClientAuthenticationType.None(
+                    clientId = "wallet-dev"
+                )
+            )
+            .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
+            .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
+            .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
+            .build()
 
     /**
      * Configuration for the face match SDK.
@@ -107,4 +116,7 @@ internal class WalletCoreConfigImpl(
         livenessThreshold = 0.972017,
         matchingThreshold = 0.5
     )
+
+    override val walletProviderHost: String
+        get() = "https://wallet-provider.eudiw.dev"
 }

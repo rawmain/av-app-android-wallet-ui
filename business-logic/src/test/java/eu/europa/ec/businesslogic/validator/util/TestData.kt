@@ -212,10 +212,10 @@ internal val filterableList = FilterableList(
 
 
 internal data class TestPayload(
-    val name: String,
+    val name: String
 ) : FilterableItemPayload
 
 internal data class TestAttributes(
     override val searchTags: List<String>,
-    val name: String,
+    val name: String
 ) : FilterableAttributes

@@ -14,18 +14,21 @@
  * governing permissions and limitations under the Licence.
  */
 
+@file:OptIn(ExperimentalTime::class)
+
 package eu.europa.ec.onboardingfeature.interactor
 
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.periodUntil
 import kotlinx.datetime.todayIn
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 private const val TAG = "DocumentIdentificationInteractor"
 

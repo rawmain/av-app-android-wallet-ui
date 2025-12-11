@@ -72,7 +72,7 @@ object StringResourceProviderMocker {
 
     fun mockIssuerName(
         resourceProvider: ResourceProvider,
-        name: String,
+        name: String
     ) {
         whenever(resourceProvider.getString(R.string.issuance_success_header_issuer_default_name))
             .thenReturn(name)

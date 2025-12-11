@@ -14,6 +14,8 @@
  * governing permissions and limitations under the Licence.
  */
 
+@file:OptIn(ExperimentalTime::class)
+
 package eu.europa.ec.onboardingfeature.di
 
 import eu.europa.ec.businesslogic.controller.log.LogController
@@ -41,6 +43,7 @@ import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
+import kotlin.time.ExperimentalTime
 
 @Module
 @ComponentScan("eu.europa.ec.onboardingfeature")

@@ -65,7 +65,7 @@ interface CryptoController {
     fun getCipher(
         encrypt: Boolean = false,
         ivBytes: ByteArray? = null,
-        userAuthenticationRequired: Boolean = true,
+        userAuthenticationRequired: Boolean = true
     ): Cipher?
 
 
@@ -99,7 +99,7 @@ class CryptoControllerImpl(
     override fun getCipher(
         encrypt: Boolean,
         ivBytes: ByteArray?,
-        userAuthenticationRequired: Boolean,
+        userAuthenticationRequired: Boolean
     ): Cipher? =
         try {
             Cipher.getInstance(AES_EXTERNAL_TRANSFORMATION).apply {

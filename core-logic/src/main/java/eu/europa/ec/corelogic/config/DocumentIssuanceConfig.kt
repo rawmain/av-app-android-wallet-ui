@@ -33,7 +33,7 @@ import eu.europa.ec.eudi.wallet.document.CreateDocumentSettings.CredentialPolicy
  */
 data class DocumentIssuanceConfig(
     val defaultRule: DocumentIssuanceRule,
-    val documentSpecificRules: Map<DocumentIdentifier, DocumentIssuanceRule>,
+    val documentSpecificRules: Map<DocumentIdentifier, DocumentIssuanceRule>
 ) {
 
     /**

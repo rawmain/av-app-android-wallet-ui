@@ -27,6 +27,7 @@ import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.QrScanFlow
 import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.config.RequestUriConfig
+import eu.europa.ec.commonfeature.di.getOrCreateCredentialOfferScope
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
@@ -225,6 +226,7 @@ class QrScanViewModel(
     }
 
     private fun navigateToDocumentOffer(scanResult: String, issuanceFlowType: IssuanceFlowType) {
+        getOrCreateCredentialOfferScope()
         setEffect {
             Effect.Navigation.SwitchScreen(
                 screenRoute = generateComposableNavigationLink(
@@ -233,7 +235,7 @@ class QrScanViewModel(
                         mapOf(
                             OfferUiConfig.serializedKeyName to uiSerializer.toBase64(
                                 OfferUiConfig(
-                                    offerURI = scanResult,
+                                    offerUri = scanResult,
                                     onSuccessNavigation = calculateOnSuccessNavigation(
                                         issuanceFlowType
                                     ),

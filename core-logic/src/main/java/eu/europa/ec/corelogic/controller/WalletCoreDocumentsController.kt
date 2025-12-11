@@ -50,10 +50,7 @@ import eu.europa.ec.eudi.wallet.issue.openid4vci.OfferResult
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.storagelogic.dao.BookmarkDao
 import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
-import eu.europa.ec.storagelogic.dao.TransactionLogDao
-import eu.europa.ec.storagelogic.model.Bookmark
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.ProducerScope
@@ -163,11 +160,11 @@ interface WalletCoreDocumentsController {
     fun issueDocument(
         issuanceMethod: IssuanceMethod,
         configId: String,
-        issuerId: String,
+        issuerId: String
     ): Flow<IssueDocumentPartialState>
 
-    fun issueDocumentsByOfferUri(
-        offerUri: String,
+    fun issueDocumentsByOffer(
+        offer: Offer,
         txCode: String? = null,
     ): Flow<IssueDocumentsPartialState>
 
@@ -197,12 +194,6 @@ interface WalletCoreDocumentsController {
 
     suspend fun resolveDocumentStatus(document: IssuedDocument): Result<Status>
 
-    suspend fun isDocumentBookmarked(documentId: DocumentId): Boolean
-
-    suspend fun storeBookmark(bookmarkId: DocumentId)
-
-    suspend fun deleteBookmark(bookmarkId: DocumentId)
-
     suspend fun isDocumentLowOnCredentials(document: IssuedDocument): Boolean
 }
 
@@ -210,8 +201,6 @@ class WalletCoreDocumentsControllerImpl(
     private val resourceProvider: ResourceProvider,
     private val eudiWallet: EudiWallet,
     private val walletCoreConfig: WalletCoreConfig,
-    private val bookmarkDao: BookmarkDao,
-    private val transactionLogDao: TransactionLogDao,
     private val revokedDocumentDao: RevokedDocumentDao,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : WalletCoreDocumentsController {
@@ -247,7 +236,7 @@ class WalletCoreDocumentsControllerImpl(
                     metadata.flatMap { (issuer, meta) ->
                         meta.credentialConfigurationsSupported.map { (id, config) ->
 
-                            val name = config.display.getLocalizedDisplayName(
+                            val name: String = config.credentialMetadata.getLocalizedDisplayName(
                                 userLocale = locale,
                                 fallback = id.value
                             )
@@ -326,7 +315,7 @@ class WalletCoreDocumentsControllerImpl(
     override fun issueDocument(
         issuanceMethod: IssuanceMethod,
         configId: String,
-        issuerId: String,
+        issuerId: String
     ): Flow<IssueDocumentPartialState> = flow {
         when (issuanceMethod) {
             IssuanceMethod.OPENID4VCI -> {
@@ -370,35 +359,27 @@ class WalletCoreDocumentsControllerImpl(
         IssueDocumentPartialState.Failure(errorMessage = documentErrorMessage)
     }
 
-    override fun issueDocumentsByOfferUri(
-        offerUri: String,
+    override fun issueDocumentsByOffer(
+        offer: Offer,
         txCode: String?,
     ): Flow<IssueDocumentsPartialState> =
         callbackFlow {
-            resolveDocumentOffer(offerUri).collect {
-                when (it) {
-                    is ResolveDocumentOfferPartialState.Failure -> throw Throwable(it.errorMessage)
-                    is ResolveDocumentOfferPartialState.Success -> {
 
-                        val issuerId = it
-                            .offer
-                            .credentialOffer
-                            .credentialIssuerIdentifier
-                            .toString()
+            val issuerId = offer
+                .credentialOffer
+                .credentialIssuerIdentifier
+                .toString()
 
-                        val manager = openId4VciManagers[issuerId]
-                            ?: openId4VciManagers.values.firstOrNull()
+            val manager = openId4VciManagers[issuerId]
+                ?: openId4VciManagers.values.firstOrNull()
 
-                        require(manager != null) { documentErrorMessage }
+            require(manager != null) { documentErrorMessage }
 
-                        manager.issueDocumentByOffer(
-                            offer = it.offer,
-                            onIssueEvent = issuanceCallback(),
-                            txCode = txCode,
-                        )
-                    }
-                }
-            }
+            manager.issueDocumentByOffer(
+                offer = offer,
+                onIssueEvent = issuanceCallback(),
+                txCode = txCode,
+            )
             awaitClose()
         }.safeAsync {
             IssueDocumentsPartialState.Failure(
@@ -534,9 +515,13 @@ class WalletCoreDocumentsControllerImpl(
 
             manager.resolveDocumentOffer(offerUri) { result ->
                 when (result) {
-                    is OfferResult.Failure -> throw Throwable(
-                        result.cause.localizedMessage ?: genericErrorMessage
-                    )
+                    is OfferResult.Failure -> {
+                        trySendBlocking(
+                            ResolveDocumentOfferPartialState.Failure(
+                                result.cause.localizedMessage ?: genericErrorMessage
+                            )
+                        )
+                    }
 
                     is OfferResult.Success -> {
                         trySendBlocking(
@@ -650,15 +635,6 @@ class WalletCoreDocumentsControllerImpl(
             }
     }
 
-    override suspend fun isDocumentBookmarked(documentId: DocumentId): Boolean =
-        bookmarkDao.retrieve(documentId) != null
-
-    override suspend fun storeBookmark(bookmarkId: DocumentId) =
-        bookmarkDao.store(Bookmark(bookmarkId))
-
-    override suspend fun deleteBookmark(bookmarkId: DocumentId) =
-        bookmarkDao.delete(bookmarkId)
-
     override suspend fun isDocumentLowOnCredentials(document: IssuedDocument): Boolean {
         val documentRemainingCredentials = document.credentialsCount()
 
@@ -677,7 +653,7 @@ class WalletCoreDocumentsControllerImpl(
 
     private fun issueDocumentWithOpenId4VCI(
         configId: String,
-        issuerId: String,
+        issuerId: String
     ): Flow<IssueDocumentsPartialState> =
         callbackFlow {
 

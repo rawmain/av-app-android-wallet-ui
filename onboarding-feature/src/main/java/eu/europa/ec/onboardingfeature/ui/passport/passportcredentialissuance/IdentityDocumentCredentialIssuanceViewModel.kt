@@ -288,7 +288,7 @@ class IdentityDocumentCredentialIssuanceViewModel(
                                     mapOf(
                                         OfferUiConfig.serializedKeyName to uiSerializer.toBase64(
                                             OfferUiConfig(
-                                                offerURI = it.link.toString(),
+                                                offerUri = it.link.toString(),
                                                 onSuccessNavigation = ConfigNavigation(
                                                     navigationType = NavigationType.PushScreen(
                                                         screen = LandingScreens.Landing,

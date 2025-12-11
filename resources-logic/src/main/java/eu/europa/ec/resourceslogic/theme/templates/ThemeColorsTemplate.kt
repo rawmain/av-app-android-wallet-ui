@@ -71,7 +71,7 @@ data class ThemeColorsTemplate(
     val tertiaryFixed: Long,
     val tertiaryFixedDim: Long,
     val onTertiaryFixed: Long,
-    val onTertiaryFixedVariant: Long,
+    val onTertiaryFixedVariant: Long
 ) {
     companion object {
         fun ThemeColorsTemplate.toColorScheme(): ColorScheme = ColorScheme(

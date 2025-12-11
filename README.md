@@ -45,7 +45,7 @@ The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.c
 
 - OpenID4VP - v1 (remote presentation), DCQL
 
-- OpenID4VCI draft 15 (issuing)
+- OpenID4VCI v1 (issuing)
   
 ### Build
 
