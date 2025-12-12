@@ -17,8 +17,8 @@
  */
 package eu.europa.ec.passportscanner.nfc
 
-import android.util.Log
-import eu.europa.ec.passportscanner.SmartScannerActivity
+import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.passportscanner.SmartScannerActivity.Companion.TAG
 import eu.europa.ec.passportscanner.nfc.passport.Passport
 import eu.europa.ec.passportscanner.parser.records.MrtdTd1
 import eu.europa.ec.passportscanner.parser.types.MrzDate
@@ -36,6 +36,7 @@ data class NFCResult(
     companion object {
         fun formatResult(
             passport: Passport?,
+            logController: LogController,
         ): NFCResult {
             val personDetails = passport?.personDetails
             val additionalPersonDetails = passport?.additionalPersonDetails
@@ -44,49 +45,62 @@ data class NFCResult(
             val dateOfBirth = if (additionalPersonDetails?.fullDateOfBirth.isNullOrEmpty()) {
                 DateUtils.toAdjustedDate(
                     formatStandardDate(
-                        personDetails?.dateOfBirth, threshold = BIRTH_DATE_THRESHOLD
+                        personDetails?.dateOfBirth,
+                        threshold = BIRTH_DATE_THRESHOLD,
+                        logController = logController
                     )
                 )
-            } else formatStandardDate(additionalPersonDetails.fullDateOfBirth, "yyyyMMdd")
+            } else formatStandardDate(
+                additionalPersonDetails.fullDateOfBirth,
+                "yyyyMMdd",
+                logController = logController
+            )
             return NFCResult(
                 dateOfExpiry = DateUtils.toReadableDate(
                     formatStandardDate(
-                        personDetails?.dateOfExpiry, threshold = EXPIRY_DATE_THRESHOLD
+                        personDetails?.dateOfExpiry,
+                        threshold = EXPIRY_DATE_THRESHOLD,
+                        logController = logController
                     )
                 ),
                 dateOfBirth = dateOfBirth,
             )
         }
 
-        fun fromEID(mrzRecord: MrtdTd1): NFCResult {
-            val dateOfBirth = formatMrzDateToStandard(mrzRecord.dateOfBirth)
-            val dateOfExpiry = formatMrzDateToStandard(mrzRecord.expirationDate)
+        fun fromEID(mrzRecord: MrtdTd1, logController: LogController): NFCResult {
+            val dateOfBirth = formatMrzDateToStandard(mrzRecord.dateOfBirth, logController)
+            val dateOfExpiry = formatMrzDateToStandard(mrzRecord.expirationDate, logController)
 
             return NFCResult(
                 dateOfBirth = DateUtils.toAdjustedDate(
                     formatStandardDate(
-                        dateOfBirth, threshold = BIRTH_DATE_THRESHOLD
+                        dateOfBirth,
+                        threshold = BIRTH_DATE_THRESHOLD,
+                        logController = logController,
                     )
                 ), dateOfExpiry = DateUtils.toReadableDate(
                     formatStandardDate(
-                        dateOfExpiry, threshold = EXPIRY_DATE_THRESHOLD
+                        dateOfExpiry,
+                        threshold = EXPIRY_DATE_THRESHOLD,
+                        logController = logController
                     )
                 )
             )
         }
 
-        private fun formatMrzDateToStandard(mrzDate: MrzDate): String? {
+        private fun formatMrzDateToStandard(
+            mrzDate: MrzDate,
+            logController: LogController
+        ): String? {
             return try {
                 // Format MrzDate directly to yyMMdd format
                 String.format(
                     Locale.US, "%02d%02d%02d", mrzDate.year, mrzDate.month, mrzDate.day
                 )
             } catch (e: Exception) {
-                Log.e(
-                    SmartScannerActivity.TAG,
-                    "Error formatting MRZ date:" + " ${mrzDate.day}/${mrzDate.month}/${mrzDate.year}",
-                    e
-                )
+                logController.e(TAG, e) {
+                    "Error formatting MRZ date:" + " ${mrzDate.day}/${mrzDate.month}/${mrzDate.year}"
+                }
                 null
             }
         }

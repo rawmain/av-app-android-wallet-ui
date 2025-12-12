@@ -19,7 +19,7 @@ package eu.europa.ec.onboardingfeature.ui.passport.passportidentification
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.util.Log
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.SmartScannerActivity
 import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.scanner.config.CaptureOptions
@@ -30,8 +30,10 @@ import eu.europa.ec.passportscanner.utils.ImageUtils
 import eu.europa.ec.resourceslogic.R
 import java.io.ByteArrayInputStream
 
-sealed class ScannedDocument(open val dateOfBirth: String?,
-                             open  val expiryDate: String?,) {
+sealed class ScannedDocument(
+    open val dateOfBirth: String?,
+    open val expiryDate: String?,
+) {
     data class Passport(
         override val dateOfBirth: String?,
         override val expiryDate: String?,
@@ -41,10 +43,11 @@ sealed class ScannedDocument(open val dateOfBirth: String?,
         expiryDate = expiryDate
     )
 
-    data class EID(override val dateOfBirth: String?, override val expiryDate: String?) : ScannedDocument(
-        dateOfBirth = dateOfBirth,
-        expiryDate = expiryDate
-    )
+    data class EID(override val dateOfBirth: String?, override val expiryDate: String?) :
+        ScannedDocument(
+            dateOfBirth = dateOfBirth,
+            expiryDate = expiryDate
+        )
 }
 
 object DocumentScannerIntentHelper {
@@ -71,15 +74,18 @@ object DocumentScannerIntentHelper {
                 )
             )
         }
-    
-    fun extractScannedDocumentFromIntent(intent: Intent): ScannedDocument {
+
+    fun extractScannedDocumentFromIntent(
+        intent: Intent,
+        logController: LogController
+    ): ScannedDocument {
         val dateOfBirth = intent.getStringExtra(ScannerConstants.DATE_OF_BIRTH)
         val expiryDate = intent.getStringExtra(ScannerConstants.EXPIRY_DATE)
         val isPassport = intent.getBooleanExtra(ScannerConstants.IS_PASSPORT, false)
 
-        Log.d("DocumentScan", "Extracted from Intent extras:")
-        Log.d("DocumentScan", "dateOfBirth: $dateOfBirth")
-        Log.d("DocumentScan", "expiryDate: $expiryDate")
+        logController.d("DocumentScan") {
+            "Extracted from Intent extras: dateOfBirth: $dateOfBirth expiryDate: $expiryDate"
+        }
 
         if (!isPassport) {
             return ScannedDocument.EID(
@@ -88,7 +94,7 @@ object DocumentScannerIntentHelper {
             )
         }
 
-        val faceImage = extractImageAsBitmap(intent)
+        val faceImage = extractImageAsBitmap(intent, logController)
 
         return ScannedDocument.Passport(
             dateOfBirth = dateOfBirth,
@@ -97,46 +103,62 @@ object DocumentScannerIntentHelper {
         )
     }
 
-    private fun extractImageAsBitmap(intent: Intent): Bitmap? {
+    private fun extractImageAsBitmap(intent: Intent, logController: LogController): Bitmap? {
         val faceImageBytes = intent.getByteArrayExtra(ScannerConstants.NFC_FACE_IMAGE)
         val mimeType = intent.getStringExtra(ScannerConstants.NFC_FACE_IMAGE_MIME_TYPE)
         val imageLength = intent.getIntExtra(ScannerConstants.NFC_FACE_IMAGE_LENGTH, 0)
 
-        Log.d("DocumentScan", "faceImageBytes: ${faceImageBytes?.size} bytes")
-        Log.d("DocumentScan", "mimeType: $mimeType")
-        Log.d("DocumentScan", "imageLength: $imageLength")
+        logController.d("DocumentScan") {
+            "faceImageBytes: ${faceImageBytes?.size} bytes mimeType: $mimeType imageLength: $imageLength"
+        }
 
         val faceImage = if (faceImageBytes != null && mimeType != null && imageLength > 0) {
-            Log.d("DocumentScan", "Converting raw image bytes to bitmap...")
-            convertRawImageBytesToBitmap(faceImageBytes, mimeType, imageLength)
+            logController.d("DocumentScan") { "Converting raw image bytes to bitmap..." }
+            convertRawImageBytesToBitmap(faceImageBytes, mimeType, imageLength, logController)
         } else {
-            Log.w(
-                "DocumentScan",
-                "Missing face image data - bytes: ${faceImageBytes != null}, mime: $mimeType, length: $imageLength"
-            )
+            logController.d("DocumentScan") {
+                "Missing face image data - bytes: ${faceImageBytes != null}, " +
+                        "mime: $mimeType, length: $imageLength"
+            }
             null
         }
 
-        Log.d(
-            "DocumentScan",
-            "faceImage result: ${if (faceImage != null) "Available (${faceImage.width}x${faceImage.height})" else "null"}"
-        )
+        logController.d("DocumentScan") {
+            "faceImage result: ${
+                if (faceImage != null) "Available (${faceImage.width}x" +
+                        "${faceImage.height})" else "null"
+            }"
+        }
         return faceImage
     }
 
-    private fun convertRawImageBytesToBitmap(imageBytes: ByteArray, mimeType: String, imageLength: Int): Bitmap? {
+    private fun convertRawImageBytesToBitmap(
+        imageBytes: ByteArray,
+        mimeType: String,
+        imageLength: Int,
+        logController: LogController,
+    ): Bitmap? {
         return try {
-            Log.d("DocumentScan", "Decoding image - mimeType: $mimeType, length: $imageLength, actual bytes: ${imageBytes.size}")
+            logController.d("DocumentScan") {
+                "Decoding image - mimeType: $mimeType, length: $imageLength, " +
+                        "actual bytes: ${imageBytes.size}"
+            }
 
             val inputStream = ByteArrayInputStream(imageBytes, 0, imageLength)
-            Log.d("DocumentScan", "Using ImageUtils.decodeImage for format: $mimeType")
+            logController.d("DocumentScan") {
+                "Using ImageUtils.decodeImage for format: $mimeType"
+            }
 
-            val bitmap = ImageUtils.decodeImage(inputStream, imageLength, mimeType)
+            val bitmap = ImageUtils.decodeImage(inputStream, imageLength, mimeType, logController)
 
-            Log.d("DocumentScan", "Decoded bitmap: ${bitmap.width}x${bitmap.height}")
+            logController.d("DocumentScan") {
+                "Decoded bitmap: ${bitmap.width}x${bitmap.height}"
+            }
             bitmap
         } catch (e: Exception) {
-            Log.e("DocumentScan", "Failed to decode face image from raw compressed bytes", e)
+            logController.e("DocumentScan", e) {
+                "Failed to decode face image from raw compressed bytes"
+            }
             null
         }
     }

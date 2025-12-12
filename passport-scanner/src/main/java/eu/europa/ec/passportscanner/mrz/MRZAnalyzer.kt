@@ -22,7 +22,6 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Rect
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
@@ -30,6 +29,7 @@ import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.R
 import eu.europa.ec.passportscanner.SmartScannerActivity
 import eu.europa.ec.passportscanner.scanner.BaseImageAnalyzer
@@ -43,6 +43,8 @@ import java.net.URLEncoder
 abstract class MRZAnalyzer(
     override val activity: Activity,
     override val intent: Intent,
+
+    override val logController: LogController,
 ) : BaseImageAnalyzer() {
 
     companion object {
@@ -55,7 +57,7 @@ abstract class MRZAnalyzer(
 
         val bdParent = activity.findViewById<RelativeLayout>(R.id.rect_bounding_layout)
 
-        if (bdParent!= null && bdParent.childCount > 1) {
+        if (bdParent != null && bdParent.childCount > 1) {
             bdParent.removeAllViews()
         }
 
@@ -83,7 +85,7 @@ abstract class MRZAnalyzer(
 
         // Calculate offsets for where the MRZ crop area starts in the preview
         val mrzCropX = 9.toPx
-        val mrzCropY = viewFinder.height - rectGuide.height - GUIDE_HEIGHT_IN_PX/4
+        val mrzCropY = viewFinder.height - rectGuide.height - GUIDE_HEIGHT_IN_PX / 4
 
         // Apply offsets to position the boxes correctly in the preview
         scaledRect.offset(mrzCropX, mrzCropY)
@@ -108,7 +110,7 @@ abstract class MRZAnalyzer(
 
     @SuppressLint("UnsafeExperimentalUsageError", "UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
-        val bitmap = BitmapUtils.getBitmap(imageProxy)
+        val bitmap = BitmapUtils.getBitmap(imageProxy, logController)
         bitmap?.let { bf ->
             val rotation = imageProxy.imageInfo.rotationDegrees
             bf.apply {
@@ -160,9 +162,8 @@ abstract class MRZAnalyzer(
             )
             inputRot = 0
 
-
             // Pass image to an ML Kit Vision API
-            Log.d("${SmartScannerActivity.TAG}/SmartScanner", "MRZ MLKit: start")
+            logController.d("${SmartScannerActivity.TAG}/SmartScanner") { "MRZ MLKit: start" }
             val image = InputImage.fromBitmap(inputBitmap, inputRot)
             val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
@@ -197,27 +198,25 @@ abstract class MRZAnalyzer(
                             .replace("%0A", "↩")
 
                         val nlCount = encoded.count { it == '↩' }
-                        Log.d(
-                            "${SmartScannerActivity.TAG}/SmartScanner",
+                        logController.d("${SmartScannerActivity.TAG}/SmartScanner") {
                             "Before cleaner: [${encoded}], with  NL = $nlCount"
-                        )
+                        }
 
-                        val cleanMRZ = MRZCleaner.clean(rawFullRead)
-                        Log.d(
-                            "${SmartScannerActivity.TAG}/SmartScanner",
+                        val cleanMRZ = MRZCleaner.clean(rawFullRead, logController)
+                        logController.d("${SmartScannerActivity.TAG}/SmartScanner") {
                             "After cleaner = [${
                                 URLEncoder.encode(cleanMRZ, "UTF-8")
                                     .replace("%3C", "<").replace("%0A", "↩")
                             }]"
-                        )
+                        }
                         processResult(result = cleanMRZ, bitmap = bf, rotation = rotation)
                     } catch (e: Exception) {
-                        Log.d("${SmartScannerActivity.TAG}/SmartScanner", e.toString())
+                        logController.d("${SmartScannerActivity.TAG}/SmartScanner", e)
                     }
                     imageProxy.close()
                 }
                 .addOnFailureListener { e ->
-                    e.printStackTrace()
+                    logController.d("${SmartScannerActivity.TAG}/SmartScanner", e)
                     imageProxy.close()
                 }
         }

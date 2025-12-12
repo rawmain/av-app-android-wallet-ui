@@ -126,7 +126,7 @@ class ModelDownloader(
                 null
             }
         } catch (e: Exception) {
-            logController.e(TAG) { "downloadModelFromUrl: Failed to download from $urlString: ${e.message}" }
+            logController.e(TAG, e) { "downloadModelFromUrl: Failed to download from $urlString" }
             null
         }
     }
@@ -149,7 +149,7 @@ class ModelDownloader(
                 }
                 logController.d(TAG) { "copyAssetIfNeeded: Copied asset $assetName to ${destFile.absolutePath}" }
             } catch (e: Exception) {
-                logController.e(TAG) { "Failed to copy asset: $assetName - ${e.message}" }
+                logController.e(TAG, e) { "Failed to copy asset: $assetName" }
             }
         }
     }

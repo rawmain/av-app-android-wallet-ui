@@ -78,11 +78,11 @@ class DocumentIdentificationInteractorImpl(
             if (age < 18) {
                 val errorMessage =
                     resourceProvider.getString(R.string.passport_validation_error_underage)
-                logController.w(TAG) { "Document validation failed: user is $age years old" }
+                logController.w(TAG) { "Document validation failed: user is younger" }
                 return DocumentValidationState.Failure(errorMessage)
             }
 
-            logController.i(TAG) { "Document validation successful - age: $age, expires: $expiry" }
+            logController.d(TAG) { "Document validation successful - age: $age, expires: $expiry" }
             DocumentValidationState.Success
         } catch (e: Exception) {
             logController.e(TAG) { "Error parsing document dates: ${e.message}" }

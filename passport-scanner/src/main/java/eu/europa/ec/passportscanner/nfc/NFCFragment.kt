@@ -25,7 +25,6 @@ import android.nfc.Tag
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +35,7 @@ import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.R
 import eu.europa.ec.passportscanner.nfc.details.IntentData
 import eu.europa.ec.passportscanner.nfc.details.NFCDocumentTag
@@ -50,10 +50,13 @@ import org.jmrtd.BACDeniedException
 import org.jmrtd.MRTDTrustStore
 import org.jmrtd.PACEException
 import org.jmrtd.lds.icao.MRZInfo
+import org.koin.android.ext.android.inject
 import org.spongycastle.jce.provider.BouncyCastleProvider
 import java.security.Security
 
 class NFCFragment : Fragment() {
+
+    private val logController: LogController by inject()
 
     private var mrzInfo: MRZInfo? = null
     private var nfcFragmentListener: NfcFragmentListener? = null
@@ -102,7 +105,7 @@ class NFCFragment : Fragment() {
             val certStore = KeyStoreUtils().toCertStore(keyStore = keyStore)
             mrtdTrustStore.addAsCSCACertStore(certStore)
         }
-        val subscribe = NFCDocumentTag().handleTag(
+        val subscribe = NFCDocumentTag(logController).handleTag(
             tag,
             mrzInfo!!,
             mrtdTrustStore,
@@ -126,7 +129,8 @@ class NFCFragment : Fragment() {
                         getString(string.warning_authentication_failed),
                         Toast.LENGTH_SHORT
                     ).show()
-                    exception.printStackTrace()
+                    logController.e(TAG, exception)
+
                     this@NFCFragment.onCardException(exception)
                 }
 
@@ -208,7 +212,7 @@ class NFCFragment : Fragment() {
     }
 
     private fun onNFCSReadStart() {
-        Log.d(TAG, "onNFCSReadStart")
+        logController.d(TAG) { "onNFCSReadStart" }
         mHandler.post {
             // Update UI for reading state
             textViewNfcTitle?.text = getString(string.nfc_title_reading)
@@ -240,7 +244,7 @@ class NFCFragment : Fragment() {
     }
 
     private fun onNFCReadFinish() {
-        Log.d(TAG, "onNFCReadFinish")
+        logController.d(TAG) { "onNFCReadFinish" }
         mHandler.post {
             progressAnimator?.cancel()
             progressBar?.visibility = View.GONE

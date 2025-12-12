@@ -27,9 +27,11 @@ import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
 import eu.europa.ec.onboardingfeature.interactor.CredentialIssuancePartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportCredentialIssuanceInteractor
+import eu.europa.ec.onboardingfeature.ui.passport.passportcredentialissuance.Effect.Navigation.OpenDeepLinkAction
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
+import eu.europa.ec.uilogic.config.NavigationType.PushScreen
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -117,7 +119,7 @@ class IdentityDocumentCredentialIssuanceViewModel(
                     Security.removeProvider(providerName)
                     Security.addProvider(provider)
                     movedCount++
-                    logController.i(TAG) { "Moved Security provider to end: $providerName" }
+                    logController.d(TAG) { "Moved Security provider to end: $providerName" }
                 }
             }
 
@@ -125,11 +127,10 @@ class IdentityDocumentCredentialIssuanceViewModel(
             val providersAfter = Security.getProviders()
                 .map { "${it.name} (position ${Security.getProviders().indexOf(it) + 1})" }
             logController.d(TAG) { "Security providers after cleanup: $providersAfter" }
-            logController.i(TAG) { "Moved $movedCount Security provider(s) to lower priority" }
+            logController.d(TAG) { "Moved $movedCount Security provider(s) to lower priority" }
 
         } catch (e: Exception) {
-            logController.e(TAG) { "Error re-prioritizing Security providers: ${e.message}" }
-            logController.e(TAG) { "Stacktrace: ${e.stackTraceToString()}" }
+            logController.e(TAG, e) { "Error re-prioritizing Security providers" }
         }
     }
 
@@ -173,38 +174,38 @@ class IdentityDocumentCredentialIssuanceViewModel(
             try {
                 passportCredentialIssuanceInteractor.issuePassportScanningDocument(context)
                     .collect { issueState ->
-                    logController.i(TAG) { "Received issueState: ${issueState::class.simpleName}" }
-                    when (issueState) {
-                        is CredentialIssuancePartialState.Success -> {
-                            setState { copy(isLoading = false) }
-                            navigateToSuccessScreen(issueState.documentId)
-                        }
+                        logController.i(TAG) { "Received issueState: ${issueState::class.simpleName}" }
+                        when (issueState) {
+                            is CredentialIssuancePartialState.Success -> {
+                                setState { copy(isLoading = false) }
+                                navigateToSuccessScreen(issueState.documentId)
+                            }
 
-                        is CredentialIssuancePartialState.DeferredSuccess -> {
-                            logController.i(TAG) { "Document issuance deferred, navigating to success route: ${issueState.successRoute}" }
-                            setState { copy(isLoading = false) }
-                            navigateToDeferredSuccessScreen(issueState.successRoute)
-                        }
+                            is CredentialIssuancePartialState.DeferredSuccess -> {
+                                logController.d(TAG) { "Document issuance deferred, navigating to success route: ${issueState.successRoute}" }
+                                setState { copy(isLoading = false) }
+                                navigateToDeferredSuccessScreen(issueState.successRoute)
+                            }
 
-                        is CredentialIssuancePartialState.UserAuthRequired -> {
-                            // Keep loading state, authentication is part of the issuance flow
-                            passportCredentialIssuanceInteractor.handleUserAuth(
-                                context = context,
-                                crypto = issueState.crypto,
-                                notifyOnAuthenticationFailure = true,
-                                resultHandler = issueState.resultHandler
-                            )
-                        }
+                            is CredentialIssuancePartialState.UserAuthRequired -> {
+                                // Keep loading state, authentication is part of the issuance flow
+                                passportCredentialIssuanceInteractor.handleUserAuth(
+                                    context = context,
+                                    crypto = issueState.crypto,
+                                    notifyOnAuthenticationFailure = true,
+                                    resultHandler = issueState.resultHandler
+                                )
+                            }
 
-                        is CredentialIssuancePartialState.Failure -> {
-                            logController.e(TAG) { "Document issuance failed: ${issueState.error}" }
-                            setState { copy(isLoading = false) }
-                            showError(issueState.error)
+                            is CredentialIssuancePartialState.Failure -> {
+                                logController.e(TAG) { "Document issuance failed: ${issueState.error}" }
+                                setState { copy(isLoading = false) }
+                                showError(issueState.error)
+                            }
                         }
                     }
-                }
             } catch (e: Exception) {
-                logController.e(TAG) { "Exception in consent and issue flow: ${e.message}" }
+                logController.e(TAG, e) { "Exception in consent and issue flow" }
                 setState { copy(isLoading = false) }
                 showError(e.message)
             }
@@ -213,7 +214,7 @@ class IdentityDocumentCredentialIssuanceViewModel(
 
     private fun navigateToSuccessScreen(documentId: String) {
         val onSuccessNavigation = ConfigNavigation(
-            navigationType = NavigationType.PushScreen(
+            navigationType = PushScreen(
                 screen = LandingScreens.Landing,
                 popUpToScreen = OnboardingScreens.Enrollment
             )
@@ -251,7 +252,7 @@ class IdentityDocumentCredentialIssuanceViewModel(
     }
 
     private fun handleDynamicPresentation(uri: String) {
-        logController.i(TAG) { "Handling dynamic presentation for uri: $uri" }
+        logController.d(TAG) { "Handling dynamic presentation for uri: $uri" }
         getOrCreatePresentationScope()
         setEffect {
             Effect.Navigation.SwitchScreen(
@@ -282,7 +283,7 @@ class IdentityDocumentCredentialIssuanceViewModel(
                 when (it.type) {
                     DeepLinkType.CREDENTIAL_OFFER -> {
                         setEffect {
-                            Effect.Navigation.OpenDeepLinkAction(
+                            OpenDeepLinkAction(
                                 deepLinkUri = uri,
                                 arguments = generateComposableArguments(
                                     mapOf(
@@ -290,7 +291,7 @@ class IdentityDocumentCredentialIssuanceViewModel(
                                             OfferUiConfig(
                                                 offerUri = it.link.toString(),
                                                 onSuccessNavigation = ConfigNavigation(
-                                                    navigationType = NavigationType.PushScreen(
+                                                    navigationType = PushScreen(
                                                         screen = LandingScreens.Landing,
                                                         popUpToScreen = IssuanceScreens.AddDocument
                                                     )
@@ -309,15 +310,17 @@ class IdentityDocumentCredentialIssuanceViewModel(
 
                     DeepLinkType.EXTERNAL -> {
                         setEffect {
-                            Effect.Navigation.OpenDeepLinkAction(
+                            OpenDeepLinkAction(
                                 deepLinkUri = uri,
                                 arguments = null
                             )
                         }
                     }
 
-                    else -> {
-                        logController.w(TAG) { "Unhandled deeplink type: ${it.type}" }
+                    DeepLinkType.OPENID4VP,
+                    DeepLinkType.ISSUANCE,
+                    DeepLinkType.DYNAMIC_PRESENTATION -> {
+                        /* no-op */
                     }
                 }
             }

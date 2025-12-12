@@ -19,7 +19,7 @@ package eu.europa.ec.passportscanner.nfc.details
 
 import android.nfc.Tag
 import android.nfc.tech.IsoDep
-import android.util.Log
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.nfc.passport.Passport
 import eu.europa.ec.passportscanner.nfc.passport.PassportNFC
 import eu.europa.ec.passportscanner.nfc.passport.PassportNfcUtils
@@ -39,7 +39,7 @@ import org.jmrtd.lds.icao.DG1File
 import org.jmrtd.lds.icao.MRZInfo
 import java.security.Security
 
-class NFCDocumentTag {
+class NFCDocumentTag(private val logController: LogController) {
 
     fun handleTag(
         tag: Tag,
@@ -59,7 +59,7 @@ class NFCDocumentTag {
                 ps = PassportService(cs, 256, 224, false, true)
                 ps.open()
 
-                val passportNFC = PassportNFC(ps, mrtdTrustStore, mrzInfo)
+                val passportNFC = PassportNFC(ps, mrtdTrustStore, mrzInfo, logController)
                 val verifySecurity = passportNFC.verifySecurity()
                 val features = passportNFC.features
                 val verificationStatus = passportNFC.verificationStatus
@@ -82,7 +82,7 @@ class NFCDocumentTag {
                     //Get the picture
                     try {
                         val faceImage =
-                            PassportNfcUtils.retrieveFaceImage(passportNFC.dg2File!!)
+                            PassportNfcUtils.retrieveFaceImage(passportNFC.dg2File!!, logController)
                         passport.face = faceImage
 
                         // Also get the raw image data
@@ -91,9 +91,8 @@ class NFCDocumentTag {
                         passport.rawFaceImageData = rawFaceImageData
                     } catch (e: Exception) {
                         //Don't do anything
-                        e.printStackTrace()
+                        logController.w(TAG, e) { "Cannot read face data" }
                     }
-
                 }
 
                 //Portrait
@@ -102,11 +101,14 @@ class NFCDocumentTag {
                     //Get the picture
                     try {
                         val faceImage =
-                            PassportNfcUtils.retrievePortraitImage(passportNFC.dg5File!!)
+                            PassportNfcUtils.retrievePortraitImage(
+                                passportNFC.dg5File!!,
+                                logController
+                            )
                         passport.portrait = faceImage
                     } catch (e: Exception) {
                         //Don't do anything
-                        e.printStackTrace()
+                        logController.w(TAG, e) { "Cannot read portrait image" }
                     }
 
                 }
@@ -117,13 +119,11 @@ class NFCDocumentTag {
                     passport.additionalPersonDetails = AdditionalPersonDetails(dg11.fullDateOfBirth)
 
                     // Hash Checking
-                    val hashCheckNotSucceeded = "hash-check not SUCCEEDED"
                     if (verifySecurity.ht != VerificationStatus.Verdict.SUCCEEDED) {
-                        Log.e(TAG, hashCheckNotSucceeded)
+                        logController.e(TAG) { "hash-check not SUCCEEDED" }
                     }
                 } else {
-                    val dg11Null = "DG11 is null"
-                    Log.e(TAG, dg11Null)
+                    logController.e(TAG) { "DG11 is null" }
                 }
 
             } catch (e: Exception) {
@@ -133,7 +133,7 @@ class NFCDocumentTag {
                 try {
                     ps?.close()
                 } catch (ex: Exception) {
-                    ex.printStackTrace()
+                    logController.e(TAG, ex)
                 }
             }
 

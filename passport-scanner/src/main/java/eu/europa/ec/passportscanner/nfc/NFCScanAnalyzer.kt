@@ -20,7 +20,7 @@ package eu.europa.ec.passportscanner.nfc
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
-import android.util.Log
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.SmartScannerActivity
 import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.mrz.MRZAnalyzer
@@ -32,13 +32,15 @@ import eu.europa.ec.passportscanner.parser.types.MrzFormat
 open class NFCScanAnalyzer(
     override val activity: Activity,
     override val intent: Intent,
-) : MRZAnalyzer(activity, intent) {
+    override val logController: LogController,
+) : MRZAnalyzer(activity, intent, logController) {
 
     override fun processResult(result: String, bitmap: Bitmap, rotation: Int) {
         // Validate the MRZ is parseable (but don't store the parsed result)
-        val mrzRecord: MrzRecord = MRZCleaner.parseAndClean(result) // This will throw if invalid
+        val mrzRecord: MrzRecord =
+            MRZCleaner.parseAndClean(result, logController) // This will throw if invalid
 
-        Log.d(SmartScannerActivity.TAG, "Got MRZ result: $mrzRecord")
+        logController.d(SmartScannerActivity.TAG) { "Got MRZ result: $mrzRecord" }
 
         when (mrzRecord.format) {
             MrzFormat.PASSPORT -> startNFCScanActivity(result)
@@ -54,5 +56,4 @@ open class NFCScanAnalyzer(
         activity.startActivity(nfcIntent)
         activity.finish()
     }
-
 }
