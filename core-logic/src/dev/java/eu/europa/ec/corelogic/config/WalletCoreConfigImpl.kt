@@ -78,7 +78,7 @@ internal class WalletCoreConfigImpl(
     override val vciConfig: List<OpenId4VciManager.Config>
         get() = listOf(
             OpenId4VciManager.Config.Builder()
-                .withIssuerUrl(issuerUrl = "https://issuer.ageverification.dev")
+                .withIssuerUrl(issuerUrl = "https://test.issuer.dev.ageverification.dev")
                 .withClientAuthenticationType(
                     OpenId4VciManager.ClientAuthenticationType.None(
                         clientId = "wallet-dev"
@@ -95,7 +95,7 @@ internal class WalletCoreConfigImpl(
      */
     override val passportScanningIssuerConfig: OpenId4VciManager.Config =
         OpenId4VciManager.Config.Builder()
-            .withIssuerUrl(issuerUrl = "https://issuer.dev.ageverification.dev")
+            .withIssuerUrl(issuerUrl = "https://passport.issuer.dev.ageverification.dev")
             .withClientAuthenticationType(
                 OpenId4VciManager.ClientAuthenticationType.None(
                     clientId = "wallet-dev"
