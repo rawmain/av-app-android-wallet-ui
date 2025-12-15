@@ -73,17 +73,19 @@ data class State(
 ) : ViewState {
     val action: ScreenNavigateAction
         get() {
-            return when (pinFlow) {
-                PinFlow.CREATE -> ScreenNavigateAction.NONE
-                PinFlow.UPDATE -> ScreenNavigateAction.CANCELABLE
+            return when {
+                pinState == PinValidationState.REENTER -> ScreenNavigateAction.BACKABLE
+                pinFlow == PinFlow.UPDATE -> ScreenNavigateAction.CANCELABLE
+                else -> ScreenNavigateAction.NONE
             }
         }
 
     val onBackEvent: Event
         get() {
-            return when (pinFlow) {
-                PinFlow.CREATE -> Event.GoBack
-                PinFlow.UPDATE -> Event.CancelPressed
+            return when {
+                pinState == PinValidationState.REENTER -> Event.GoBack
+                pinFlow == PinFlow.UPDATE -> Event.CancelPressed
+                else -> Event.GoBack
             }
         }
 }
@@ -234,7 +236,13 @@ class PinViewModel(
                 }
             }
 
-            is Event.GoBack -> setEffect { Effect.Navigation.Pop }
+            is Event.GoBack -> {
+                if (viewState.value.pinState == PinValidationState.REENTER) {
+                    setupEnterPhaseFromReenter()
+                } else {
+                    setEffect { Effect.Navigation.Pop }
+                }
+            }
         }
     }
 
@@ -304,6 +312,24 @@ class PinViewModel(
                 resetPin = true,
                 subtitle = calculateSubtitle(newPinState),
                 title = calculateTitle(newPinState)
+            )
+        }
+    }
+
+    private fun setupEnterPhaseFromReenter() {
+        val newPinState = PinValidationState.ENTER
+
+        setState {
+            copy(
+                quickPinError = null,
+                enteredPin = "",
+                pinState = newPinState,
+                buttonText = calculateButtonText(newPinState),
+                pin = "",
+                isButtonEnabled = false,
+                resetPin = true,
+                subtitle = calculateSubtitle(newPinState),
+                title = calculateTitle(newPinState),
             )
         }
     }

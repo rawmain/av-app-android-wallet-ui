@@ -44,8 +44,10 @@ import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
 import eu.europa.ec.uilogic.component.content.ImePaddingConfig
+import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
+import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_LARGE
 import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.component.wrap.BottomSheetTextDataUi
 import eu.europa.ec.uilogic.component.wrap.ButtonConfig
@@ -181,7 +183,14 @@ private fun Content(
             .verticalScroll(rememberScrollState())
     ) {
         if (state.pinFlow == PinFlow.CREATE) {
-            TopStepBar(currentStep = 2)
+            TopStepBar(
+                currentStep = 2,
+                topPadding = if (state.action == ScreenNavigateAction.NONE) {
+                    SPACING_EXTRA_LARGE
+                } else {
+                    0
+                }
+            )
         }
 
         VSpacer.ExtraLarge()
