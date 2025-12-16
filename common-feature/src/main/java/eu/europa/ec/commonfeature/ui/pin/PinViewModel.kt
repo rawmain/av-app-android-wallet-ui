@@ -368,6 +368,8 @@ class PinViewModel(
     }
 
     private fun getListOfRules(pin: String): Form {
+        // TODO enhance security: Sequential or easily guessable patterns (such as "135246 or "147258") should not be permitted.
+        // TODO enhance security: The validation should check the most pwned PINs
         return Form(
             mapOf(
                 listOf(
