@@ -186,6 +186,7 @@
     <string name="nfc_error_missing_data">Die erforderlichen Passdaten fehlen</string>
     <string name="nfc_error_more_than_one_tag">Mehrere NFC-Tags erkannt</string>
     <string name="nfc_error_reading_failed">Der Reisepass konnte nicht gelesen werden. Bitte versuchen Sie es erneut.</string>
+    <string name="nfc_error_reading_tag">Fehler beim NFC-Lesen. Bitte versuchen Sie es erneut.</string>
     <string name="nfc_error_tag_not_valid">NFC-Tag nicht gültig</string>
     <string name="nfc_error_unexpected">Es ist ein unerwarteter Fehler aufgetreten.</string>
     <string name="nfc_error_user_canceled">Scan abgebrochen</string>

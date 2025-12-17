@@ -186,6 +186,7 @@
     <string name="nfc_error_missing_data">Der mangler nødvendige pasoplysninger</string>
     <string name="nfc_error_more_than_one_tag">Mere end ét NFC-tag registreret</string>
     <string name="nfc_error_reading_failed">Kunne ikke læse passet. Prøv igen.</string>
+    <string name="nfc_error_reading_tag">Fejl under NFC-læsning. Prøv igen.</string>
     <string name="nfc_error_tag_not_valid">NFC-tag er ikke gyldigt</string>
     <string name="nfc_error_unexpected">Der opstod en uventet fejl</string>
     <string name="nfc_error_user_canceled">Scanningen blev annulleret</string>

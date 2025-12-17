@@ -298,7 +298,7 @@ class NFCFragment : Fragment() {
     }
 
     private fun onNFCTagLost() {
-        getString(string.error_reading_nfc)
+        getString(string.nfc_error_reading_tag)
         Toast.makeText(context, "Error while NFC reading, try again", Toast.LENGTH_LONG).show()
         onNFCReadFinish()
     }
