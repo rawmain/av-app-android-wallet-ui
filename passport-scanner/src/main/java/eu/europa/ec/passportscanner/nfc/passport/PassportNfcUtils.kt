@@ -18,7 +18,7 @@
 package eu.europa.ec.passportscanner.nfc.passport
 
 import android.graphics.Bitmap
-import android.util.Log
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.utils.ImageUtils
 import org.jmrtd.cert.CVCPrincipal
 import org.jmrtd.cert.CardVerifiableCertificate
@@ -60,7 +60,7 @@ object PassportNfcUtils {
     }
 
     @Throws(IOException::class)
-    fun retrieveFaceImage(dg2File: DG2File): Bitmap {
+    fun retrieveFaceImage(dg2File: DG2File, logController: LogController): Bitmap {
         val allFaceImageInfos = ArrayList<FaceImageInfo>()
         val faceInfos = dg2File.faceInfos
         for (faceInfo in faceInfos) {
@@ -72,7 +72,8 @@ object PassportNfcUtils {
             return toBitmap(
                 faceImageInfo.imageLength,
                 faceImageInfo.imageInputStream,
-                faceImageInfo.mimeType
+                faceImageInfo.mimeType,
+                logController,
             )
         }
         throw IOException("Unable to decodeImage FaceImage")
@@ -128,33 +129,43 @@ object PassportNfcUtils {
     }
 
     @Throws(IOException::class)
-    fun retrievePortraitImage(dg5File: DG5File): Bitmap {
+    fun retrievePortraitImage(dg5File: DG5File, logController: LogController): Bitmap {
         val faceInfos = dg5File.images
         if (!faceInfos.isEmpty()) {
             val faceImageInfo = faceInfos.iterator().next()
             return toBitmap(
                 faceImageInfo.imageLength,
                 faceImageInfo.imageInputStream,
-                faceImageInfo.mimeType
+                faceImageInfo.mimeType,
+                logController,
             )
         }
         throw IOException("Unable to decodeImage PortraitImage")
     }
 
     @Throws(IOException::class)
-    private fun toBitmap(imageLength: Int, inputStream: InputStream, mimeType: String): Bitmap {
+    private fun toBitmap(
+        imageLength: Int,
+        inputStream: InputStream,
+        mimeType: String,
+        logController: LogController,
+    ): Bitmap {
         val dataInputStream = DataInputStream(inputStream)
         val buffer = ByteArray(imageLength)
         dataInputStream.readFully(buffer, 0, imageLength)
         val byteArrayInputStream = ByteArrayInputStream(buffer, 0, imageLength)
-        return ImageUtils.decodeImage(byteArrayInputStream, imageLength, mimeType)
+        return ImageUtils.decodeImage(byteArrayInputStream, imageLength, mimeType, logController)
     }
 
 
     @Throws(GeneralSecurityException::class)
-    fun getEACCredentials(caReference: CVCPrincipal, cvcaStores: List<KeyStore>): EACCredentials? {
+    fun getEACCredentials(
+        caReference: CVCPrincipal,
+        cvcaStores: List<KeyStore>,
+        logController: LogController,
+    ): EACCredentials? {
         for (cvcaStore in cvcaStores) {
-            val eacCredentials = getEACCredentials(caReference, cvcaStore)
+            val eacCredentials = getEACCredentials(caReference, cvcaStore, logController)
             if (eacCredentials != null) {
                 return eacCredentials
             }
@@ -173,7 +184,8 @@ object PassportNfcUtils {
     @Throws(GeneralSecurityException::class)
     private fun getEACCredentials(
         caReference: CVCPrincipal?,
-        cvcaStore: KeyStore
+        cvcaStore: KeyStore,
+        logController: LogController
     ): EACCredentials? {
         if (caReference == null) {
             throw IllegalArgumentException("CA reference cannot be null")
@@ -189,7 +201,7 @@ object PassportNfcUtils {
                 if (key is PrivateKey) {
                     privateKey = key
                 } else {
-                    Log.w(TAG, "skipping non-private key $alias")
+                    logController.d(TAG) { "skipping non-private key $alias" }
                     continue
                 }
                 chain = cvcaStore.getCertificateChain(alias)
@@ -204,13 +216,13 @@ object PassportNfcUtils {
                 /* See if we have a private key for that certificate. */
                 privateKey = cvcaStore.getKey(holderRef.name, "".toCharArray()) as PrivateKey
                 chain = cvcaStore.getCertificateChain(holderRef.name)
-                Log.i(TAG, "found a key, privateKey = $privateKey")
+                logController.d(TAG) { "found a key, privateKey = $privateKey" }
                 return EACCredentials(privateKey, chain!!)
             }
-            Log.e(
-                TAG,
-                "null chain or key for entry " + alias + ": chain = " + Arrays.toString(chain) + ", privateKey = " + privateKey
-            )
+            logController.d(TAG) {
+                "null chain or key for entry $alias: chain = ${Arrays.toString(chain)}, " +
+                        "privateKey = $privateKey"
+            }
             continue
         }
         return null
@@ -230,7 +242,8 @@ object PassportNfcUtils {
         sodIssuer: X500Principal,
         sodSerialNumber: BigInteger,
         cscaStores: List<CertStore>,
-        cscaTrustAnchors: Set<TrustAnchor>
+        cscaTrustAnchors: Set<TrustAnchor>,
+        logController: LogController,
     ): List<Certificate> {
         val chain = ArrayList<Certificate>()
         val selector = X509CertSelector()
@@ -272,20 +285,21 @@ object PassportNfcUtils {
             }
             if (!chain.contains(docSigningCertificate)) {
                 /* NOTE: if doc signing certificate not in list, we add it ourselves. */
-                Log.w(TAG, "Adding doc signing certificate after PKIXBuilder finished")
+                logController.w(TAG) { "Adding doc signing certificate after PKIXBuilder finished" }
                 chain.add(0, docSigningCertificate)
             }
             if (result != null) {
                 val trustAnchorCertificate = result.trustAnchor.trustedCert
                 if (trustAnchorCertificate != null && !chain.contains(trustAnchorCertificate)) {
                     /* NOTE: if trust anchor not in list, we add it ourselves. */
-                    Log.w(TAG, "Adding trust anchor certificate after PKIXBuilder finished")
+                    logController.w(TAG) {
+                        "Adding trust anchor certificate after PKIXBuilder finished"
+                    }
                     chain.add(trustAnchorCertificate)
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
-            Log.i(TAG, "Building a chain failed (" + e.message + ").")
+            logController.e(TAG, e) { "Building a chain failed" }
         }
 
         return chain

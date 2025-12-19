@@ -35,7 +35,7 @@ data class AppIconAndTextDataUi(
 @Composable
 fun AppIconAndText(
     modifier: Modifier = Modifier,
-    appIconAndTextData: AppIconAndTextDataUi,
+    appIconAndTextData: AppIconAndTextDataUi
 ) {
     Row(
         modifier = modifier,

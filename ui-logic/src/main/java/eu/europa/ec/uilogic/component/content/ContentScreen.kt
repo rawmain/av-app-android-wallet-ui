@@ -75,7 +75,7 @@ data class ToolbarActionUi(
 
 data class ToolbarConfig(
     val title: String = "",
-    val actions: List<ToolbarActionUi> = listOf(),
+    val actions: List<ToolbarActionUi> = listOf()
 )
 
 enum class ScreenNavigateAction {
@@ -103,7 +103,7 @@ fun ContentScreen(
     contentErrorConfig: ContentErrorConfig? = null,
     broadcastAction: BroadcastAction? = null,
     imePaddingConfig: ImePaddingConfig = ImePaddingConfig.NO_PADDING,
-    bodyContent: @Composable (PaddingValues) -> Unit,
+    bodyContent: @Composable (PaddingValues) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -279,7 +279,7 @@ private fun DefaultToolBar(
 
 @Composable
 internal fun ToolBarActions(
-    toolBarActions: List<ToolbarActionUi>?,
+    toolBarActions: List<ToolbarActionUi>?
 ) {
     toolBarActions?.let { actions ->
 

@@ -30,6 +30,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
+@OptIn(kotlin.time.ExperimentalTime::class)
 class TestDocumentIdentificationInteractor {
 
     @Mock

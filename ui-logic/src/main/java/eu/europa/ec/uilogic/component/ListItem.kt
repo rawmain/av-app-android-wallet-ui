@@ -164,7 +164,7 @@ sealed class ListItemTrailingContentDataUi {
     data class TextWithIcon(
         val text: String,
         val iconData: IconDataUi,
-        val tint: Color? = null,
+        val tint: Color? = null
     ) : ListItemTrailingContentDataUi()
 }
 

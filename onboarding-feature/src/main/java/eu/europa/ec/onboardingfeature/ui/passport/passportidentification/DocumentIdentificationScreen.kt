@@ -52,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Effect.Navigation
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.Event.OnDocumentScanSuccessful
 import eu.europa.ec.resourceslogic.R
@@ -74,6 +75,7 @@ import eu.europa.ec.uilogic.component.wrap.TextConfig
 import eu.europa.ec.uilogic.component.wrap.WrapImage
 import eu.europa.ec.uilogic.component.wrap.WrapStickyBottomContent
 import eu.europa.ec.uilogic.component.wrap.WrapText
+import org.koin.compose.koinInject
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -87,6 +89,7 @@ fun DocumentIdentificationScreen(
 
     val state by viewModel.viewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val logController = koinInject<LogController>()
 
     val mrzScannerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -94,9 +97,13 @@ fun DocumentIdentificationScreen(
         when (result.resultCode) {
             Activity.RESULT_OK -> {
                 result.data?.let { intent ->
+
                     val scannedDocument =
-                        DocumentScannerIntentHelper.extractScannedDocumentFromIntent(intent)
-                    if (scannedDocument.dateOfBirth == null && scannedDocument.expiryDate == null ) {
+                        DocumentScannerIntentHelper.extractScannedDocumentFromIntent(
+                            intent,
+                            logController
+                        )
+                    if (scannedDocument.dateOfBirth == null && scannedDocument.expiryDate == null) {
                         viewModel.setEvent(Event.OnDocumentScanFailed(DocumentErrors.NoDocumentDataReceived))
                     } else {
                         viewModel.setEvent(OnDocumentScanSuccessful(scannedDocument))
@@ -131,7 +138,10 @@ fun DocumentIdentificationScreen(
         }
     ) { paddingValues ->
         if (state.scanComplete) {
-            VerifyYourDataContent(scannedDocument = state.scannedDocument!!, paddingValues = paddingValues)
+            VerifyYourDataContent(
+                scannedDocument = state.scannedDocument!!,
+                paddingValues = paddingValues
+            )
         } else {
             Content(paddingValues = paddingValues)
         }
@@ -157,16 +167,24 @@ private fun ActionButtons(
 
     val buttons = StickyBottomType.TwoButtons(
         primaryButtonConfig = ButtonConfig(
-        type = ButtonType.SECONDARY,
-        onClick = {
-            if (state.scanComplete && state.scannedDocument == null)
-                onTryAgain()
-            else
-                onBack()
-        }),
+            type = ButtonType.SECONDARY,
+            onClick = {
+                if (state.scanComplete && state.scannedDocument == null) {
+                    onTryAgain()
+                } else {
+                    onBack()
+                }
+            }),
         secondaryButtonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
-            onClick = { if (state.scanComplete) onNext() else onCapture() }))
+            onClick = {
+                if (state.scanComplete) {
+                    onNext()
+                } else {
+                    onCapture()
+                }
+            })
+    )
 
     val primaryButtonText = if (state.scanComplete) {
         R.string.passport_biometrics_next
@@ -189,7 +207,7 @@ private fun ActionButtons(
         buttonConfigs?.let { buttonConfig ->
             when (buttonConfig.type) {
                 ButtonType.PRIMARY -> Text(stringResource(primaryButtonText))
-                ButtonType.SECONDARY -> Text(stringResource (secondaryButtonText))
+                ButtonType.SECONDARY -> Text(stringResource(secondaryButtonText))
             }
         }
     }
@@ -408,7 +426,13 @@ fun VerifyYourDataContentPreview() {
                 )
             }
         ) { paddingValues ->
-            VerifyYourDataContent(scannedDocument = ScannedDocument.Passport("10/28/1983", "01/31/2033", null), paddingValues = paddingValues)
+            VerifyYourDataContent(
+                scannedDocument = ScannedDocument.Passport(
+                    dateOfBirth = "10/28/1983",
+                    expiryDate = "01/31/2033",
+                    faceImage = null
+                ), paddingValues = paddingValues
+            )
         }
     }
 }

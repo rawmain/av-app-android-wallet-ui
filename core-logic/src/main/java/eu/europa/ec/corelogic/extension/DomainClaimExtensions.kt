@@ -58,7 +58,7 @@ fun List<ClaimDomain>.removeEmptyGroups(): List<ClaimDomain> {
  * @return A new list of [ClaimDomain] sorted recursively according to the [selector].
  */
 fun <T : Comparable<T>> List<ClaimDomain>.sortRecursivelyBy(
-    selector: (ClaimDomain) -> T,
+    selector: (ClaimDomain) -> T
 ): List<ClaimDomain> {
     return this.map { claim ->
         when (claim) {

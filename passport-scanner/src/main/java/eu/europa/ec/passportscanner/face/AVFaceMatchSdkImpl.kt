@@ -46,6 +46,8 @@ import java.io.File
 class AVFaceMatchSdkImpl(
     private val context: Context,
     private val logController: LogController,
+    private val nativeBridge: NativeBridge,
+    private val avCameraCallbackHolder: AVCameraCallbackHolder,
 ) : AVFaceMatchSDK {
 
     private val sdkScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -159,7 +161,7 @@ class AVFaceMatchSdkImpl(
             }
 
             logController.d(TAG) { "init: Calling native initialization..." }
-            val result = NativeBridge.safeInit(configJson.toString(), modelBasePath)
+            val result = nativeBridge.safeInit(configJson.toString(), modelBasePath)
             logController.d(TAG) { "init: Native initialization result: $result" }
 
             if (result) {
@@ -170,7 +172,7 @@ class AVFaceMatchSdkImpl(
                 failWithError("Native SDK initialization failed. Check that all model files are valid and compatible.")
             }
         } catch (e: Exception) {
-            logController.e(TAG) { "init: Exception during initialization: ${e.message}" }
+            logController.e(TAG, e) { "init: Exception during initialization" }
             failWithError("Initialization failed: ${e.message}")
         }
     }
@@ -184,7 +186,7 @@ class AVFaceMatchSdkImpl(
 
         // Validate reference image path
         if (referenceImagePath.isEmpty() || !File(referenceImagePath).exists()) {
-            logController.e(TAG) { "captureAndMatch: Invalid reference image path: $referenceImagePath" }
+            logController.e(TAG) { "captureAndMatch: Invalid reference image path" }
             onResult(
                 AVMatchResult(
                     processed = true,
@@ -201,7 +203,7 @@ class AVFaceMatchSdkImpl(
 
         try {
             // Process reference image first
-            val originalResult = NativeBridge.safeProcess(referenceImagePath, true)
+            val originalResult = nativeBridge.safeProcess(referenceImagePath, true)
             logController.d(TAG) { "captureAndMatch: Reference processing result - embeddingExtracted: ${originalResult.embeddingExtracted}, faceDetected: ${originalResult.faceDetected}" }
 
             val referenceResult = AVProcessResult(
@@ -230,18 +232,18 @@ class AVFaceMatchSdkImpl(
             logController.d(TAG) { "captureAndMatch: Reference image processed successfully, embedding size: ${referenceResult.embedding.size}" }
 
             // Initialize decision maker for multiple samples
-            val decisor = AVDecisor(numSamples = 3)
+            val decisor = AVDecisor(numSamples = 3, logController)
             logController.d(TAG) { "captureAndMatch: Created decisor with ${decisor.getSampleCount()}/${3} samples" }
 
             // Set up callback holder for camera activity
-            AVCameraCallbackHolder.referenceResult = referenceResult
-            AVCameraCallbackHolder.decisor = decisor
-            AVCameraCallbackHolder.onFinalResult = { result ->
+            avCameraCallbackHolder.referenceResult = referenceResult
+            avCameraCallbackHolder.decisor = decisor
+            avCameraCallbackHolder.onFinalResult = { result ->
                 logController.d(TAG) { "captureAndMatch: Final callback triggered with result: $result" }
                 onResult(result)
             }
 
-            logController.d(TAG) { "captureAndMatch: Callback holder setup complete, ready: ${AVCameraCallbackHolder.isReady()}" }
+            logController.d(TAG) { "captureAndMatch: Callback holder setup complete, ready: ${avCameraCallbackHolder.isReady()}" }
 
             // Start camera activity for live capture
             logController.d(TAG) { "captureAndMatch: Starting CameraActivity..." }
@@ -250,7 +252,7 @@ class AVFaceMatchSdkImpl(
             logController.d(TAG) { "captureAndMatch: CameraActivity started" }
 
         } catch (e: Exception) {
-            logController.e(TAG) { "captureAndMatch: Exception occurred: ${e.message}" }
+            logController.e(TAG, e) { "captureAndMatch: Exception occurred" }
             onResult(
                 AVMatchResult(
                     processed = false,
@@ -265,8 +267,8 @@ class AVFaceMatchSdkImpl(
 
     override fun reset() {
         logController.d(TAG) { "reset: Resetting SDK state" }
-        AVCameraCallbackHolder.reset()
-        NativeBridge.jni_release()
+        avCameraCallbackHolder.reset()
+        nativeBridge.jni_release()
         sdkInitialized = false
         _initStatus.value = SdkInitStatus.NotInitialized
         // Note: modelsPrepared stays true as models are still in storage
@@ -279,95 +281,9 @@ class AVFaceMatchSdkImpl(
      */
     fun getVersion(): String {
         return try {
-            NativeBridge.jni_getVersion()
-        } catch (e: Exception) {
+            nativeBridge.jni_getVersion()
+        } catch (_: Exception) {
             "Unknown"
-        }
-    }
-
-    /**
-     * Match two face embeddings directly
-     * @param embedding1 First face embedding
-     * @param embedding2 Second face embedding
-     * @return true if embeddings match (same subject)
-     */
-    fun matchEmbeddings(embedding1: FloatArray, embedding2: FloatArray): Boolean {
-        return NativeBridge.safeMatch(embedding1, embedding2)
-    }
-
-    /**
-     * Test method to process two images directly without camera
-     * @param referenceImagePath Path to reference image (from passport)
-     * @param capturedImagePath Path to captured image (selfie)
-     * @return AVMatchResult with comparison results
-     */
-    fun testDirectMatch(referenceImagePath: String, capturedImagePath: String): AVMatchResult {
-        // Validate paths
-        if (referenceImagePath.isEmpty() || !File(referenceImagePath).exists()) {
-            return AVMatchResult(
-                processed = true,
-                referenceIsValid = false,
-                capturedIsLive = false,
-                isSameSubject = false,
-                capturedPath = null
-            )
-        }
-
-        if (capturedImagePath.isEmpty() || !File(capturedImagePath).exists()) {
-            return AVMatchResult(
-                processed = true,
-                referenceIsValid = true,
-                capturedIsLive = false,
-                isSameSubject = false,
-                capturedPath = null
-            )
-        }
-
-        try {
-            // Process reference image
-            val referenceResult = NativeBridge.jni_process(referenceImagePath, true)
-            if (!referenceResult.embeddingExtracted) {
-                return AVMatchResult(
-                    processed = true,
-                    referenceIsValid = false,
-                    capturedIsLive = false,
-                    isSameSubject = false,
-                    capturedPath = null
-                )
-            }
-
-            // Process captured image
-            val capturedResult = NativeBridge.jni_process(capturedImagePath, false)
-            if (!capturedResult.embeddingExtracted) {
-                return AVMatchResult(
-                    processed = true,
-                    referenceIsValid = true,
-                    capturedIsLive = false,
-                    isSameSubject = false,
-                    capturedPath = capturedImagePath
-                )
-            }
-
-            // Match embeddings
-            val isSameSubject = matchEmbeddings(referenceResult.embedding, capturedResult.embedding)
-
-            return AVMatchResult(
-                processed = true,
-                referenceIsValid = true,
-                capturedIsLive = capturedResult.isLive,
-                isSameSubject = isSameSubject,
-                capturedPath = capturedImagePath
-            )
-
-        } catch (e: Exception) {
-            logController.e(TAG) { "Error in testDirectMatch: ${e.message}" }
-            return AVMatchResult(
-                processed = false,
-                referenceIsValid = false,
-                capturedIsLive = false,
-                isSameSubject = false,
-                capturedPath = null
-            )
         }
     }
 }

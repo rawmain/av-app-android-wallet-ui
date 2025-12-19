@@ -29,11 +29,14 @@ import eu.europa.ec.corelogic.controller.WalletCoreLogController
 import eu.europa.ec.corelogic.controller.WalletCoreLogControllerImpl
 import eu.europa.ec.corelogic.controller.WalletCoreTransactionLogController
 import eu.europa.ec.corelogic.controller.WalletCoreTransactionLogControllerImpl
+import eu.europa.ec.corelogic.provider.WalletCoreAttestationProvider
+import eu.europa.ec.corelogic.provider.WalletCoreAttestationProviderImpl
 import eu.europa.ec.eudi.wallet.EudiWallet
+import eu.europa.ec.networklogic.repository.WalletAttestationRepository
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
-import eu.europa.ec.storagelogic.dao.BookmarkDao
 import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
 import eu.europa.ec.storagelogic.dao.TransactionLogDao
+import io.ktor.client.HttpClient
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
@@ -52,10 +55,17 @@ fun provideEudiWallet(
     context: Context,
     walletCoreConfig: WalletCoreConfig,
     walletCoreLogController: WalletCoreLogController,
-    walletCoreTransactionLogController: WalletCoreTransactionLogController
-): EudiWallet = EudiWallet(context, walletCoreConfig.config) {
+    walletCoreTransactionLogController: WalletCoreTransactionLogController,
+    walletCoreAttestationProvider: WalletCoreAttestationProvider,
+    httpClient: HttpClient
+): EudiWallet = EudiWallet(
+    context = context,
+    config = walletCoreConfig.config,
+    walletProvider = walletCoreAttestationProvider
+) {
     withLogger(walletCoreLogController)
     withTransactionLogger(walletCoreTransactionLogController)
+    withKtorHttpClientFactory { httpClient }
 }
 
 @Single
@@ -76,21 +86,27 @@ fun provideWalletCoreTransactionLogController(
     uuidProvider = uuidProvider
 )
 
+@Single
+fun provideWalletCoreAttestationProvider(
+    walletAttestationRepository: WalletAttestationRepository,
+    walletCoreConfig: WalletCoreConfig
+): WalletCoreAttestationProvider =
+    WalletCoreAttestationProviderImpl(
+        walletCoreConfig = walletCoreConfig,
+        walletAttestationRepository = walletAttestationRepository
+    )
+
 @Factory
 fun provideWalletCoreDocumentsController(
     resourceProvider: ResourceProvider,
     eudiWallet: EudiWallet,
     walletCoreConfig: WalletCoreConfig,
-    bookmarkDao: BookmarkDao,
-    transactionLogDao: TransactionLogDao,
     revokedDocumentDao: RevokedDocumentDao
 ): WalletCoreDocumentsController =
     WalletCoreDocumentsControllerImpl(
         resourceProvider,
         eudiWallet,
         walletCoreConfig,
-        bookmarkDao,
-        transactionLogDao,
         revokedDocumentDao
     )
 

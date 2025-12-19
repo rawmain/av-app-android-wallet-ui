@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 European Commission
+ * Copyright (c) 2023 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -14,15 +14,17 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.dashboardfeature.ui.documents.detail.model
+package kl.open.fmandroid.di
 
-import eu.europa.ec.corelogic.model.ClaimDomain
-import eu.europa.ec.corelogic.model.DocumentIdentifier
-import eu.europa.ec.eudi.wallet.document.DocumentId
+import eu.europa.ec.businesslogic.controller.log.LogController
+import kl.open.fmandroid.NativeBridge
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Factory
+import org.koin.core.annotation.Module
 
-data class DocumentDetailsDomain(
-    val docName: String,
-    val docId: DocumentId,
-    val documentIdentifier: DocumentIdentifier,
-    val documentClaims: List<ClaimDomain>,
-)
+@Module
+@ComponentScan("kl.open.fmandroid")
+class KeylessModule
+
+@Factory
+fun provideNativeBridge(logController: LogController): NativeBridge = NativeBridge(logController)

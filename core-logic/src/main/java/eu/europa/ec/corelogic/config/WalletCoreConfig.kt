@@ -221,4 +221,9 @@ interface WalletCoreConfig {
      * @return The FaceMatchConfig with model paths and thresholds
      */
     val faceMatchConfig: FaceMatchConfig
+
+    /**
+     * Host for the Wallet Provider.
+     */
+    val walletProviderHost: String
 }

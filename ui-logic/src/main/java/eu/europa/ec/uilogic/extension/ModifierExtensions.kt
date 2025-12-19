@@ -178,7 +178,7 @@ fun Modifier.paddingFrom(
     top: Boolean = true,
     start: Boolean = true,
     end: Boolean = true,
-    bottom: Boolean = true,
+    bottom: Boolean = true
 ): Modifier {
     val layoutDirection = LocalLayoutDirection.current
     return this.padding(

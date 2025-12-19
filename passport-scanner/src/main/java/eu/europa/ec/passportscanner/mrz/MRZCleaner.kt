@@ -17,18 +17,17 @@
  */
 package eu.europa.ec.passportscanner.mrz
 
-import android.util.Log
-import eu.europa.ec.passportscanner.SmartScannerActivity
+import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.passportscanner.SmartScannerActivity.Companion.TAG
 import eu.europa.ec.passportscanner.parser.MrzParser
 import eu.europa.ec.passportscanner.parser.MrzRecord
-
 import java.net.URLEncoder
 
 
 object MRZCleaner {
-    private var previousMRZString:String? = null
+    private var previousMRZString: String? = null
 
-    fun clean(mrz: String): String {
+    fun clean(mrz: String, logController: LogController): String {
         if (mrz.isBlank()) {
             throw IllegalArgumentException("Empty MRZ string.")
         }
@@ -52,14 +51,14 @@ object MRZCleaner {
             .replace(Regex("[^A-Z0-9<\\n]"), "") // Remove any other char
             .trim()
 
-        result = reconstructTd3LinesIfNeeded(result)
+        result = reconstructTd3LinesIfNeeded(result, logController)
 
         if (result.contains("<") && (
                     result.startsWith("P") ||
-                    result.startsWith("I") ||
-                    result.startsWith("A") ||
-                    result.startsWith("C") ||
-                    result.startsWith("V"))
+                            result.startsWith("I") ||
+                            result.startsWith("A") ||
+                            result.startsWith("C") ||
+                            result.startsWith("V"))
         ) {
             when (result.count { it == '\n' }) {
                 1 -> {
@@ -67,22 +66,28 @@ object MRZCleaner {
                         result = result.slice(IntRange(0, 88))
                     }
                 }
+
                 2 -> {
                     if (result.length > 92) {
                         result = result.slice(IntRange(0, 91))
                     }
                 }
+
                 else -> throw IllegalArgumentException("Invalid MRZ string. Wrong number of lines.")
             }
         } else {
-            Log.d(SmartScannerActivity.TAG, "Error = [${URLEncoder.encode(result, "UTF-8").replace("%3C", "<").replace("%0A", "↩")}]")
+            logController.d(TAG) {
+                "Error = [${
+                    URLEncoder.encode(result, "UTF-8").replace("%3C", "<").replace("%0A", "↩")
+                }]"
+            }
             throw IllegalArgumentException("Invalid MRZ string. No '<' or 'P', 'I', 'A', 'C', 'V' detected.")
         }
 
         return result
     }
 
-    private fun reconstructTd3LinesIfNeeded(mrzText: String): String {
+    private fun reconstructTd3LinesIfNeeded(mrzText: String, logController: LogController): String {
         if (!mrzText.startsWith("P<")) {
             return mrzText
         }
@@ -97,8 +102,8 @@ object MRZCleaner {
 
         val allChars = lines.joinToString("")
         return if (allChars.length >= 88) {
-            Log.d(SmartScannerActivity.TAG, "fixing lines ${lines.size} for TD3")
-            allChars.substring(0, 44) + "\n" + allChars.substring(44, 88)
+            logController.d(TAG) { "fixing lines ${lines.size} for TD3" }
+            allChars.take(44) + "\n" + allChars.substring(44, 88)
         } else {
             mrzText
         }
@@ -114,10 +119,10 @@ object MRZCleaner {
             .replace("3", "J")
     }
 
-    fun parseAndClean(mrz: String): MrzRecord {
-        val record = MrzParser.parse(mrz)
+    fun parseAndClean(mrz: String, logController: LogController): MrzRecord {
+        val record = MrzParser.parse(mrz, logController)
 
-        Log.d(SmartScannerActivity.TAG, "Previous Scan: $previousMRZString")
+        logController.d(TAG) { "Previous Scan: $previousMRZString" }
         if (record.validDateOfBirth && record.validDocumentNumber && record.validExpirationDate || record.validComposite) {
             record.givenNames = record.givenNames?.replaceNumberToChar()
             record.surname = record.surname.replaceNumberToChar()
@@ -125,13 +130,12 @@ object MRZCleaner {
             record.nationality = record.nationality.replaceNumberToChar()
             return record
         } else {
-            Log.d(SmartScannerActivity.TAG, "Still accept scanning.")
-            Log.d(SmartScannerActivity.TAG, "Previous Scan: $previousMRZString")
+            logController.d(TAG) { "Still accept scanning." }
+            logController.d(TAG) { "Previous Scan: $previousMRZString" }
             if (mrz != previousMRZString) {
                 previousMRZString = mrz
             }
             throw IllegalArgumentException("Invalid check digits.")
         }
     }
-
 }

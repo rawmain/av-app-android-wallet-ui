@@ -57,6 +57,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.commonfeature.config.QrScanFlow
 import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.ui.qr_scan.component.QrCodeAnalyzer
@@ -85,11 +86,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
+import org.koin.compose.koinInject
 
 @Composable
 fun QrScanScreen(
     navController: NavController,
-    viewModel: QrScanViewModel
+    viewModel: QrScanViewModel,
 ) {
     val state: State by viewModel.viewState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -167,7 +169,7 @@ private fun Content(
                 onEventSend = onEventSend,
                 onQrScanned = { qrCode ->
                     onEventSend(Event.OnQrScanned(context = context, resultQr = qrCode))
-                }
+                },
             )
 
             AnimatedInformativeText(state = state, paddingValues = paddingValues)
@@ -235,7 +237,7 @@ private fun OpenCamera(
         contentAlignment = Alignment.Center
     ) {
         if (hasCameraPermission) {
-
+            val logController = koinInject<LogController>()
             // The Camera.
             AndroidView(
                 modifier = Modifier
@@ -257,7 +259,7 @@ private fun OpenCamera(
 
                     imageAnalysis.setAnalyzer(
                         ContextCompat.getMainExecutor(context),
-                        QrCodeAnalyzer { result ->
+                        QrCodeAnalyzer(logController) { result ->
                             onQrScanned(result)
                         }
                     )
@@ -269,7 +271,9 @@ private fun OpenCamera(
                             imageAnalysis
                         )
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        logController.e("OpenCamera", e) {
+                            "Error binding camera"
+                        }
                     }
                     previewView
                 }
@@ -333,7 +337,7 @@ private fun InformativeTextPreview() {
             effectFlow = flowOf(),
             onEventSend = {},
             onNavigationRequested = {},
-            paddingValues = PaddingValues()
+            paddingValues = PaddingValues(),
         )
     }
 }
