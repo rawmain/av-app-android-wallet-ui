@@ -27,7 +27,6 @@ import android.hardware.camera2.CaptureRequest
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.util.Size
 import android.view.MotionEvent
 import android.view.OrientationEventListener
@@ -55,6 +54,7 @@ import androidx.constraintlayout.widget.Guideline
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.mrz.MRZAnalyzer.Companion.GUIDE_HEIGHT_IN_PX
 import eu.europa.ec.passportscanner.nfc.NFCScanAnalyzer
 import eu.europa.ec.passportscanner.scanner.BaseActivity
@@ -64,6 +64,7 @@ import eu.europa.ec.passportscanner.scanner.config.Orientation
 import eu.europa.ec.passportscanner.scanner.config.ScannerOptions
 import eu.europa.ec.passportscanner.utils.CameraUtils.isLedFlashAvailable
 import eu.europa.ec.passportscanner.utils.extension.toPx
+import org.koin.android.ext.android.inject
 import eu.europa.ec.resourceslogic.R.string
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -76,6 +77,8 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         const val SCANNER_OPTIONS = "scanner_options"
         const val SCANNER_RESULT = "scanner_result"
     }
+
+    private val logController: LogController by inject()
 
     private val REQUEST_CODE_PERMISSIONS = 10
     private val REQUEST_CODE_PERMISSIONS_VERSION_R = 2296
@@ -152,7 +155,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         // Use scanner options directly if no scanner type is called
         val options: ScannerOptions? = intent.getParcelableExtra(SCANNER_OPTIONS)
         options?.let {
-            Log.d(TAG, "scannerOptions: $it")
+            logController.d(TAG) { "scannerOptions: $it" }
             scannerOptions = options
         } ?: run {
             throw SmartScannerException("Please set proper scanner options to be able to use ID PASS Smart Scanner.")
@@ -173,7 +176,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         runOnUiThread {
             showMRZGuide()
 
-            val analyzer = NFCScanAnalyzer(activity = this, intent = intent)
+            val analyzer = NFCScanAnalyzer(this, intent, logController)
             viewFinder.visibility = VISIBLE
             // Set Analyzer and start camera
             startCamera(analyzer)
@@ -250,10 +253,9 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                     }
                     // Adjust initial zoom ratio of camera to aid high resolution capture of Pdf417 or QR Code or ID PASS Lite
                     preview?.surfaceProvider = viewFinder.surfaceProvider
-                    Log.d(
-                        TAG,
+                    logController.d(TAG) {
                         "Measured size: ${viewFinder.width}x${viewFinder.height}"
-                    )
+                    }
                     // Autofocus modes and Tap to focus
                     val camera2InterOp = Camera2Interop.Extender(imageAnalysisBuilder)
                     camera2InterOp.setCaptureRequestOption(
@@ -288,7 +290,9 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                                             }.build()
                                         )
                                     } catch (e: CameraInfoUnavailableException) {
-                                        Log.d("ERROR", "cannot access camera", e)
+                                        logController.e(TAG, e) {
+                                            "cannot access camera"
+                                        }
                                     }
                                     true
                                 }
@@ -299,7 +303,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                     }
 
                 } catch (exc: Exception) {
-                    Log.e(TAG, "Use case binding failed", exc)
+                    logController.e(TAG, exc) { "Use case binding failed" }
                 }
             }, ContextCompat.getMainExecutor(this))
         }
@@ -405,7 +409,7 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
     private fun showMRZGuide() {
         guideContainer?.alpha = 1f
 
-        config?.let { conf ->
+        config?.let { _ ->
             viewFinder.post {
                 val width = viewFinder.width - 21.toPx
 

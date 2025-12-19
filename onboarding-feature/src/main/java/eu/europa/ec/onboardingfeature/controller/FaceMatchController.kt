@@ -17,10 +17,8 @@
 package eu.europa.ec.onboardingfeature.controller
 
 import android.content.Context
-import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
-import eu.europa.ec.passportscanner.face.AVFaceMatchSdkImpl
 import eu.europa.ec.passportscanner.face.FaceMatchConfig
 import eu.europa.ec.passportscanner.face.SdkInitStatus
 import kotlinx.coroutines.flow.Flow
@@ -53,10 +51,8 @@ interface FaceMatchController {
 
 class FaceMatchControllerImpl(
     private val walletCoreConfig: WalletCoreConfig,
-    private val logController: LogController,
+    private val faceMatchSDK: AVFaceMatchSDK,
 ) : FaceMatchController {
-
-    private var faceMatchSDK: AVFaceMatchSDK? = null
 
     private fun convertConfig(): FaceMatchConfig {
         val coreConfig = walletCoreConfig.faceMatchConfig
@@ -71,15 +67,12 @@ class FaceMatchControllerImpl(
     }
 
     override fun init(context: Context): Flow<SdkInitStatus> {
-        val sdk = getOrCreateSdk(context)
-        return sdk.init(convertConfig(), context.applicationContext)
+        return faceMatchSDK.init(convertConfig(), context.applicationContext)
     }
 
     override suspend fun captureAndMatch(faceImagePath: String): FaceMatchResult {
-        val sdk = faceMatchSDK ?: throw IllegalStateException("SDK not initialized")
-
         return suspendCancellableCoroutine { continuation ->
-            sdk.captureAndMatch(faceImagePath) { result ->
+            faceMatchSDK.captureAndMatch(faceImagePath) { result ->
                 continuation.resume(
                     FaceMatchResult(
                         processed = result.processed,
@@ -88,12 +81,6 @@ class FaceMatchControllerImpl(
                     )
                 )
             }
-        }
-    }
-
-    private fun getOrCreateSdk(context: Context): AVFaceMatchSDK {
-        return faceMatchSDK ?: AVFaceMatchSdkImpl(context.applicationContext, logController).also {
-            faceMatchSDK = it
         }
     }
 }

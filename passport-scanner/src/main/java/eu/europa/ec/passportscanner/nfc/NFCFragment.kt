@@ -22,10 +22,10 @@ import android.content.Context
 import android.content.Intent
 import android.nfc.NfcAdapter
 import android.nfc.Tag
+import android.nfc.TagLostException
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +36,7 @@ import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.R
 import eu.europa.ec.passportscanner.nfc.details.IntentData
 import eu.europa.ec.passportscanner.nfc.details.NFCDocumentTag
@@ -50,10 +51,14 @@ import org.jmrtd.BACDeniedException
 import org.jmrtd.MRTDTrustStore
 import org.jmrtd.PACEException
 import org.jmrtd.lds.icao.MRZInfo
+import org.koin.android.ext.android.inject
 import org.spongycastle.jce.provider.BouncyCastleProvider
+import java.io.IOException
 import java.security.Security
 
 class NFCFragment : Fragment() {
+
+    private val logController: LogController by inject()
 
     private var mrzInfo: MRZInfo? = null
     private var nfcFragmentListener: NfcFragmentListener? = null
@@ -102,7 +107,7 @@ class NFCFragment : Fragment() {
             val certStore = KeyStoreUtils().toCertStore(keyStore = keyStore)
             mrtdTrustStore.addAsCSCACertStore(certStore)
         }
-        val subscribe = NFCDocumentTag().handleTag(
+        val subscribe = NFCDocumentTag(logController).handleTag(
             tag,
             mrzInfo!!,
             mrtdTrustStore,
@@ -126,7 +131,8 @@ class NFCFragment : Fragment() {
                         getString(string.warning_authentication_failed),
                         Toast.LENGTH_SHORT
                     ).show()
-                    exception.printStackTrace()
+                    logController.e(TAG, exception)
+
                     this@NFCFragment.onCardException(exception)
                 }
 
@@ -141,6 +147,11 @@ class NFCFragment : Fragment() {
                 }
 
                 override fun onCardException(exception: CardServiceException) {
+                   if (exception.cause.isTagLostReason()) {
+                        this@NFCFragment.onNFCTagLost()
+                        return
+                    }
+
                     val sw = exception.sw.toShort()
                     when (sw) {
                         ISO7816.SW_CLA_NOT_SUPPORTED -> {
@@ -208,7 +219,7 @@ class NFCFragment : Fragment() {
     }
 
     private fun onNFCSReadStart() {
-        Log.d(TAG, "onNFCSReadStart")
+        logController.d(TAG) { "onNFCSReadStart" }
         mHandler.post {
             // Update UI for reading state
             textViewNfcTitle?.text = getString(string.nfc_title_reading)
@@ -240,7 +251,7 @@ class NFCFragment : Fragment() {
     }
 
     private fun onNFCReadFinish() {
-        Log.d(TAG, "onNFCReadFinish")
+        logController.d(TAG) { "onNFCReadFinish" }
         mHandler.post {
             progressAnimator?.cancel()
             progressBar?.visibility = View.GONE
@@ -286,6 +297,12 @@ class NFCFragment : Fragment() {
         }
     }
 
+    private fun onNFCTagLost() {
+        getString(string.nfc_error_reading_tag)
+        Toast.makeText(context, "Error while NFC reading, try again", Toast.LENGTH_LONG).show()
+        onNFCReadFinish()
+    }
+
     private fun onPassportRead(passport: Passport?) {
         mHandler.post {
             if (nfcFragmentListener != null) {
@@ -318,4 +335,9 @@ class NFCFragment : Fragment() {
             return myFragment
         }
     }
+}
+
+private fun Throwable?.isTagLostReason(): Boolean {
+    val isTransceiveFailedCause = this?.message?.contains("Transceive failed", true) ?: false
+    return this is TagLostException || (this is IOException  && isTransceiveFailedCause )
 }

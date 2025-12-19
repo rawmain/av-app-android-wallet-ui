@@ -114,7 +114,7 @@ class PassportScanningDocumentsControllerImpl(
                 val documents =
                     metadata.credentialConfigurationsSupported.map { (id, config) ->
 
-                        val name = config.display.getLocalizedDisplayName(
+                        val name = config.credentialMetadata.getLocalizedDisplayName(
                             userLocale = locale,
                             fallback = id.value
                         )

@@ -24,30 +24,32 @@
 
 package eu.europa.ec.passportscanner.face
 
-import android.util.Log
+import eu.europa.ec.businesslogic.controller.log.LogController
 
 /**
  * Singleton holder for camera callback data during face matching operation
  * Used to pass data between the SDK and camera activity
  */
-object AVCameraCallbackHolder {
-    private const val TAG = "AVCameraCallbackHolder"
-
+class AVCameraCallbackHolder(private val logController: LogController) {
     var referenceResult: AVProcessResult? = null
         set(value) {
-            Log.d(TAG, "referenceResult set: ${value != null} (embeddingSize: ${value?.embedding?.size ?: 0})")
+            logController.d(TAG) {
+                "referenceResult set: ${value != null} (embeddingSize: ${value?.embedding?.size ?: 0})"
+            }
             field = value
         }
 
     var decisor: AVDecisor? = null
         set(value) {
-            Log.d(TAG, "decisor set: ${value != null} (samples: ${value?.getSampleCount() ?: 0})")
+            logController.d(TAG) {
+                "decisor set: ${value != null} (samples: ${value?.getSampleCount() ?: 0})"
+            }
             field = value
         }
 
     var onFinalResult: ((AVMatchResult) -> Unit)? = null
         set(value) {
-            Log.d(TAG, "onFinalResult callback set: ${value != null}")
+            logController.d(TAG) { "onFinalResult callback set: ${value != null}" }
             field = value
         }
 
@@ -55,11 +57,11 @@ object AVCameraCallbackHolder {
      * Reset all callback data
      */
     fun reset() {
-        Log.d(TAG, "reset: Clearing all callback data")
+        logController.d(TAG) { "reset: Clearing all callback data" }
         referenceResult = null
         decisor = null
         onFinalResult = null
-        Log.d(TAG, "reset: All callback data cleared")
+        logController.d(TAG) { "reset: All callback data cleared" }
     }
 
     /**
@@ -67,7 +69,10 @@ object AVCameraCallbackHolder {
      */
     fun isReady(): Boolean {
         val ready = referenceResult != null && decisor != null && onFinalResult != null
-        Log.d(TAG, "isReady: $ready (ref: ${referenceResult != null}, decisor: ${decisor != null}, callback: ${onFinalResult != null})")
+        logController.d(TAG) {
+            "isReady: $ready (ref: ${referenceResult != null}, decisor: ${decisor != null}, " +
+                    "callback: ${onFinalResult != null})"
+        }
         return ready
     }
 
@@ -75,13 +80,15 @@ object AVCameraCallbackHolder {
      * Trigger the final result callback
      */
     fun triggerCallback(result: AVMatchResult) {
-        Log.d(TAG, "triggerCallback: Attempting to trigger final callback with result: $result")
+        logController.d(TAG) { "triggerCallback: Attempting to trigger final callback with result: $result" }
         onFinalResult?.let { callback ->
-            Log.d(TAG, "triggerCallback: Callback found, invoking...")
+            logController.d(TAG) { "triggerCallback: Callback found, invoking..." }
             callback(result)
-            Log.d(TAG, "triggerCallback: Callback invoked successfully")
+            logController.d(TAG) { "triggerCallback: Callback invoked successfully" }
         } ?: run {
-            Log.e(TAG, "triggerCallback: No callback found! onFinalResult is null")
+            logController.e(TAG) { "triggerCallback: No callback found! onFinalResult is null" }
         }
     }
 }
+
+private const val TAG = "AVCameraCallbackHolder"

@@ -18,6 +18,7 @@
 package eu.europa.ec.passportscanner.utils
 
 import android.annotation.SuppressLint
+import eu.europa.ec.businesslogic.controller.log.LogController
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -45,18 +46,24 @@ object DateUtils {
         fromPattern: String = "yyMMdd",
         toPattern: String = "MM/dd/yyyy",
         locale: Locale? = Locale("en"),
-        threshold: Int? = null
+        threshold: Int? = null,
+        logController: LogController
     ): String? {
         if (fromPattern === "yyMMdd") {
-            val date = stringToDate2DigitsYear(dateString, threshold) ?: return null
+            val date = stringToDate2DigitsYear(dateString, threshold, logController) ?: return null
             return dateToString(date, SimpleDateFormat(toPattern, locale))
         }
 
-        val date = stringToDate(dateString, SimpleDateFormat(fromPattern)) ?: return null
+        val date =
+            stringToDate(dateString, SimpleDateFormat(fromPattern), logController) ?: return null
         return dateToString(date, SimpleDateFormat(toPattern, locale))
     }
 
-    private fun stringToDate2DigitsYear(dateStr: String?, threshold: Int? = null): Date? {
+    private fun stringToDate2DigitsYear(
+        dateStr: String?,
+        threshold: Int? = null,
+        logController: LogController
+    ): Date? {
         if (dateStr == null || threshold == null) return null
         var date: Date? = null
         try {
@@ -66,18 +73,22 @@ object DateUtils {
             sdf.applyPattern("yyMMdd")
             date = sdf.parse(dateStr)
         } catch (e: ParseException) {
-            e.printStackTrace()
+            logController.e("DateUtils", e)
         }
         return date
     }
 
-    private fun stringToDate(dateStr: String?, dateFormat: DateFormat): Date? {
+    private fun stringToDate(
+        dateStr: String?,
+        dateFormat: DateFormat,
+        logController: LogController
+    ): Date? {
         if (dateStr == null) return null
         var date: Date? = null
         try {
             date = dateFormat.parse(dateStr)
         } catch (e: ParseException) {
-            e.printStackTrace()
+            logController.e("DateUtils", e)
         }
         return date
     }

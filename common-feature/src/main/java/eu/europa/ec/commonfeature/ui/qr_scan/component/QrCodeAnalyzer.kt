@@ -23,10 +23,12 @@ import com.google.zxing.BinaryBitmap
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.qrcode.QRCodeReader
+import eu.europa.ec.businesslogic.controller.log.LogController
 import java.nio.ByteBuffer
 
 class QrCodeAnalyzer(
-    private val onQrCodeScanned: (String) -> Unit
+    private val logController: LogController,
+    private val onQrCodeScanned: (String) -> Unit,
 ) : ImageAnalysis.Analyzer {
 
     private val supportedImageFormats = listOf(
@@ -54,7 +56,7 @@ class QrCodeAnalyzer(
                 val result = QRCodeReader().decode(binaryBmp)
                 onQrCodeScanned(result.text)
             } catch (e: Exception) {
-                e.printStackTrace()
+                logController.e("QrCodeAnalyzer", e){ "analyze failed"}
             } finally {
                 image.close()
             }

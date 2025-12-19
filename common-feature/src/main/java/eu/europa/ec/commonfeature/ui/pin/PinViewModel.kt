@@ -73,17 +73,19 @@ data class State(
 ) : ViewState {
     val action: ScreenNavigateAction
         get() {
-            return when (pinFlow) {
-                PinFlow.CREATE -> ScreenNavigateAction.NONE
-                PinFlow.UPDATE -> ScreenNavigateAction.CANCELABLE
+            return when {
+                pinState == PinValidationState.REENTER -> ScreenNavigateAction.BACKABLE
+                pinFlow == PinFlow.UPDATE -> ScreenNavigateAction.CANCELABLE
+                else -> ScreenNavigateAction.NONE
             }
         }
 
     val onBackEvent: Event
         get() {
-            return when (pinFlow) {
-                PinFlow.CREATE -> Event.GoBack
-                PinFlow.UPDATE -> Event.CancelPressed
+            return when {
+                pinState == PinValidationState.REENTER -> Event.GoBack
+                pinFlow == PinFlow.UPDATE -> Event.CancelPressed
+                else -> Event.GoBack
             }
         }
 }
@@ -194,7 +196,7 @@ class PinViewModel(
 
             is Event.NextButtonPressed -> {
                 val state = viewState.value
-                logController.i("PIN") { "state on button pressed: $state" }
+                logController.d("PIN") { "state on button pressed: $state" }
                 when (state.pinState) {
                     PinValidationState.ENTER -> {
                         // Set state for re-enter phase
@@ -234,7 +236,13 @@ class PinViewModel(
                 }
             }
 
-            is Event.GoBack -> setEffect { Effect.Navigation.Pop }
+            is Event.GoBack -> {
+                if (viewState.value.pinState == PinValidationState.REENTER) {
+                    setupEnterPhaseFromReenter()
+                } else {
+                    setEffect { Effect.Navigation.Pop }
+                }
+            }
         }
     }
 
@@ -308,6 +316,24 @@ class PinViewModel(
         }
     }
 
+    private fun setupEnterPhaseFromReenter() {
+        val newPinState = PinValidationState.ENTER
+
+        setState {
+            copy(
+                quickPinError = null,
+                enteredPin = "",
+                pinState = newPinState,
+                buttonText = calculateButtonText(newPinState),
+                pin = "",
+                isButtonEnabled = false,
+                resetPin = true,
+                subtitle = calculateSubtitle(newPinState),
+                title = calculateTitle(newPinState),
+            )
+        }
+    }
+
     private fun calculateTitle(pinState: PinValidationState): String {
         return when (pinState) {
             PinValidationState.ENTER -> resourceProvider.getString(R.string.quick_pin_create_title)
@@ -342,6 +368,8 @@ class PinViewModel(
     }
 
     private fun getListOfRules(pin: String): Form {
+        // TODO enhance security: Sequential or easily guessable patterns (such as "135246 or "147258") should not be permitted.
+        // TODO enhance security: The validation should check the most pwned PINs
         return Form(
             mapOf(
                 listOf(
@@ -381,7 +409,7 @@ class PinViewModel(
                     resetPin = false
                 )
             }
-            logController.i("PIN") { "state after validation: ${viewState.value}" }
+            logController.d("PIN") { "state after validation: ${viewState.value}" }
 
             // FFWD to next screen if the pin is valid
             if (validationResult.isValid) {

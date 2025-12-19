@@ -21,8 +21,8 @@ import android.graphics.Bitmap
 import android.graphics.Bitmap.Config
 import android.graphics.Bitmap.createBitmap
 import android.graphics.BitmapFactory
+import eu.europa.ec.businesslogic.controller.log.LogController
 import org.jnbis.internal.WsqDecoder
-import timber.log.Timber
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.io.IOException
@@ -36,23 +36,36 @@ object ImageUtils {
     var WSQ_MIME_TYPE = "image/x-wsq"
 
     @Throws(IOException::class)
-    fun decodeImage(inputStream: InputStream, imageLength: Int, mimeType: String): Bitmap {
-        Timber.d("decodeImage of type $mimeType and length $imageLength")
+    fun decodeImage(
+        inputStream: InputStream,
+        imageLength: Int,
+        mimeType: String,
+        logController: LogController,
+    ): Bitmap {
+        logController.d { "decodeImage of type $mimeType and length $imageLength" }
         return when {
-            JPEG2000_MIME_TYPE.equals(mimeType, ignoreCase = true) || JPEG2000_ALT_MIME_TYPE.equals(mimeType, ignoreCase = true) -> {
+            JPEG2000_MIME_TYPE.equals(mimeType, ignoreCase = true) || JPEG2000_ALT_MIME_TYPE.equals(
+                mimeType,
+                ignoreCase = true
+            ) -> {
                 decodeJPEG2000(inputStream, imageLength)
             }
+
             WSQ_MIME_TYPE.equals(mimeType, ignoreCase = true) -> {
                 decodeWSQ(inputStream, imageLength)
             }
+
             else -> {
-                decodeDefault(inputStream, imageLength)
+                decodeDefault(logController, inputStream, imageLength)
             }
         }
     }
 
     @Throws(IOException::class)
-    private fun readInputStreamToByteArray(inputStream: InputStream, imageLength: Int): ByteArrayInputStream {
+    private fun readInputStreamToByteArray(
+        inputStream: InputStream,
+        imageLength: Int
+    ): ByteArrayInputStream {
         return synchronized(inputStream) {
             val bytes = ByteArray(imageLength)
             DataInputStream(inputStream).readFully(bytes)
@@ -76,18 +89,30 @@ object ImageUtils {
         val byteData = bitmap.pixels
         val intData = IntArray(byteData.size)
         for (j in byteData.indices) {
-            intData[j] = -0x1000000 or ((byteData[j].toInt() and 0xFF) shl 16) or ((byteData[j].toInt() and 0xFF) shl 8) or (byteData[j].toInt() and 0xFF)
+            intData[j] =
+                -0x1000000 or ((byteData[j].toInt() and 0xFF) shl 16) or ((byteData[j].toInt() and 0xFF) shl 8) or (byteData[j].toInt() and 0xFF)
         }
-        return createBitmap(intData, 0, bitmap.width, bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        return createBitmap(
+            intData,
+            0,
+            bitmap.width,
+            bitmap.width,
+            bitmap.height,
+            Bitmap.Config.ARGB_8888
+        )
     }
 
     @Throws(IOException::class)
-    private fun decodeDefault(inputStream: InputStream, imageLength: Int): Bitmap {
+    private fun decodeDefault(
+        logController: LogController,
+        inputStream: InputStream,
+        imageLength: Int
+    ): Bitmap {
         inputStream.reset()
         try {
             return BitmapFactory.decodeStream(inputStream)
         } catch (e: Exception) {
-            Timber.e(e, "Failed to decode using BitmapFactory, try to read as JP2")
+            logController.e(e) { "Failed to decode using BitmapFactory, try to read as JP2" }
             inputStream.reset()
             return decodeJPEG2000(inputStream, imageLength)
         }

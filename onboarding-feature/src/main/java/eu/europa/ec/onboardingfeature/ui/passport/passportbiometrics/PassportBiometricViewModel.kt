@@ -17,12 +17,10 @@
 package eu.europa.ec.onboardingfeature.ui.passport.passportbiometrics
 
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
-import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.android.annotation.KoinViewModel
 
 private const val TAG = "PassportBiometricViewModel"
@@ -47,8 +45,6 @@ sealed class Effect : ViewSideEffect {
 
 @KoinViewModel
 class PassportBiometricViewModel(
-    private val resourceProvider: ResourceProvider,
-    private val uiSerializer: UiSerializer,
     private val logController: LogController
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -56,7 +52,7 @@ class PassportBiometricViewModel(
 
     override fun handleEvents(event: Event) {
         when(event) {
-            Event.OnInitEvent -> logController.i(TAG) { "OnInitEvent -- PassportBiometricViewModel" }
+            Event.OnInitEvent -> logController.d(TAG) { "OnInitEvent -- PassportBiometricViewModel" }
             Event.OnBackPressed -> setEffect { Effect.Navigation.GoBack }
             Event.OnLinkPressed -> Unit // FIXME: Handle the navigation from link
             Event.OnNextPressed -> Unit // FIXME: Implement the ops

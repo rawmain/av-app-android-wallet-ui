@@ -14,6 +14,8 @@
  * governing permissions and limitations under the Licence.
  */
 
+@file:OptIn(ExperimentalTime::class)
+
 package eu.europa.ec.onboardingfeature.di
 
 import eu.europa.ec.businesslogic.controller.log.LogController
@@ -35,12 +37,14 @@ import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
 import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractorImpl
 import eu.europa.ec.onboardingfeature.interactor.PassportScanIntroInteractor
 import eu.europa.ec.onboardingfeature.interactor.PassportScanIntroInteractorImpl
+import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Factory
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
+import kotlin.time.ExperimentalTime
 
 @Module
 @ComponentScan("eu.europa.ec.onboardingfeature")
@@ -67,8 +71,8 @@ fun provideEnrollmentInteractor(
 @Single
 fun provideFaceMatchController(
     walletCoreConfig: WalletCoreConfig,
-    logController: LogController,
-): FaceMatchController = FaceMatchControllerImpl(walletCoreConfig, logController)
+    avFaceMatchSDK: AVFaceMatchSDK,
+): FaceMatchController = FaceMatchControllerImpl(walletCoreConfig, avFaceMatchSDK)
 
 @Factory
 fun providePassportScanIntroInteractor(

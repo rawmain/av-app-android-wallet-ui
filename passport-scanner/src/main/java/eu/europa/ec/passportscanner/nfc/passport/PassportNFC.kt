@@ -17,7 +17,7 @@
  */
 package eu.europa.ec.passportscanner.nfc.passport
 
-import android.util.Log
+import eu.europa.ec.businesslogic.controller.log.LogController
 import net.sf.scuba.smartcards.CardServiceException
 import org.jmrtd.BACKey
 import org.jmrtd.FeatureStatus
@@ -74,7 +74,7 @@ import javax.security.auth.x500.X500Principal
 
 
 class PassportNFC @Throws(GeneralSecurityException::class)
-private constructor() {
+private constructor(private val logController: LogController) {
     /** The hash function for DG hashes.  */
     private var digest: MessageDigest? = null
 
@@ -86,7 +86,8 @@ private constructor() {
      *
      * @since 0.4.9
      */
-    /* The feature status has been created in constructor. */ val features: FeatureStatus
+    val features: FeatureStatus
+
     /**
      * Gets the verification status thus far.
      *
@@ -102,7 +103,7 @@ private constructor() {
      *
      * @return the trust store in use
      */
-    var trustManager: MRTDTrustStore?=null
+    var trustManager: MRTDTrustStore? = null
 
     /**
      * Gets the document signing private key, or null if not present.
@@ -128,21 +129,22 @@ private constructor() {
     /**
      * Sets the CVCA certificate.
      *
-     * @param cert the CV certificate
+     * @param cvCertificate the CV certificate
      */
     var cvCertificate: CardVerifiableCertificate? = null
         set(cert) {
             field = cert
             try {
-                val cvcaFile = CVCAFile(PassportService.EF_CVCA, cvCertificate!!.holderReference.name)
+                val cvcaFile =
+                    CVCAFile(PassportService.EF_CVCA, cvCertificate!!.holderReference.name)
                 putFile(PassportService.EF_CVCA, cvcaFile.encoded)
             } catch (ce: CertificateException) {
-                ce.printStackTrace()
+                logController.e(TAG, ce) { "Certificate exception" }
             }
 
         }
 
-    private var service: PassportService?=null
+    private var service: PassportService? = null
 
     private val random: Random
 
@@ -187,7 +189,12 @@ private constructor() {
      * @throws GeneralSecurityException if certain security primitives are not supported
      */
     @Throws(CardServiceException::class, GeneralSecurityException::class)
-    constructor(ps: PassportService?, trustManager: MRTDTrustStore, mrzInfo: MRZInfo) : this() {
+    constructor(
+        ps: PassportService?,
+        trustManager: MRTDTrustStore,
+        mrzInfo: MRZInfo,
+        logController: LogController
+    ) : this(logController) {
         if (ps == null) {
             throw IllegalArgumentException("Service cannot be null")
         }
@@ -202,8 +209,9 @@ private constructor() {
 
             /* Find out whether this MRTD supports SAC. */
             try {
-                Log.i(TAG, "Inspecting card access file")
-                val cardAccessFile = CardAccessFile(ps.getInputStream(PassportService.EF_CARD_ACCESS))
+                logController.i(TAG) { "Inspecting card access file" }
+                val cardAccessFile =
+                    CardAccessFile(ps.getInputStream(PassportService.EF_CARD_ACCESS))
                 val securityInfos = cardAccessFile.securityInfos
                 for (securityInfo in securityInfos) {
                     if (securityInfo is PACEInfo) {
@@ -212,8 +220,7 @@ private constructor() {
                 }
             } catch (e: Exception) {
                 /* NOTE: No card access file, continue to test for BAC. */
-                Log.i(TAG, "DEBUG: failed to get card access file: " + e.message)
-                e.printStackTrace()
+                logController.e(TAG, e) { "DEBUG: failed to get card access file" }
             }
 
             hasSAC = features.hasSAC() == Verdict.PRESENT
@@ -223,8 +230,7 @@ private constructor() {
                     paceResult = doPACE(ps, mrzInfo)
                     isSACSucceeded = true
                 } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.i(TAG, "PACE failed, falling back to BAC")
+                    logController.e(TAG, e) { "PACE failed, falling back to BAC" }
                     isSACSucceeded = false
                 }
 
@@ -233,7 +239,7 @@ private constructor() {
         } catch (cse: CardServiceException) {
             throw cse
         } catch (e: Exception) {
-            e.printStackTrace()
+            logController.e(TAG, e) { "Cannot open document" }
             throw CardServiceException("Cannot open document. " + e.message)
         }
 
@@ -245,16 +251,30 @@ private constructor() {
             if (isSACSucceeded) {
                 verificationStatus.setSAC(VerificationStatus.Verdict.SUCCEEDED, "Succeeded")
                 features.setBAC(Verdict.UNKNOWN)
-                verificationStatus.setBAC(VerificationStatus.Verdict.NOT_CHECKED, "Using SAC, BAC not checked", EMPTY_TRIED_BAC_ENTRY_LIST)
+                verificationStatus.setBAC(
+                    VerificationStatus.Verdict.NOT_CHECKED,
+                    "Using SAC, BAC not checked",
+                    EMPTY_TRIED_BAC_ENTRY_LIST
+                )
             } else {
                 /* We failed SAC, and we failed BAC. */
                 features.setBAC(Verdict.NOT_PRESENT)
-                verificationStatus.setBAC(VerificationStatus.Verdict.NOT_PRESENT, "Non-BAC document", EMPTY_TRIED_BAC_ENTRY_LIST)
+                verificationStatus.setBAC(
+                    VerificationStatus.Verdict.NOT_PRESENT,
+                    "Non-BAC document",
+                    EMPTY_TRIED_BAC_ENTRY_LIST
+                )
             }
         } catch (e: Exception) {
-            Log.i(TAG, "Attempt to read EF.COM before BAC failed with: " + e.message)
+            logController.e(TAG, e) {
+                "Attempt to read EF.COM before BAC failed with"
+            }
             features.setBAC(Verdict.PRESENT)
-            verificationStatus.setBAC(VerificationStatus.Verdict.NOT_CHECKED, "BAC document", EMPTY_TRIED_BAC_ENTRY_LIST)
+            verificationStatus.setBAC(
+                VerificationStatus.Verdict.NOT_CHECKED,
+                "BAC document",
+                EMPTY_TRIED_BAC_ENTRY_LIST
+            )
         }
 
         /* If we have to do BAC, try to do BAC. */
@@ -272,7 +292,11 @@ private constructor() {
                     triedBACEntries
                 )
             } catch (_: Exception) {
-                verificationStatus.setBAC(VerificationStatus.Verdict.FAILED, "BAC failed", triedBACEntries)
+                verificationStatus.setBAC(
+                    VerificationStatus.Verdict.FAILED,
+                    "BAC failed",
+                    triedBACEntries
+                )
             }
 
         }
@@ -288,20 +312,19 @@ private constructor() {
             dg1File = getDG1File(ps)
             dgNumbersAlreadyRead.add(1)
         } catch (ioe: IOException) {
-            ioe.printStackTrace()
-            Log.w(TAG, "Could not read file")
+            logController.w(TAG, ioe) { "Could not read file" }
         }
 
         try {
             dg14File = getDG14File(ps)
         } catch (e: Exception) {
-            e.printStackTrace()
+            logController.w(TAG, e) { "Could not read DG14 file" }
         }
 
         try {
             cvcaFile = getCVCAFile(ps)
         } catch (e: Exception) {
-            e.printStackTrace()
+            logController.w(TAG, e) { "Could not read CVCA file" }
         }
 
         /* Get the list of DGs from EF.SOd, we don't trust EF.COM. */
@@ -310,16 +333,16 @@ private constructor() {
             dgNumbers.addAll(sodFile!!.dataGroupHashes.keys)
         } else if (comFile != null) {
             /* Get the list from EF.COM since we failed to parse EF.SOd. */
-            Log.w(TAG, "Failed to get DG list from EF.SOd. Getting DG list from EF.COM.")
+            logController.w(TAG) { "Failed to get DG list from EF.SOd. Getting DG list from EF.COM." }
             val tagList = comFile!!.tagList
             dgNumbers.addAll(toDataGroupList(tagList)!!)
         }
         Collections.sort(dgNumbers) /* NOTE: need to sort it, since we get keys as a set. */
 
-        val foundDGs = "Found DGs: $dgNumbers"
-            Log.i(TAG, foundDGs)
+        logController.d(TAG) { "Found DGs: $dgNumbers" }
 
-        var hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>? = verificationStatus.hashResults
+        var hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>? =
+            verificationStatus.hashResults
         if (hashResults == null) {
             hashResults = TreeMap<Int, VerificationStatus.HashMatchResult>()
         }
@@ -341,7 +364,11 @@ private constructor() {
                 hashResults[dgNumber] = hashResult!!
             }
         }
-        verificationStatus.setHT(VerificationStatus.Verdict.UNKNOWN, verificationStatus.htReason, hashResults)
+        verificationStatus.setHT(
+            VerificationStatus.Verdict.UNKNOWN,
+            verificationStatus.htReason,
+            hashResults
+        )
 
         /* Check EAC support by DG14 presence. */
         if (dgNumbers.contains(14)) {
@@ -356,7 +383,11 @@ private constructor() {
         if (hasCA) {
             try {
                 val eaccaResults = doEACCA(ps, dg14File, sodFile)
-                verificationStatus.setCA(VerificationStatus.Verdict.SUCCEEDED, "EAC succeeded", eaccaResults[0])
+                verificationStatus.setCA(
+                    VerificationStatus.Verdict.SUCCEEDED,
+                    "EAC succeeded",
+                    eaccaResults[0]
+                )
             } catch (_: Exception) {
                 verificationStatus.setCA(VerificationStatus.Verdict.FAILED, "CA Failed", null)
             }
@@ -367,10 +398,21 @@ private constructor() {
         val cvcaKeyStores = trustManager.cvcaStores
         if (hasEAC && cvcaKeyStores != null && cvcaKeyStores.size > 0 && verificationStatus.ca == VerificationStatus.Verdict.SUCCEEDED) {
             try {
-                val eactaResults = doEACTA(ps, mrzInfo, cvcaFile, paceResult, verificationStatus.caResult, cvcaKeyStores)
-                verificationStatus.setEAC(VerificationStatus.Verdict.SUCCEEDED, "EAC succeeded", eactaResults[0])
+                val eactaResults = doEACTA(
+                    ps,
+                    mrzInfo,
+                    cvcaFile,
+                    paceResult,
+                    verificationStatus.caResult,
+                    cvcaKeyStores
+                )
+                verificationStatus.setEAC(
+                    VerificationStatus.Verdict.SUCCEEDED,
+                    "EAC succeeded",
+                    eactaResults[0]
+                )
             } catch (e: Exception) {
-                e.printStackTrace()
+                logController.e(TAG, e) { "EAC failed" }
                 verificationStatus.setEAC(VerificationStatus.Verdict.FAILED, "EAC Failed", null)
             }
 
@@ -383,10 +425,9 @@ private constructor() {
                 dg15File = getDG15File(ps)
                 dgNumbersAlreadyRead.add(15)
             } catch (ioe: IOException) {
-                ioe.printStackTrace()
-                Log.w(TAG, "Could not read DG15 file")
+                logController.w(TAG, ioe) { "Could not read DG15 file" }
             } catch (e: Exception) {
-                Log.w(TAG, "Failed to read DG15: ${e.message}")
+                logController.w(TAG, e) { "Failed to read DG15" }
             }
         }
 
@@ -394,21 +435,19 @@ private constructor() {
         try {
             dg2File = getDG2File(ps)
         } catch (e: Exception) {
-            e.printStackTrace()
+            logController.e(TAG, e) { "Failed to read DG2" }
         }
 
         try {
             dg5File = getDG5File(ps)
         } catch (e: Exception) {
-            e.printStackTrace()
+            logController.e(TAG, e) { "Failed to read DG5" }
         }
 
         try {
             dg11File = getDG11File(ps)
         } catch (e: Exception) {
-            val dg11Failmsg = "DG11 fail read"
-            Log.e(TAG, dg11Failmsg)
-            e.printStackTrace()
+            logController.e(TAG, e) { "DG11 fail read" }
         }
     }
 
@@ -455,7 +494,7 @@ private constructor() {
                 updateCOMSODFile(null)
             }
         } catch (ioe: Exception) {
-            ioe.printStackTrace()
+            logController.e(TAG, ioe) { "Failed to insert file" }
         }
 
         verificationStatus.setAll(VerificationStatus.Verdict.UNKNOWN, "Unknown") // FIXME: why all?
@@ -480,21 +519,23 @@ private constructor() {
                 if (fid != PassportService.EF_COM.toInt() && fid != PassportService.EF_SOD.toInt() && fid != PassportService.EF_CVCA.toInt()) {
                     val dg = getDG(fid)
                     if (dg == null) {
-                        Log.w(TAG, "Could not get input stream for " + Integer.toHexString(fid))
+                        logController.w(TAG) { "Could not get input stream for $fid" }
                         continue
                     }
                     val tag = dg.encoded[0]
-                    dgHashes[LDSFileUtil.lookupDataGroupNumberByTag(tag.toInt())] = digest.digest(dg.encoded)
+                    dgHashes[LDSFileUtil.lookupDataGroupNumberByTag(tag.toInt())] =
+                        digest.digest(dg.encoded)
                     comFile!!.insertTag(tag.toInt() and 0xFF)
                 }
             }
             if (this.docSigningPrivateKey != null) {
-                sodFile = SODFile(digestAlg, signatureAlg, dgHashes, this.docSigningPrivateKey, cert)
+                sodFile =
+                    SODFile(digestAlg, signatureAlg, dgHashes, this.docSigningPrivateKey, cert)
             } else {
                 sodFile = SODFile(digestAlg, signatureAlg, dgHashes, signature, cert)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            logController.e(TAG, e) { "Failed to update EF_COM and EF_SOD" }
         }
 
     }
@@ -512,7 +553,7 @@ private constructor() {
             /* Check document signing signature. */
             val docSigningCert = sodFile!!.docSigningCertificate
             if (docSigningCert == null) {
-                Log.w(TAG, "Could not get document signer certificate from EF.SOd")
+                logController.w(TAG) { "Could not get document signer certificate from EF.SOd" }
             }
             if (checkDocSignature(docSigningCert)) {
                 verificationStatus.setDS(VerificationStatus.Verdict.SUCCEEDED, "Signature checked")
@@ -520,10 +561,13 @@ private constructor() {
                 verificationStatus.setDS(VerificationStatus.Verdict.FAILED, "Signature incorrect")
             }
         } catch (_: NoSuchAlgorithmException) {
-            verificationStatus.setDS(VerificationStatus.Verdict.FAILED, "Unsupported signature algorithm")
+            verificationStatus.setDS(
+                VerificationStatus.Verdict.FAILED,
+                "Unsupported signature algorithm"
+            )
             return  /* NOTE: Serious enough to not perform other checks, leave method. */
         } catch (e: Exception) {
-            e.printStackTrace()
+            logController.e(TAG, e) { "Failed to check document signing signature" }
             verificationStatus.setDS(VerificationStatus.Verdict.FAILED, "Unexpected exception")
             return  /* NOTE: Serious enough to not perform other checks, leave method. */
         }
@@ -539,7 +583,11 @@ private constructor() {
             val chain = ArrayList<Certificate>()
 
             if (sodFile == null) {
-                verificationStatus.setCS(VerificationStatus.Verdict.FAILED, "Unable to build certificate chain", chain)
+                verificationStatus.setCS(
+                    VerificationStatus.Verdict.FAILED,
+                    "Unable to build certificate chain",
+                    chain
+                )
                 return
             }
 
@@ -552,42 +600,64 @@ private constructor() {
                 sodSerialNumber = sodFile!!.serialNumber
                 docSigningCertificate = sodFile!!.docSigningCertificate
             } catch (e: Exception) {
-                Log.w(TAG, "Error getting document signing certificate: " + e.message)
+                logController.w(
+                    TAG,
+                    e
+                ) { "Error getting document signing certificate" }
                 // FIXME: search for it in cert stores?
             }
 
             if (docSigningCertificate != null) {
                 chain.add(docSigningCertificate)
             } else {
-                Log.w(TAG, "Error getting document signing certificate from EF.SOd")
+                logController.w(TAG) { "Error getting document signing certificate from EF.SOd" }
             }
 
             /* Get trust anchors. */
             val cscaStores = trustManager?.cscaStores
             if (cscaStores == null || cscaStores.size <= 0) {
-                Log.w(TAG, "No CSCA certificate stores found.")
-                verificationStatus.setCS(VerificationStatus.Verdict.FAILED, "No CSCA certificate stores found", chain)
+                logController.w(TAG) { "No CSCA certificate stores found." }
+                verificationStatus.setCS(
+                    VerificationStatus.Verdict.FAILED,
+                    "No CSCA certificate stores found",
+                    chain
+                )
             }
             val cscaTrustAnchors = trustManager?.cscaAnchors
             if (cscaTrustAnchors == null || cscaTrustAnchors.size <= 0) {
-                Log.w(TAG, "No CSCA trust anchors found.")
-                verificationStatus.setCS(VerificationStatus.Verdict.FAILED, "No CSCA trust anchors found", chain)
+                logController.w(TAG) { "No CSCA trust anchors found." }
+                verificationStatus.setCS(
+                    VerificationStatus.Verdict.FAILED,
+                    "No CSCA trust anchors found",
+                    chain
+                )
             }
 
             /* Optional internal EF.SOd consistency check. */
             if (docSigningCertificate != null) {
                 val docIssuer = docSigningCertificate.issuerX500Principal
                 if (sodIssuer != null && sodIssuer != docIssuer) {
-                    Log.e(TAG, "Security object issuer principal is different from embedded DS certificate issuer!")
+                    logController.e(TAG) {
+                        "Security object issuer principal is different from embedded DS certificate issuer!"
+                    }
                 }
                 val docSerialNumber = docSigningCertificate.serialNumber
                 if (sodSerialNumber != null && sodSerialNumber != docSerialNumber) {
-                    Log.w(TAG, "Security object serial number is different from embedded DS certificate serial number!")
+                    logController.w(TAG) {
+                        "Security object serial number is different from embedded DS certificate serial number!"
+                    }
                 }
             }
 
             /* Run PKIX algorithm to build chain to any trust anchor. Add certificates to our chain. */
-            val pkixChain = PassportNfcUtils.getCertificateChain(docSigningCertificate, sodIssuer!!, sodSerialNumber!!, cscaStores!!, cscaTrustAnchors!!)
+            val pkixChain = PassportNfcUtils.getCertificateChain(
+                docSigningCertificate,
+                sodIssuer!!,
+                sodSerialNumber!!,
+                cscaStores!!,
+                cscaTrustAnchors!!,
+                logController
+            )
 
             for (certificate in pkixChain) {
                 if (certificate == docSigningCertificate) {
@@ -598,16 +668,28 @@ private constructor() {
 
             val chainDepth = chain.size
             if (chainDepth <= 1) {
-                verificationStatus.setCS(VerificationStatus.Verdict.FAILED, "Could not build chain to trust anchor", chain)
+                verificationStatus.setCS(
+                    VerificationStatus.Verdict.FAILED,
+                    "Could not build chain to trust anchor",
+                    chain
+                )
                 return
             }
             if (verificationStatus.cs == VerificationStatus.Verdict.UNKNOWN) {
-                verificationStatus.setCS(VerificationStatus.Verdict.SUCCEEDED, "Found a chain to a trust anchor", chain)
+                verificationStatus.setCS(
+                    VerificationStatus.Verdict.SUCCEEDED,
+                    "Found a chain to a trust anchor",
+                    chain
+                )
             }
 
         } catch (e: Exception) {
-            e.printStackTrace()
-            verificationStatus.setCS(VerificationStatus.Verdict.FAILED, "Signature failed", EMPTY_CERTIFICATE_CHAIN)
+            logController.e(TAG, e) { "Failed to build certificate chain" }
+            verificationStatus.setCS(
+                VerificationStatus.Verdict.FAILED,
+                "Signature failed",
+                EMPTY_CERTIFICATE_CHAIN
+            )
         }
 
     }
@@ -617,7 +699,8 @@ private constructor() {
      */
     private fun verifyHT() {
         /* Compare stored hashes to computed hashes. */
-        var hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>? = verificationStatus.hashResults
+        var hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>? =
+            verificationStatus.hashResults
         if (hashResults == null) {
             hashResults = TreeMap<Int, VerificationStatus.HashMatchResult>()
         }
@@ -632,10 +715,18 @@ private constructor() {
             verifyHash(dgNumber, hashResults)
         }
         if (verificationStatus.ht == VerificationStatus.Verdict.UNKNOWN) {
-            verificationStatus.setHT(VerificationStatus.Verdict.SUCCEEDED, "All hashes match", hashResults)
+            verificationStatus.setHT(
+                VerificationStatus.Verdict.SUCCEEDED,
+                "All hashes match",
+                hashResults
+            )
         } else {
             /* Update storedHashes and computedHashes. */
-            verificationStatus.setHT(verificationStatus.ht!!, verificationStatus.htReason, hashResults)
+            verificationStatus.setHT(
+                verificationStatus.ht!!,
+                verificationStatus.htReason,
+                hashResults
+            )
         }
     }
 
@@ -684,7 +775,8 @@ private constructor() {
     }
 
     private fun verifyHash(dgNumber: Int): VerificationStatus.HashMatchResult? {
-        var hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>? = verificationStatus.hashResults
+        var hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>? =
+            verificationStatus.hashResults
         if (hashResults == null) {
             hashResults = TreeMap<Int, VerificationStatus.HashMatchResult>()
         }
@@ -700,7 +792,10 @@ private constructor() {
      *
      * @param hashResults the hashtable status to update
      */
-    private fun verifyHash(dgNumber: Int, hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>): VerificationStatus.HashMatchResult? {
+    private fun verifyHash(
+        dgNumber: Int,
+        hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>
+    ): VerificationStatus.HashMatchResult? {
         val fid = LDSFileUtil.lookupFIDByTag(LDSFileUtil.lookupTagByDataGroupNumber(dgNumber))
 
 
@@ -710,7 +805,11 @@ private constructor() {
             val storedHashes = sodFile!!.dataGroupHashes
             storedHash = storedHashes[dgNumber]
         } catch (_: Exception) {
-            verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "DG$dgNumber failed, could not get stored hash", hashResults)
+            verificationStatus.setHT(
+                VerificationStatus.Verdict.FAILED,
+                "DG$dgNumber failed, could not get stored hash",
+                hashResults
+            )
             return null
         }
 
@@ -719,7 +818,11 @@ private constructor() {
         try {
             digest = getDigest(digestAlgorithm)
         } catch (_: NoSuchAlgorithmException) {
-            verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "Unsupported algorithm \"$digestAlgorithm\"", null)
+            verificationStatus.setHT(
+                VerificationStatus.Verdict.FAILED,
+                "Unsupported algorithm \"$digestAlgorithm\"",
+                null
+            )
             return null // DEBUG -- MO
         }
 
@@ -732,13 +835,13 @@ private constructor() {
             }
 
             if (abstractTaggedLDSFile == null && verificationStatus.eac != VerificationStatus.Verdict.SUCCEEDED && (fid == PassportService.EF_DG3 || fid == PassportService.EF_DG4)) {
-                Log.w(TAG, "Skipping DG$dgNumber during HT verification because EAC failed.")
+                logController.w(TAG) { "Skipping DG$dgNumber during HT verification because EAC failed." }
                 val hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
                 hashResults[dgNumber] = hashResult
                 return hashResult
             }
             if (abstractTaggedLDSFile == null) {
-                Log.w(TAG, "Skipping DG$dgNumber during HT verification because file could not be read.")
+                logController.w(TAG) { "Skipping DG$dgNumber during HT verification because file could not be read." }
                 val hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
                 hashResults[dgNumber] = hashResult
                 return hashResult
@@ -747,7 +850,11 @@ private constructor() {
         } catch (_: Exception) {
             val hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
             hashResults[dgNumber] = hashResult
-            verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "DG$dgNumber failed due to exception", hashResults)
+            verificationStatus.setHT(
+                VerificationStatus.Verdict.FAILED,
+                "DG$dgNumber failed due to exception",
+                hashResults
+            )
             return hashResult
         }
 
@@ -758,14 +865,22 @@ private constructor() {
             hashResults[dgNumber] = hashResult
 
             if (!Arrays.equals(storedHash, computedHash)) {
-                verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "Hash mismatch", hashResults)
+                verificationStatus.setHT(
+                    VerificationStatus.Verdict.FAILED,
+                    "Hash mismatch",
+                    hashResults
+                )
             }
 
             return hashResult
         } catch (_: Exception) {
             val hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
             hashResults[dgNumber] = hashResult
-            verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "Hash failed due to exception", hashResults)
+            verificationStatus.setHT(
+                VerificationStatus.Verdict.FAILED,
+                "Hash failed due to exception",
+                hashResults
+            )
             return hashResult
         }
 
@@ -778,7 +893,7 @@ private constructor() {
             digest!!.reset()
             return digest
         }
-        Log.i(TAG, "Using hash algorithm $digestAlgorithm")
+        logController.d(TAG) { "Using hash algorithm $digestAlgorithm" }
         if (Security.getAlgorithms("MessageDigest").contains(digestAlgorithm)) {
             digest = MessageDigest.getInstance(digestAlgorithm)
         } else {
@@ -792,21 +907,27 @@ private constructor() {
             1 -> {
                 return dg1File
             }
+
             2 -> {
                 return dg2File
             }
+
             5 -> {
                 return dg5File
             }
+
             11 -> {
                 return dg11File
             }
+
             14 -> {
                 return dg14File
             }
+
             15 -> {
                 return dg15File
             }
+
             else -> {
                 return null
             }
@@ -876,13 +997,19 @@ private constructor() {
             digestEncryptionAlgorithm = digestJavaString.replace("-", "") + "withRSA"
         }
 
-        Log.i(TAG, "digestEncryptionAlgorithm = $digestEncryptionAlgorithm")
+        logController.d(TAG) { "digestEncryptionAlgorithm = $digestEncryptionAlgorithm" }
 
         val sig: Signature = Signature.getInstance(digestEncryptionAlgorithm, BC_PROVIDER)
         if (digestEncryptionAlgorithm.endsWith("withRSA/PSS")) {
-            val saltLength = findSaltRSA_PSS(digestEncryptionAlgorithm, docSigningCert, eContent, signature)//Unknown salt so we try multiples until we get a success or failure
+            val saltLength = findSaltRsaPss(
+                digestEncryptionAlgorithm,
+                docSigningCert,
+                eContent,
+                signature
+            )//Unknown salt so we try multiples until we get a success or failure
             val mgf1ParameterSpec = MGF1ParameterSpec("SHA-256")
-            val pssParameterSpec = PSSParameterSpec("SHA-256", "MGF1", mgf1ParameterSpec, saltLength, 1)
+            val pssParameterSpec =
+                PSSParameterSpec("SHA-256", "MGF1", mgf1ParameterSpec, saltLength, 1)
             sig.setParameter(pssParameterSpec)
         }
         sig.initVerify(docSigningCert)
@@ -891,7 +1018,12 @@ private constructor() {
     }
 
 
-    private fun findSaltRSA_PSS(digestEncryptionAlgorithm: String, docSigningCert: Certificate?, eContent: ByteArray, signature: ByteArray): Int {
+    private fun findSaltRsaPss(
+        digestEncryptionAlgorithm: String,
+        docSigningCert: Certificate?,
+        eContent: ByteArray,
+        signature: ByteArray
+    ): Int {
         //Using brute force
         for (i in 0..512) {
             try {
@@ -899,7 +1031,8 @@ private constructor() {
                 val sig: Signature = Signature.getInstance(digestEncryptionAlgorithm, BC_PROVIDER)
                 if (digestEncryptionAlgorithm.endsWith("withRSA/PSS")) {
                     val mgf1ParameterSpec = MGF1ParameterSpec("SHA-256")
-                    val pssParameterSpec = PSSParameterSpec("SHA-256", "MGF1", mgf1ParameterSpec, i, 1)
+                    val pssParameterSpec =
+                        PSSParameterSpec("SHA-256", "MGF1", mgf1ParameterSpec, i, 1)
                     sig.setParameter(pssParameterSpec)
                 }
 
@@ -910,7 +1043,7 @@ private constructor() {
                     return i
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                logController.e(TAG, e) { "findSaltRSA_PSS" }
             }
 
         }
@@ -936,7 +1069,11 @@ private constructor() {
 
             if (paceInfos.isNotEmpty()) {
                 val paceInfo = paceInfos.iterator().next()
-                paceResult = ps.doPACE(paceKeySpec, paceInfo.objectIdentifier, PACEInfo.toParameterSpec(paceInfo.parameterId))
+                paceResult = ps.doPACE(
+                    paceKeySpec,
+                    paceInfo.objectIdentifier,
+                    PACEInfo.toParameterSpec(paceInfo.parameterId)
+                )
             }
         } finally {
             isCardAccessFile?.close()
@@ -950,8 +1087,13 @@ private constructor() {
         return ps.doBAC(bacKey)
     }
 
-    private fun doEACCA(ps: PassportService, dg14File: DG14File?, sodFile: SODFile?): List<EACCAResult> {
-        Log.i(TAG, "doEACCA entry")
+    @Suppress("")
+    private fun doEACCA(
+        ps: PassportService,
+        dg14File: DG14File?,
+        sodFile: SODFile?
+    ): List<EACCAResult> {
+        logController.i(TAG) { "doEACCA entry" }
         if (dg14File == null) {
             throw NullPointerException("dg14File is null")
         }
@@ -971,10 +1113,10 @@ private constructor() {
         while (securityInfoIterator.hasNext()) {
             val securityInfo = securityInfoIterator.next()
             if (securityInfo is ChipAuthenticationInfo) {
-                Log.i(TAG, "doEACCA: found ChipAuthenticationInfo")
+                logController.i(TAG) { "doEACCA: found ChipAuthenticationInfo" }
                 chipAuthenticationInfo = securityInfo
             } else if (securityInfo is ChipAuthenticationPublicKeyInfo) {
-                Log.i(TAG,"doEACCA: found ChipAuthenticationPublicKeyInfo")
+                logController.i(TAG) { "doEACCA: found ChipAuthenticationPublicKeyInfo" }
                 chipAuthenticationPublicKeyInfos.add(securityInfo)
             }
         }
@@ -994,13 +1136,18 @@ private constructor() {
                 oidhumanreadable = chipAuthenticationInfo.protocolOIDString
 
                 try {
-                    Log.i("EMRTD", "Chip Authentication starting")
-                    val doEACCA = ps.doEACCA(keyid, oidasn1, oidhumanreadable, authenticationPublicKeyInfo.subjectPublicKey)
+                    logController.i("EMRTD") { "Chip Authentication starting" }
+                    val doEACCA = ps.doEACCA(
+                        keyid,
+                        oidasn1,
+                        oidhumanreadable,
+                        authenticationPublicKeyInfo.subjectPublicKey
+                    )
                     eaccaResults.add(doEACCA)
-                    Log.i("EMRTD", "Chip Authentication succeeded")
+                    logController.i("EMRTD") { "Chip Authentication succeeded" }
                 } catch (_: CardServiceException) {
                     /* NOTE: Failed? Too bad, try next public key. */
-                    Log.w(TAG, "try next public key")
+                    logController.w(TAG) { "try next public key" }
                 }
             } else {
 
@@ -1010,63 +1157,93 @@ private constructor() {
                 if (SecurityInfo.ID_PK_ECDH.equals(oidasn1)) {
 
                     val oidmapECDH = mapOf<String, String>(
-                            SecurityInfo.ID_CA_ECDH_3DES_CBC_CBC to "id-CA-ECDH-3DES-CBC-CBC",
-                            SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_128 to "id-CA-ECDH-AES-CBC-CMAC-128",
-                            SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_192 to "id-CA-ECDH-AES-CBC-CMAC-192",
-                            SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_256 to "id-CA-ECDH-AES-CBC-CMAC-256")
+                        SecurityInfo.ID_CA_ECDH_3DES_CBC_CBC to "id-CA-ECDH-3DES-CBC-CBC",
+                        SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_128 to "id-CA-ECDH-AES-CBC-CMAC-128",
+                        SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_192 to "id-CA-ECDH-AES-CBC-CMAC-192",
+                        SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_256 to "id-CA-ECDH-AES-CBC-CMAC-256"
+                    )
 
-                    for ((asn1,humanreadable) in oidmapECDH) {
+                    for ((asn1, humanreadable) in oidmapECDH) {
+                        logController.d(TAG) { "trying human readable $humanreadable" }
                         try {
-                            Log.i(TAG, "Trying $humanreadable")
-                            val doEACCA = ps.doEACCA(keyid, asn1, humanreadable, authenticationPublicKeyInfo.subjectPublicKey)
+                            val doEACCA = ps.doEACCA(
+                                keyid,
+                                asn1,
+                                humanreadable,
+                                authenticationPublicKeyInfo.subjectPublicKey
+                            )
                             eaccaResults.add(doEACCA)
-                            Log.i(TAG, "Success $humanreadable")
+                            logController.d(TAG) { "Success" }
                             break@outer
                         } catch (cse: CardServiceException) {
-                            Log.e(TAG,"FAIL $humanreadable : ${cse.message}")
+                            logController.e(TAG, cse) { "FAIL" }
                         } catch (e: Exception) {
-                            Log.e(TAG,"FAiL $humanreadable : ${e.message}")
+                            logController.e(TAG, e) { "FAiL" }
                         }
                     }
 
-                    Log.e(TAG,"all ECDH choices failed")
+                    logController.e(TAG) { "all ECDH choices failed" }
 
                 } else if (SecurityInfo.ID_PK_DH.equals(oidasn1)) {
 
                     val oidmapDH = mapOf<String, String>(
-                            SecurityInfo.ID_CA_DH_3DES_CBC_CBC to "id-CA-DH-3DES-CBC-CBC",
-                            SecurityInfo.ID_CA_DH_AES_CBC_CMAC_128 to "id-CA-DH-AES-CBC-CMAC-128",
-                            SecurityInfo.ID_CA_DH_AES_CBC_CMAC_192 to "id-CA-DH-AES-CBC-CMAC-192",
-                            SecurityInfo.ID_CA_DH_AES_CBC_CMAC_256 to "id-CA-DH-AES-CBC-CMAC-256")
+                        SecurityInfo.ID_CA_DH_3DES_CBC_CBC to "id-CA-DH-3DES-CBC-CBC",
+                        SecurityInfo.ID_CA_DH_AES_CBC_CMAC_128 to "id-CA-DH-AES-CBC-CMAC-128",
+                        SecurityInfo.ID_CA_DH_AES_CBC_CMAC_192 to "id-CA-DH-AES-CBC-CMAC-192",
+                        SecurityInfo.ID_CA_DH_AES_CBC_CMAC_256 to "id-CA-DH-AES-CBC-CMAC-256"
+                    )
 
                     for ((asn1, humanreadable) in oidmapDH) {
+                        logController.d(TAG) { "trying human readable $humanreadable" }
+
                         try {
-                            Log.i(TAG, "Trying $humanreadable")
-                            val doEACCA = ps.doEACCA(keyid, asn1, humanreadable, authenticationPublicKeyInfo.subjectPublicKey)
+                            val doEACCA = ps.doEACCA(
+                                keyid,
+                                asn1,
+                                humanreadable,
+                                authenticationPublicKeyInfo.subjectPublicKey
+                            )
                             eaccaResults.add(doEACCA)
-                            Log.i(TAG, "Success $humanreadable")
+                            logController.d(TAG) { "Success" }
                             break@outer
                         } catch (cse: CardServiceException) {
-                            Log.e(TAG,"FAIL $humanreadable : ${cse.message}")
+                            logController.e(TAG, cse) { "FAIL" }
                         } catch (e: Exception) {
-                            Log.e(TAG,"FAiL $humanreadable : ${e.message}")
+                            logController.e(TAG, e) { "FAiL" }
                         }
                     }
 
-                    Log.e(TAG,"all DH choices failed")
+                    logController.e(TAG) { "all DH choices failed" }
 
                 } else {
-                    Log.e(TAG,"UNKNOWN $oidasn1")
+                    if (logController.isDebugLogging()) {
+                        logController.d(TAG) { "UNKNOWN Security Info: $oidasn1" }
+                    } else {
+                        logController.e(TAG) { "UNKNOWN Security Info" }
+                    }
                 }
             }
         }
 
-        Log.i(TAG, "doEACCA exit")
+        logController.i(TAG) { "doEACCA exit" }
         return eaccaResults
     }
 
-    @Throws(IOException::class, CardServiceException::class, GeneralSecurityException::class, IllegalArgumentException::class, NullPointerException::class)
-    private fun doEACTA(ps: PassportService, mrzInfo: MRZInfo, cvcaFile: CVCAFile?, paceResult: PACEResult?, eaccaResult: EACCAResult?, cvcaKeyStores: List<KeyStore>): List<EACTAResult> {
+    @Throws(
+        IOException::class,
+        CardServiceException::class,
+        GeneralSecurityException::class,
+        IllegalArgumentException::class,
+        NullPointerException::class
+    )
+    private fun doEACTA(
+        ps: PassportService,
+        mrzInfo: MRZInfo,
+        cvcaFile: CVCAFile?,
+        paceResult: PACEResult?,
+        eaccaResult: EACCAResult?,
+        cvcaKeyStores: List<KeyStore>
+    ): List<EACTAResult> {
         if (cvcaFile == null) {
             throw NullPointerException("CVCAFile is null")
         }
@@ -1081,7 +1258,9 @@ private constructor() {
 
         //EAC
         for (caReference in possibleCVCAReferences) {
-            val eacCredentials = PassportNfcUtils.getEACCredentials(caReference, cvcaKeyStores) ?: continue
+            val eacCredentials =
+                PassportNfcUtils.getEACCredentials(caReference, cvcaKeyStores, logController)
+                    ?: continue
 
             val privateKey = eacCredentials.privateKey
             val chain = eacCredentials.chain
@@ -1092,14 +1271,28 @@ private constructor() {
 
             try {
                 if (paceResult == null) {
-                    val eactaResult = ps.doEACTA(caReference, terminalCerts, privateKey, null, eaccaResult, mrzInfo.documentNumber)
+                    val eactaResult = ps.doEACTA(
+                        caReference,
+                        terminalCerts,
+                        privateKey,
+                        null,
+                        eaccaResult,
+                        mrzInfo.documentNumber
+                    )
                     eactaResults.add(eactaResult)
                 } else {
-                    val eactaResult = ps.doEACTA(caReference, terminalCerts, privateKey, null, eaccaResult, paceResult)
+                    val eactaResult = ps.doEACTA(
+                        caReference,
+                        terminalCerts,
+                        privateKey,
+                        null,
+                        eaccaResult,
+                        paceResult
+                    )
                     eactaResults.add(eactaResult)
                 }
             } catch (cse: CardServiceException) {
-                cse.printStackTrace()
+                logController.e(TAG, cse) { "doEACTA failed" }
                 /* NOTE: Failed? Too bad, try next public key. */
                 continue
             }
@@ -1229,8 +1422,7 @@ private constructor() {
                 val dgNumber = LDSFileUtil.lookupDataGroupNumberByTag(tag)
                 dgNumberList.add(dgNumber)
             } catch (nfe: NumberFormatException) {
-                Log.w(TAG, "Could not find DG number for tag: " + Integer.toHexString(tag))
-                nfe.printStackTrace()
+                logController.w(TAG, nfe) { "Could not find DG number for tag" }
             }
 
         }

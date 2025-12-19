@@ -18,6 +18,7 @@
  */
 package eu.europa.ec.passportscanner.parser
 
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.parser.types.MrzDate
 import eu.europa.ec.passportscanner.parser.types.MrzDocumentCode
 import eu.europa.ec.passportscanner.parser.types.MrzDocumentCode.Companion.parse
@@ -35,7 +36,7 @@ abstract class MrzRecord protected constructor(
     /**
      * Detected MRZ format.
      */
-    val format: MrzFormat?
+    val format: MrzFormat?,
 ) : Serializable {
     /**
      * The document code.
@@ -131,14 +132,19 @@ abstract class MrzRecord protected constructor(
      * @throws MrzParseException when a problem occurs.
      */
     @Throws(MrzParseException::class)
-    open fun fromMrz(mrz: String) {
-        if (format != get(mrz)) {
-            throw MrzParseException("invalid format: " + get(mrz), mrz, MrzRange(0, 0, 0), format)
+    open fun fromMrz(mrz: String, logController: LogController) {
+        if (format != get(mrz, logController)) {
+            throw MrzParseException(
+                "invalid format: " + get(mrz, logController),
+                mrz,
+                MrzRange(0, 0, 0),
+                format
+            )
         }
         code = parse(mrz)
-        code1 = mrz.get(0)
-        code2 = mrz.get(1)
-        issuingCountry = MrzParser(mrz).parseString(MrzRange(2, 5, 0))
+        code1 = mrz[0]
+        code2 = mrz[1]
+        issuingCountry = MrzParser(mrz, logController).parseString(MrzRange(2, 5, 0))
     }
 
     /**
@@ -146,7 +152,8 @@ abstract class MrzRecord protected constructor(
      * @param name expected array of length 2, in the form of [surname, first_name]. Must not be null.
      */
     protected fun setName(name: Array<String?>) {
-        surname = name[0] ?: throw MrzParseException("surname is null", "", MrzRange(0, 0, 0), format)
+        surname =
+            name[0] ?: throw MrzParseException("surname is null", "", MrzRange(0, 0, 0), format)
         givenNames = name[1]
     }
 

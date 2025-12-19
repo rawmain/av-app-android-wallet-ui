@@ -18,6 +18,7 @@
  */
 package eu.europa.ec.passportscanner.parser.records
 
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.parser.MrzParser
 import eu.europa.ec.passportscanner.parser.MrzRange
 import eu.europa.ec.passportscanner.parser.MrzRecord
@@ -34,10 +35,9 @@ class MRP : MrzRecord(MrzFormat.PASSPORT) {
      */
     var personalNumber: String? = null
 
-
-    override fun fromMrz(mrz: String) {
-        super.fromMrz(mrz)
-        val parser = MrzParser(mrz)
+    override fun fromMrz(mrz: String, logController: LogController) {
+        super.fromMrz(mrz, logController)
+        val parser = MrzParser(mrz, logController)
         setName(parser.parseName(MrzRange(5, 44, 0)))
         documentNumber = parser.parseString(MrzRange(0, 9, 1))
         validDocumentNumber = parser.checkDigit(9, 1, MrzRange(0, 9, 1), "passport number")
@@ -68,10 +68,5 @@ class MRP : MrzRecord(MrzFormat.PASSPORT) {
 
     override fun toString(): String {
         return "MRP{" + super.toString() + ", personalNumber=" + personalNumber + '}'
-    }
-
-
-    companion object {
-        private const val serialVersionUID = 1L
     }
 }

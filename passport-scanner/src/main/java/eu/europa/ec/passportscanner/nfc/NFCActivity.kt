@@ -24,11 +24,11 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import com.google.gson.Gson
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.R
 import eu.europa.ec.resourceslogic.R.string
 import eu.europa.ec.passportscanner.SmartScannerActivity
@@ -36,6 +36,7 @@ import eu.europa.ec.passportscanner.api.ScannerConstants
 import eu.europa.ec.passportscanner.api.ScannerConstants.IS_PASSPORT
 import eu.europa.ec.passportscanner.nfc.passport.Passport
 import org.jmrtd.lds.icao.MRZInfo
+import org.koin.android.ext.android.inject
 
 
 class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
@@ -45,6 +46,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
         private const val TAG_NFC = "TAG_NFC"
     }
 
+    private val logController: LogController by inject()
     private var mrzInfo: MRZInfo? = null
     private var nfcAdapter: NfcAdapter? = null
     private var pendingIntent: PendingIntent? = null
@@ -59,7 +61,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
         try {
             mrzInfo = MRZInfo(mrz)
         } catch (e: Exception) {
-            e.printStackTrace()
+            logController.e(TAG, e)
         } finally {
             // when an exception occurs and mrzInfo is still null execute initialization of MrzInfo
             try {
@@ -67,7 +69,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
                     mrzInfo = MRZInfo(mrz)
                 }
             } catch (ioe: IllegalArgumentException) {
-                ioe.printStackTrace()
+                logController.e(TAG, ioe)
                 this.finish()
                 Toast.makeText(applicationContext, "Invalid MRZ scanned", Toast.LENGTH_SHORT).show()
             }
@@ -146,29 +148,28 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
     }
 
     override fun onPassportRead(passport: Passport?) {
-        val nfcResult = NFCResult.formatResult(passport = passport)
+        val nfcResult = NFCResult.formatResult(passport = passport, logController = logController)
 
         // Send NFC Results via Plugin
         val data = Intent()
-        Log.d(TAG, "Success from NFC -- RESULT")
-        Log.d(TAG, "value: $nfcResult")
+        logController.d(TAG) { "Success from NFC -- RESULT: $nfcResult" }
         data.putExtra(SmartScannerActivity.SCANNER_RESULT, Gson().toJson(nfcResult))
 
         // Also add raw face image data for our custom handling
-        Log.d(TAG, "passport object: $passport")
-        Log.d(TAG, "passport.face: ${passport?.face}")
-        Log.d(TAG, "passport.rawFaceImageData: ${passport?.rawFaceImageData}")
+        logController.d(TAG) { "passport object: $passport" }
+        logController.d(TAG) { "passport.face: ${passport?.face}" }
+        logController.d(TAG) { "passport.rawFaceImageData: ${passport?.rawFaceImageData}" }
 
         passport?.rawFaceImageData?.let { rawImageData ->
-            Log.d(
-                TAG,
-                "Adding face image data - mime: ${rawImageData.mimeType}, length: ${rawImageData.imageLength}"
-            )
+            logController.d(TAG) {
+                "Adding face image data - mime: ${rawImageData.mimeType}, " +
+                        "length: ${rawImageData.imageLength}"
+            }
             data.putExtra(ScannerConstants.NFC_FACE_IMAGE, rawImageData.imageBytes)
             data.putExtra(ScannerConstants.NFC_FACE_IMAGE_MIME_TYPE, rawImageData.mimeType)
             data.putExtra(ScannerConstants.NFC_FACE_IMAGE_LENGTH, rawImageData.imageLength)
         } ?: run {
-            Log.w(TAG, "No rawFaceImageData found in passport")
+            logController.w(TAG) { "No rawFaceImageData found in passport" }
         }
         data.putExtra(ScannerConstants.EXPIRY_DATE, nfcResult.dateOfExpiry)
         data.putExtra(ScannerConstants.DATE_OF_BIRTH, nfcResult.dateOfBirth)
@@ -179,7 +180,9 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
     }
 
     override fun onCardException(cardException: Exception?) {
-        cardException?.printStackTrace()
+        cardException?.run {
+            logController.e(TAG, cardException)
+        }
     }
 
     private fun showWirelessSettings() {

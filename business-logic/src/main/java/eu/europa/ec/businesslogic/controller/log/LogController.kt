@@ -27,15 +27,22 @@ import java.io.File
 
 interface LogController {
     fun d(tag: String, message: () -> String)
+    fun d(tag: String, exception: Throwable)
     fun d(message: () -> String)
     fun e(tag: String, message: () -> String)
     fun e(tag: String, exception: Throwable)
+    fun e(tag: String, exception: Throwable, message: () -> String)
     fun e(message: () -> String)
+    fun e(exception: Throwable, message: () -> String)
     fun e(exception: Throwable)
     fun w(tag: String, message: () -> String)
     fun w(message: () -> String)
+    fun w(tag: String, exception: Throwable, message: () -> String)
+    fun w(exception: Throwable, message: () -> String)
     fun i(tag: String, message: () -> String)
     fun i(message: () -> String)
+
+    fun isDebugLogging(): Boolean
     fun retrieveLogFileUris(): List<Uri>
 }
 
@@ -57,9 +64,17 @@ class LogControllerImpl(
         .withDir(logsDir)
         .withSizeLimit(FILE_SIZE_LIMIT)
         .withFileLimit(FILE_LIMIT)
-        .withMinPriority(if (configLogic.isBuildTypeDebug()) {Log.DEBUG} else {Log.INFO})
+        .withMinPriority(
+            if (configLogic.isBuildTypeDebug()) {
+                Log.DEBUG
+            } else {
+                Log.INFO
+            }
+        )
         .appendToFile(true)
         .build()
+
+    private val isDebugLoggingEnabled: Boolean = configLogic.isBuildTypeDebug()
 
     init {
         if (configLogic.isBuildTypeDebug()) {
@@ -74,6 +89,10 @@ class LogControllerImpl(
         Timber.tag(tag).d(message())
     }
 
+    override fun d(tag: String, exception: Throwable) {
+        Timber.tag(tag).d(exception)
+    }
+
     override fun d(message: () -> String) {
         d(tag = tag, message = message)
     }
@@ -83,11 +102,19 @@ class LogControllerImpl(
     }
 
     override fun e(tag: String, exception: Throwable) {
-        Timber.tag(tag).e(exception.message.orEmpty())
+        Timber.tag(tag).e(exception, exception.message.orEmpty())
+    }
+
+    override fun e(tag: String, exception: Throwable, message: () -> String) {
+        Timber.tag(tag).e(exception, message())
     }
 
     override fun e(message: () -> String) {
         e(tag, message)
+    }
+
+    override fun e(exception: Throwable, message: () -> String) {
+        e(tag, exception, message)
     }
 
     override fun e(exception: Throwable) {
@@ -102,6 +129,14 @@ class LogControllerImpl(
         w(tag, message)
     }
 
+    override fun w(tag: String, exception: Throwable, message: () -> String) {
+        Timber.tag(tag).w(exception, message())
+    }
+
+    override fun w(exception: Throwable, message: () -> String) {
+        Timber.tag(tag).w(exception, message())
+    }
+
     override fun i(tag: String, message: () -> String) {
         Timber.tag(tag).i(message())
     }
@@ -109,6 +144,8 @@ class LogControllerImpl(
     override fun i(message: () -> String) {
         i(tag, message)
     }
+
+    override fun isDebugLogging(): Boolean = isDebugLoggingEnabled
 
     override fun retrieveLogFileUris(): List<Uri> {
         return fileLoggerTree.files.map {

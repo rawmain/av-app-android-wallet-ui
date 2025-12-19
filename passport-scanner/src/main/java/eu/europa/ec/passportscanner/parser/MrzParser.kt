@@ -18,12 +18,12 @@
  */
 package eu.europa.ec.passportscanner.parser
 
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.parser.types.MrzDate
 import eu.europa.ec.passportscanner.parser.types.MrzFormat
 import eu.europa.ec.passportscanner.parser.types.MrzFormat.Companion.get
 import eu.europa.ec.passportscanner.parser.types.MrzSex
 import eu.europa.ec.passportscanner.parser.types.MrzSex.Companion.fromMrz
-import timber.log.Timber
 
 
 /**
@@ -37,7 +37,8 @@ class MrzParser(
     /**
      * The MRZ record, not null.
      */
-    val mrz: String
+    private val mrz: String,
+    private val logController: LogController,
 ) {
 
     /**
@@ -49,7 +50,7 @@ class MrzParser(
     /**
      * MRZ record format.
      */
-    val format: MrzFormat = get(mrz)
+    val format: MrzFormat = get(mrz, logController)
 
     /**
      * @author jllarraz@github
@@ -72,25 +73,24 @@ class MrzParser(
             str.endsWith("<<K")
         )  // Sometimes MLKit  perceives `<` as `K`
         {
-            if (str.endsWith("<<KK")) {
-                stripChar = 2
+            stripChar = if (str.endsWith("<<KK")) {
+                2
             } else if (str.endsWith("<<KKK")) {
-                stripChar = 3
+                3
             } else {
-                stripChar = 1
+                1
             }
-            str = str.substring(0, str.length - stripChar)
+            str = str.dropLast(stripChar)
         }
 
         val names = str.split("<<".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         var surname: String?
-        var givenNames = ""
-        surname = parseString(MrzRange(range.column, range.column + names[0].length, range.row))
+        var givenNames: String
         if (names.size == 1) {
             givenNames =
                 parseNameString(MrzRange(range.column, range.column + names[0].length, range.row))
             surname = ""
-        } else if (names.size > 1) {
+        } else {
             surname =
                 parseNameString(MrzRange(range.column, range.column + names[0].length, range.row))
             givenNames = parseNameString(
@@ -124,10 +124,10 @@ class MrzParser(
     fun checkValidCharacters(range: MrzRange) {
         val str = rawValue(range)
         for (i in 0..<str.length) {
-            val c = str.get(i)
-            if (c != FILLER && (c < '0' || c > '9') && (c < 'A' || c > 'Z')) {
+            val c = str[i]
+            if (c != FILLER && (c !in '0'..'9') && (c !in 'A'..'Z')) {
                 throw MrzParseException(
-                    "Invalid character in MRZ record: " + c,
+                    "Invalid character in MRZ record: $c",
                     mrz,
                     MrzRange(range.column + i, range.column + i + 1, range.row),
                     format
@@ -145,7 +145,7 @@ class MrzParser(
         checkValidCharacters(range)
         var str = rawValue(range)
         while (str.endsWith("<")) {
-            str = str.substring(0, str.length - 1)
+            str = str.dropLast(1)
         }
         return str.replace("" + FILLER + FILLER, ", ").replace(FILLER, ' ')
     }
@@ -167,7 +167,7 @@ class MrzParser(
             str.endsWith("<<KK")
         )  // Sometimes MLKit perceives `<<` as `KK`
         {
-            str = str.substring(0, str.length - 1)
+            str = str.dropLast(1)
         }
         return str.replace("" + FILLER + FILLER, "").replace(FILLER, ' ')
     }
@@ -200,14 +200,16 @@ class MrzParser(
         var invalidCheckdigit: MrzRange? = null
 
         val digit: Char = (computeCheckDigit(str) + '0'.code).toChar()
-        var checkDigit = rows[row].get(col)
+        var checkDigit = rows[row][col]
         if (checkDigit == FILLER) {
             checkDigit = '0'
         }
 
         if (digit != checkDigit) {
             invalidCheckdigit = MrzRange(col, col + 1, row)
-            println("Check digit verification failed for " + fieldName + ": expected " + digit + " but got " + checkDigit)
+            logController.d(TAG) {
+                "Check digit verification failed for $fieldName: expected $digit but got $checkDigit"
+            }
         }
         return invalidCheckdigit == null
     }
@@ -219,18 +221,17 @@ class MrzParser(
      * @throws IllegalArgumentException if the range is not 6 characters long.
      */
     fun parseDate(range: MrzRange): MrzDate {
-        require(range.length() == 6) { "Parameter range: invalid value " + range + ": must be 6 characters long" }
-        var r: MrzRange?
-        r = MrzRange(range.column, range.column + 2, range.row)
+        require(range.length() == 6) { "Parameter range: invalid value $range: must be 6 characters long" }
+        var r = MrzRange(range.column, range.column + 2, range.row)
         var year: Int
         try {
             year = rawValue(r).toInt()
         } catch (ex: NumberFormatException) {
             year = -1
-            Timber.d("Failed to parse MRZ date year " + rawValue(range) + ": " + ex, mrz, r)
+            logController.d(TAG) { "Failed to parse MRZ date year ${rawValue(range)}: $ex" }
         }
-        if (year < 0 || year > 99) {
-            Timber.d("Invalid year value " + year + ": must be 0..99")
+        if (year !in 0..99) {
+            logController.d(TAG) { "Invalid year value $year: must be 0..99" }
         }
         r = MrzRange(range.column + 2, range.column + 4, range.row)
         var month: Int
@@ -238,10 +239,10 @@ class MrzParser(
             month = rawValue(r).toInt()
         } catch (ex: NumberFormatException) {
             month = -1
-            Timber.d("Failed to parse MRZ date month " + rawValue(range) + ": " + ex, mrz, r)
+            logController.d(TAG) { "Failed to parse MRZ date month ${rawValue(range)}: $ex" }
         }
-        if (month < 1 || month > 12) {
-            Timber.d("Invalid month value " + month + ": must be 1..12")
+        if (month !in 1..12) {
+            logController.d(TAG) { "Invalid month value $month: must be 1..12" }
         }
         r = MrzRange(range.column + 4, range.column + 6, range.row)
         var day: Int
@@ -249,10 +250,10 @@ class MrzParser(
             day = rawValue(r).toInt()
         } catch (ex: NumberFormatException) {
             day = -1
-            Timber.d("Failed to parse MRZ date month " + rawValue(range) + ": " + ex, mrz, r)
+            logController.d(TAG) { "Failed to parse MRZ date month ${rawValue(range)}: $ex" }
         }
-        if (day < 1 || day > 31) {
-            Timber.d("Invalid day value " + day + ": must be 1..31")
+        if (day !in 1..31) {
+            logController.d(TAG) { "Invalid day value $day: must be 1..31" }
         }
         return MrzDate(year, month, day)
     }
@@ -264,25 +265,25 @@ class MrzParser(
      * @return sex, never null.
      */
     fun parseSex(col: Int, row: Int): MrzSex {
-        return fromMrz(rows[row].get(col))
+        return fromMrz(rows[row][col])
     }
 
     companion object {
-        // Using Timber for logging
 
+        private val TAG: String = MrzParser::class.simpleName!!
         private val MRZ_WEIGHTS = intArrayOf(7, 3, 1)
 
         private fun getCharacterValue(c: Char): Int {
             if (c == FILLER) {
                 return 0
             }
-            if (c >= '0' && c <= '9') {
+            if (c in '0'..'9') {
                 return c.code - '0'.code
             }
-            if (c >= 'A' && c <= 'Z') {
+            if (c in 'A'..'Z') {
                 return c.code - 'A'.code + 10
             }
-            throw RuntimeException("Invalid character in MRZ record: " + c)
+            throw RuntimeException("Invalid character in MRZ record: $c")
         }
 
         /**
@@ -293,7 +294,7 @@ class MrzParser(
         fun computeCheckDigit(str: String): Int {
             var result = 0
             for (i in 0..<str.length) {
-                result += getCharacterValue(str.get(i)) * MRZ_WEIGHTS[i % MRZ_WEIGHTS.size]
+                result += getCharacterValue(str[i]) * MRZ_WEIGHTS[i % MRZ_WEIGHTS.size]
             }
             return result % 10
         }
@@ -304,9 +305,9 @@ class MrzParser(
          * @param mrz MRZ to parse.
          * @return record class.
          */
-        fun parse(mrz: String): MrzRecord {
-            val result = get(mrz).newRecord()
-            result.fromMrz(mrz)
+        fun parse(mrz: String, logController: LogController): MrzRecord {
+            val result = get(mrz, logController).newRecord()
+            result.fromMrz(mrz, logController)
             return result
         }
 

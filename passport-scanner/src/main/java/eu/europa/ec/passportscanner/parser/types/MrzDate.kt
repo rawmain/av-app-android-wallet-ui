@@ -18,7 +18,6 @@
  */
 package eu.europa.ec.passportscanner.parser.types
 
-import timber.log.Timber
 import java.io.Serializable
 
 /**
@@ -69,15 +68,12 @@ class MrzDate : Serializable, Comparable<MrzDate?> {
 
     private fun check(): Boolean {
         if (year < 0 || year > 99) {
-            Timber.d("Parameter year: invalid value %s: must be 0..99", year)
             return false
         }
         if (month < 1 || month > 12) {
-            Timber.d("Parameter month: invalid value %s: must be 1..12", month)
             return false
         }
         if (day < 1 || day > 31) {
-            Timber.d("Parameter day: invalid value %s: must be 1..31", day)
             return false
         }
 

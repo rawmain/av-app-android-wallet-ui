@@ -23,6 +23,7 @@ import project.convention.logic.config.LibraryModule.CoreLogic
 import project.convention.logic.config.LibraryModule.IssuanceFeature
 import project.convention.logic.config.LibraryModule.LandingFeature
 import project.convention.logic.config.LibraryModule.NetworkLogic
+import project.convention.logic.config.LibraryModule.PassportScanner
 import project.convention.logic.config.LibraryModule.OnboardingFeature
 import project.convention.logic.config.LibraryModule.PresentationFeature
 import project.convention.logic.config.LibraryModule.ResourcesLogic
@@ -70,6 +71,7 @@ dependencies {
     api(project(IssuanceFeature.path))
     api(project(OnboardingFeature.path))
     api(project(LandingFeature.path))
+    api(project(PassportScanner.path))
 
     // Modules Kover Report
     koverModules.forEach {

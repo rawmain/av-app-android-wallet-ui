@@ -164,7 +164,9 @@ enum class DeepLinkType(val schemas: List<String>, val host: String? = null) {
         )
     ),
     CREDENTIAL_OFFER(
-        schemas = listOf(BuildConfig.CREDENTIAL_OFFER_SCHEME)
+        schemas = listOf(
+            BuildConfig.CREDENTIAL_OFFER_SCHEME
+        )
     ),
     ISSUANCE(
         schemas = listOf(BuildConfig.ISSUE_AUTHORIZATION_SCHEME),

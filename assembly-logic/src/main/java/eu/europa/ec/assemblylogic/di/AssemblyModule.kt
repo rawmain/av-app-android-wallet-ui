@@ -26,11 +26,13 @@ import eu.europa.ec.issuancefeature.di.FeatureIssuanceModule
 import eu.europa.ec.landingfeature.di.FeatureLandingModule
 import eu.europa.ec.networklogic.di.LogicNetworkModule
 import eu.europa.ec.onboardingfeature.di.FeatureOnboardingModule
+import eu.europa.ec.passportscanner.di.PassportscannerModule
 import eu.europa.ec.presentationfeature.di.FeaturePresentationModule
 import eu.europa.ec.resourceslogic.di.LogicResourceModule
 import eu.europa.ec.startupfeature.di.FeatureStartupModule
 import eu.europa.ec.storagelogic.di.LogicStorageModule
 import eu.europa.ec.uilogic.di.LogicUiModule
+import kl.open.fmandroid.di.KeylessModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.KoinApplication
@@ -55,7 +57,9 @@ private val assembledModules = listOf(
     FeatureOnboardingModule().module,
     FeaturePresentationModule().module,
     FeatureIssuanceModule().module,
-    FeatureLandingModule().module
+    FeatureLandingModule().module,
+    KeylessModule().module,
+    PassportscannerModule().module,
 )
 
 internal fun Application.setupKoin(): KoinApplication {

@@ -45,7 +45,7 @@ The app consumes the SDK called EUDIW Wallet core [Wallet core](https://github.c
 
 - OpenID4VP - v1 (remote presentation), DCQL
 
-- OpenID4VCI draft 15 (issuing)
+- OpenID4VCI v1 (issuing)
   
 ### Build
 
@@ -109,6 +109,8 @@ The following channels are available for discussions, feedback, and support requ
 ## Important note
 
 This white-label application is a reference implementation of the Age Verification solution that should be customised before publishing it. The current version is not feature complete and will require further integration work before production deployment. In particular, any national-specific enrolment procedures must be implemented by the respective Member States or publishing parties.
+
+To enhance security, it is strongly recommended that the allowed PINs raise the overall security level. Sequential or easily guessable patterns (such as "135246 or "147258") should not be permitted. Additionally, it is advisable to check against a list of the most commonly used or "pwned" PINs to prevent users from choosing weak credentials.
 
 Please note that this application is still under active development. It is regularly updated and new features and improvements are continuously being added.
 
