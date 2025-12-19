@@ -186,6 +186,7 @@
     <string name="nfc_error_missing_data">Required passport data is missing</string>
     <string name="nfc_error_more_than_one_tag">More than one NFC tag detected</string>
     <string name="nfc_error_reading_failed">Failed to read passport. Please try again.</string>
+    <string name="nfc_error_reading_tag">Error while NFC reading. Try again.</string>
     <string name="nfc_error_tag_not_valid">NFC tag not valid</string>
     <string name="nfc_error_unexpected">Unexpected error occurred</string>
     <string name="nfc_error_user_canceled">Scan canceled</string>

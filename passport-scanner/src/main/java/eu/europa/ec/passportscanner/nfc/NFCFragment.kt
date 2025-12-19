@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.nfc.NfcAdapter
 import android.nfc.Tag
+import android.nfc.TagLostException
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -52,6 +53,7 @@ import org.jmrtd.PACEException
 import org.jmrtd.lds.icao.MRZInfo
 import org.koin.android.ext.android.inject
 import org.spongycastle.jce.provider.BouncyCastleProvider
+import java.io.IOException
 import java.security.Security
 
 class NFCFragment : Fragment() {
@@ -145,6 +147,11 @@ class NFCFragment : Fragment() {
                 }
 
                 override fun onCardException(exception: CardServiceException) {
+                   if (exception.cause.isTagLostReason()) {
+                        this@NFCFragment.onNFCTagLost()
+                        return
+                    }
+
                     val sw = exception.sw.toShort()
                     when (sw) {
                         ISO7816.SW_CLA_NOT_SUPPORTED -> {
@@ -290,6 +297,12 @@ class NFCFragment : Fragment() {
         }
     }
 
+    private fun onNFCTagLost() {
+        getString(string.nfc_error_reading_tag)
+        Toast.makeText(context, "Error while NFC reading, try again", Toast.LENGTH_LONG).show()
+        onNFCReadFinish()
+    }
+
     private fun onPassportRead(passport: Passport?) {
         mHandler.post {
             if (nfcFragmentListener != null) {
@@ -322,4 +335,9 @@ class NFCFragment : Fragment() {
             return myFragment
         }
     }
+}
+
+private fun Throwable?.isTagLostReason(): Boolean {
+    val isTransceiveFailedCause = this?.message?.contains("Transceive failed", true) ?: false
+    return this is TagLostException || (this is IOException  && isTransceiveFailedCause )
 }

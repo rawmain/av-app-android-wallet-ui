@@ -171,6 +171,7 @@
     <string name="nfc_error_missing_data">Les données requises du passeport sont manquantes.</string>
     <string name="nfc_error_more_than_one_tag">Plusieurs étiquettes NFC détectées</string>
     <string name="nfc_error_reading_failed">Impossible de lire le passeport. Veuillez réessayer.</string>
+    <string name="nfc_error_reading_tag">Erreur lors de la lecture NFC. Veuillez réessayer.</string>
     <string name="nfc_error_tag_not_valid">Balise NFC non valide</string>
     <string name="nfc_error_unexpected">Une erreur inattendue s\'est produite.</string>
     <string name="nfc_error_user_canceled">Analyse annulée</string>
