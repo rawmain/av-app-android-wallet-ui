@@ -20,8 +20,10 @@ package eu.europa.ec.passportscanner.scanner
 import android.app.Activity
 import android.content.Intent
 import androidx.camera.core.ImageAnalysis
+import eu.europa.ec.businesslogic.controller.log.LogController
 
 abstract class BaseImageAnalyzer : ImageAnalysis.Analyzer {
     abstract val activity : Activity
     abstract val intent: Intent
+    abstract val logController: LogController
 }

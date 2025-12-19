@@ -41,7 +41,7 @@ import eu.europa.ec.eudi.wallet.document.format.SdJwtVcClaim
  * - Create a [ClaimPathDomain] with a list containing only the claim's identifier.
  */
 fun DocumentClaim.toClaimPaths(
-    parentPath: List<String> = emptyList(),
+    parentPath: List<String> = emptyList()
 ): List<ClaimPathDomain> {
     return when (this) {
         is SdJwtVcClaim -> {

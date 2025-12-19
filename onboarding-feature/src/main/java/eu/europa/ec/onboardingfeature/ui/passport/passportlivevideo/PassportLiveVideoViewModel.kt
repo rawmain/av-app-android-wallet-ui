@@ -78,7 +78,7 @@ class PassportLiveVideoViewModel(
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State {
-        logController.i(TAG) { "get the following param=$passportLiveVideoSerializedConfig" }
+        logController.d(TAG) { "get the following param=$passportLiveVideoSerializedConfig" }
         val config: PassportLiveVideoUiConfig? = uiSerializer.fromBase64(
             passportLiveVideoSerializedConfig,
             PassportLiveVideoUiConfig::class.java,
@@ -94,7 +94,7 @@ class PassportLiveVideoViewModel(
             }
 
             Event.OnLiveVideoCapture -> {
-                logController.i(tag = TAG) { "Event invoked OnLiveVideoCapture" }
+                logController.d(tag = TAG) { "Event invoked OnLiveVideoCapture" }
                 handleLiveVideoCapture()
             }
 
@@ -103,7 +103,7 @@ class PassportLiveVideoViewModel(
             }
 
             Event.OnRetry -> {
-                logController.i(tag = TAG) { "Event invoked OnRetry" }
+                logController.d(tag = TAG) { "Event invoked OnRetry" }
                 setState { copy(error = null) }
             }
         }
@@ -182,7 +182,7 @@ class PassportLiveVideoViewModel(
                     }
                 }
             } catch (e: Exception) {
-                logController.e(TAG) { "Exception during live video capture: ${e.message}" }
+                logController.e(TAG, e) { "Exception during live video capture" }
                 setState { copy(isLoading = false) }
                 showError(e.message ?: "An unexpected error occurred")
             }
@@ -206,7 +206,7 @@ class PassportLiveVideoViewModel(
                 file.delete()
             }
         } catch (e: Exception) {
-            logController.e(TAG) { "Exception while deleting temp file: ${e.message}" }
+            logController.e(TAG, e) { "Exception while deleting temp file" }
         }
     }
 

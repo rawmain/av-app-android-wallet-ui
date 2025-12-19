@@ -65,7 +65,7 @@ open class EudiComponentActivity : FragmentActivity() {
         intent: Intent?,
         builder: NavGraphBuilder.(NavController) -> Unit
     ) {
-        logController.i("DCAPI") { "Content called with intent: $intent, action: ${intent?.action}" }
+        logController.d("DCAPI") { "Content called with intent: $intent, action: ${intent?.action}" }
         ThemeManager.instance.Theme(darkTheme = false) {
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -104,18 +104,21 @@ open class EudiComponentActivity : FragmentActivity() {
     }
 
     private fun handleDeepLink(intent: Intent?, coldBoot: Boolean = false) {
-        logController.i("DeepLink") { "Handling deep link: ${intent?.data}, action: ${intent?.action}" }
+        logController.d("DeepLink") { "Handling deep link: ${intent?.data}, action: ${intent?.action}" }
 
         // Handle DCAPI intents
         if (isDCAPIIntent(intent)) {
-            logController.i("DCAPI") { "Detected DCAPI intent: ${intent?.action}" }
+            logController.d("DCAPI") { "Detected DCAPI intent: ${intent?.action}" }
 
             // Cache the intent BEFORE checking if user is logged in
             // This ensures it survives the PIN entry flow
             cacheIntent(intent)
             logController.i("DCAPI") { "Cached DCAPI intent for later retrieval" }
 
-            logController.i("DCAPI") { "User logged in with documents: ${routerHost.userIsLoggedInWithDocuments()}" }
+            logController.d("DCAPI") {
+                val loggedInWithDocuments: Boolean = routerHost.userIsLoggedInWithDocuments()
+                "User logged in with documents: $loggedInWithDocuments"
+            }
             if (routerHost.userIsLoggedInWithDocuments()) {
                 logController.i("DCAPI") { "Navigating to landing screen" }
                 routerHost.popToLandingScreen()

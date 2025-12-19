@@ -65,7 +65,7 @@ interface AddDocumentInteractor {
     fun issueDocument(
         issuanceMethod: IssuanceMethod,
         configId: String,
-        issuerId: String,
+        issuerId: String
     ): Flow<IssueDocumentPartialState>
 
     fun handleUserAuth(
@@ -161,7 +161,7 @@ class AddDocumentInteractorImpl(
     override fun issueDocument(
         issuanceMethod: IssuanceMethod,
         configId: String,
-        issuerId: String,
+        issuerId: String
     ): Flow<IssueDocumentPartialState> =
         walletCoreDocumentsController.issueDocument(
             issuanceMethod = issuanceMethod,

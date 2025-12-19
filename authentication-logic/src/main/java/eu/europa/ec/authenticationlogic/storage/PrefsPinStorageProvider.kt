@@ -24,7 +24,7 @@ import eu.europa.ec.businesslogic.extension.encodeToBase64String
 
 class PrefsPinStorageProvider(
     private val prefsController: PrefsController,
-    private val cryptoController: CryptoController,
+    private val cryptoController: CryptoController
 ) : PinStorageProvider {
 
     companion object {

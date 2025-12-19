@@ -16,6 +16,7 @@
 
 package eu.europa.ec.passportscanner.parser.records
 
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.parser.MrzParser
 import eu.europa.ec.passportscanner.parser.MrzRange
 import eu.europa.ec.passportscanner.parser.MrzRecord
@@ -38,9 +39,9 @@ class MrtdTd1 : MrzRecord(MrzFormat.MRTD_TD1) {
      */
     var optional2: String? = null
 
-    override fun fromMrz(mrz: String) {
-        super.fromMrz(mrz)
-        val p = MrzParser(mrz)
+    override fun fromMrz(mrz: String, logController: LogController) {
+        super.fromMrz(mrz, logController)
+        val p = MrzParser(mrz, logController)
         documentNumber = p.parseString(MrzRange(5, 14, 0))
         validDocumentNumber = p.checkDigit(14, 0, MrzRange(5, 14, 0), "document number")
         optional = p.parseString(MrzRange(15, 30, 0))

@@ -1,5 +1,8 @@
 # Changelog
 
+## 2025.11-2
+- updated EUDI Wallet Core dependency to 0.20.0
+
 ## 2025.10-2
 
 ### Added

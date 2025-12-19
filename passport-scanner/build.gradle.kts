@@ -64,9 +64,6 @@ dependencies {
     // Guava for ListenableFuture (required by CameraX with flavors)
     implementation("com.google.guava:guava:31.1-android")
 
-    // MRZ (logging replaced slf4j with Timber)
-    implementation(libs.timber)
-
     // JSON processing
     implementation(libs.gson)
     implementation(libs.json.path)

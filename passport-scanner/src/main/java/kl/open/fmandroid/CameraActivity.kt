@@ -43,11 +43,17 @@ import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.face.AVCameraCallbackHolder
 import eu.europa.ec.passportscanner.face.AVMatchResult
+import org.koin.android.ext.android.inject
 import java.io.File
 
 class CameraActivity : AppCompatActivity() {
+
+    private val logController: LogController by inject()
+    private val nativeBridge :NativeBridge by inject()
+    private val avCameraCallbackHolder: AVCameraCallbackHolder by inject()
 
     private lateinit var imageCapture: ImageCapture
     private lateinit var previewView: PreviewView
@@ -59,7 +65,7 @@ class CameraActivity : AppCompatActivity() {
             startCamera()
         } else {
             Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show()
-            AVCameraCallbackHolder.triggerCallback(MatchResult.error())
+            avCameraCallbackHolder.triggerCallback(MatchResult.error())
             finish()
         }
     }
@@ -74,14 +80,15 @@ class CameraActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        android.util.Log.d("CameraActivity", "onCreate: Starting camera activity")
+        logController.d("CameraActivity") { "onCreate: Starting camera activity" }
 
         previewView = PreviewView(this)
         previewView.scaleX = -1f // Mirror the preview
         setContentView(previewView)
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             startCamera()
         } else {
             requestPermissionLauncher.launch(Manifest.permission.CAMERA)
@@ -89,14 +96,14 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun startCamera() {
-        android.util.Log.d("CameraActivity", "startCamera: Initializing camera")
+        logController.d("CameraActivity") { "startCamera: Initializing camera" }
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
 
             val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
+                it.surfaceProvider = previewView.surfaceProvider
             }
 
             val resolutionSelector = ResolutionSelector.Builder()
@@ -117,7 +124,7 @@ class CameraActivity : AppCompatActivity() {
             cameraProvider.unbindAll()
             cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
 
-            android.util.Log.d("CameraActivity", "startCamera: Camera bound, starting capture")
+            logController.d("CameraActivity") { "startCamera: Camera bound, starting capture" }
             // Start the first frame capture
             captureFrame()
 
@@ -125,12 +132,13 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun captureFrame() {
-        android.util.Log.d("CameraActivity", "captureFrame: Capturing frame")
-        val finalFile = File(getExternalFilesDir(null), "captured_frame_${System.currentTimeMillis()}.png")
+        logController.d("CameraActivity") { "captureFrame: Capturing frame" }
+        val finalFile =
+            File(getExternalFilesDir(null), "captured_frame_${System.currentTimeMillis()}.png")
 
         val imageCaptureCallback = object : ImageCapture.OnImageCapturedCallback() {
             override fun onCaptureSuccess(imageProxy: ImageProxy) {
-                android.util.Log.d("CameraActivity", "captureFrame: Image captured successfully")
+                logController.d("CameraActivity") { "captureFrame: Image captured successfully" }
                 // Convert raw ImageProxy to Bitmap
                 val bitmap = imageProxyToBitmap(imageProxy)
                 // Read the correct rotation from the ImageProxy metadata
@@ -141,7 +149,8 @@ class CameraActivity : AppCompatActivity() {
                 // If we got a valid Bitmap, rotate and save as PNG
                 if (bitmap != null) {
                     // Rotate the bitmap to upright orientation
-                    val matrix = Matrix().apply { if (rotationDegrees != 0f) postRotate(rotationDegrees) }
+                    val matrix =
+                        Matrix().apply { if (rotationDegrees != 0f) postRotate(rotationDegrees) }
                     val rotatedBitmap = Bitmap.createBitmap(
                         bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
                     )
@@ -151,20 +160,24 @@ class CameraActivity : AppCompatActivity() {
                         rotatedBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
                     }
 
-                    android.util.Log.d("CameraActivity", "captureFrame: Image saved to ${finalFile.absolutePath}")
+                    logController.d("CameraActivity") { "captureFrame: Image saved to ${finalFile.absolutePath}" }
                     // Pass the saved file path into the processing pipeline
                     processCapturedImage(finalFile.absolutePath)
                 } else {
-                    android.util.Log.e("CameraActivity", "captureFrame: Failed to convert imageProxy to bitmap")
+                    logController.e("CameraActivity") {
+                        "captureFrame: Failed to convert imageProxy to bitmap"
+                    }
                     // On error, report a failure result and clean up
-                    AVCameraCallbackHolder.triggerCallback(MatchResult.error())
+                    avCameraCallbackHolder.triggerCallback(MatchResult.error())
                     finish()
                 }
             }
 
             override fun onError(exception: ImageCaptureException) {
-                android.util.Log.e("CameraActivity", "captureFrame: Image capture failed", exception)
-                AVCameraCallbackHolder.triggerCallback(MatchResult.error())
+                logController.e("CameraActivity", exception) {
+                    "captureFrame: Image capture failed"
+                }
+                avCameraCallbackHolder.triggerCallback(MatchResult.error())
                 finish()
             }
         }
@@ -176,47 +189,64 @@ class CameraActivity : AppCompatActivity() {
     }
 
     fun processCapturedImage(imagePath: String) {
-        android.util.Log.d("CameraActivity", "processCapturedImage: Processing $imagePath")
+        logController.d("CameraActivity") { "processCapturedImage: Processing $imagePath" }
         try {
-            val capturedResult = NativeBridge.safeProcess(imagePath, false)
-            android.util.Log.d("CameraActivity", "processCapturedImage: Face detected: ${capturedResult.faceDetected}, Live: ${capturedResult.isLive}")
+            val capturedResult = nativeBridge.safeProcess(imagePath, false)
+            logController.d("CameraActivity") {
+                "processCapturedImage: Face detected: ${capturedResult.faceDetected}, " +
+                        "Live: ${capturedResult.isLive}"
+            }
 
             if (capturedResult.faceDetected && capturedResult.embeddingExtracted) {
-                val referenceEmbedding = AVCameraCallbackHolder.referenceResult?.embedding
+                val referenceEmbedding = avCameraCallbackHolder.referenceResult?.embedding
                 if (referenceEmbedding != null) {
-                    val isSameSubject = NativeBridge.safeMatch(referenceEmbedding, capturedResult.embedding)
+                    val isSameSubject =
+                        nativeBridge.safeMatch(referenceEmbedding, capturedResult.embedding)
 
-                    android.util.Log.d("CameraActivity", "processCapturedImage: Same subject: $isSameSubject")
+                    logController.d("CameraActivity") {
+                        "processCapturedImage: Same subject: $isSameSubject"
+                    }
 
-                    AVCameraCallbackHolder.decisor?.addResult(isSameSubject)
+                    avCameraCallbackHolder.decisor?.addResult(isSameSubject)
 
-                    if (AVCameraCallbackHolder.decisor?.hasEnoughSamples() == true) {
-                        val finalDecision = AVCameraCallbackHolder.decisor?.getFinalDecision() ?: false
-                        android.util.Log.d("CameraActivity", "processCapturedImage: Final decision: $finalDecision")
+                    if (avCameraCallbackHolder.decisor?.hasEnoughSamples() == true) {
+                        val finalDecision =
+                            avCameraCallbackHolder.decisor?.getFinalDecision() ?: false
+                        logController.d("CameraActivity") {
+                            "processCapturedImage: Final decision: $finalDecision"
+                        }
                         finishCapture(imagePath, capturedResult.isLive, finalDecision)
                     } else {
-                        android.util.Log.d("CameraActivity", "processCapturedImage: Need more samples, capturing next frame")
+                        logController.d("CameraActivity") {
+                            "processCapturedImage: Need more samples, capturing next frame"
+                        }
                         captureFrame()
                     }
                 } else {
-                    android.util.Log.e("CameraActivity", "processCapturedImage: No reference embedding available")
-                    AVCameraCallbackHolder.triggerCallback(MatchResult.error())
+                    logController.e("CameraActivity") {
+                        "processCapturedImage: No reference embedding available"
+                    }
+                    avCameraCallbackHolder.triggerCallback(MatchResult.error())
                     finish()
                 }
             } else {
-                android.util.Log.d("CameraActivity", "processCapturedImage: No face detected, retrying")
+                logController.d("CameraActivity") {
+                    "processCapturedImage: No face detected, retrying"
+                }
                 // No face detected, just retry another capture
                 captureFrame()
             }
         } catch (e: Exception) {
-            android.util.Log.e("CameraActivity", "processCapturedImage: Exception during processing", e)
-            AVCameraCallbackHolder.triggerCallback(MatchResult.error())
+            logController.e("CameraActivity",e) {
+                "processCapturedImage: Exception during processing"
+            }
+            avCameraCallbackHolder.triggerCallback(MatchResult.error())
             finish()
         }
     }
 
     private fun finishCapture(imagePath: String, isLive: Boolean, isSameSubject: Boolean) {
-        android.util.Log.d("CameraActivity", "finishCapture: Creating final result")
+        logController.d("CameraActivity") { "finishCapture: Creating final result" }
         val finalResult = AVMatchResult(
             processed = true,
             referenceIsValid = true,
@@ -225,7 +255,7 @@ class CameraActivity : AppCompatActivity() {
             capturedPath = imagePath
         )
 
-        AVCameraCallbackHolder.triggerCallback(finalResult)
+        avCameraCallbackHolder.triggerCallback(finalResult)
         finish()
     }
 }

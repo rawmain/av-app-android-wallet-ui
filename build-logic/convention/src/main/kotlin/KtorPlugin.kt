@@ -14,10 +14,20 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.dashboardfeature.ui.document_sign.model
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.dependencies
+import project.convention.logic.libs
 
-import eu.europa.ec.uilogic.component.ListItemDataUi
-
-data class DocumentSignButtonUi(
-    val data: ListItemDataUi,
-)
+class KtorPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        with(target) {
+            dependencies {
+                add("implementation", libs.findLibrary("ktor-android").get())
+                add("implementation", libs.findLibrary("ktor-logging").get())
+                add("implementation", libs.findLibrary("ktor-client-content-negotiation").get())
+                add("implementation", libs.findLibrary("ktor-serialization-kotlinx-json").get())
+            }
+        }
+    }
+}

@@ -89,14 +89,14 @@ platform :android do
     end
 
     if ENV['GITHUB_RELEASE_REPO'] && ENV['GITHUB_RELEASE_TOKEN']
-      walletApkPath = prepare_binary(
+      apkPath = prepare_binary(
         appVersion: fullVersion,
         buildType: ENV["APP_BUILD_TYPE"]
       )
 
       extraAttachments = ENV['GITHUB_EXTRA_ATTACHMENTS']
       attachments = [apkPath]
-
+    
       if extraAttachments && !extraAttachments.strip.empty?
         extraPaths = extraAttachments.split(',').map(&:strip)
         attachments.concat(extraPaths)
@@ -120,12 +120,12 @@ platform :android do
 
     project_root = File.expand_path("..", __dir__)
     base_dir = File.join(
-      project_root,
-      "app",
-      "build",
-      "outputs",
-      "apk",
-      build_type,
+      project_root, 
+      "app", 
+      "build", 
+      "outputs", 
+      "apk", 
+      build_type, 
       "release"
     )
 

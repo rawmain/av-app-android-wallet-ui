@@ -28,7 +28,10 @@ import eu.europa.ec.uilogic.component.utils.SPACING_EXTRA_LARGE
 import eu.europa.ec.uilogic.component.wrap.WrapStepBar
 
 @Composable
-fun TopStepBar(currentStep: Int) {
+fun TopStepBar(
+    currentStep: Int,
+    topPadding: Int = SPACING_EXTRA_LARGE,
+) {
 
     val step1 = stringResource(id = R.string.onboarding_step_1_title)
     val step2 = stringResource(id = R.string.onboarding_step_2_title)
@@ -39,7 +42,7 @@ fun TopStepBar(currentStep: Int) {
         currentStep = currentStep,
         steps = listOf(step1, step2, step3, step4),
         modifier = Modifier.padding(
-            top = SPACING_EXTRA_LARGE.dp,
+            top = topPadding.dp,
         ),
     )
 }

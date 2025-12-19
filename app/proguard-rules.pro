@@ -93,10 +93,6 @@
 -dontwarn org.koin.compose.stable.StableParametersDefinition
 -dontwarn okhttp3.internal.Util
 
-# Retrofit
--keep,allowobfuscation,allowshrinking interface retrofit2.Call
--keep,allowobfuscation,allowshrinking class retrofit2.Response
-
 # Couroutines
 -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 
@@ -106,12 +102,28 @@
 # Enum
 -keep enum * { *; }
 
-# UI Config
+# Gson
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class sun.misc.Unsafe { *; }
+-keep class com.google.gson.** { *; }
+
+# Keep all config classes and their fields for Gson serialization
+-keep class * implements eu.europa.ec.uilogic.serializer.UiSerializable { *; }
+-keep class * implements eu.europa.ec.uilogic.serializer.UiSerializableParser { *; }
+-keep class * implements eu.europa.ec.uilogic.serializer.adapter.SerializableAdapterType { *; }
+
+# Keep all config-related classes
+-keep class eu.europa.ec.commonfeature.config.** { *; }
+-keep class eu.europa.ec.onboardingfeature.config.** { *; }
+-keep class eu.europa.ec.uilogic.config.** { *; }
+
+# Keep DocumentId for serialization
+-keep class eu.europa.ec.eudi.wallet.document.DocumentExtensions { *; }
+
+# UI Config interfaces
 -keep interface eu.europa.ec.uilogic.serializer.UiSerializableParser
 -keep interface eu.europa.ec.uilogic.serializer.UiSerializable
--keepclassmembers class * implements eu.europa.ec.uilogic.serializer.adapter.SerializableAdapterType { *; }
--keepclassmembers class * implements eu.europa.ec.uilogic.serializer.UiSerializableParser { *; }
--keepclassmembers class * implements eu.europa.ec.uilogic.serializer.UiSerializable { *; }
 
 # Bouncycastle
 -keep class org.bouncycastle.** { *; }
@@ -128,3 +140,57 @@
 -dontwarn org.jmrtd.**
 -dontwarn net.sf.scuba.**
 -dontwarn org.ejbca.cvc.**
+
+# Koin
+-keep class org.koin.** { *; }
+-keep class org.koin.core.** { *; }
+-keep class org.koin.android.** { *; }
+-keepclassmembers class * {
+    @org.koin.core.annotation.* *;
+    @org.koin.android.annotation.* *;
+}
+
+# Koin Annotations - Keep all classes annotated with Koin annotations
+-keep @org.koin.core.annotation.* class * { *; }
+-keep @org.koin.android.annotation.* class * { *; }
+
+# Keep Koin generated modules
+-keep class * extends org.koin.core.module.Module { *; }
+
+# Keep ViewModels and their constructors
+-keep class * extends androidx.lifecycle.ViewModel {
+    <init>(...);
+}
+
+# Keep all injected parameters
+-keepclassmembers class * {
+    @org.koin.core.annotation.InjectedParam *;
+}
+
+# Ensure Koin definitions are preserved
+-if class *
+-keepclasseswithmembers class <1> {
+    @org.koin.core.annotation.Single <methods>;
+}
+
+-if class *
+-keepclasseswithmembers class <1> {
+    @org.koin.core.annotation.Factory <methods>;
+}
+
+# Face Matching SDK (JNI)
+# Keep all classes used by native code to prevent obfuscation/removal
+-keep class kl.open.fmandroid.** { *; }
+-keepclassmembers class kl.open.fmandroid.** {
+    <init>(...);
+    *;
+}
+# Specifically keep ProcessResult and NativeBridge for JNI
+-keep class kl.open.fmandroid.ProcessResult {
+    <init>(...);
+    *;
+}
+-keep class kl.open.fmandroid.NativeBridge {
+    native <methods>;
+    *;
+}

@@ -18,7 +18,7 @@
  */
 package eu.europa.ec.passportscanner.parser.types
 
-import android.util.Log
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.parser.MrzParseException
 import eu.europa.ec.passportscanner.parser.MrzRange
 import eu.europa.ec.passportscanner.parser.MrzRecord
@@ -41,6 +41,7 @@ enum class MrzFormat(
     PASSPORT(2, 44, MRP::class.java),
 
     MRTD_TD1(3, 30, MrtdTd1::class.java);
+
     /**
      * Checks if this format is able to parse given serialized MRZ record.
      * @param mrzRows MRZ record, separated into rows.
@@ -63,24 +64,25 @@ enum class MrzFormat(
     }
 
     companion object {
+
+        private val TAG: String = MrzFormat::class.simpleName!!
         /**
          * Detects given MRZ format.
          * @param mrz the MRZ string.
          * @return the format, never null.
          */
         @JvmStatic
-        fun get(mrz: String): MrzFormat {
+        fun get(mrz: String, logController: LogController): MrzFormat {
             var mrz = mrz
             val dummyRow = 44
             var rows: Array<String?> =
                 mrz.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val cols = rows[0]!!.length
-            Log.d("SmartScanner", "mrz: " + mrz)
-            Log.d("SmartScanner", "rows: " + rows.contentToString())
+            logController.d(TAG) { "mrz: $mrz" }
+            logController.d(TAG) { "rows: " + rows.contentToString() }
             val mrzBuilder = StringBuilder(mrz)
             for (i in 1..<rows.size) {
                 if (rows[i]!!.length != cols) {
-                    //throw new MrzParseException("Different row lengths: 0: " + cols + " and " + i + ": " + rows[i].length(), mrz, new MrzRange(0, 0, 0), null);
                     if (rows[i]!!.length != dummyRow) {
                         mrzBuilder.append("<")
                     }
@@ -88,8 +90,8 @@ enum class MrzFormat(
             }
             mrz = mrzBuilder.toString()
             rows = mrz.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            Log.d("SmartScanner", "mrz append: " + mrz)
-            Log.d("SmartScanner", "rows append: " + rows.contentToString())
+            logController.d(TAG) { "mrz append: $mrz" }
+            logController.d(TAG) { "rows append: " + rows.contentToString() }
             for (f in MrzFormat.entries) {
                 if (f.isFormatOf(rows)) {
                     return f

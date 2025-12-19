@@ -16,6 +16,7 @@
 
 package eu.europa.ec.uilogic.component.preview
 
+import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
 import androidx.compose.ui.tooling.preview.Preview
 import eu.europa.ec.resourceslogic.theme.values.ThemeColors
@@ -26,7 +27,7 @@ import eu.europa.ec.resourceslogic.theme.values.ThemeColors
 @Preview(
     name = "Light Mode",
     showBackground = true,
-    uiMode = UI_MODE_NIGHT_NO,
+    uiMode = UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL,
     backgroundColor = ThemeColors.eudiw_theme_light_background_preview
 )
 annotation class ThemeModePreviews

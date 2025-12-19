@@ -24,13 +24,13 @@
 
 package eu.europa.ec.passportscanner.face
 
-import android.util.Log
+import eu.europa.ec.businesslogic.controller.log.LogController
 
 /**
  * Decision making component for face matching based on multiple samples
  * Aggregates results from multiple frame captures to make final decision
  */
-class AVDecisor(private val numSamples: Int = 3) {
+class AVDecisor(private val numSamples: Int = 3, private val logController: LogController) {
     private val results = mutableListOf<Boolean>()
     private val TAG = "AVDecisor"
 
@@ -40,8 +40,10 @@ class AVDecisor(private val numSamples: Int = 3) {
      */
     fun addResult(isMatch: Boolean) {
         results.add(isMatch)
-        Log.d(TAG, "addResult: Added result $isMatch, total samples: ${results.size}/$numSamples")
-        Log.d(TAG, "addResult: Current results: $results")
+        logController.d(TAG) {
+            "addResult: Added result $isMatch, total samples: ${results.size}/$numSamples"
+        }
+        logController.d(TAG) { "addResult: Current results: $results" }
     }
 
     /**
@@ -49,7 +51,7 @@ class AVDecisor(private val numSamples: Int = 3) {
      */
     fun hasEnoughSamples(): Boolean {
         val enough = results.size >= numSamples
-        Log.d(TAG, "hasEnoughSamples: $enough (${results.size}/$numSamples)")
+        logController.d(TAG) { "hasEnoughSamples: $enough (${results.size}/$numSamples)" }
         return enough
     }
 
@@ -59,13 +61,15 @@ class AVDecisor(private val numSamples: Int = 3) {
      */
     fun getFinalDecision(): Boolean {
         if (results.isEmpty()) {
-            Log.d(TAG, "getFinalDecision: No results available, returning false")
+            logController.d(TAG) { "getFinalDecision: No results available, returning false" }
             return false
         }
 
         val matchCount = results.count { it }
         val decision = matchCount > results.size / 2
-        Log.d(TAG, "getFinalDecision: $matchCount matches out of ${results.size} samples = $decision")
+        logController.d(TAG) {
+            "getFinalDecision: $matchCount matches out of ${results.size} samples = $decision"
+        }
         return decision
     }
 
@@ -73,7 +77,7 @@ class AVDecisor(private val numSamples: Int = 3) {
      * Reset the decisor for a new matching session
      */
     fun reset() {
-        Log.d(TAG, "reset: Clearing ${results.size} previous results")
+        logController.d(TAG) { "reset: Clearing ${results.size} previous results" }
         results.clear()
     }
 
