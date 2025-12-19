@@ -177,3 +177,20 @@
 -keepclasseswithmembers class <1> {
     @org.koin.core.annotation.Factory <methods>;
 }
+
+# Face Matching SDK (JNI)
+# Keep all classes used by native code to prevent obfuscation/removal
+-keep class kl.open.fmandroid.** { *; }
+-keepclassmembers class kl.open.fmandroid.** {
+    <init>(...);
+    *;
+}
+# Specifically keep ProcessResult and NativeBridge for JNI
+-keep class kl.open.fmandroid.ProcessResult {
+    <init>(...);
+    *;
+}
+-keep class kl.open.fmandroid.NativeBridge {
+    native <methods>;
+    *;
+}
