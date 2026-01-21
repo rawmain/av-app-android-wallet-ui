@@ -134,7 +134,7 @@
     <string name="issuance_code_title">%1$s erfordert Verifizierung</string>
     <string name="issuance_document_offer_deferred_success_description">Ihre Dokumente von %1$s wurden angefordert. Sie werden benachrichtigt, sobald die Gutschriften an Ihr Wallet übermittelt wurden.</string>
     <string name="issuance_document_offer_deferred_success_description_with_doc">Your document %s has been requested. You will be notified when it has been issued to your application.</string>
-    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %s has been requested from %s. You will be notified when it has been issued to your application.</string>
+    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %1$s has been requested from %2$s. You will be notified when it has been issued to your application.</string>
     <string name="issuance_document_offer_deferred_success_primary_button_text">OK</string>
     <string name="issuance_document_offer_deferred_success_text">In Bearbeitung!</string>
     <string name="issuance_document_offer_description">Die folgende Transaktion erfordert Ihre Zustimmung und Authentifizierung.</string>

@@ -119,7 +119,7 @@
     <string name="issuance_code_title">%1$s nécessite une vérification</string>
     <string name="issuance_document_offer_deferred_success_description">Vos documents de %1$s ont été demandés. Vous serez informé lorsqu\'ils auront été délivrés dans votre portefeuille.</string>
     <string name="issuance_document_offer_deferred_success_description_with_doc">Your document %s has been requested. You will be notified when it has been issued to your application.</string>
-    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %s has been requested from %s. You will be notified when it has been issued to your application.</string>
+    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %1$s has been requested from %2$s. You will be notified when it has been issued to your application.</string>
     <string name="issuance_document_offer_deferred_success_primary_button_text">OK</string>
     <string name="issuance_document_offer_deferred_success_text">En cours!</string>
     <string name="issuance_document_offer_description">La transaction suivante nécessite votre autorisation et votre authentification.</string>

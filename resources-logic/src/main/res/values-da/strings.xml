@@ -134,7 +134,7 @@
     <string name="issuance_code_title">%1$s kræver verifikation</string>
     <string name="issuance_document_offer_deferred_success_description">Dine dokumenter fra %1$s er blevet anmodet. Du får besked, når de er blevet udstedt til din applikation.</string>
     <string name="issuance_document_offer_deferred_success_description_with_doc">Your document %s has been requested. You will be notified when it has been issued to your application.</string>
-    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %s has been requested from %s. You will be notified when it has been issued to your application.</string>
+    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %1$s has been requested from %2$s. You will be notified when it has been issued to your application.</string>
     <string name="issuance_document_offer_deferred_success_primary_button_text">OK</string>
     <string name="issuance_document_offer_deferred_success_text">I gang!</string>
     <string name="issuance_document_offer_description">Følgende transaktion kræver din tilladelse og godkendelse.</string>

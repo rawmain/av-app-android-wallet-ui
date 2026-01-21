@@ -69,7 +69,7 @@ import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 
 @Composable
 fun WrapPinTextField(
-    modifier: Modifier = Modifier.fillMaxWidth(),
+    modifier: Modifier = Modifier,
     displayCode: String? = null,
     onPinUpdate: (code: String) -> Unit,
     length: Int,
