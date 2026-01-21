@@ -93,6 +93,13 @@
 -dontwarn org.koin.compose.stable.StableParametersDefinition
 -dontwarn okhttp3.internal.Util
 
+# Google Crypto Tink
+-dontwarn com.google.crypto.tink.subtle.Ed25519Sign$KeyPair
+-dontwarn com.google.crypto.tink.subtle.Ed25519Sign
+-dontwarn com.google.crypto.tink.subtle.Ed25519Verify
+-dontwarn com.google.crypto.tink.subtle.X25519
+-dontwarn com.google.crypto.tink.subtle.XChaCha20Poly1305
+
 # Couroutines
 -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 
