@@ -53,6 +53,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.math.BigInteger
 import java.security.GeneralSecurityException
+import java.security.InvalidAlgorithmParameterException
 import java.security.KeyStore
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -1043,7 +1044,13 @@ private constructor(private val logController: LogController) {
                     return i
                 }
             } catch (e: Exception) {
-                logController.e(TAG, e) { "findSaltRSA_PSS" }
+                if (e is InvalidAlgorithmParameterException) {
+                    logController.w(TAG) { "findSaltRsaPss: Invalid param with salt value: $i. ${e.message}" }
+                    continue
+                }
+                else {
+                    logController.e(TAG) { "findSaltRSA_PSS: ${e.message}" }
+                }
             }
 
         }
@@ -1087,6 +1094,151 @@ private constructor(private val logController: LogController) {
         return ps.doBAC(bacKey)
     }
 
+    private data class SecurityInfoData(
+        val chipAuthenticationInfo: ChipAuthenticationInfo?,
+        val chipAuthenticationPublicKeyInfos: List<ChipAuthenticationPublicKeyInfo>
+    )
+
+    private fun parseSecurityInfos(dg14File: DG14File): SecurityInfoData {
+        var chipAuthenticationInfo: ChipAuthenticationInfo? = null
+        val chipAuthenticationPublicKeyInfos = ArrayList<ChipAuthenticationPublicKeyInfo>()
+
+        for (securityInfo in dg14File.securityInfos) {
+            when (securityInfo) {
+                is ChipAuthenticationInfo -> {
+                    logController.i(TAG) { "doEACCA: found ChipAuthenticationInfo" }
+                    chipAuthenticationInfo = securityInfo
+                }
+                is ChipAuthenticationPublicKeyInfo -> {
+                    logController.i(TAG) { "doEACCA: found ChipAuthenticationPublicKeyInfo" }
+                    chipAuthenticationPublicKeyInfos.add(securityInfo)
+                }
+            }
+        }
+
+        return SecurityInfoData(chipAuthenticationInfo, chipAuthenticationPublicKeyInfos)
+    }
+
+    private fun tryAuthenticationWithInfo(
+        ps: PassportService,
+        chipAuthenticationInfo: ChipAuthenticationInfo,
+        publicKeyInfo: ChipAuthenticationPublicKeyInfo
+    ): EACCAResult? {
+        return try {
+            val keyid = chipAuthenticationInfo.keyId
+            val oidasn1 = chipAuthenticationInfo.objectIdentifier
+            val oidhumanreadable = chipAuthenticationInfo.protocolOIDString
+
+            logController.i("EMRTD") { "Chip Authentication starting" }
+            val result = ps.doEACCA(
+                keyid,
+                oidasn1,
+                oidhumanreadable,
+                publicKeyInfo.subjectPublicKey
+            )
+            logController.i("EMRTD") { "Chip Authentication succeeded" }
+            result
+        } catch (e: CardServiceException) {
+            logController.w(TAG, e) { "Authentication with ChipAuthenticationInfo failed, try next public key" }
+            null
+        }
+    }
+
+    private fun tryECDHAuthentication(
+        ps: PassportService,
+        publicKeyInfo: ChipAuthenticationPublicKeyInfo
+    ): EACCAResult? {
+        val oidmapECDH = mapOf(
+            SecurityInfo.ID_CA_ECDH_3DES_CBC_CBC to "id-CA-ECDH-3DES-CBC-CBC",
+            SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_128 to "id-CA-ECDH-AES-CBC-CMAC-128",
+            SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_192 to "id-CA-ECDH-AES-CBC-CMAC-192",
+            SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_256 to "id-CA-ECDH-AES-CBC-CMAC-256"
+        )
+
+        val keyid = publicKeyInfo.keyId
+
+        for ((asn1, humanreadable) in oidmapECDH) {
+            logController.d(TAG) { "trying human readable $humanreadable" }
+            try {
+                val result = ps.doEACCA(
+                    keyid,
+                    asn1,
+                    humanreadable,
+                    publicKeyInfo.subjectPublicKey
+                )
+                logController.d(TAG) { "Success" }
+                return result
+            } catch (cse: CardServiceException) {
+                logController.e(TAG, cse) { "FAIL" }
+            } catch (e: Exception) {
+                logController.e(TAG, e) { "FAiL" }
+            }
+        }
+
+        logController.e(TAG) { "all ECDH choices failed" }
+        return null
+    }
+
+    private fun tryDHAuthentication(
+        ps: PassportService,
+        publicKeyInfo: ChipAuthenticationPublicKeyInfo
+    ): EACCAResult? {
+        val oidmapDH = mapOf(
+            SecurityInfo.ID_CA_DH_3DES_CBC_CBC to "id-CA-DH-3DES-CBC-CBC",
+            SecurityInfo.ID_CA_DH_AES_CBC_CMAC_128 to "id-CA-DH-AES-CBC-CMAC-128",
+            SecurityInfo.ID_CA_DH_AES_CBC_CMAC_192 to "id-CA-DH-AES-CBC-CMAC-192",
+            SecurityInfo.ID_CA_DH_AES_CBC_CMAC_256 to "id-CA-DH-AES-CBC-CMAC-256"
+        )
+
+        val keyid = publicKeyInfo.keyId
+
+        for ((asn1, humanreadable) in oidmapDH) {
+            logController.d(TAG) { "trying human readable $humanreadable" }
+            try {
+                val result = ps.doEACCA(
+                    keyid,
+                    asn1,
+                    humanreadable,
+                    publicKeyInfo.subjectPublicKey
+                )
+                logController.d(TAG) { "Success" }
+                return result
+            } catch (cse: CardServiceException) {
+                logController.e(TAG, cse) { "FAIL" }
+            } catch (e: Exception) {
+                logController.e(TAG, e) { "FAiL" }
+            }
+        }
+
+        logController.e(TAG) { "all DH choices failed" }
+        return null
+    }
+
+    private fun processPublicKeyInfo(
+        ps: PassportService,
+        publicKeyInfo: ChipAuthenticationPublicKeyInfo,
+        chipAuthenticationInfo: ChipAuthenticationInfo?
+    ): EACCAResult? {
+        if (chipAuthenticationInfo != null) {
+            return tryAuthenticationWithInfo(ps, chipAuthenticationInfo, publicKeyInfo)
+        }
+
+        val oidasn1 = publicKeyInfo.objectIdentifier
+
+        return when {
+            SecurityInfo.ID_PK_ECDH == oidasn1 -> tryECDHAuthentication(ps, publicKeyInfo)
+            SecurityInfo.ID_PK_DH == oidasn1 -> tryDHAuthentication(ps, publicKeyInfo)
+            else -> {
+                if (logController.isDebugLogging()) {
+                    logController.d(TAG) { "UNKNOWN Security Info: $oidasn1" }
+                } else {
+                    logController.e(TAG) { "UNKNOWN Security Info" }
+                }
+                null
+            }
+        }
+    }
+
     @Suppress("")
     private fun doEACCA(
         ps: PassportService,
@@ -1102,126 +1254,18 @@ private constructor(private val logController: LogController) {
             throw NullPointerException("sodFile is null")
         }
 
-        //Chip Authentication
         val eaccaResults = ArrayList<EACCAResult>()
+        val securityInfoData = parseSecurityInfos(dg14File)
 
-        var chipAuthenticationInfo: ChipAuthenticationInfo? = null
-
-        val chipAuthenticationPublicKeyInfos = ArrayList<ChipAuthenticationPublicKeyInfo>()
-        val securityInfos = dg14File.securityInfos
-        val securityInfoIterator = securityInfos.iterator()
-        while (securityInfoIterator.hasNext()) {
-            val securityInfo = securityInfoIterator.next()
-            if (securityInfo is ChipAuthenticationInfo) {
-                logController.i(TAG) { "doEACCA: found ChipAuthenticationInfo" }
-                chipAuthenticationInfo = securityInfo
-            } else if (securityInfo is ChipAuthenticationPublicKeyInfo) {
-                logController.i(TAG) { "doEACCA: found ChipAuthenticationPublicKeyInfo" }
-                chipAuthenticationPublicKeyInfos.add(securityInfo)
-            }
-        }
-
-        var keyid: BigInteger
-        var oidasn1: String
-        var oidhumanreadable: String
-
-        val publicKeyInfoIterator = chipAuthenticationPublicKeyInfos.iterator()
-        outer@
-        while (publicKeyInfoIterator.hasNext()) {
-            val authenticationPublicKeyInfo = publicKeyInfoIterator.next()
-
-            if (chipAuthenticationInfo != null) {
-                keyid = chipAuthenticationInfo.keyId
-                oidasn1 = chipAuthenticationInfo.objectIdentifier
-                oidhumanreadable = chipAuthenticationInfo.protocolOIDString
-
-                try {
-                    logController.i("EMRTD") { "Chip Authentication starting" }
-                    val doEACCA = ps.doEACCA(
-                        keyid,
-                        oidasn1,
-                        oidhumanreadable,
-                        authenticationPublicKeyInfo.subjectPublicKey
-                    )
-                    eaccaResults.add(doEACCA)
-                    logController.i("EMRTD") { "Chip Authentication succeeded" }
-                } catch (_: CardServiceException) {
-                    /* NOTE: Failed? Too bad, try next public key. */
-                    logController.w(TAG) { "try next public key" }
-                }
-            } else {
-
-                keyid = authenticationPublicKeyInfo.keyId
-                oidasn1 = authenticationPublicKeyInfo.objectIdentifier
-
-                if (SecurityInfo.ID_PK_ECDH.equals(oidasn1)) {
-
-                    val oidmapECDH = mapOf<String, String>(
-                        SecurityInfo.ID_CA_ECDH_3DES_CBC_CBC to "id-CA-ECDH-3DES-CBC-CBC",
-                        SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_128 to "id-CA-ECDH-AES-CBC-CMAC-128",
-                        SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_192 to "id-CA-ECDH-AES-CBC-CMAC-192",
-                        SecurityInfo.ID_CA_ECDH_AES_CBC_CMAC_256 to "id-CA-ECDH-AES-CBC-CMAC-256"
-                    )
-
-                    for ((asn1, humanreadable) in oidmapECDH) {
-                        logController.d(TAG) { "trying human readable $humanreadable" }
-                        try {
-                            val doEACCA = ps.doEACCA(
-                                keyid,
-                                asn1,
-                                humanreadable,
-                                authenticationPublicKeyInfo.subjectPublicKey
-                            )
-                            eaccaResults.add(doEACCA)
-                            logController.d(TAG) { "Success" }
-                            break@outer
-                        } catch (cse: CardServiceException) {
-                            logController.e(TAG, cse) { "FAIL" }
-                        } catch (e: Exception) {
-                            logController.e(TAG, e) { "FAiL" }
-                        }
-                    }
-
-                    logController.e(TAG) { "all ECDH choices failed" }
-
-                } else if (SecurityInfo.ID_PK_DH.equals(oidasn1)) {
-
-                    val oidmapDH = mapOf<String, String>(
-                        SecurityInfo.ID_CA_DH_3DES_CBC_CBC to "id-CA-DH-3DES-CBC-CBC",
-                        SecurityInfo.ID_CA_DH_AES_CBC_CMAC_128 to "id-CA-DH-AES-CBC-CMAC-128",
-                        SecurityInfo.ID_CA_DH_AES_CBC_CMAC_192 to "id-CA-DH-AES-CBC-CMAC-192",
-                        SecurityInfo.ID_CA_DH_AES_CBC_CMAC_256 to "id-CA-DH-AES-CBC-CMAC-256"
-                    )
-
-                    for ((asn1, humanreadable) in oidmapDH) {
-                        logController.d(TAG) { "trying human readable $humanreadable" }
-
-                        try {
-                            val doEACCA = ps.doEACCA(
-                                keyid,
-                                asn1,
-                                humanreadable,
-                                authenticationPublicKeyInfo.subjectPublicKey
-                            )
-                            eaccaResults.add(doEACCA)
-                            logController.d(TAG) { "Success" }
-                            break@outer
-                        } catch (cse: CardServiceException) {
-                            logController.e(TAG, cse) { "FAIL" }
-                        } catch (e: Exception) {
-                            logController.e(TAG, e) { "FAiL" }
-                        }
-                    }
-
-                    logController.e(TAG) { "all DH choices failed" }
-
-                } else {
-                    if (logController.isDebugLogging()) {
-                        logController.d(TAG) { "UNKNOWN Security Info: $oidasn1" }
-                    } else {
-                        logController.e(TAG) { "UNKNOWN Security Info" }
-                    }
-                }
+        for (publicKeyInfo in securityInfoData.chipAuthenticationPublicKeyInfos) {
+            val result = processPublicKeyInfo(
+                ps,
+                publicKeyInfo,
+                securityInfoData.chipAuthenticationInfo
+            )
+            if (result != null) {
+                eaccaResults.add(result)
+                break
             }
         }
 

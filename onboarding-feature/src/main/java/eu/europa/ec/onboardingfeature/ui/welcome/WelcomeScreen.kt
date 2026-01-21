@@ -147,7 +147,7 @@ private fun WelcomePager(pagerState: PagerState, pages: List<SinglePageConfig>) 
             .fillMaxWidth()
             .wrapContentHeight()
             .defaultMinSize(minHeight = 250.dp),
-        pageContent = SinglePage(pages)
+        pageContent = singlePage(pages)
     )
 }
 
@@ -166,7 +166,7 @@ private fun handleNavigationEffect(
 data class SinglePageConfig(val title: Int, val description: Int, val icon: IconDataUi)
 
 @Composable
-private fun SinglePage(
+private fun singlePage(
     pages: List<SinglePageConfig>,
 ): @Composable (PagerScope.(page: Int) -> Unit) = { page ->
     Column(

@@ -134,7 +134,7 @@
     <string name="issuance_code_title">%1$s kræver verifikation</string>
     <string name="issuance_document_offer_deferred_success_description">Dine dokumenter fra %1$s er blevet anmodet. Du får besked, når de er blevet udstedt til din applikation.</string>
     <string name="issuance_document_offer_deferred_success_description_with_doc">Your document %s has been requested. You will be notified when it has been issued to your application.</string>
-    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %s has been requested from %s. You will be notified when it has been issued to your application.</string>
+    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %1$s has been requested from %2$s. You will be notified when it has been issued to your application.</string>
     <string name="issuance_document_offer_deferred_success_primary_button_text">OK</string>
     <string name="issuance_document_offer_deferred_success_text">I gang!</string>
     <string name="issuance_document_offer_description">Følgende transaktion kræver din tilladelse og godkendelse.</string>
@@ -275,7 +275,8 @@
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Er du sikker på, at du vil annullere ændringen af PIN?</string>
     <string name="quick_pin_bottom_sheet_cancel_title">Annuller PIN-ændring?</string>
     <string name="quick_pin_change_enter_new_subtitle">Vælg din nye PIN</string>
-    <string formatted="false" name="quick_pin_change_lockout_countdown_minutes">PIN-ændring blokeret. Prøv igen om %d:%02d</string>
+    <string name="quick_pin_change_help_text">Undgå venligst at bruge fortløbende tal eller fødselsdage, hvis det er muligt.</string>
+    <string name="quick_pin_change_lockout_countdown_minutes">PIN-ændring blokeret. Prøv igen om %d:%02d</string>
     <string name="quick_pin_change_lockout_countdown_seconds">PIN-ændring blokeret. Prøv igen om %d sekunder</string>
     <string name="quick_pin_change_reenter_new_subtitle">Indtast din nye PIN igen</string>
     <string name="quick_pin_change_success_btn">Okay</string>
@@ -293,7 +294,7 @@
     <string name="quick_pin_invalid_last_attempt">Ugyldig PIN-kode. Dette er dit sidste forsøg, inden du bliver låst ude.</string>
     <string name="quick_pin_invalid_with_attempts">Ugyldig PIN-kode. %d forsøg tilbage.</string>
     <string name="quick_pin_locked_out">For mange mislykkede forsøg. Vent venligst, før du prøver igen.</string>
-    <string formatted="false" name="quick_pin_lockout_countdown_minutes">Kontoen er låst. Prøv igen om %d:%02d</string>
+    <string name="quick_pin_lockout_countdown_minutes">Kontoen er låst. Prøv igen om %d:%02d</string>
     <string name="quick_pin_lockout_countdown_seconds">Kontoen er låst. Prøv igen om %d sekunder</string>
     <string name="quick_pin_next_button">Næste</string>
     <string name="quick_pin_non_match">PIN stemmer ikke overens</string>
@@ -301,6 +302,8 @@
     <string name="request_bottom_sheet_warning_subtitle">Hvis du vælger ikke at dele visse data, kan det resultere i manglende udstedelse af det anmodede dokument.</string>
     <string name="request_bottom_sheet_warning_title">Advarsel</string>
     <string name="request_collapsed_supporting_text">Legitimationsdetaljer</string>
+    <string name="request_data_info_notice">Hvorfor har vi brug for dine data?</string>
+    <string name="request_data_verified_entity_message">En afhængig part anses for at være betroet, når den opfylder foruddefinerede kriterier for sikkerhed, databeskyttelse, compliance og ansvarlig datahåndtering. Tillid styrkes gennem vurderinger, revisioner og certificeringer.</string>
     <string name="request_gender_female">Kvinde</string>
     <string name="request_gender_male">Mand</string>
     <string name="request_gender_not_applicable">Ikke relevant</string>
