@@ -96,11 +96,11 @@ fun WrapStepBar(currentStep: Int, steps: List<String>, modifier: Modifier = Modi
         }
     }
 
-    scrollToTheStartIndex(startIndex, coroutineScope, listState)
+    ScrollToTheStartIndex(startIndex, coroutineScope, listState)
 }
 
 @Composable
-private fun scrollToTheStartIndex(
+private fun ScrollToTheStartIndex(
     startIndex: Int,
     coroutineScope: CoroutineScope,
     listState: LazyListState
@@ -126,7 +126,7 @@ private fun calculateStartIndex(
 
     // only for the last two steps we calculate the start index in a fancy way
     // taking into account the screen and font size
-    var startIndex = calculateStartIndexForTrailingItems(currentStep, steps, textMeasurer)
+    val startIndex = calculateStartIndexForTrailingItems(currentStep, steps, textMeasurer)
 
     return startIndex
 }

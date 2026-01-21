@@ -59,9 +59,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 @Composable
 fun BiometricSetupScreen(navController: NavController, viewModel: BiometricSetupViewModel) {
     val state: State by viewModel.viewState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val title = stringResource(id = R.string.biometric_setup_title)
-    val appName = context.getString(R.string.landing_screen_title)
+    val appName = stringResource(R.string.landing_screen_title)
     val descriptionWithAppName = stringResource(
         id = R.string.biometric_setup_description,
         appName
@@ -86,7 +85,7 @@ fun BiometricSetupScreen(navController: NavController, viewModel: BiometricSetup
         )
     }
 
-    observeScreenResume(viewModel)
+    ObserveScreenResume(viewModel)
 }
 
 @Composable
@@ -120,7 +119,7 @@ private fun ActionButtons(
 }
 
 @Composable
-private fun observeScreenResume(viewModel: BiometricSetupViewModel) {
+private fun ObserveScreenResume(viewModel: BiometricSetupViewModel) {
     LifecycleEffect(
         lifecycleOwner = LocalLifecycleOwner.current,
         lifecycleEvent = Lifecycle.Event.ON_RESUME

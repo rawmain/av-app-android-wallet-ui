@@ -56,7 +56,6 @@ import eu.europa.ec.uilogic.component.preview.PreviewTheme
 import eu.europa.ec.uilogic.component.preview.ThemeModePreviews
 import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
 import eu.europa.ec.uilogic.component.utils.SIZE_MEDIUM
-import eu.europa.ec.uilogic.component.utils.SPACING_LARGE
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.utils.VSpacer
 import eu.europa.ec.uilogic.component.wrap.OtpTextField
@@ -397,9 +396,7 @@ private fun VerifyIdentity(
 
 @Composable
 private fun PinFieldLayout(
-    modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = SPACING_SMALL.dp, bottom = SPACING_LARGE.dp),
+    modifier: Modifier = Modifier,
     state: State,
     onPinInput: (String) -> Unit,
 ) {

@@ -16,7 +16,6 @@
 
 package eu.europa.ec.issuancefeature.ui.code
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -62,7 +61,6 @@ fun DocumentOfferCodeScreen(
     viewModel: DocumentOfferCodeViewModel
 ) {
     val state: State by viewModel.viewState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     ContentScreen(
         isLoading = state.isLoading,
@@ -72,7 +70,6 @@ fun DocumentOfferCodeScreen(
         onBack = { viewModel.setEvent(Event.Pop) },
     ) { paddingValues ->
         Content(
-            context = context,
             title = state.screenTitle,
             subTitle = state.screenSubtitle,
             pinCodeLength = state.offerCodeUiConfig.txCodeLength,
@@ -88,7 +85,6 @@ fun DocumentOfferCodeScreen(
 
 @Composable
 private fun Content(
-    context: Context,
     title: String,
     subTitle: String,
     pinCodeLength: Int,
@@ -130,6 +126,8 @@ private fun Content(
                 )
             )
         }
+
+        val context = LocalContext.current
 
         CodeFieldLayout(
             modifier = Modifier
@@ -204,7 +202,6 @@ private fun DocumentOfferCodeScreenEmptyPreview() {
             onEventSend = {},
             onNavigationRequested = {},
             paddingValues = PaddingValues(SPACING_MEDIUM.dp),
-            context = LocalContext.current
         )
     }
 }
