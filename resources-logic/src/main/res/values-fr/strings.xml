@@ -1,3 +1,18 @@
+<!--
+  ~ Copyright (c) 2025 European Commission
+  ~
+  ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
+  ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
+  ~ except in compliance with the Licence.
+  ~
+  ~ You may obtain a copy of the Licence at:
+  ~ https://joinup.ec.europa.eu/software/page/eupl
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software distributed under
+  ~ the Licence is distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF
+  ~ ANY KIND, either express or implied. See the Licence for the specific language
+  ~ governing permissions and limitations under the Licence.
+  -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="age_over_18">Âge supérieur à 18 ans</string>
     <string name="biometric_confirm_request">Confirm request</string>
@@ -254,13 +269,14 @@
     <string name="proximity_connectivity_caption">Show this QR code to access the necessary information for sharing</string>
     <string name="qr_scan_informative_text_issuance_flow">La lecture du code QR ne fonctionne pas ?\nVeuillez essayer une autre méthode</string>
     <string name="qr_scan_informative_text_presentation_flow">La lecture du code QR ne fonctionne pas ?\nVeuillez essayer une autre méthode</string>
-    <string name="qr_scan_permission_not_granted">Autorisation d\'accès à la caméra non donnée\\nOuvrir les paramètres de l\'application</string>
+    <string name="qr_scan_permission_not_granted">Autorisation d\'accès à la caméra non donnée\nOuvrir les paramètres de l\'application</string>
     <string name="quick_pin_bottom_sheet_cancel_primary_button_text">Oui, annuler</string>
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">Non</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Êtes-vous sûr de vouloir annuler le changement de code PIN ?</string>
     <string name="quick_pin_bottom_sheet_cancel_title">Annuler le changement de code PIN ?</string>
     <string name="quick_pin_change_enter_new_subtitle">Choisissez un nouveau code PIN</string>
-    <string formatted="false" name="quick_pin_change_lockout_countdown_minutes">Changement de code PIN bloqué. Réessayez dans %d:%02d</string>
+    <string name="quick_pin_change_help_text">Veuillez éviter, si possible, d\'utiliser des chiffres consécutifs ou des dates d\'anniversaire.</string>
+    <string name="quick_pin_change_lockout_countdown_minutes">Changement de code PIN bloqué. Réessayez dans %d:%02d</string>
     <string name="quick_pin_change_lockout_countdown_seconds">Changement de code PIN bloqué. Réessayez dans %d secondes</string>
     <string name="quick_pin_change_reenter_new_subtitle">Saisissez à nouveau le nouveau code PIN</string>
     <string name="quick_pin_change_success_btn">D\'accord</string>
@@ -278,7 +294,7 @@
     <string name="quick_pin_invalid_last_attempt">Code PIN invalide. C’est votre dernière tentative avant le verrouillage.</string>
     <string name="quick_pin_invalid_with_attempts">Code PIN invalide. Il vous reste %d tentative(s).</string>
     <string name="quick_pin_locked_out">Trop de tentatives échouées. Veuillez patienter avant de réessayer.</string>
-    <string formatted="false" name="quick_pin_lockout_countdown_minutes">Compte verrouillé. Réessayez dans %d:%02d</string>
+    <string name="quick_pin_lockout_countdown_minutes">Compte verrouillé. Réessayez dans %d:%02d</string>
     <string name="quick_pin_lockout_countdown_seconds">Compte verrouillé. Réessayez dans %d secondes</string>
     <string name="quick_pin_next_button">Suivant</string>
     <string name="quick_pin_non_match">Les codes PIN ne coïncident pas</string>
@@ -286,13 +302,15 @@
     <string name="request_bottom_sheet_warning_subtitle">La décision de ne pas communiquer certaines données peut entraîner la non-délivrance du document demandé.</string>
     <string name="request_bottom_sheet_warning_title">Avertissement</string>
     <string name="request_collapsed_supporting_text">Détails d\'identification</string>
+    <string name="request_data_info_notice">Pourquoi avons-nous besoin de vos données ?</string>
+    <string name="request_data_verified_entity_message">Une partie de confiance est considérée comme digne de confiance lorsqu&amp;#39;elle répond à des critères prédéfinis en matière de sécurité, de protection des données, de conformité et de gestion responsable des données. La confiance est renforcée par des évaluations, des audits et des certifications.</string>
     <string name="request_gender_female">Femme</string>
     <string name="request_gender_male">Homme</string>
     <string name="request_gender_not_applicable">Non applicable</string>
     <string name="request_gender_not_known">Inconnu</string>
     <string name="request_header_description">La transaction suivante nécessite votre autorisation et votre authentification.</string>
     <string name="request_header_main_text">DEMANDE DE PARTAGE DE DONNÉES</string>
-    <string name="request_no_data">Le document demandé n\'est pas disponible dans votre portefeuille de vérification d\'âge.\\n        Veuillez contacter l\'émetteur autorisé pour plus d\'informations.</string>
+    <string name="request_no_data">Le document demandé n\'est pas disponible dans votre portefeuille de vérification d\'âge.\n        Veuillez contacter l\'émetteur autorisé pour plus d\'informations.</string>
     <string name="request_relying_party_default_name">Service en ligne</string>
     <string name="request_relying_party_description">demande ce qui suit</string>
     <string name="request_sticky_button_text">Partager</string>

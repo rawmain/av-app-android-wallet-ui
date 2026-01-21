@@ -275,7 +275,8 @@
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Durch Abbrechen werden Sie zurück zur Startseite geleitet, ohne den Schnell-Pin zu ändern</string>
     <string name="quick_pin_bottom_sheet_cancel_title">Schnell-Pin-Änderung abbrechen?</string>
     <string name="quick_pin_change_enter_new_subtitle">Wiederholen Sie Ihre 6-stellige PIN</string>
-    <string formatted="false" name="quick_pin_change_lockout_countdown_minutes">PIN-Änderung blockiert. Versuchen Sie es in %d:%02d erneut</string>
+    <string name="quick_pin_change_help_text">Bitte vermeiden Sie nach Möglichkeit die Verwendung von aufeinanderfolgenden Zahlen oder Geburtstagen.</string>
+    <string name="quick_pin_change_lockout_countdown_minutes">PIN-Änderung blockiert. Versuchen Sie es in %d:%02d erneut</string>
     <string name="quick_pin_change_lockout_countdown_seconds">PIN-Änderung blockiert. Versuchen Sie es in %d Sekunden erneut</string>
     <string name="quick_pin_change_reenter_new_subtitle">Wiederholen Sie Ihre 6-stellige PIN</string>
     <string name="quick_pin_change_success_btn">ZURÜCK ZUR STARTSEITE</string>
@@ -293,7 +294,7 @@
     <string name="quick_pin_invalid_last_attempt">Ungültige PIN. Dies ist Ihr letzter Versuch vor der Sperrung.</string>
     <string name="quick_pin_invalid_with_attempts">Ungültige PIN. Noch %d Versuche übrig.</string>
     <string name="quick_pin_locked_out">Zu viele fehlgeschlagene Versuche. Bitte warten Sie, bevor Sie es erneut versuchen.</string>
-    <string formatted="false" name="quick_pin_lockout_countdown_minutes">Konto gesperrt. Versuchen Sie es in %d:%02d erneut</string>
+    <string name="quick_pin_lockout_countdown_minutes">Konto gesperrt. Versuchen Sie es in %d:%02d erneut</string>
     <string name="quick_pin_lockout_countdown_seconds">Konto gesperrt. Versuchen Sie es in %d Sekunden erneut</string>
     <string name="quick_pin_next_button">Weiter</string>
     <string name="quick_pin_non_match">PINs stimmen nicht überein</string>
@@ -301,6 +302,8 @@
     <string name="request_bottom_sheet_warning_subtitle">Wenn Sie bestimmte Daten nicht teilen, kann das angeforderte Dokument möglicherweise nicht ausgestellt werden.</string>
     <string name="request_bottom_sheet_warning_title">Warnung</string>
     <string name="request_collapsed_supporting_text">Anmeldeinformationen</string>
+    <string name="request_data_info_notice">Warum benötigen wir Ihre Daten?</string>
+    <string name="request_data_verified_entity_message">Eine vertrauende Partei gilt als vertrauenswürdig, wenn sie vordefinierte Kriterien für Sicherheit, Datenschutz, Compliance und verantwortlichen Datenumgang erfüllt. Das Vertrauen wird durch Bewertungen, Audits und Zertifizierungen gestärkt.</string>
     <string name="request_gender_female">Weiblich</string>
     <string name="request_gender_male">Männlich</string>
     <string name="request_gender_not_applicable">Nicht zutreffend</string>
