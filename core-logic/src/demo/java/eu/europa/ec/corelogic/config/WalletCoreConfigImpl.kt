@@ -22,6 +22,8 @@ import eu.europa.ec.eudi.wallet.EudiWalletConfig
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.ClientIdScheme
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.Format
+import eu.europa.ec.eudi.wallet.zkp.LongfellowCircuits
+import eu.europa.ec.eudi.wallet.zkp.LongfellowZkSystemRepository
 import eu.europa.ec.resourceslogic.R
 import kotlin.time.Duration.Companion.seconds
 
@@ -69,6 +71,12 @@ internal class WalletCoreConfigImpl(
                     configureDCAPI {
                         withEnabled(true)
                     }
+
+                    configureZkp(
+                        LongfellowZkSystemRepository(
+                            circuits = LongfellowCircuits.get(context)
+                        ).build()
+                    )
                 }
             }
             return _config!!
