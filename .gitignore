@@ -53,9 +53,15 @@ fastlane/report.xml
 # Kotlin
 .kotlin/*
 
-# extensions
-*.apk
-
 # Claude
 CLAUDE.md
 .claude/*
+
+# Maestro test outputs
+debug_*.txt
+*_output.txt
+verification_output.txt
+app/demo/
+.maestro/output/
+maestro-output/
+maestro_*.log

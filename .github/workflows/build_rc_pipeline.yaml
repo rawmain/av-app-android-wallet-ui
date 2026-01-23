@@ -73,3 +73,106 @@ jobs:
           name: demo-release-apk
           path: app/build/outputs/apk/demo/release/demo_release_*_RC.apk
           retention-days: 90
+
+  e2e-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Install Git LFS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-lfs
+          git lfs install
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Download DEMO release APK
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-release-apk
+          path: apk/
+
+      - name: Enable KVM group permissions
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Setup Android SDK
+        uses: amyu/setup-android@v4
+
+      - name: Install Maestro CLI
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Verify Maestro installation
+        run: |
+          export PATH="${HOME}/.maestro/bin:${PATH}"
+          maestro --version
+
+      - name: Run E2E Tests on Emulator (Sequential)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          ram-size: 4096M
+          heap-size: 512M
+          disk-size: 8192M
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: |
+            echo "Emulator started, waiting for boot to complete..."
+            adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
+            echo "Emulator boot completed"
+
+            # Install APK
+            echo "Installing RC APK..."
+            adb install -r apk/*.apk
+            echo "APK installed successfully"
+
+            export PATH="${HOME}/.maestro/bin:${PATH}"
+
+            # Run E2E test with TRUSTED issuer
+            echo "=========================================="
+            echo "Running E2E Test 1/2: Trusted Issuer Flow"
+            echo "=========================================="
+            maestro test .maestro/e2e_flow_trusted_issuer.yaml --format junit --output maestro-results-trusted.xml || echo "Trusted E2E test failed"
+
+            # Wait a bit between tests
+            sleep 5
+
+            # Run E2E test with UNTRUSTED issuer
+            echo "=========================================="
+            echo "Running E2E Test 2/2: Untrusted Issuer Flow"
+            echo "=========================================="
+            maestro test .maestro/e2e_flow_untrusted_issuer.yaml --format junit --output maestro-results-untrusted.xml || echo "Untrusted E2E test failed"
+
+            echo "=========================================="
+            echo "All E2E tests completed"
+            echo "=========================================="
+
+      - name: Upload Maestro Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: maestro-e2e-test-results
+          path: |
+            maestro-results-*.xml
+            ~/.maestro/tests/
+          retention-days: 30
+
+      - name: Publish E2E Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: maestro-results-*.xml
+          check_name: RC E2E Test Results
+          comment_mode: off
