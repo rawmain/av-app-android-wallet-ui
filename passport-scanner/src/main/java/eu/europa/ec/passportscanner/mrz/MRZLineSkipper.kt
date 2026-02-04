@@ -17,7 +17,6 @@
 package eu.europa.ec.passportscanner.mrz
 
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.passportscanner.parser.MrzParser
 import eu.europa.ec.passportscanner.parser.MrzRecord
 
 /**
@@ -25,7 +24,8 @@ import eu.europa.ec.passportscanner.parser.MrzRecord
  * This helps handle cases where OCR detects extra lines that aren't part of the actual MRZ.
  */
 class MRZLineSkipper(
-    val logController: LogController
+    val logController: LogController,
+    private val parseCallback: (String, LogController) -> MrzRecord
 ) {
 
     companion object {
@@ -159,7 +159,7 @@ class MRZLineSkipper(
         val mrzString = lines.joinToString("\n")
 
         return try {
-            val record = MrzParser.parse(mrzString, logController)
+            val record = parseCallback(mrzString, logController)
 
             // Check if the record has valid checksums
             if (record.validDateOfBirth &&

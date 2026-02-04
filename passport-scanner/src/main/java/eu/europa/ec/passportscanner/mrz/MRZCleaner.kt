@@ -19,6 +19,7 @@ package eu.europa.ec.passportscanner.mrz
 
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.SmartScannerActivity.Companion.TAG
+import eu.europa.ec.passportscanner.parser.MrzParser
 import eu.europa.ec.passportscanner.parser.MrzRecord
 import java.net.URLEncoder
 
@@ -119,7 +120,7 @@ object MRZCleaner {
     }
 
     fun parseAndClean(mrz: String, logController: LogController): MrzRecord? {
-        val lineSkipper = MRZLineSkipper(logController)
+        val lineSkipper = MRZLineSkipper(logController, MrzParser::parse)
         lineSkipper.tryParse(mrz)?.let { record ->
             record.givenNames = record.givenNames?.replaceNumberToChar()
             record.surname = record.surname.replaceNumberToChar()
