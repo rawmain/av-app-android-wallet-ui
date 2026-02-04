@@ -26,7 +26,29 @@ import java.net.URLEncoder
 
 object MRZCleaner {
 
-    fun clean(mrz: String, logController: LogController): String {
+    /**
+     * Cleans individual text block from OCR before block reconstruction.
+     * Applies character-level cleaning only, doesn't affect structure.
+     */
+    fun cleanBlockText(text: String): String {
+        return text
+            .replace(Regex("[ \\t\\r]+"), "") // Remove whitespace
+            .replace("«", "<")
+            .replace("<c<", "<<<")
+            .replace("<e<", "<<<")
+            .replace("<E<", "<<<")
+            .replace("<K<", "<<<")
+            .replace("<S<", "<<<")
+            .replace("<C<", "<<<")
+            .replace("<¢<", "<<<")
+            .replace("<(<", "<<<")
+            .replace("<{<", "<<<")
+            .replace("<[<", "<<<")
+            .replace(Regex("^P[KC]"), "P<")
+            .replace(Regex("[^A-Z0-9<]"), "") // Remove invalid chars (no newlines in blocks)
+    }
+
+    fun clean(mrz: String, logController: LogController, skipReconstruction: Boolean = false): String {
         if (mrz.isBlank()) {
             throw IllegalArgumentException("Empty MRZ string.")
         }
@@ -50,7 +72,10 @@ object MRZCleaner {
             .replace(Regex("[^A-Z0-9<\\n]"), "") // Remove any other char
             .trim()
 
-        result = reconstructTd3LinesIfNeeded(result, logController)
+        // Skip reconstruction if MRZBlockReconstructor already handled it
+        if (!skipReconstruction) {
+            result = reconstructTd3LinesIfNeeded(result, logController)
+        }
 
 
         if (result.contains("<") && (

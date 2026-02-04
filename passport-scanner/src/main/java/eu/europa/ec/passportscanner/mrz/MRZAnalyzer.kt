@@ -194,12 +194,17 @@ abstract class MRZAnalyzer(
                         val lines = blocks[i].lines
                         for (j in lines.indices) {
                             lines[j].boundingBox?.let { boundingBox ->
-                                textBlocks.add(
-                                    MRZBlockReconstructor.TextBlock(
-                                        text = lines[j].text,
-                                        boundingBox = boundingBox
+                                // Clean the block text before reconstruction
+                                val cleanedText = MRZCleaner.cleanBlockText(lines[j].text)
+
+                                if (cleanedText.isNotEmpty()) {
+                                    textBlocks.add(
+                                        MRZBlockReconstructor.TextBlock(
+                                            text = cleanedText,
+                                            boundingBox = boundingBox
+                                        )
                                     )
-                                )
+                                }
 
                                 // Add bounding box to debug view
                                 addBoundingBoxToView(
@@ -213,7 +218,7 @@ abstract class MRZAnalyzer(
                         }
                     }
 
-                    // Reconstruct MRZ from potentially split blocks
+                    // Reconstruct MRZ from potentially split blocks with cleaned text
                     val rawFullRead = MRZBlockReconstructor.reconstruct(textBlocks, logController)
 
                     try {
@@ -223,12 +228,13 @@ abstract class MRZAnalyzer(
 
                         val nlCount = encoded.count { it == '↩' }
                         logController.d("${SmartScannerActivity.TAG}/SmartScanner") {
-                            "Before cleaner: [${encoded}], with  NL = $nlCount"
+                            "After reconstruction: [${encoded}], with  NL = $nlCount"
                         }
 
-                        val cleanMRZ = MRZCleaner.clean(rawFullRead, logController)
+                        // Skip reconstruction in clean() since MRZBlockReconstructor already handled it
+                        val cleanMRZ = MRZCleaner.clean(rawFullRead, logController, skipReconstruction = true)
                         logController.d("${SmartScannerActivity.TAG}/SmartScanner") {
-                            "After cleaner = [${
+                            "After final cleanup = [${
                                 URLEncoder.encode(cleanMRZ, "UTF-8")
                                     .replace("%3C", "<").replace("%0A", "↩")
                             }]"
