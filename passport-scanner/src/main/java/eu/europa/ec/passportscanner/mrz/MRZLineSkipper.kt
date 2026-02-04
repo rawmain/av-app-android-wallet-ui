@@ -49,12 +49,12 @@ class MRZLineSkipper(
         }
 
         // Try window of 3 lines - TD1 format
-        logController.d(TAG) { "Trying windows of 3 lines" }
-        checkWindow(3, lines, null)?.let { return it }
+        logController.d(TAG) { "Trying windows of 3 lines (TD1 format)" }
+        checkWindow(3, lines, isPassportCheck = false)?.let { return it }
 
-        // Try window of 2 lines - TD3/Passport format - first line must start with 'P'
-        logController.d(TAG) { "Trying windows of 2 lines (must start with 'P')" }
-        checkWindow(2, lines, 'P')?.let { return it }
+        // Try window of 2 lines - TD3/Passport format
+        logController.d(TAG) { "Trying windows of 2 lines (TD3 passport format)" }
+        checkWindow(2, lines, isPassportCheck = true)?.let { return it }
 
 
         logController.d(TAG) { "No valid combination found" }
@@ -68,13 +68,13 @@ class MRZLineSkipper(
      *
      * @param numLines Number of lines in each window (2 or 3)
      * @param linesArray Array of all detected lines
-     * @param startChar Expected first character of the first line (null to skip check)
+     * @param isPassportCheck True for TD3 passport validation (first line starts with 'P', second ends with digit)
      * @return Valid MrzRecord if found, null otherwise
      */
     private fun checkWindow(
         numLines: Int,
         linesArray: List<String>,
-        startChar: Char?
+        isPassportCheck: Boolean
     ): MrzRecord? {
         if (numLines > linesArray.size) {
             return null
@@ -90,20 +90,14 @@ class MRZLineSkipper(
         for ((index, combo) in combinations.withIndex()) {
             val selectedLines = combo.map { linesArray[it] }
 
-            // Check if first line starts with expected character
-            if (startChar != null) {
-                val firstLine = selectedLines.firstOrNull()
-                if ( firstLine.isNullOrEmpty() || firstLine[0] != startChar) {
+            if (isPassportCheck) {
+                if (checkPassportRequirements(selectedLines)) {
                     logController.d(TAG) {
-                        "Skipping combination ${index + 1}/${combinations.size}: lines ${combo.map { it + 1 }} - " +
-                        "first line doesn't start with '$startChar' (starts with '${firstLine?.firstOrNull() ?: "empty"}')"
+                        "Skipping combination ${index + 1}/${combinations.size}: lines ${combo.map { it + 1 }} " +
+                                "not filling passport requirements')"
                     }
                     continue
                 }
-            }
-
-            logController.d(TAG) {
-                "Trying combination ${index + 1}/${combinations.size}: lines ${combo.map { it + 1 }}"
             }
 
             tryParseLines(selectedLines)?.let { record ->
@@ -115,6 +109,22 @@ class MRZLineSkipper(
         }
 
         return null
+    }
+
+    private fun checkPassportRequirements(selectedLines: List<String>): Boolean {
+        val firstLine = selectedLines.firstOrNull()
+        val secondLine = if (selectedLines.size >= 2) selectedLines[1] else null
+
+        // First line must start with 'P'
+        if (firstLine.isNullOrEmpty() || !firstLine.startsWith("P")) {
+            return true
+        }
+
+        // Second line must end with digit
+        if (secondLine.isNullOrEmpty() || !secondLine.last().isDigit()) {
+            return true
+        }
+        return false
     }
 
     /**
@@ -155,6 +165,18 @@ class MRZLineSkipper(
      */
     private fun tryParseLines(lines: List<String>): MrzRecord? {
         if (lines.isEmpty()) return null
+
+        // TD3 validation: For 2-line MRZ starting with 'P', second line must end with digit
+        if (lines.size == 2 && lines[0].startsWith("P")) {
+            val secondLine = lines[1]
+            if (secondLine.isEmpty() || !secondLine.last().isDigit()) {
+                logController.d(TAG) {
+                    "TD3 validation failed: Second line should end with digit, " +
+                    "but ends with '${secondLine.lastOrNull() ?: "empty"}'"
+                }
+                return null
+            }
+        }
 
         val mrzString = lines.joinToString("\n")
 

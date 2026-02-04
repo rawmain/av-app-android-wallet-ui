@@ -170,17 +170,38 @@ abstract class MRZAnalyzer(
             recognizer.process(image)
 
                 .addOnSuccessListener { visionText ->
-                    var rawFullRead = ""
                     val blocks = visionText.textBlocks
 
                     val bdParent = initializeBoundingBoxes()
 
+                    // Log text structure
+                    val structureLog = buildString {
+                        appendLine("MLKit Text Recognition Structure:")
+                        appendLine("Total blocks: ${blocks.size}")
+                        for (i in blocks.indices) {
+                            val lines = blocks[i].lines
+                            appendLine("Block ${i + 1} (${lines.size} lines):")
+                            for (j in lines.indices) {
+                                appendLine("  [Block${i + 1} Line${j + 1}] ${lines[j].text}")
+                            }
+                        }
+                    }
+                    logController.d("${SmartScannerActivity.TAG}/SmartScanner") { structureLog }
+
+                    // Collect text blocks with bounding boxes for reconstruction
+                    val textBlocks = mutableListOf<MRZBlockReconstructor.TextBlock>()
                     for (i in blocks.indices) {
                         val lines = blocks[i].lines
                         for (j in lines.indices) {
-                            rawFullRead += lines[j].text + "\n"
+                            lines[j].boundingBox?.let { boundingBox ->
+                                textBlocks.add(
+                                    MRZBlockReconstructor.TextBlock(
+                                        text = lines[j].text,
+                                        boundingBox = boundingBox
+                                    )
+                                )
 
-                            blocks[i].boundingBox?.let { boundingBox ->
+                                // Add bounding box to debug view
                                 addBoundingBoxToView(
                                     boundingBox,
                                     bdParent,
@@ -191,6 +212,9 @@ abstract class MRZAnalyzer(
                             }
                         }
                     }
+
+                    // Reconstruct MRZ from potentially split blocks
+                    val rawFullRead = MRZBlockReconstructor.reconstruct(textBlocks, logController)
 
                     try {
                         val encoded = URLEncoder.encode(rawFullRead, "UTF-8")
@@ -211,7 +235,7 @@ abstract class MRZAnalyzer(
                         }
                         processResult(result = cleanMRZ, bitmap = bf, rotation = rotation)
                     } catch (e: Exception) {
-                        logController.d("${SmartScannerActivity.TAG}/SmartScanner", e)
+                        logController.d("${SmartScannerActivity.TAG}/SmartScanner", {e.message.orEmpty()})
                     }
                     imageProxy.close()
                 }
