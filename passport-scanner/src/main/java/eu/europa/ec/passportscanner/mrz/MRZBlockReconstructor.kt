@@ -52,21 +52,12 @@ object MRZBlockReconstructor {
             return ""
         }
 
-        logController.d(TAG) { "Reconstructing from ${blocks.size} blocks" }
-
         // Group blocks into lines based on vertical position
         val lines = groupBlocksIntoLines(blocks, logController)
-
-        logController.d(TAG) { "Grouped into ${lines.size} lines" }
 
         // Check if any line starts with "P" to detect TD3 passport format
         val isTd3Passport = lines.any { lineBlocks ->
             lineBlocks.firstOrNull()?.text?.startsWith("P") == true
-        }
-
-        logController.d(TAG) {
-            if (isTd3Passport) "TD3 passport detected - all lines will be filled to $TD3_LINE_LENGTH chars"
-            else "Not TD3 format"
         }
 
         // Reconstruct each line
@@ -81,10 +72,8 @@ object MRZBlockReconstructor {
             val lastChar = secondLine.lastOrNull()
             if (lastChar == null || !lastChar.isDigit()) {
                 logController.w(TAG) {
-                    "TD3 validation warning: Second line should end with a digit, but ends with '${lastChar ?: "empty"}'"
+                    "TD3 validation warning: Second line should end with digit, ends with '${lastChar ?: "empty"}'"
                 }
-            } else {
-                logController.d(TAG) { "TD3 validation passed: Second line ends with digit '$lastChar'" }
             }
         }
 
@@ -119,10 +108,6 @@ object MRZBlockReconstructor {
         val avgBlockHeight = blocks.map { it.boundingBox.height() }.average()
         val threshold = (avgBlockHeight * 0.3).toInt()
 
-        logController.d(TAG) {
-            "Grouping threshold: $threshold pixels (30% of avg height ${avgBlockHeight.toInt()}px)"
-        }
-
         for ((block, centerY) in sortedBlocks) {
             if (abs(centerY - currentCenterY) <= threshold) {
                 // Same line
@@ -145,12 +130,6 @@ object MRZBlockReconstructor {
         // Sort blocks within each line by X position (left to right)
         lines.forEach { line ->
             line.sortBy { it.boundingBox.left }
-        }
-
-        // Log the grouping
-        lines.forEachIndexed { index, line ->
-            val blockTexts = line.map { "\"${it.text}\"" }.joinToString(", ")
-            logController.d(TAG) { "Line ${index + 1}: ${line.size} blocks [$blockTexts]" }
         }
 
         return lines
@@ -177,36 +156,21 @@ object MRZBlockReconstructor {
         if (lineBlocks.size == 1) {
             val text = lineBlocks.first().text
             if (isTd3Passport && text.length < TD3_LINE_LENGTH) {
-                val padded = text + MRZ_FILLER_CHAR.toString().repeat(TD3_LINE_LENGTH - text.length)
-                logController.d(TAG) { "Single block padded from ${text.length} to $TD3_LINE_LENGTH chars" }
-                return padded
+                return text + MRZ_FILLER_CHAR.toString().repeat(TD3_LINE_LENGTH - text.length)
             }
             return text
         }
 
         if (!isTd3Passport) {
             // Not TD3, just concatenate
-            logController.d(TAG) { "Not TD3 format, simple concatenation" }
             return lineBlocks.joinToString("") { it.text }
         }
-
-        logController.d(TAG) { "TD3 format, filling gaps with '$MRZ_FILLER_CHAR'" }
-
-        // Calculate total width of the line
-        val lineLeft = lineBlocks.minOf { it.boundingBox.left }
-        val lineRight = lineBlocks.maxOf { it.boundingBox.right }
-        val totalLineWidth = lineRight - lineLeft
 
         // Calculate current text length
         val currentTextLength = lineBlocks.sumOf { it.text.length }
 
-        logController.d(TAG) {
-            "Current length: $currentTextLength, target: $TD3_LINE_LENGTH, blocks: ${lineBlocks.size}"
-        }
-
         // If we already have 44+ characters, just concatenate
         if (currentTextLength >= TD3_LINE_LENGTH) {
-            logController.d(TAG) { "Already at target length, no filling needed" }
             return lineBlocks.joinToString("") { it.text }
         }
 
@@ -247,21 +211,16 @@ object MRZBlockReconstructor {
                 if (index < gaps) {
                     val fillersCount = fillersPerGap[index]
                     append(MRZ_FILLER_CHAR.toString().repeat(fillersCount))
-                    logController.d(TAG) {
-                        "Gap ${index + 1}: added $fillersCount fillers between \"${block.text}\" and \"${lineBlocks[index + 1].text}\""
-                    }
                 }
             }
         }
-
-        logController.d(TAG) { "Reconstructed line: \"$result\" (length: ${result.length})" }
 
         // For TD3 second line, verify it ends with a digit
         if (isSecondLine && result.isNotEmpty()) {
             val lastChar = result.last()
             if (!lastChar.isDigit()) {
                 logController.w(TAG) {
-                    "Warning: TD3 second line should end with digit but ends with '$lastChar'"
+                    "TD3 second line should end with digit but ends with '$lastChar'"
                 }
             }
         }

@@ -127,7 +127,6 @@ object MRZCleaner {
 
         val allChars = lines.joinToString("")
         return if (allChars.length >= 88) {
-            logController.d(TAG) { "fixing lines ${lines.size} for TD3" }
             allChars.take(44) + "\n" + allChars.substring(44, 88)
         } else {
             mrzText

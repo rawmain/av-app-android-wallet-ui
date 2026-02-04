@@ -122,7 +122,6 @@ abstract class MRZAnalyzer(
             val rectGuide = activity.findViewById<ImageView>(R.id.scanner_overlay)
             val viewFinder = activity.findViewById<View>(R.id.view_finder)
             var inputBitmap: Bitmap
-            var inputRot: Int
             var rotatedBF = BitmapUtils.rotateImage(bf, rotation)
 
             // try to cropped forcefully
@@ -160,7 +159,7 @@ abstract class MRZAnalyzer(
                 mrzCropWidth.toInt(),
                 mrzCropHeight.toInt()
             )
-            inputRot = 0
+            var inputRot: Int = 0
 
             // Pass image to an ML Kit Vision API
             logController.d("${SmartScannerActivity.TAG}/SmartScanner") { "MRZ MLKit: start" }
@@ -222,23 +221,8 @@ abstract class MRZAnalyzer(
                     val rawFullRead = MRZBlockReconstructor.reconstruct(textBlocks, logController)
 
                     try {
-                        val encoded = URLEncoder.encode(rawFullRead, "UTF-8")
-                            .replace("%3C", "<")
-                            .replace("%0A", "↩")
-
-                        val nlCount = encoded.count { it == '↩' }
-                        logController.d("${SmartScannerActivity.TAG}/SmartScanner") {
-                            "After reconstruction: [${encoded}], with  NL = $nlCount"
-                        }
-
                         // Skip reconstruction in clean() since MRZBlockReconstructor already handled it
                         val cleanMRZ = MRZCleaner.clean(rawFullRead, logController, skipReconstruction = true)
-                        logController.d("${SmartScannerActivity.TAG}/SmartScanner") {
-                            "After final cleanup = [${
-                                URLEncoder.encode(cleanMRZ, "UTF-8")
-                                    .replace("%3C", "<").replace("%0A", "↩")
-                            }]"
-                        }
                         processResult(result = cleanMRZ, bitmap = bf, rotation = rotation)
                     } catch (e: Exception) {
                         logController.d("${SmartScannerActivity.TAG}/SmartScanner", {e.message.orEmpty()})

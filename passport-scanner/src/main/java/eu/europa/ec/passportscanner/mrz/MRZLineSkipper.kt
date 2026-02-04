@@ -42,22 +42,16 @@ class MRZLineSkipper(
     fun tryParse(cleanedMrz: String): MrzRecord? {
         val lines = cleanedMrz.split('\n').filter { it.isNotEmpty() }
 
-        logController.d(TAG) { "Processing ${lines.size} lines" }
-
         if (lines.size < 3) {
             return tryParseLines(lines)
         }
 
         // Try window of 3 lines - TD1 format
-        logController.d(TAG) { "Trying windows of 3 lines (TD1 format)" }
         checkWindow(3, lines, isPassportCheck = false)?.let { return it }
 
         // Try window of 2 lines - TD3/Passport format
-        logController.d(TAG) { "Trying windows of 2 lines (TD3 passport format)" }
         checkWindow(2, lines, isPassportCheck = true)?.let { return it }
 
-
-        logController.d(TAG) { "No valid combination found" }
         return null
     }
 
@@ -83,27 +77,16 @@ class MRZLineSkipper(
         // Generate all combinations of indices
         val combinations = generateCombinations(linesArray.size, numLines)
 
-        logController.d(TAG) {
-            "Checking ${combinations.size} combinations of $numLines lines from ${linesArray.size} total"
-        }
-
         for ((index, combo) in combinations.withIndex()) {
             val selectedLines = combo.map { linesArray[it] }
 
             if (isPassportCheck) {
                 if (checkPassportRequirements(selectedLines)) {
-                    logController.d(TAG) {
-                        "Skipping combination ${index + 1}/${combinations.size}: lines ${combo.map { it + 1 }} " +
-                                "not filling passport requirements')"
-                    }
                     continue
                 }
             }
 
             tryParseLines(selectedLines)?.let { record ->
-                logController.d(TAG) {
-                    "SUCCESS! Valid MRZ found with lines ${combo.map { it + 1 }}"
-                }
                 return record
             }
         }
@@ -170,10 +153,6 @@ class MRZLineSkipper(
         if (lines.size == 2 && lines[0].startsWith("P")) {
             val secondLine = lines[1]
             if (secondLine.isEmpty() || !secondLine.last().isDigit()) {
-                logController.d(TAG) {
-                    "TD3 validation failed: Second line should end with digit, " +
-                    "but ends with '${secondLine.lastOrNull() ?: "empty"}'"
-                }
                 return null
             }
         }
@@ -190,13 +169,6 @@ class MRZLineSkipper(
                 record.validComposite) {
                 record
             } else {
-                logController.d(TAG) {
-                    "Parse succeeded but checksums invalid: " +
-                    "DOB=${record.validDateOfBirth}, " +
-                    "DocNum=${record.validDocumentNumber}, " +
-                    "Exp=${record.validExpirationDate}, " +
-                    "Composite=${record.validComposite}"
-                }
                 null
             }
         } catch (e: Exception) {
