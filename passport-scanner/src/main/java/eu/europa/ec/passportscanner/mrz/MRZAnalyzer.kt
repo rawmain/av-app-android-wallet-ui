@@ -38,7 +38,6 @@ import eu.europa.ec.passportscanner.utils.draw.BoundingBoxDraw
 import eu.europa.ec.passportscanner.utils.extension.setBrightness
 import eu.europa.ec.passportscanner.utils.extension.setContrast
 import eu.europa.ec.passportscanner.utils.extension.toPx
-import java.net.URLEncoder
 
 abstract class MRZAnalyzer(
     override val activity: Activity,
@@ -188,7 +187,7 @@ abstract class MRZAnalyzer(
                     logController.d("${SmartScannerActivity.TAG}/SmartScanner") { structureLog }
 
                     // Collect text blocks with bounding boxes for reconstruction
-                    val textBlocks = mutableListOf<MRZBlockReconstructor.TextBlock>()
+                    val textBlocks = mutableListOf<MRZLineReconstructor.TextBlock>()
                     for (i in blocks.indices) {
                         val lines = blocks[i].lines
                         for (j in lines.indices) {
@@ -198,7 +197,7 @@ abstract class MRZAnalyzer(
 
                                 if (cleanedText.isNotEmpty()) {
                                     textBlocks.add(
-                                        MRZBlockReconstructor.TextBlock(
+                                        MRZLineReconstructor.TextBlock(
                                             text = cleanedText,
                                             boundingBox = boundingBox
                                         )
@@ -218,7 +217,7 @@ abstract class MRZAnalyzer(
                     }
 
                     // Reconstruct MRZ from potentially split blocks with cleaned text
-                    val rawFullRead = MRZBlockReconstructor.reconstruct(textBlocks, logController)
+                    val rawFullRead = MRZLineReconstructor.reconstruct(textBlocks)
 
                     try {
                         // Skip reconstruction in clean() since MRZBlockReconstructor already handled it
