@@ -172,20 +172,6 @@ abstract class MRZAnalyzer(
 
                     val bdParent = initializeBoundingBoxes()
 
-                    // Log text structure
-                    val structureLog = buildString {
-                        appendLine("MLKit Text Recognition Structure:")
-                        appendLine("Total blocks: ${blocks.size}")
-                        for (i in blocks.indices) {
-                            val lines = blocks[i].lines
-                            appendLine("Block ${i + 1} (${lines.size} lines):")
-                            for (j in lines.indices) {
-                                appendLine("  [Block${i + 1} Line${j + 1}] ${lines[j].text}")
-                            }
-                        }
-                    }
-                    logController.d("${SmartScannerActivity.TAG}/SmartScanner") { structureLog }
-
                     // Collect text blocks with bounding boxes for reconstruction
                     val textBlocks = mutableListOf<MRZLineReconstructor.TextBlock>()
                     for (i in blocks.indices) {
@@ -216,11 +202,9 @@ abstract class MRZAnalyzer(
                         }
                     }
 
-                    // Reconstruct MRZ from potentially split blocks with cleaned text
                     val rawFullRead = MRZLineReconstructor.reconstruct(textBlocks)
 
                     try {
-                        // Skip reconstruction in clean() since MRZBlockReconstructor already handled it
                         val cleanMRZ = MRZCleaner.clean(rawFullRead, logController, skipReconstruction = true)
                         processResult(result = cleanMRZ, bitmap = bf, rotation = rotation)
                     } catch (e: Exception) {
