@@ -81,7 +81,7 @@ class MRZLineSkipper(
             val selectedLines = combo.map { linesArray[it] }
 
             if (isPassportCheck) {
-                if (checkPassportRequirements(selectedLines)) {
+                if (!checkPassportRequirements(selectedLines)) {
                     continue
                 }
             }
@@ -96,18 +96,18 @@ class MRZLineSkipper(
 
     private fun checkPassportRequirements(selectedLines: List<String>): Boolean {
         val firstLine = selectedLines.firstOrNull()
-        val secondLine = if (selectedLines.size >= 2) selectedLines[1] else null
 
         // First line must start with 'P'
         if (firstLine.isNullOrEmpty() || !firstLine.startsWith("P")) {
-            return true
+            return false
         }
 
+        val secondLine = if (selectedLines.size >= 2) selectedLines[1] else null
         // Second line must end with digit
         if (secondLine.isNullOrEmpty() || !secondLine.last().isDigit()) {
-            return true
+            return false
         }
-        return false
+        return true
     }
 
     /**
