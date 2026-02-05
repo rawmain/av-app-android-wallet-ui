@@ -149,14 +149,6 @@ class MRZLineSkipper(
     private fun tryParseLines(lines: List<String>): MrzRecord? {
         if (lines.isEmpty()) return null
 
-        // TD3 validation: For 2-line MRZ starting with 'P', second line must end with digit
-        if (lines.size == 2 && lines[0].startsWith("P")) {
-            val secondLine = lines[1]
-            if (secondLine.isEmpty() || !secondLine.last().isDigit()) {
-                return null
-            }
-        }
-
         val mrzString = lines.joinToString("\n")
 
         return try {
