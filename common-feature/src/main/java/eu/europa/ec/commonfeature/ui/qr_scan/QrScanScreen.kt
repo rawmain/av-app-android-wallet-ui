@@ -78,7 +78,9 @@ import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
 import eu.europa.ec.uilogic.component.utils.screenWidthInDp
 import eu.europa.ec.uilogic.component.wrap.WrapCard
 import eu.europa.ec.uilogic.component.wrap.WrapIcon
+import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.uilogic.extension.openAppSettings
+import eu.europa.ec.uilogic.extension.openUrl
 import eu.europa.ec.uilogic.extension.paddingFrom
 import eu.europa.ec.uilogic.extension.throttledClickable
 import eu.europa.ec.uilogic.navigation.CommonScreens
@@ -133,6 +135,12 @@ private fun handleNavigationEffect(
         }
 
         is Effect.Navigation.GoToAppSettings -> context.openAppSettings()
+
+        is Effect.Navigation.OpenExternalUrl -> {
+            context.openUrl(navigationEffect.url.toUri())
+            // Return to previous screen since the URL will be handled externally
+            navController.popBackStack()
+        }
     }
 }
 
