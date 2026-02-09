@@ -68,6 +68,7 @@
     <string name="content_description_message_icon">Besked</string>
     <string name="content_description_more_vert_icon">Flere emner</string>
     <string name="content_description_national_eid_icon">Nationalt eID</string>
+    <string name="content_description_no_connection_icon">Ingen internetforbindelse</string>
     <string name="content_description_open_new_icon">Åbn nyt</string>
     <string name="content_description_over_18_icon">Over 18</string>
     <string name="content_description_present_document_same_device_icon">Fremvis dokument ved personligt fremmøde</string>
@@ -113,6 +114,7 @@
     <string name="generic_error_description">Hvis problemet fortsætter, bedes du kontakte kundesupport</string>
     <string name="generic_error_message">Ups! Noget gik galt</string>
     <string name="generic_error_retry">Prøv igen</string>
+    <string name="generic_network_error_description">Opret forbindelse til Wi-Fi eller mobildata, og prøv igen.</string>
     <string name="generic_network_error_message">Du er ikke forbundet til internettet</string>
     <string name="generic_no">Ingen</string>
     <string name="generic_ok">OK</string>

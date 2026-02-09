@@ -68,6 +68,7 @@
     <string name="content_description_message_icon">Nachricht</string>
     <string name="content_description_more_vert_icon">Weitere Elemente</string>
     <string name="content_description_national_eid_icon">Nationale eID</string>
+    <string name="content_description_no_connection_icon">Keine Internetverbindung</string>
     <string name="content_description_open_new_icon">Neu öffnen</string>
     <string name="content_description_over_18_icon">Über 18</string>
     <string name="content_description_present_document_same_device_icon">Dokument persönlich vorlegen</string>
@@ -113,6 +114,7 @@
     <string name="generic_error_description">Wenn das Problem weiterhin besteht, wenden Sie sich bitte an den Kundendienst.</string>
     <string name="generic_error_message">Ups! Ein Fehler ist aufgetreten.</string>
     <string name="generic_error_retry">Bitte versuchen Sie es erneut.</string>
+    <string name="generic_network_error_description">Bitte verbinden Sie sich mit WLAN oder mobilem Internet und versuchen Sie es erneut.</string>
     <string name="generic_network_error_message">Sie sind nicht mit dem Internet verbunden.</string>
     <string name="generic_no">NEIN</string>
     <string name="generic_ok">OK</string>

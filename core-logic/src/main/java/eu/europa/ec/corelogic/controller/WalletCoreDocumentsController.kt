@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.extension.documentIdentifier
 import eu.europa.ec.corelogic.extension.getLocalizedDisplayName
@@ -74,7 +75,10 @@ sealed class IssueDocumentPartialState {
     data class DeferredSuccess(val deferredDocuments: Map<String, String>) :
         IssueDocumentPartialState()
 
-    data class Failure(val errorMessage: String) : IssueDocumentPartialState()
+    data class Failure(
+        val errorMessage: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : IssueDocumentPartialState()
     data class UserAuthRequired(
         val crypto: BiometricCrypto,
         val resultHandler: DeviceAuthenticationResult,
@@ -91,7 +95,10 @@ sealed class IssueDocumentsPartialState {
         val nonIssuedDocuments: Map<String, String>,
     ) : IssueDocumentsPartialState()
 
-    data class Failure(val errorMessage: String) : IssueDocumentsPartialState()
+    data class Failure(
+        val errorMessage: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : IssueDocumentsPartialState()
     data class UserAuthRequired(
         val crypto: BiometricCrypto,
         val resultHandler: DeviceAuthenticationResult,
@@ -117,7 +124,10 @@ sealed class FetchScopedDocumentsPartialState {
     data class Success(val documents: List<ScopedDocumentDomain>) :
         FetchScopedDocumentsPartialState()
 
-    data class Failure(val errorMessage: String) : FetchScopedDocumentsPartialState()
+    data class Failure(
+        val errorMessage: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : FetchScopedDocumentsPartialState()
 }
 
 sealed class IssueDeferredDocumentPartialState {

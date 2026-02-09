@@ -68,6 +68,7 @@
     <string name="content_description_message_icon">Message</string>
     <string name="content_description_more_vert_icon">More Items</string>
     <string name="content_description_national_eid_icon">National eID</string>
+    <string name="content_description_no_connection_icon">No internet connection</string>
     <string name="content_description_open_new_icon">Open new</string>
     <string name="content_description_over_18_icon">Over 18</string>
     <string name="content_description_present_document_same_device_icon">Present document in person</string>
@@ -113,6 +114,7 @@
     <string name="generic_error_description">If the issue persists, please contact customer support</string>
     <string name="generic_error_message">Oups! Something went wrong</string>
     <string name="generic_error_retry">Please try again</string>
+    <string name="generic_network_error_description">Please connect to Wi-Fi or mobile data and try again.</string>
     <string name="generic_network_error_message">You are not connected to the internet</string>
     <string name="generic_no">No</string>
     <string name="generic_ok">OK</string>

@@ -68,6 +68,7 @@
     <string name="content_description_message_icon">Message</string>
     <string name="content_description_more_vert_icon">Plus d\'articles</string>
     <string name="content_description_national_eid_icon">eID national</string>
+    <string name="content_description_no_connection_icon">Pas de connexion Internet</string>
     <string name="content_description_open_new_icon">Ouvrir nouveau</string>
     <string name="content_description_over_18_icon">Plus de 18 ans</string>
     <string name="content_description_present_document_same_device_icon">Présenter le document en personne</string>
@@ -113,6 +114,7 @@
     <string name="generic_error_description">Si le problème persiste, veuillez contacter l\'assistance client</string>
     <string name="generic_error_message">OUPS! Un défaut s\'est produit.</string>
     <string name="generic_error_retry">Veuillez réessayer</string>
+    <string name="generic_network_error_description">Veuillez vous connecter au Wi-Fi ou aux données mobiles et réessayer.</string>
     <string name="generic_network_error_message">Vous n\'êtes pas connecté à Internet</string>
     <string name="generic_no">Non</string>
     <string name="generic_ok">OK</string>
