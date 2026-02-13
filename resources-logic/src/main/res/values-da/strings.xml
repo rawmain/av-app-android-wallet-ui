@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2026 European Commission
+  ~ Copyright (c) 2025 European Commission
   ~
   ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
   ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -249,7 +249,7 @@
     <string name="passport_live_video_step_second">Følg instruktionerne på skærmen (f.eks. blink eller drej dit hoved).</string>
     <string name="passport_live_video_step_third">Undgå filtre, masker eller forhindringer.</string>
     <string name="passport_scan_intro_back_button">Tilbage</string>
-    <string name="passport_scan_intro_data_download_notice">Verifikation kræver yderligere data. Når du trykker på Start, downloades ca. 250MB til ansigtsmatching.</string>
+    <string name="passport_scan_intro_data_download_notice">Bekræftelse kræver yderligere data. Når du trykker på Download, downloades cirka 250 MB aktiver til ansigtsmatchning.</string>
     <string name="passport_scan_intro_description">Pas / ID-kort metoden er hurtig og sikker! Tag et billede af dit pas / ID-kort, scan dit pas / ID-kort og optag en video af dig selv—tre trin for sikker onboarding.</string>
     <string name="passport_scan_intro_download_button">Download</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
