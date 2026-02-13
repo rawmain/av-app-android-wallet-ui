@@ -18,6 +18,8 @@ package eu.europa.ec.presentationfeature.interactor
 
 import android.content.Context
 import eu.europa.ec.businesslogic.extension.safeAsync
+import eu.europa.ec.businesslogic.extension.toErrorType
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
@@ -45,7 +47,10 @@ sealed class PresentationRequestInteractorPartialState {
         val verifierIsTrusted: Boolean,
     ) : PresentationRequestInteractorPartialState()
 
-    data class Failure(val error: String) : PresentationRequestInteractorPartialState()
+    data class Failure(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : PresentationRequestInteractorPartialState()
     data object Disconnect : PresentationRequestInteractorPartialState()
 }
 
@@ -126,7 +131,10 @@ class PresentationRequestInteractorImpl(
                 }
 
                 is TransferEventPartialState.Error -> {
-                    PresentationRequestInteractorPartialState.Failure(error = response.error)
+                    PresentationRequestInteractorPartialState.Failure(
+                        error = response.error,
+                        errorType = response.errorType,
+                    )
                 }
 
                 is TransferEventPartialState.Disconnected -> {
@@ -137,7 +145,8 @@ class PresentationRequestInteractorImpl(
             }
         }.safeAsync {
             PresentationRequestInteractorPartialState.Failure(
-                error = it.localizedMessage ?: genericErrorMsg
+                error = it.localizedMessage ?: genericErrorMsg,
+                errorType = it.toErrorType(),
             )
         }
 

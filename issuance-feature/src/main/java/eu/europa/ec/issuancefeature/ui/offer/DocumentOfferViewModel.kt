@@ -40,6 +40,7 @@ import eu.europa.ec.uilogic.component.ListItemDataUi
 import eu.europa.ec.uilogic.component.RelyingPartyDataUi
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
+import eu.europa.ec.uilogic.extension.createErrorConfigFromMessage
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.mvi.MviViewModel
@@ -217,12 +218,20 @@ class DocumentOfferViewModel(
                             copy(
                                 isLoading = false,
                                 isInitialised = false,
-                                error = ContentErrorConfig(
-                                    errorSubTitle = response.errorMessage,
+                                error = createErrorConfigFromMessage(
+                                    errorMessage = response.errorMessage,
+                                    resourceProvider = resourceProvider,
+                                    errorType = response.errorType,
+                                    onRetry = {
+                                        resolveDocumentOffer(
+                                            offerUri = offerUri,
+                                            deepLink = deepLink,
+                                        )
+                                    },
                                     onCancel = {
                                         setEvent(Event.DismissError)
                                         doNavigation(viewState.value.offerUiConfig.onCancelNavigation)
-                                    }
+                                    },
                                 )
                             )
                         }
@@ -331,9 +340,20 @@ class DocumentOfferViewModel(
                         setState {
                             copy(
                                 isLoading = false,
-                                error = ContentErrorConfig(
-                                    errorSubTitle = response.errorMessage,
-                                    onCancel = { setEvent(Event.DismissError) }
+                                error = createErrorConfigFromMessage(
+                                    errorMessage = response.errorMessage,
+                                    resourceProvider = resourceProvider,
+                                    errorType = response.errorType,
+                                    onRetry = {
+                                        issueDocuments(
+                                            context = context,
+                                            offerUri = offerUri,
+                                            issuerName = issuerName,
+                                            onSuccessNavigation = onSuccessNavigation,
+                                            txCodeLength = null,
+                                        )
+                                    },
+                                    onCancel = { setEvent(Event.DismissError) },
                                 )
                             )
                         }

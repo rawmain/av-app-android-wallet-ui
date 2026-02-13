@@ -31,6 +31,7 @@ import eu.europa.ec.onboardingfeature.util.mockedScopedDocuments
 import eu.europa.ec.onboardingfeature.util.mockedSuccessContentDescription
 import eu.europa.ec.onboardingfeature.util.mockedSuccessDescription
 import eu.europa.ec.onboardingfeature.util.mockedSuccessText
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.testfeature.util.mockedDefaultLocale
@@ -239,6 +240,67 @@ class TestEnrollmentInteractor {
                 // Then
                 assertEquals(
                     EnrollmentInteractorPartialState.UserAuthRequired(crypto, resultHandler),
+                    awaitItem()
+                )
+            }
+        }
+    }
+
+    // Case 6: NO_CONNECTION errorType propagation from getScopedDocuments failure
+    @Test
+    fun `Given getScopedDocuments fails with NO_CONNECTION, When issueNationalEID is called, Then Failure with NO_CONNECTION errorType is returned`() {
+        coroutineRule.runTest {
+            // Given
+            whenever(walletCoreDocumentsController.getScopedDocuments(any())).thenReturn(
+                FetchScopedDocumentsPartialState.Failure(
+                    errorMessage = mockedPlainFailureMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                )
+            )
+
+            // When
+            interactor.issueNationalEID(context).runFlowTest {
+                // Then
+                assertEquals(
+                    EnrollmentInteractorPartialState.Failure(
+                        error = mockedPlainFailureMessage,
+                        errorType = ErrorType.NO_CONNECTION,
+                    ),
+                    awaitItem()
+                )
+            }
+        }
+    }
+
+    // Case 7: NO_CONNECTION errorType propagation from issueDocument failure
+    @Test
+    fun `Given issueDocument fails with NO_CONNECTION, When issueNationalEID is called, Then Failure with NO_CONNECTION errorType is returned`() {
+        coroutineRule.runTest {
+            // Given
+            whenever(walletCoreDocumentsController.getScopedDocuments(any())).thenReturn(
+                FetchScopedDocumentsPartialState.Success(mockedScopedDocuments)
+            )
+            whenever(
+                walletCoreDocumentsController.issueDocument(
+                    issuanceMethod = eq(IssuanceMethod.OPENID4VCI),
+                    configId = any(),
+                    issuerId = any()
+                )
+            ).thenReturn(
+                IssueDocumentPartialState.Failure(
+                    errorMessage = mockedPlainFailureMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                ).toFlow()
+            )
+
+            // When
+            interactor.issueNationalEID(context).runFlowTest {
+                // Then
+                assertEquals(
+                    EnrollmentInteractorPartialState.Failure(
+                        error = mockedPlainFailureMessage,
+                        errorType = ErrorType.NO_CONNECTION,
+                    ),
                     awaitItem()
                 )
             }

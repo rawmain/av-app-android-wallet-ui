@@ -299,7 +299,8 @@ class PassportScanningDocumentsControllerImpl(
                 is IssueEvent.Failure -> {
                     trySendBlocking(
                         IssueDocumentsPartialState.Failure(
-                            errorMessage = documentErrorMessage
+                            errorMessage = documentErrorMessage,
+                            errorType = event.cause.toErrorType(),
                         )
                     )
                 }

@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
+import eu.europa.ec.businesslogic.extension.toErrorType
 import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.extension.documentIdentifier
@@ -117,7 +118,10 @@ sealed class DeleteAllDocumentsPartialState {
 
 sealed class ResolveDocumentOfferPartialState {
     data class Success(val offer: Offer) : ResolveDocumentOfferPartialState()
-    data class Failure(val errorMessage: String) : ResolveDocumentOfferPartialState()
+    data class Failure(
+        val errorMessage: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : ResolveDocumentOfferPartialState()
 }
 
 sealed class FetchScopedDocumentsPartialState {
@@ -142,6 +146,7 @@ sealed class IssueDeferredDocumentPartialState {
     data class Failed(
         val documentId: DocumentId,
         val errorMessage: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
     ) : IssueDeferredDocumentPartialState()
 
     data class Expired(
@@ -290,7 +295,8 @@ class WalletCoreDocumentsControllerImpl(
             }
         }.getOrElse {
             FetchScopedDocumentsPartialState.Failure(
-                errorMessage = it.localizedMessage ?: genericErrorMessage
+                errorMessage = it.localizedMessage ?: genericErrorMessage,
+                errorType = it.toErrorType(),
             )
         }
     }
@@ -366,7 +372,10 @@ class WalletCoreDocumentsControllerImpl(
             }
         }
     }.safeAsync {
-        IssueDocumentPartialState.Failure(errorMessage = documentErrorMessage)
+        IssueDocumentPartialState.Failure(
+            errorMessage = documentErrorMessage,
+            errorType = it.toErrorType(),
+        )
     }
 
     override fun issueDocumentsByOffer(
@@ -393,7 +402,8 @@ class WalletCoreDocumentsControllerImpl(
             awaitClose()
         }.safeAsync {
             IssueDocumentsPartialState.Failure(
-                errorMessage = documentErrorMessage
+                errorMessage = documentErrorMessage,
+                errorType = it.toErrorType(),
             )
         }
 
@@ -528,7 +538,8 @@ class WalletCoreDocumentsControllerImpl(
                     is OfferResult.Failure -> {
                         trySendBlocking(
                             ResolveDocumentOfferPartialState.Failure(
-                                result.cause.localizedMessage ?: genericErrorMessage
+                                errorMessage = result.cause.localizedMessage ?: genericErrorMessage,
+                                errorType = result.cause.toErrorType(),
                             )
                         )
                     }
@@ -545,7 +556,8 @@ class WalletCoreDocumentsControllerImpl(
             awaitClose()
         }.safeAsync {
             ResolveDocumentOfferPartialState.Failure(
-                errorMessage = it.localizedMessage ?: genericErrorMessage
+                errorMessage = it.localizedMessage ?: genericErrorMessage,
+                errorType = it.toErrorType(),
             )
         }
 
@@ -569,7 +581,8 @@ class WalletCoreDocumentsControllerImpl(
                                     IssueDeferredDocumentPartialState.Failed(
                                         documentId = deferredIssuanceResult.documentId,
                                         errorMessage = deferredIssuanceResult.cause.localizedMessage
-                                            ?: documentErrorMessage
+                                            ?: documentErrorMessage,
+                                        errorType = deferredIssuanceResult.cause.toErrorType(),
                                     )
                                 )
                             }
@@ -619,7 +632,8 @@ class WalletCoreDocumentsControllerImpl(
         }.safeAsync {
             IssueDeferredDocumentPartialState.Failed(
                 documentId = docId,
-                errorMessage = it.localizedMessage ?: genericErrorMessage
+                errorMessage = it.localizedMessage ?: genericErrorMessage,
+                errorType = it.toErrorType(),
             )
         }
 
@@ -679,7 +693,8 @@ class WalletCoreDocumentsControllerImpl(
 
         }.safeAsync {
             IssueDocumentsPartialState.Failure(
-                errorMessage = documentErrorMessage
+                errorMessage = documentErrorMessage,
+                errorType = it.toErrorType(),
             )
         }
 
@@ -741,7 +756,8 @@ class WalletCoreDocumentsControllerImpl(
                 is IssueEvent.Failure -> {
                     trySendBlocking(
                         IssueDocumentsPartialState.Failure(
-                            errorMessage = documentErrorMessage
+                            errorMessage = documentErrorMessage,
+                            errorType = event.cause.toErrorType(),
                         )
                     )
                 }
