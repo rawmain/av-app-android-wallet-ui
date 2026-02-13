@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2025 European Commission
+  ~ Copyright (c) 2026 European Commission
   ~
   ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
   ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -136,7 +136,7 @@
     <string name="issuance_code_title">%1$s kræver verifikation</string>
     <string name="issuance_document_offer_deferred_success_description">Dine dokumenter fra %1$s er blevet anmodet. Du får besked, når de er blevet udstedt til din applikation.</string>
     <string name="issuance_document_offer_deferred_success_description_with_doc">Your document %s has been requested. You will be notified when it has been issued to your application.</string>
-    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %1$s has been requested from %2$s. You will be notified when it has been issued to your application.</string>
+    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %s has been requested from %s. You will be notified when it has been issued to your application.</string>
     <string name="issuance_document_offer_deferred_success_primary_button_text">OK</string>
     <string name="issuance_document_offer_deferred_success_text">I gang!</string>
     <string name="issuance_document_offer_description">Følgende transaktion kræver din tilladelse og godkendelse.</string>
@@ -251,6 +251,8 @@
     <string name="passport_scan_intro_back_button">Tilbage</string>
     <string name="passport_scan_intro_data_download_notice">Verifikation kræver yderligere data. Når du trykker på Start, downloades ca. 250MB til ansigtsmatching.</string>
     <string name="passport_scan_intro_description">Pas / ID-kort metoden er hurtig og sikker! Tag et billede af dit pas / ID-kort, scan dit pas / ID-kort og optag en video af dig selv—tre trin for sikker onboarding.</string>
+    <string name="passport_scan_intro_download_button">Download</string>
+    <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Aldersverifikationsmetode</string>
     <string name="passport_scan_intro_start_button">Start</string>
     <string name="passport_scan_intro_step_1_description">Tag et klart foto af din identitetsdokumentside med personlige oplysninger.</string>
@@ -276,6 +278,7 @@
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">Nej</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Er du sikker på, at du vil annullere ændringen af PIN?</string>
     <string name="quick_pin_bottom_sheet_cancel_title">Annuller PIN-ændring?</string>
+    <string name="quick_pin_cant_use_previous_pin">Den nye pinkode skal være anderledes end de tidligere pinkoder</string>
     <string name="quick_pin_change_enter_new_subtitle">Vælg din nye PIN</string>
     <string name="quick_pin_change_help_text">Undgå venligst at bruge fortløbende tal eller fødselsdage, hvis det er muligt.</string>
     <string name="quick_pin_change_lockout_countdown_minutes">PIN-ændring blokeret. Prøv igen om %d:%02d</string>

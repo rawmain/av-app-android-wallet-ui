@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2025 European Commission
+  ~ Copyright (c) 2026 European Commission
   ~
   ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
   ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -136,7 +136,7 @@
     <string name="issuance_code_title">%1$s erfordert Verifizierung</string>
     <string name="issuance_document_offer_deferred_success_description">Ihre Dokumente von %1$s wurden angefordert. Sie werden benachrichtigt, sobald die Gutschriften an Ihr Wallet übermittelt wurden.</string>
     <string name="issuance_document_offer_deferred_success_description_with_doc">Your document %s has been requested. You will be notified when it has been issued to your application.</string>
-    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %1$s has been requested from %2$s. You will be notified when it has been issued to your application.</string>
+    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %s has been requested from %s. You will be notified when it has been issued to your application.</string>
     <string name="issuance_document_offer_deferred_success_primary_button_text">OK</string>
     <string name="issuance_document_offer_deferred_success_text">In Bearbeitung!</string>
     <string name="issuance_document_offer_description">Die folgende Transaktion erfordert Ihre Zustimmung und Authentifizierung.</string>
@@ -251,6 +251,8 @@
     <string name="passport_scan_intro_back_button">Zurück</string>
     <string name="passport_scan_intro_data_download_notice">Verifizierung erfordert zusätzliche Daten. Wenn Sie auf Starten tippen, werden ca. 250MB an Dateien für den Gesichtsabgleich heruntergeladen.</string>
     <string name="passport_scan_intro_description">Die Reisepass / Personalausweis Methode ist schnell und sicher! Foto Ihres Reisepasses / Personalausweises aufnehmen, Reisepass / Personalausweis scannen und Video von sich selbst aufnehmen—drei Schritte für sicheres Onboarding.</string>
+    <string name="passport_scan_intro_download_button">Herunterladen</string>
+    <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Altersverifizierungsmethode</string>
     <string name="passport_scan_intro_start_button">Starten</string>
     <string name="passport_scan_intro_step_1_description">Erstellen Sie ein klares Foto der Seite Ihres Identitätsdokuments mit persönlichen Daten.</string>
@@ -276,6 +278,7 @@
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">ABBRECHEN</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Durch Abbrechen werden Sie zurück zur Startseite geleitet, ohne den Schnell-Pin zu ändern</string>
     <string name="quick_pin_bottom_sheet_cancel_title">Schnell-Pin-Änderung abbrechen?</string>
+    <string name="quick_pin_cant_use_previous_pin">Die neue PIN muss sich von den vorherigen PINs unterscheiden.</string>
     <string name="quick_pin_change_enter_new_subtitle">Wiederholen Sie Ihre 6-stellige PIN</string>
     <string name="quick_pin_change_help_text">Bitte vermeiden Sie nach Möglichkeit die Verwendung von aufeinanderfolgenden Zahlen oder Geburtstagen.</string>
     <string name="quick_pin_change_lockout_countdown_minutes">PIN-Änderung blockiert. Versuchen Sie es in %d:%02d erneut</string>

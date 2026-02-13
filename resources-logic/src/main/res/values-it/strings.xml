@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2025 European Commission
+  ~ Copyright (c) 2026 European Commission
   ~
   ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
   ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -136,7 +136,7 @@
     <string name="issuance_code_title">%1$s richiede la verifica</string>
     <string name="issuance_document_offer_deferred_success_description">I tuoi documenti da %1$s sono stati richiesti. Ti avviseremo quando saranno disponibile sulla tua applicazione.</string>
     <string name="issuance_document_offer_deferred_success_description_with_doc">Your document %s has been requested. You will be notified when it has been issued to your application.</string>
-    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %1$s has been requested from %2$s. You will be notified when it has been issued to your application.</string>
+    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %s has been requested from %s. You will be notified when it has been issued to your application.</string>
     <string name="issuance_document_offer_deferred_success_primary_button_text">OK</string>
     <string name="issuance_document_offer_deferred_success_text">Operazione in corso!</string>
     <string name="issuance_document_offer_description">La seguente transazione richiede la tua autorizzazione e autenticazione.</string>
@@ -251,6 +251,8 @@
     <string name="passport_scan_intro_back_button">Indietro</string>
     <string name="passport_scan_intro_data_download_notice">La verifica richiede dati aggiuntivi. Quando tocchi Inizia, verranno scaricati circa 250MB di risorse per il riconoscimento facciale.</string>
     <string name="passport_scan_intro_description">Il metodo passaporto / carta d\'identità è veloce e sicuro! Scatta una foto del tuo passaporto / carta d\'identità, scansiona il tuo passaporto / carta d\'identità e registra un video di te stesso—tre passaggi per un onboarding sicuro.</string>
+    <string name="passport_scan_intro_download_button">Scaricamento</string>
+    <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>
     <string name="passport_scan_intro_start_button">Inizia</string>
     <string name="passport_scan_intro_step_1_description">Cattura una foto chiara della pagina del tuo documento d\'identità con i dati personali.</string>
@@ -276,6 +278,7 @@
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">No</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Sei sicuro di voler annullare il cambio PIN?</string>
     <string name="quick_pin_bottom_sheet_cancel_title">Annullare il cambio PIN?</string>
+    <string name="quick_pin_cant_use_previous_pin">Il nuovo PIN deve essere diverso dai PIN precedenti</string>
     <string name="quick_pin_change_enter_new_subtitle">Scegli un nuovo PIN</string>
     <string name="quick_pin_change_help_text">Se possibile, evita di usare numeri consecutivi o date di nascita.</string>
     <string name="quick_pin_change_lockout_countdown_minutes">Cambio PIN bloccato. Riprova tra %d:%02d</string>
