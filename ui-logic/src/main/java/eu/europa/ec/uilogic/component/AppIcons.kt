@@ -316,4 +316,10 @@ object AppIcons {
         contentDescriptionId = R.string.passport_biometrics_content_description,
         imageVector = null
     )
+
+    val NoConnection: IconDataUi = IconDataUi(
+        resourceId = R.drawable.ic_no_connection,
+        contentDescriptionId = R.string.content_description_no_connection_icon,
+        imageVector = null
+    )
 }

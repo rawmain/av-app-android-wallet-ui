@@ -29,6 +29,7 @@ import eu.europa.ec.presentationfeature.interactor.PresentationLoadingSendReques
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
+import eu.europa.ec.uilogic.extension.createErrorConfigFromMessage
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.navigation.PresentationScreens
@@ -73,13 +74,15 @@ class PresentationLoadingViewModel(
                     is PresentationLoadingObserveResponsePartialState.Failure -> {
                         setState {
                             copy(
-                                error = ContentErrorConfig(
+                                error = createErrorConfigFromMessage(
+                                    errorMessage = it.error,
+                                    resourceProvider = resourceProvider,
+                                    errorType = it.errorType,
                                     onRetry = { setEvent(Event.DoWork(context)) },
-                                    errorSubTitle = it.error,
                                     onCancel = {
                                         setEvent(Event.DismissError)
                                         doNavigation(NavigationType.PopTo(getPreviousScreen()))
-                                    }
+                                    },
                                 )
                             )
                         }
@@ -130,9 +133,11 @@ class PresentationLoadingViewModel(
             is PresentationLoadingSendRequestedDocumentPartialState.Failure -> {
                 setState {
                     copy(
-                        error = ContentErrorConfig(
+                        error = createErrorConfigFromMessage(
+                            errorMessage = result.error,
+                            resourceProvider = resourceProvider,
+                            errorType = result.errorType,
                             onRetry = { setEvent(event) },
-                            errorSubTitle = result.error,
                             onCancel = {
                                 setEvent(Event.DismissError)
                                 doNavigation(
@@ -140,7 +145,7 @@ class PresentationLoadingViewModel(
                                         getPreviousScreen()
                                     )
                                 )
-                            }
+                            },
                         )
                     )
                 }

@@ -21,6 +21,7 @@ import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvai
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.corelogic.controller.FetchScopedDocumentsPartialState
 import eu.europa.ec.corelogic.controller.IssuanceMethod
 import eu.europa.ec.corelogic.controller.IssueDocumentPartialState
@@ -299,6 +300,70 @@ class TestPassportCredentialIssuanceInteractor {
                 // Then
                 assertEquals(
                     CredentialIssuancePartialState.Failure(mockedPlainFailureMessage),
+                    awaitItem()
+                )
+            }
+        }
+    }
+
+    // Case 7: NO_CONNECTION errorType propagation from getPassportScanningScopedDocuments failure
+    @Test
+    fun `Given getPassportScanningScopedDocuments fails with NO_CONNECTION, When issuePassportScanningDocument is called, Then Failure with NO_CONNECTION errorType is returned`() {
+        coroutineRule.runTest {
+            // Given
+            whenever(
+                passportScanningDocumentsController.getPassportScanningScopedDocuments(any())
+            ).thenReturn(
+                FetchScopedDocumentsPartialState.Failure(
+                    errorMessage = mockedPlainFailureMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                )
+            )
+
+            // When
+            interactor.issuePassportScanningDocument(context).runFlowTest {
+                // Then
+                assertEquals(
+                    CredentialIssuancePartialState.Failure(
+                        error = mockedPlainFailureMessage,
+                        errorType = ErrorType.NO_CONNECTION,
+                    ),
+                    awaitItem()
+                )
+            }
+        }
+    }
+
+    // Case 8: NO_CONNECTION errorType propagation from issuePassportScanningDocument failure
+    @Test
+    fun `Given issuePassportScanningDocument fails with NO_CONNECTION, When issuePassportScanningDocument is called, Then Failure with NO_CONNECTION errorType is returned`() {
+        coroutineRule.runTest {
+            // Given
+            whenever(
+                passportScanningDocumentsController.getPassportScanningScopedDocuments(any())
+            ).thenReturn(
+                FetchScopedDocumentsPartialState.Success(mockedScopedDocumentsWithAgeVerification)
+            )
+            whenever(
+                passportScanningDocumentsController.issuePassportScanningDocument(
+                    issuanceMethod = eq(IssuanceMethod.OPENID4VCI),
+                    configId = any()
+                )
+            ).thenReturn(
+                IssueDocumentPartialState.Failure(
+                    errorMessage = mockedPlainFailureMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                ).toFlow()
+            )
+
+            // When
+            interactor.issuePassportScanningDocument(context).runFlowTest {
+                // Then
+                assertEquals(
+                    CredentialIssuancePartialState.Failure(
+                        error = mockedPlainFailureMessage,
+                        errorType = ErrorType.NO_CONNECTION,
+                    ),
                     awaitItem()
                 )
             }

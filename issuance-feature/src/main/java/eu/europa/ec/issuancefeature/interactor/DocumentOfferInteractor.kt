@@ -21,6 +21,8 @@ import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvai
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
+import eu.europa.ec.businesslogic.extension.toErrorType
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.businesslogic.util.safeLet
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.di.CredentialOfferIssuanceScope
@@ -67,7 +69,10 @@ sealed class ResolveDocumentOfferInteractorPartialState {
         val issuerLogo: URI?,
     ) : ResolveDocumentOfferInteractorPartialState()
 
-    data class Failure(val errorMessage: String) : ResolveDocumentOfferInteractorPartialState()
+    data class Failure(
+        val errorMessage: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : ResolveDocumentOfferInteractorPartialState()
 }
 
 sealed class IssueDocumentsInteractorPartialState {
@@ -79,7 +84,10 @@ sealed class IssueDocumentsInteractorPartialState {
         val successRoute: String,
     ) : IssueDocumentsInteractorPartialState()
 
-    data class Failure(val errorMessage: String) : IssueDocumentsInteractorPartialState()
+    data class Failure(
+        val errorMessage: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : IssueDocumentsInteractorPartialState()
 
     data class UserAuthRequired(
         val crypto: BiometricCrypto,
@@ -132,7 +140,10 @@ class DocumentOfferInteractorImpl(
             ).map { response ->
                 when (response) {
                     is ResolveDocumentOfferPartialState.Failure -> {
-                        ResolveDocumentOfferInteractorPartialState.Failure(errorMessage = response.errorMessage)
+                        ResolveDocumentOfferInteractorPartialState.Failure(
+                            errorMessage = response.errorMessage,
+                            errorType = response.errorType,
+                        )
                     }
 
                     is ResolveDocumentOfferPartialState.Success -> {
@@ -208,7 +219,8 @@ class DocumentOfferInteractorImpl(
             }
         }.safeAsync {
             ResolveDocumentOfferInteractorPartialState.Failure(
-                errorMessage = it.localizedMessage ?: genericErrorMsg
+                errorMessage = it.localizedMessage ?: genericErrorMsg,
+                errorType = it.toErrorType(),
             )
         }
 
@@ -226,7 +238,10 @@ class DocumentOfferInteractorImpl(
                 ).map { response ->
                     when (response) {
                         is IssueDocumentsPartialState.Failure -> {
-                            IssueDocumentsInteractorPartialState.Failure(errorMessage = response.errorMessage)
+                            IssueDocumentsInteractorPartialState.Failure(
+                                errorMessage = response.errorMessage,
+                                errorType = response.errorType,
+                            )
                         }
 
                         is IssueDocumentsPartialState.PartialSuccess -> {
@@ -270,7 +285,8 @@ class DocumentOfferInteractorImpl(
             )
         }.safeAsync {
             IssueDocumentsInteractorPartialState.Failure(
-                errorMessage = it.localizedMessage ?: genericErrorMsg
+                errorMessage = it.localizedMessage ?: genericErrorMsg,
+                errorType = it.toErrorType(),
             )
         }
 

@@ -25,9 +25,30 @@ import java.net.URLEncoder
 
 
 object MRZCleaner {
-    private var previousMRZString: String? = null
 
-    fun clean(mrz: String, logController: LogController): String {
+    /**
+     * Cleans individual text block from OCR before block reconstruction.
+     * Applies character-level cleaning only, doesn't affect structure.
+     */
+    fun cleanBlockText(text: String): String {
+        return text
+            .replace(Regex("[ \\t\\r]+"), "") // Remove whitespace
+            .replace("«", "<")
+            .replace("<c<", "<<<")
+            .replace("<e<", "<<<")
+            .replace("<E<", "<<<")
+            .replace("<K<", "<<<")
+            .replace("<S<", "<<<")
+            .replace("<C<", "<<<")
+            .replace("<¢<", "<<<")
+            .replace("<(<", "<<<")
+            .replace("<{<", "<<<")
+            .replace("<[<", "<<<")
+            .replace(Regex("^P[KC]"), "P<")
+            .replace(Regex("[^A-Z0-9<]"), "") // Remove invalid chars (no newlines in blocks)
+    }
+
+    fun clean(mrz: String, logController: LogController, skipReconstruction: Boolean = false): String {
         if (mrz.isBlank()) {
             throw IllegalArgumentException("Empty MRZ string.")
         }
@@ -51,7 +72,11 @@ object MRZCleaner {
             .replace(Regex("[^A-Z0-9<\\n]"), "") // Remove any other char
             .trim()
 
-        result = reconstructTd3LinesIfNeeded(result, logController)
+        // Skip reconstruction if MRZBlockReconstructor already handled it
+        if (!skipReconstruction) {
+            result = reconstructTd3LinesIfNeeded(result, logController)
+        }
+
 
         if (result.contains("<") && (
                     result.startsWith("P") ||
@@ -102,7 +127,6 @@ object MRZCleaner {
 
         val allChars = lines.joinToString("")
         return if (allChars.length >= 88) {
-            logController.d(TAG) { "fixing lines ${lines.size} for TD3" }
             allChars.take(44) + "\n" + allChars.substring(44, 88)
         } else {
             mrzText
@@ -119,23 +143,15 @@ object MRZCleaner {
             .replace("3", "J")
     }
 
-    fun parseAndClean(mrz: String, logController: LogController): MrzRecord {
-        val record = MrzParser.parse(mrz, logController)
-
-        logController.d(TAG) { "Previous Scan: $previousMRZString" }
-        if (record.validDateOfBirth && record.validDocumentNumber && record.validExpirationDate || record.validComposite) {
+    fun parseAndClean(mrz: String, logController: LogController): MrzRecord? {
+        val lineSkipper = MRZLineSkipper(logController, MrzParser::parse)
+        lineSkipper.tryParse(mrz)?.let { record ->
             record.givenNames = record.givenNames?.replaceNumberToChar()
             record.surname = record.surname.replaceNumberToChar()
             record.issuingCountry = record.issuingCountry.replaceNumberToChar()
             record.nationality = record.nationality.replaceNumberToChar()
             return record
-        } else {
-            logController.d(TAG) { "Still accept scanning." }
-            logController.d(TAG) { "Previous Scan: $previousMRZString" }
-            if (mrz != previousMRZString) {
-                previousMRZString = mrz
-            }
-            throw IllegalArgumentException("Invalid check digits.")
         }
+        return null
     }
 }

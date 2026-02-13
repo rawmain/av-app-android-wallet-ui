@@ -20,6 +20,7 @@ import android.content.Context
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
 import eu.europa.ec.corelogic.controller.FetchScopedDocumentsPartialState
@@ -50,7 +51,10 @@ sealed class CredentialIssuancePartialState {
         val resultHandler: DeviceAuthenticationResult,
     ) : CredentialIssuancePartialState()
 
-    data class Failure(val error: String) : CredentialIssuancePartialState()
+    data class Failure(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : CredentialIssuancePartialState()
 }
 
 interface PassportCredentialIssuanceInteractor {
@@ -116,13 +120,23 @@ class PassportCredentialIssuanceInteractorImpl(
                                 )
 
                             is IssueDocumentPartialState.Failure ->
-                                emit(CredentialIssuancePartialState.Failure(issueState.errorMessage))
+                                emit(
+                                    CredentialIssuancePartialState.Failure(
+                                        error = issueState.errorMessage,
+                                        errorType = issueState.errorType,
+                                    )
+                                )
                         }
                     }
                 }
 
                 is FetchScopedDocumentsPartialState.Failure ->
-                    emit(CredentialIssuancePartialState.Failure(state.errorMessage))
+                    emit(
+                        CredentialIssuancePartialState.Failure(
+                            error = state.errorMessage,
+                            errorType = state.errorType,
+                        )
+                    )
             }
         }
 

@@ -21,6 +21,7 @@ import android.content.Intent
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
 import eu.europa.ec.corelogic.controller.SendRequestedDocumentsPartialState
 import eu.europa.ec.corelogic.controller.WalletCorePartialState
@@ -35,7 +36,10 @@ sealed class PresentationLoadingObserveResponsePartialState {
         val authenticationData: List<AuthenticationData>,
     ) : PresentationLoadingObserveResponsePartialState()
 
-    data class Failure(val error: String) : PresentationLoadingObserveResponsePartialState()
+    data class Failure(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : PresentationLoadingObserveResponsePartialState()
     data object Success : PresentationLoadingObserveResponsePartialState()
     data class Redirect(val uri: URI) : PresentationLoadingObserveResponsePartialState()
     data object RequestReadyToBeSent : PresentationLoadingObserveResponsePartialState()
@@ -43,7 +47,10 @@ sealed class PresentationLoadingObserveResponsePartialState {
 }
 
 sealed class PresentationLoadingSendRequestedDocumentPartialState {
-    data class Failure(val error: String) : PresentationLoadingSendRequestedDocumentPartialState()
+    data class Failure(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : PresentationLoadingSendRequestedDocumentPartialState()
     data object Success : PresentationLoadingSendRequestedDocumentPartialState()
 }
 
@@ -67,7 +74,8 @@ class PresentationLoadingInteractorImpl(
         walletCorePresentationController.observeSentDocumentsRequest().mapNotNull { response ->
             when (response) {
                 is WalletCorePartialState.Failure -> PresentationLoadingObserveResponsePartialState.Failure(
-                    error = response.error
+                    error = response.error,
+                    errorType = response.errorType,
                 )
 
                 is WalletCorePartialState.Redirect -> PresentationLoadingObserveResponsePartialState.Redirect(
@@ -96,7 +104,8 @@ class PresentationLoadingInteractorImpl(
         return when (val result = walletCorePresentationController.sendRequestedDocuments()) {
             is SendRequestedDocumentsPartialState.RequestSent -> PresentationLoadingSendRequestedDocumentPartialState.Success
             is SendRequestedDocumentsPartialState.Failure -> PresentationLoadingSendRequestedDocumentPartialState.Failure(
-                result.error
+                error = result.error,
+                errorType = result.errorType,
             )
         }
     }
