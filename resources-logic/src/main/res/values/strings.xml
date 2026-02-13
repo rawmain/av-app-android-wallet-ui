@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2026 European Commission
+  ~ Copyright (c) 2025 European Commission
   ~
   ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
   ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -249,7 +249,7 @@
     <string name="passport_live_video_step_second">Follow the on-screen instructions (e.g., blink or turn your head).</string>
     <string name="passport_live_video_step_third">Avoid filters, masks, or obstructions.</string>
     <string name="passport_scan_intro_back_button">Back</string>
-    <string name="passport_scan_intro_data_download_notice">Verification requires additional data. When you tap Start, approximately 250MB of assets will be downloaded for face matching.</string>
+    <string name="passport_scan_intro_data_download_notice">Verification requires additional data. When you tap Download, approximately 250MB of assets will be downloaded for face matching.</string>
     <string name="passport_scan_intro_description">The passport / ID card method is quick and secure! Take a photo of your passport / ID card, scan your passport / ID card, and record a video of yourself—three steps for secure onboarding.</string>
     <string name="passport_scan_intro_download_button">Download</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>

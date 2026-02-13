@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2026 European Commission
+  ~ Copyright (c) 2025 European Commission
   ~
   ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
   ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -249,7 +249,7 @@
     <string name="passport_live_video_step_second">Seguire le istruzioni sullo schermo (ad esempio, battere le palpebre o girare la testa).</string>
     <string name="passport_live_video_step_third">Evitare filtri, maschere o ostacoli.</string>
     <string name="passport_scan_intro_back_button">Indietro</string>
-    <string name="passport_scan_intro_data_download_notice">La verifica richiede dati aggiuntivi. Quando tocchi Inizia, verranno scaricati circa 250MB di risorse per il riconoscimento facciale.</string>
+    <string name="passport_scan_intro_data_download_notice">La verifica richiede dati aggiuntivi. Toccando Scarica, verranno scaricati circa 250 MB di risorse per il riconoscimento facciale.</string>
     <string name="passport_scan_intro_description">Il metodo passaporto / carta d\'identità è veloce e sicuro! Scatta una foto del tuo passaporto / carta d\'identità, scansiona il tuo passaporto / carta d\'identità e registra un video di te stesso—tre passaggi per un onboarding sicuro.</string>
     <string name="passport_scan_intro_download_button">Scaricamento</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
