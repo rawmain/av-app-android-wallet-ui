@@ -33,6 +33,7 @@ import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.RelyingPartyDataUi
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
+import eu.europa.ec.uilogic.extension.createErrorConfigFromMessage
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.navigation.CommonScreens
@@ -118,10 +119,12 @@ class PresentationRequestViewModel(
                         setState {
                             copy(
                                 isLoading = false,
-                                error = ContentErrorConfig(
+                                error = createErrorConfigFromMessage(
+                                    errorMessage = response.error,
+                                    resourceProvider = resourceProvider,
+                                    errorType = response.errorType,
                                     onRetry = { setEvent(Event.DoWork) },
-                                    errorSubTitle = response.error,
-                                    onCancel = { setEvent(Event.Pop) }
+                                    onCancel = { setEvent(Event.Pop) },
                                 )
                             )
                         }

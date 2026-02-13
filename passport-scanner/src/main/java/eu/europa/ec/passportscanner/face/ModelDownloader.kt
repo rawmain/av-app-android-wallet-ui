@@ -19,6 +19,7 @@ package eu.europa.ec.passportscanner.face
 import android.content.Context
 import eu.europa.ec.businesslogic.controller.log.LogController
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.HttpURLConnection
@@ -51,20 +52,22 @@ class ModelDownloader(
         outputFilename: String? = null,
         onProgress: ((Int) -> Unit)? = null,
     ): String? = withContext(Dispatchers.IO) {
+        logController.d(TAG) { "downloadModelFromUrl: Starting download from $urlString" }
+
+        val url = URL(urlString)
+        val filename = outputFilename ?: url.path.substringAfterLast('/').ifEmpty { "model.onnx" }
+        val destFile = File(destDir, filename)
+
+        if (destFile.exists()) {
+            logController.d(TAG) { "File already exists. Not downloading." }
+            return@withContext filename
+        }
+
+        logController.d(TAG) { "downloadModelFromUrl: Downloading to ${destFile.absolutePath}" }
+
+        val tempFile = File(destDir, "$filename.tmp")
+
         try {
-            logController.d(TAG) { "downloadModelFromUrl: Starting download from $urlString" }
-
-            val url = URL(urlString)
-            val filename = outputFilename ?: url.path.substringAfterLast('/').ifEmpty { "model.onnx" }
-            val destFile = File(destDir, filename)
-
-            if (destFile.exists()) {
-                logController.d(TAG) { "File already exists. Not downloading." }
-                return@withContext filename
-            }
-
-            logController.d(TAG) { "downloadModelFromUrl: Downloading to ${destFile.absolutePath}" }
-
             // Use HttpURLConnection with proper configuration
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
@@ -83,7 +86,7 @@ class ModelDownloader(
                 logController.d(TAG) { "downloadModelFromUrl: Content length: $contentLength bytes" }
 
                 connection.inputStream.use { input ->
-                    destFile.outputStream().use { output ->
+                    tempFile.outputStream().use { output ->
                         val buffer = ByteArray(8192)
                         var bytesRead: Int
                         var totalBytesRead = 0L
@@ -91,6 +94,7 @@ class ModelDownloader(
                         var lastReportedPercentage = 0
 
                         while (input.read(buffer).also { bytesRead = it } != -1) {
+                            coroutineContext.ensureActive()
                             output.write(buffer, 0, bytesRead)
                             totalBytesRead += bytesRead
 
@@ -108,7 +112,7 @@ class ModelDownloader(
                             }
 
                             // Report progress every 5%
-                            if (percentage >= lastReportedPercentage + 5 && contentLength > 0) {
+                            if (percentage >= lastReportedPercentage + 5) {
                                 onProgress?.invoke(percentage)
                                 lastReportedPercentage = percentage
                             }
@@ -119,6 +123,7 @@ class ModelDownloader(
                     }
                 }
 
+                tempFile.renameTo(destFile)
                 logController.d(TAG) { "downloadModelFromUrl: Download complete: ${destFile.length()} bytes" }
                 filename
             } else {
@@ -128,6 +133,9 @@ class ModelDownloader(
         } catch (e: Exception) {
             logController.e(TAG, e) { "downloadModelFromUrl: Failed to download from $urlString" }
             null
+        } finally {
+            // Clean up temp file if it wasn't successfully renamed
+            tempFile.delete()
         }
     }
 

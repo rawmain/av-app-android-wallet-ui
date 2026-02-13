@@ -50,6 +50,7 @@ import eu.europa.ec.uilogic.component.RelyingPartyDataUi
 import eu.europa.ec.uilogic.component.content.ContentHeaderConfig
 import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -63,7 +64,7 @@ import java.net.URI
 class TestDocumentIssuanceSuccessInteractor {
 
     @get:Rule
-    val coroutineRule = CoroutineTestRule()
+    val coroutineRule = CoroutineTestRule(testDispatcher = UnconfinedTestDispatcher())
 
     @Mock
     private lateinit var walletCoreDocumentsController: WalletCoreDocumentsController

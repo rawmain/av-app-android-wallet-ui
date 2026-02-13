@@ -42,6 +42,11 @@ interface FaceMatchController {
     fun init(context: Context): Flow<SdkInitStatus>
 
     /**
+     * Cancel any ongoing SDK initialization (model download/preparation).
+     */
+    fun cancelInit()
+
+    /**
      * Capture and match face against reference image
      * @param faceImagePath Path to the reference face image
      * @return FaceMatchResult with matching details
@@ -68,6 +73,10 @@ class FaceMatchControllerImpl(
 
     override fun init(context: Context): Flow<SdkInitStatus> {
         return faceMatchSDK.init(convertConfig(), context.applicationContext)
+    }
+
+    override fun cancelInit() {
+        faceMatchSDK.cancelInit()
     }
 
     override suspend fun captureAndMatch(faceImagePath: String): FaceMatchResult {

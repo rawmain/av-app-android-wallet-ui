@@ -17,34 +17,23 @@
 package eu.europa.ec.onboardingfeature.interactor
 
 import android.content.Context
-import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-
-private const val TAG = "PassportScanIntroInteractor"
+import eu.europa.ec.passportscanner.face.SdkInitStatus
+import kotlinx.coroutines.flow.Flow
 
 interface PassportScanIntroInteractor {
-    suspend fun init(context: Context)
+    fun initFaceMatchSDK(context: Context): Flow<SdkInitStatus>
+    fun cancelFaceMatchSDKInit()
 }
 
 class PassportScanIntroInteractorImpl(
     private val faceMatchController: FaceMatchController,
-    private val logController: LogController,
 ) : PassportScanIntroInteractor {
+    override fun initFaceMatchSDK(context: Context): Flow<SdkInitStatus> {
+        return faceMatchController.init(context)
+    }
 
-    private val interactorScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-    override suspend fun init(context: Context) {
-        logController.d(TAG) { "Starting face match SDK initialization..." }
-
-        // Fire and forget - just trigger initialization
-        interactorScope.launch {
-            faceMatchController.init(context).collect { status ->
-                logController.d(TAG) { "SDK init status: $status" }
-            }
-        }
+    override fun cancelFaceMatchSDKInit() {
+        faceMatchController.cancelInit()
     }
 }

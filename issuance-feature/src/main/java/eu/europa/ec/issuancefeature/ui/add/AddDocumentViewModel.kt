@@ -38,6 +38,7 @@ import eu.europa.ec.issuancefeature.ui.add.model.AddDocumentUi
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
+import eu.europa.ec.uilogic.extension.createErrorConfigFromMessage
 import eu.europa.ec.uilogic.component.content.ScreenNavigateAction
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
@@ -239,10 +240,12 @@ class AddDocumentViewModel(
                         setState {
                             copy(
                                 error = if (deepLinkAction == null) {
-                                    ContentErrorConfig(
+                                    createErrorConfigFromMessage(
+                                        errorMessage = response.error,
+                                        resourceProvider = resourceProvider,
+                                        errorType = response.errorType,
                                         onRetry = { setEvent(event) },
-                                        errorSubTitle = response.error,
-                                        onCancel = { setEvent(Event.DismissError) }
+                                        onCancel = { setEvent(Event.DismissError) },
                                     )
                                 } else {
                                     null
@@ -301,10 +304,21 @@ class AddDocumentViewModel(
                     is IssueDocumentPartialState.Failure -> {
                         setState {
                             copy(
-                                error = ContentErrorConfig(
-                                    onRetry = null,
-                                    errorSubTitle = response.errorMessage,
-                                    onCancel = { setEvent(Event.DismissError) }
+                                error = createErrorConfigFromMessage(
+                                    errorMessage = response.errorMessage,
+                                    resourceProvider = resourceProvider,
+                                    errorType = response.errorType,
+                                    onRetry = {
+                                        setEvent(
+                                            Event.IssueDocument(
+                                                issuanceMethod = issuanceMethod,
+                                                issuerId = issuerId,
+                                                configId = configId,
+                                                context = context,
+                                            )
+                                        )
+                                    },
+                                    onCancel = { setEvent(Event.DismissError) },
                                 ),
                                 isLoading = false
                             )

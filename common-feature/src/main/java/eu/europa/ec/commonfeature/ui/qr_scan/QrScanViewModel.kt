@@ -74,6 +74,7 @@ sealed class Effect : ViewSideEffect {
         data class SwitchScreen(val screenRoute: String) : Navigation()
         data object Pop : Navigation()
         data object GoToAppSettings : Navigation()
+        data class OpenExternalUrl(val url: String) : Navigation()
     }
 }
 
@@ -143,7 +144,7 @@ class QrScanViewModel(
                                 shouldValidateSchema = true,
                                 shouldValidateHost = false,
                                 shouldValidatePath = false,
-                                shouldValidateQuery = true,
+                                shouldValidateQuery = false, // allows DC API(FIDO) links without query
                             )
                         ) to scannedQr
                     )
@@ -204,26 +205,33 @@ class QrScanViewModel(
     }
 
     private fun navigateToPresentationRequest(scanResult: String) {
-        setEffect {
-            getOrCreatePresentationScope()
-            Effect.Navigation.SwitchScreen(
-                screenRoute = generateComposableNavigationLink(
-                    screen = PresentationScreens.PresentationRequest,
-                    arguments = generateComposableArguments(
-                        mapOf(
-                            RequestUriConfig.serializedKeyName to uiSerializer.toBase64(
-                                RequestUriConfig(
-                                    PresentationMode.OpenId4Vp(
-                                        uri = scanResult,
-                                        initiatorRoute = LandingScreens.Landing.screenRoute
-                                    )
-                                ),
-                                RequestUriConfig.Parser
+        val isDcApiQr = scanResult.startsWith("FIDO:", ignoreCase = true)
+        if (isDcApiQr) {
+            setEffect {
+                Effect.Navigation.OpenExternalUrl(scanResult)
+            }
+        } else {
+            setEffect {
+                getOrCreatePresentationScope()
+                Effect.Navigation.SwitchScreen(
+                    screenRoute = generateComposableNavigationLink(
+                        screen = PresentationScreens.PresentationRequest,
+                        arguments = generateComposableArguments(
+                            mapOf(
+                                RequestUriConfig.serializedKeyName to uiSerializer.toBase64(
+                                    RequestUriConfig(
+                                        PresentationMode.OpenId4Vp(
+                                            uri = scanResult,
+                                            initiatorRoute = LandingScreens.Landing.screenRoute
+                                        )
+                                    ),
+                                    RequestUriConfig.Parser
+                                )
                             )
                         )
                     )
                 )
-            )
+            }
         }
     }
 

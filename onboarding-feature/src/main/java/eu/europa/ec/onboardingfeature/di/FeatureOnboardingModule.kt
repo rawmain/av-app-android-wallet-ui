@@ -77,10 +77,8 @@ fun provideFaceMatchController(
 @Factory
 fun providePassportScanIntroInteractor(
     faceMatchController: FaceMatchController,
-    logController: LogController,
 ): PassportScanIntroInteractor = PassportScanIntroInteractorImpl(
-    faceMatchController,
-    logController
+    faceMatchController
 )
 
 @Factory

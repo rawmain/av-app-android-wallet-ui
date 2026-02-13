@@ -21,6 +21,8 @@ import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvai
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
+import eu.europa.ec.businesslogic.extension.toErrorType
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.commonfeature.config.IssuanceFlowType
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
@@ -54,7 +56,10 @@ sealed class AddDocumentInteractorPartialState {
         AddDocumentInteractorPartialState()
 
     data class NoOptions(val errorMsg: String) : AddDocumentInteractorPartialState()
-    data class Failure(val error: String) : AddDocumentInteractorPartialState()
+    data class Failure(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : AddDocumentInteractorPartialState()
 }
 
 interface AddDocumentInteractor {
@@ -99,7 +104,8 @@ class AddDocumentInteractorImpl(
             when (state) {
                 is FetchScopedDocumentsPartialState.Failure -> emit(
                     AddDocumentInteractorPartialState.Failure(
-                        error = state.errorMessage
+                        error = state.errorMessage,
+                        errorType = state.errorType,
                     )
                 )
 
@@ -154,7 +160,8 @@ class AddDocumentInteractorImpl(
             }
         }.safeAsync {
             AddDocumentInteractorPartialState.Failure(
-                error = it.localizedMessage ?: genericErrorMsg
+                error = it.localizedMessage ?: genericErrorMsg,
+                errorType = it.toErrorType(),
             )
         }
 

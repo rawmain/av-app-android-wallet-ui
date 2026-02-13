@@ -21,7 +21,9 @@ import androidx.activity.ComponentActivity
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.addOrReplace
 import eu.europa.ec.businesslogic.extension.safeAsync
+import eu.europa.ec.businesslogic.extension.toErrorType
 import eu.europa.ec.businesslogic.extension.toUri
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.corelogic.di.WalletPresentationScope
 import eu.europa.ec.corelogic.model.AuthenticationData
 import eu.europa.ec.corelogic.util.EudiWalletListenerWrapper
@@ -66,7 +68,10 @@ sealed class TransferEventPartialState {
     data object Connected : TransferEventPartialState()
     data object Connecting : TransferEventPartialState()
     data object Disconnected : TransferEventPartialState()
-    data class Error(val error: String) : TransferEventPartialState()
+    data class Error(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : TransferEventPartialState()
     data class QrEngagementReady(val qrCode: String) : TransferEventPartialState()
     data class RequestReceived(
         val requestData: List<RequestedDocument>,
@@ -80,7 +85,10 @@ sealed class TransferEventPartialState {
 }
 
 sealed class CheckKeyUnlockPartialState {
-    data class Failure(val error: String) : CheckKeyUnlockPartialState()
+    data class Failure(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : CheckKeyUnlockPartialState()
     data class UserAuthenticationRequired(
         val authenticationData: List<AuthenticationData>,
     ) : CheckKeyUnlockPartialState()
@@ -89,14 +97,20 @@ sealed class CheckKeyUnlockPartialState {
 }
 
 sealed class SendRequestedDocumentsPartialState {
-    data class Failure(val error: String) : SendRequestedDocumentsPartialState()
+    data class Failure(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : SendRequestedDocumentsPartialState()
     data object RequestSent : SendRequestedDocumentsPartialState()
 }
 
 sealed class ResponseReceivedPartialState {
     data object Success : ResponseReceivedPartialState()
     data class Redirect(val uri: URI) : ResponseReceivedPartialState()
-    data class Failure(val error: String) : ResponseReceivedPartialState()
+    data class Failure(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : ResponseReceivedPartialState()
     data class IntentToSend(val intent: Intent) : ResponseReceivedPartialState()
 }
 
@@ -105,7 +119,10 @@ sealed class WalletCorePartialState {
         val authenticationData: List<AuthenticationData>,
     ) : WalletCorePartialState()
 
-    data class Failure(val error: String) : WalletCorePartialState()
+    data class Failure(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : WalletCorePartialState()
     data object Success : WalletCorePartialState()
     data class Redirect(val uri: URI) : WalletCorePartialState()
     data object RequestIsReadyToBeSent : WalletCorePartialState()
@@ -261,10 +278,12 @@ class WalletCorePresentationControllerImpl(
                     TransferEventPartialState.Disconnected
                 )
             },
-            onError = { errorMessage ->
+            onError = { throwable ->
                 trySendBlocking(
                     TransferEventPartialState.Error(
-                        error = errorMessage.ifEmpty { genericErrorMessage }
+                        error = throwable.localizedMessage?.ifEmpty { genericErrorMessage }
+                            ?: genericErrorMessage,
+                        errorType = throwable.toErrorType(),
                     )
                 )
             },
@@ -318,7 +337,8 @@ class WalletCorePresentationControllerImpl(
         }
     }.safeAsync {
         TransferEventPartialState.Error(
-            error = it.localizedMessage ?: resourceProvider.genericErrorMessage()
+            error = it.localizedMessage ?: resourceProvider.genericErrorMessage(),
+            errorType = it.toErrorType(),
         )
     }.shareIn(coroutineScope, SharingStarted.Lazily, 2)
 
@@ -381,7 +401,8 @@ class WalletCorePresentationControllerImpl(
         }
     }.safeAsync {
         CheckKeyUnlockPartialState.Failure(
-            error = it.localizedMessage ?: genericErrorMessage
+            error = it.localizedMessage ?: genericErrorMessage,
+            errorType = it.toErrorType(),
         )
     }
 
@@ -418,7 +439,10 @@ class WalletCorePresentationControllerImpl(
                     if (response.error == "Peer disconnected without proper session termination") {
                         ResponseReceivedPartialState.Success
                     } else {
-                        ResponseReceivedPartialState.Failure(error = response.error)
+                        ResponseReceivedPartialState.Failure(
+                            error = response.error,
+                            errorType = response.errorType,
+                        )
                     }
                 }
 
@@ -443,7 +467,8 @@ class WalletCorePresentationControllerImpl(
             }
         }.safeAsync {
             ResponseReceivedPartialState.Failure(
-                error = it.localizedMessage ?: genericErrorMessage
+                error = it.localizedMessage ?: genericErrorMessage,
+                errorType = it.toErrorType(),
             )
         }
     }
@@ -452,7 +477,10 @@ class WalletCorePresentationControllerImpl(
         merge(checkForKeyUnlock(), mappedCallbackStateFlow()).mapNotNull {
             when (it) {
                 is CheckKeyUnlockPartialState.Failure -> {
-                    WalletCorePartialState.Failure(it.error)
+                    WalletCorePartialState.Failure(
+                        error = it.error,
+                        errorType = it.errorType,
+                    )
                 }
 
                 is CheckKeyUnlockPartialState.UserAuthenticationRequired -> {
@@ -460,7 +488,10 @@ class WalletCorePresentationControllerImpl(
                 }
 
                 is ResponseReceivedPartialState.Failure -> {
-                    WalletCorePartialState.Failure(it.error)
+                    WalletCorePartialState.Failure(
+                        error = it.error,
+                        errorType = it.errorType,
+                    )
                 }
 
                 is ResponseReceivedPartialState.Redirect -> {
@@ -483,7 +514,8 @@ class WalletCorePresentationControllerImpl(
             }
         }.safeAsync {
             WalletCorePartialState.Failure(
-                error = it.localizedMessage ?: genericErrorMessage
+                error = it.localizedMessage ?: genericErrorMessage,
+                errorType = it.toErrorType(),
             )
         }
 

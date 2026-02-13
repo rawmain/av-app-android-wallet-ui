@@ -38,7 +38,6 @@ import eu.europa.ec.passportscanner.utils.draw.BoundingBoxDraw
 import eu.europa.ec.passportscanner.utils.extension.setBrightness
 import eu.europa.ec.passportscanner.utils.extension.setContrast
 import eu.europa.ec.passportscanner.utils.extension.toPx
-import java.net.URLEncoder
 
 abstract class MRZAnalyzer(
     override val activity: Activity,
@@ -122,7 +121,6 @@ abstract class MRZAnalyzer(
             val rectGuide = activity.findViewById<ImageView>(R.id.scanner_overlay)
             val viewFinder = activity.findViewById<View>(R.id.view_finder)
             var inputBitmap: Bitmap
-            var inputRot: Int
             var rotatedBF = BitmapUtils.rotateImage(bf, rotation)
 
             // try to cropped forcefully
@@ -160,7 +158,7 @@ abstract class MRZAnalyzer(
                 mrzCropWidth.toInt(),
                 mrzCropHeight.toInt()
             )
-            inputRot = 0
+            var inputRot: Int = 0
 
             // Pass image to an ML Kit Vision API
             logController.d("${SmartScannerActivity.TAG}/SmartScanner") { "MRZ MLKit: start" }
@@ -170,17 +168,29 @@ abstract class MRZAnalyzer(
             recognizer.process(image)
 
                 .addOnSuccessListener { visionText ->
-                    var rawFullRead = ""
                     val blocks = visionText.textBlocks
 
                     val bdParent = initializeBoundingBoxes()
 
+                    // Collect text blocks with bounding boxes for reconstruction
+                    val textBlocks = mutableListOf<MRZLineReconstructor.TextBlock>()
                     for (i in blocks.indices) {
                         val lines = blocks[i].lines
                         for (j in lines.indices) {
-                            rawFullRead += lines[j].text + "\n"
+                            lines[j].boundingBox?.let { boundingBox ->
+                                // Clean the block text before reconstruction
+                                val cleanedText = MRZCleaner.cleanBlockText(lines[j].text)
 
-                            blocks[i].boundingBox?.let { boundingBox ->
+                                if (cleanedText.isNotEmpty()) {
+                                    textBlocks.add(
+                                        MRZLineReconstructor.TextBlock(
+                                            text = cleanedText,
+                                            boundingBox = boundingBox
+                                        )
+                                    )
+                                }
+
+                                // Add bounding box to debug view
                                 addBoundingBoxToView(
                                     boundingBox,
                                     bdParent,
@@ -192,26 +202,13 @@ abstract class MRZAnalyzer(
                         }
                     }
 
+                    val rawFullRead = MRZLineReconstructor.reconstruct(textBlocks)
+
                     try {
-                        val encoded = URLEncoder.encode(rawFullRead, "UTF-8")
-                            .replace("%3C", "<")
-                            .replace("%0A", "↩")
-
-                        val nlCount = encoded.count { it == '↩' }
-                        logController.d("${SmartScannerActivity.TAG}/SmartScanner") {
-                            "Before cleaner: [${encoded}], with  NL = $nlCount"
-                        }
-
-                        val cleanMRZ = MRZCleaner.clean(rawFullRead, logController)
-                        logController.d("${SmartScannerActivity.TAG}/SmartScanner") {
-                            "After cleaner = [${
-                                URLEncoder.encode(cleanMRZ, "UTF-8")
-                                    .replace("%3C", "<").replace("%0A", "↩")
-                            }]"
-                        }
+                        val cleanMRZ = MRZCleaner.clean(rawFullRead, logController, skipReconstruction = true)
                         processResult(result = cleanMRZ, bitmap = bf, rotation = rotation)
                     } catch (e: Exception) {
-                        logController.d("${SmartScannerActivity.TAG}/SmartScanner", e)
+                        logController.d("${SmartScannerActivity.TAG}/SmartScanner", {e.message.orEmpty()})
                     }
                     imageProxy.close()
                 }

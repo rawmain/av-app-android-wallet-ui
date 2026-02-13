@@ -17,6 +17,7 @@
 package eu.europa.ec.issuancefeature.interactor
 
 import android.content.Context
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
@@ -91,6 +92,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.net.URL
+import java.net.UnknownHostException
 import java.util.Locale
 
 class TestDocumentOfferInteractor {
@@ -499,6 +501,63 @@ class TestDocumentOfferInteractor {
                 val expectedResult = ResolveDocumentOfferInteractorPartialState.Failure(
                     errorMessage = mockedGenericErrorMessage
                 )
+                assertEquals(expectedResult, awaitItem())
+            }
+        }
+
+    // Case 10:
+    // 1. walletCoreDocumentsController.resolveDocumentOffer() returns
+    // ResolveDocumentOfferPartialState.Failure with:
+    // a plain failure message and errorType NO_CONNECTION
+
+    // Case 10 Expected Result:
+    // ResolveDocumentOfferInteractorPartialState.Failure state, with:
+    // - the same failure message
+    // - errorType NO_CONNECTION
+    @Test
+    fun `Given Case 10, When resolveDocumentOffer is called, Then Case 10 Expected Result is returned`() =
+        coroutineRule.runTest {
+            // Given
+            mockWalletDocumentsControllerResolveOfferEventEmission(
+                event = ResolveDocumentOfferPartialState.Failure(
+                    errorMessage = mockedPlainFailureMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                )
+            )
+
+            // When
+            interactor.resolveDocumentOffer(mockedUriPath1).runFlowTest {
+                val expectedResult = ResolveDocumentOfferInteractorPartialState.Failure(
+                    errorMessage = mockedPlainFailureMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                )
+                // Then
+                assertEquals(expectedResult, awaitItem())
+            }
+        }
+
+    // Case 11:
+    // 1. walletCoreDocumentsController.resolveDocumentOffer() throws:
+    // a RuntimeException wrapping UnknownHostException (network error)
+
+    // Case 11 Expected Result:
+    // ResolveDocumentOfferInteractorPartialState.Failure state, with:
+    // - the exception's message
+    // - errorType NO_CONNECTION
+    @Test
+    fun `Given Case 11, When resolveDocumentOffer is called, Then Case 11 Expected Result is returned`() =
+        coroutineRule.runTest {
+            // Given
+            whenever(walletCoreDocumentsController.resolveDocumentOffer(mockedUriPath1))
+                .thenThrow(mockedNetworkException)
+
+            // When
+            interactor.resolveDocumentOffer(mockedUriPath1).runFlowTest {
+                val expectedResult = ResolveDocumentOfferInteractorPartialState.Failure(
+                    errorMessage = mockedNetworkExceptionMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                )
+                // Then
                 assertEquals(expectedResult, awaitItem())
             }
         }
@@ -950,6 +1009,82 @@ class TestDocumentOfferInteractor {
                 assertEquals(expectedResult, awaitItem())
             }
         }
+
+    // Case 11:
+    // 1. walletCoreDocumentsController.issueDocumentsByOffer emits
+    // IssueDocumentsPartialState.Failure with:
+    // mockedPlainFailureMessage as the error message and errorType NO_CONNECTION
+
+    // Case 11 Expected Result:
+    // IssueDocumentsInteractorPartialState.Failure state, with:
+    // - errorMessage equal to mockedPlainFailureMessage
+    // - errorType NO_CONNECTION
+    @Test
+    fun `Given Case 11, When issueDocuments is called, Then Case 11 Expected Result is returned`() =
+        coroutineRule.runTest {
+            // Given
+            mockWalletDocumentsControllerIssueByUriEventEmission(
+                offerUri = mockedUriPath1,
+                event = IssueDocumentsPartialState.Failure(
+                    errorMessage = mockedPlainFailureMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                )
+            )
+
+            // When
+            interactor.issueDocuments(
+                offerUri = mockedUriPath1,
+                issuerName = mockedIssuerName,
+                navigation = mockedConfigNavigationTypePop,
+                txCode = mockedTxCode
+            ).runFlowTest {
+                val expectedResult = IssueDocumentsInteractorPartialState.Failure(
+                    errorMessage = mockedPlainFailureMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                )
+                // Then
+                assertEquals(expectedResult, awaitItem())
+            }
+        }
+
+    // Case 12:
+    // 1. walletCoreDocumentsController.issueDocumentsByOffer throws:
+    // a RuntimeException wrapping UnknownHostException (network error)
+
+    // Case 12 Expected Result:
+    // IssueDocumentsInteractorPartialState.Failure state, with:
+    // - the exception's message
+    // - errorType NO_CONNECTION
+    @Test
+    fun `Given Case 12, When issueDocuments is called, Then Case 12 Expected Result is returned`() =
+        coroutineRule.runTest {
+            // Given
+            val mockedOffer = mockOffer(
+                issuerName = mockedIssuerName
+            )
+            whenever(
+                walletCoreDocumentsController.issueDocumentsByOffer(
+                    offer = mockedOffer,
+                    txCode = mockedTxCode
+                )
+            ).thenThrow(mockedNetworkException)
+
+            // When
+            interactor.credentialOffers[mockedUriPath1] = mockedOffer
+            interactor.issueDocuments(
+                offerUri = mockedUriPath1,
+                issuerName = mockedIssuerName,
+                navigation = mockedConfigNavigationTypePop,
+                txCode = mockedTxCode
+            ).runFlowTest {
+                val expectedResult = IssueDocumentsInteractorPartialState.Failure(
+                    errorMessage = mockedNetworkExceptionMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                )
+                // Then
+                assertEquals(expectedResult, awaitItem())
+            }
+        }
     //endregion
 
     //region handleUserAuthentication
@@ -1189,6 +1324,11 @@ class TestDocumentOfferInteractor {
     )
 
     private val mockHttpUrl = "https://issuer.eudiw.dev"
+    private val mockedNetworkExceptionMessage = "Unable to resolve host"
+    private val mockedNetworkException = RuntimeException(
+        mockedNetworkExceptionMessage,
+        UnknownHostException(mockedNetworkExceptionMessage)
+    )
 
     private val mockedTripleObject by lazy {
         Triple(

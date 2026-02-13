@@ -43,6 +43,9 @@ dependencies {
     implementation(project(LibraryModule.BusinessLogic.path))
     implementation(project(LibraryModule.ResourcesLogic.path))
 
+    // Test dependencies
+    testImplementation(project(LibraryModule.TestLogic.path))
+
     implementation(files("libs/jj2000_imageutil.jar"))
 
     // Core Android dependencies

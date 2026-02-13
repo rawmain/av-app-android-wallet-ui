@@ -19,6 +19,8 @@ package eu.europa.ec.corelogic.controller
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
+import eu.europa.ec.businesslogic.extension.toErrorType
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.extension.documentIdentifier
 import eu.europa.ec.corelogic.extension.getLocalizedDisplayName
@@ -156,7 +158,8 @@ class PassportScanningDocumentsControllerImpl(
             }
         }.getOrElse {
             FetchScopedDocumentsPartialState.Failure(
-                errorMessage = it.localizedMessage ?: genericErrorMessage
+                errorMessage = it.localizedMessage ?: genericErrorMessage,
+                errorType = it.toErrorType(),
             )
         }
     }
@@ -171,7 +174,8 @@ class PassportScanningDocumentsControllerImpl(
                     when (response) {
                         is IssueDocumentsPartialState.Failure -> emit(
                             IssueDocumentPartialState.Failure(
-                                errorMessage = documentErrorMessage
+                                errorMessage = documentErrorMessage,
+                                errorType = response.errorType,
                             )
                         )
 
@@ -204,7 +208,10 @@ class PassportScanningDocumentsControllerImpl(
             }
         }
     }.safeAsync {
-        IssueDocumentPartialState.Failure(errorMessage = documentErrorMessage)
+        IssueDocumentPartialState.Failure(
+            errorMessage = documentErrorMessage,
+            errorType = it.toErrorType(),
+        )
     }
 
     private fun issuePassportScanningDocumentWithOpenId4VCI(configId: String): Flow<IssueDocumentsPartialState> =
@@ -229,7 +236,8 @@ class PassportScanningDocumentsControllerImpl(
 
         }.safeAsync {
             IssueDocumentsPartialState.Failure(
-                errorMessage = documentErrorMessage
+                errorMessage = documentErrorMessage,
+                errorType = it.toErrorType(),
             )
         }
 
@@ -291,7 +299,8 @@ class PassportScanningDocumentsControllerImpl(
                 is IssueEvent.Failure -> {
                     trySendBlocking(
                         IssueDocumentsPartialState.Failure(
-                            errorMessage = documentErrorMessage
+                            errorMessage = documentErrorMessage,
+                            errorType = event.cause.toErrorType(),
                         )
                     )
                 }

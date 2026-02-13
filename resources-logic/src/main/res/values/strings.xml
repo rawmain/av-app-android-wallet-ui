@@ -68,6 +68,7 @@
     <string name="content_description_message_icon">Message</string>
     <string name="content_description_more_vert_icon">More Items</string>
     <string name="content_description_national_eid_icon">National eID</string>
+    <string name="content_description_no_connection_icon">No internet connection</string>
     <string name="content_description_open_new_icon">Open new</string>
     <string name="content_description_over_18_icon">Over 18</string>
     <string name="content_description_present_document_same_device_icon">Present document in person</string>
@@ -113,6 +114,7 @@
     <string name="generic_error_description">If the issue persists, please contact customer support</string>
     <string name="generic_error_message">Oups! Something went wrong</string>
     <string name="generic_error_retry">Please try again</string>
+    <string name="generic_network_error_description">Please connect to Wi-Fi or mobile data and try again.</string>
     <string name="generic_network_error_message">You are not connected to the internet</string>
     <string name="generic_no">No</string>
     <string name="generic_ok">OK</string>
@@ -134,7 +136,7 @@
     <string name="issuance_code_title">%1$s requires verification</string>
     <string name="issuance_document_offer_deferred_success_description">Your documents from %1$s have been requested. You will be notified when they have been issued to your application.</string>
     <string name="issuance_document_offer_deferred_success_description_with_doc">Your document %s has been requested. You will be notified when it has been issued to your application.</string>
-    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %1$s has been requested from %2$s. You will be notified when it has been issued to your application.</string>
+    <string name="issuance_document_offer_deferred_success_description_with_doc_and_issuer">Your document %s has been requested from %s. You will be notified when it has been issued to your application.</string>
     <string name="issuance_document_offer_deferred_success_primary_button_text">OK</string>
     <string name="issuance_document_offer_deferred_success_text">In Progress!</string>
     <string name="issuance_document_offer_description">The following transaction requires your permission and authentication.</string>
@@ -247,8 +249,10 @@
     <string name="passport_live_video_step_second">Follow the on-screen instructions (e.g., blink or turn your head).</string>
     <string name="passport_live_video_step_third">Avoid filters, masks, or obstructions.</string>
     <string name="passport_scan_intro_back_button">Back</string>
-    <string name="passport_scan_intro_data_download_notice">Verification requires additional data. When you tap Start, approximately 250MB of assets will be downloaded for face matching.</string>
+    <string name="passport_scan_intro_data_download_notice">Verification requires additional data. When you tap Download, approximately 250MB of assets will be downloaded for face matching.</string>
     <string name="passport_scan_intro_description">The passport / ID card method is quick and secure! Take a photo of your passport / ID card, scan your passport / ID card, and record a video of yourself—three steps for secure onboarding.</string>
+    <string name="passport_scan_intro_download_button">Download</string>
+    <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Age verification enrollment method</string>
     <string name="passport_scan_intro_start_button">Start</string>
     <string name="passport_scan_intro_step_1_description">Capture a clear photo of your identity document page with personal details.</string>
@@ -274,6 +278,7 @@
     <string name="quick_pin_bottom_sheet_cancel_secondary_button_text">No</string>
     <string name="quick_pin_bottom_sheet_cancel_subtitle">Are you sure you wanna cancel the PIN change?</string>
     <string name="quick_pin_bottom_sheet_cancel_title">Cancel the PIN change?</string>
+    <string name="quick_pin_cant_use_previous_pin">New PIN needs to be different than previous PINs</string>
     <string name="quick_pin_change_enter_new_subtitle">Choose your new PIN</string>
     <string name="quick_pin_change_help_text">Please avoid using consecutive numbers or birthdays if possible.</string>
     <string name="quick_pin_change_lockout_countdown_minutes">Change PIN blocked. Try again in %d:%02d</string>
