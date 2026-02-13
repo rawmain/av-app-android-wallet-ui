@@ -112,6 +112,12 @@ interface AVFaceMatchSDK {
     fun captureAndMatch(referenceImagePath: String, onResult: (AVMatchResult) -> Unit)
 
     /**
+     * Cancel any ongoing initialization (model download/preparation).
+     * Returns initialization status to NotInitialized so init() can be called again.
+     */
+    fun cancelInit()
+
+    /**
      * Reset the SDK state
      * Returns initialization status to NotInitialized
      */

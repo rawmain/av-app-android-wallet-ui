@@ -20,6 +20,7 @@ import android.content.Context
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.interactor.DeviceAuthenticationInteractor
 import eu.europa.ec.corelogic.config.WalletCoreConfig
@@ -51,7 +52,10 @@ sealed class EnrollmentInteractorPartialState {
         val resultHandler: DeviceAuthenticationResult,
     ) : EnrollmentInteractorPartialState()
 
-    data class Failure(val error: String) : EnrollmentInteractorPartialState()
+    data class Failure(
+        val error: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : EnrollmentInteractorPartialState()
 }
 
 interface EnrollmentInteractor {
@@ -116,13 +120,23 @@ class EnrollmentInteractorImpl(
                             )
 
                         is IssueDocumentPartialState.Failure ->
-                            emit(EnrollmentInteractorPartialState.Failure(issueState.errorMessage))
+                            emit(
+                                EnrollmentInteractorPartialState.Failure(
+                                    error = issueState.errorMessage,
+                                    errorType = issueState.errorType,
+                                )
+                            )
                     }
                 }
             }
 
             is FetchScopedDocumentsPartialState.Failure ->
-                emit(EnrollmentInteractorPartialState.Failure(state.errorMessage))
+                emit(
+                    EnrollmentInteractorPartialState.Failure(
+                        error = state.errorMessage,
+                        errorType = state.errorType,
+                    )
+                )
         }
     }
 

@@ -35,9 +35,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.File
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Implementation of AVFaceMatchSDK for passport face verification
@@ -51,8 +53,11 @@ class AVFaceMatchSdkImpl(
 ) : AVFaceMatchSDK {
 
     private val sdkScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var initJob: Job? = null
     private val modelDownloader = ModelDownloader(context, logController)
+    @Volatile
     private var modelsPrepared = false
+    @Volatile
     private var sdkInitialized = false
     private val embeddingOutputFilename = "embedding.onnx"
 
@@ -71,26 +76,21 @@ class AVFaceMatchSdkImpl(
         config: FaceMatchConfig,
         context: Context,
     ): Flow<SdkInitStatus> {
-        // Check if already initialized or in progress
-        when (_initStatus.value) {
-            is SdkInitStatus.Ready -> {
-                logController.d(TAG) { "init: SDK already initialized, returning existing flow" }
-                return initStatusFlow
-            }
-
-            is SdkInitStatus.Preparing, is SdkInitStatus.Initializing -> {
-                logController.d(TAG) { "init: Initialization already in progress, returning existing flow" }
-                return initStatusFlow
-            }
-
-            is SdkInitStatus.Error, is SdkInitStatus.NotInitialized -> {
-                // Continue with initialization
-                logController.d(TAG) { "init: Starting SDK initialization" }
-            }
+        // Check if already initialized
+        if (_initStatus.value is SdkInitStatus.Ready) {
+            logController.d(TAG) { "init: SDK already initialized, returning existing flow" }
+            return initStatusFlow
         }
 
-        // Launch initialization in background
-        sdkScope.launch {
+        // Check if initialization is actively running
+        if (initJob?.isActive == true) {
+            logController.d(TAG) { "init: Initialization already in progress, returning existing flow" }
+            return initStatusFlow
+        }
+
+        // Start new initialization
+        logController.d(TAG) { "init: Starting SDK initialization" }
+        initJob = sdkScope.launch {
             performInitialization(config, context)
         }
 
@@ -171,6 +171,9 @@ class AVFaceMatchSdkImpl(
             } else {
                 failWithError("Native SDK initialization failed. Check that all model files are valid and compatible.")
             }
+        } catch (e: CancellationException) {
+            logController.d(TAG) { "init: Initialization was cancelled" }
+            throw e
         } catch (e: Exception) {
             logController.e(TAG, e) { "init: Exception during initialization" }
             failWithError("Initialization failed: ${e.message}")
@@ -263,6 +266,15 @@ class AVFaceMatchSdkImpl(
                 )
             )
         }
+    }
+
+    override fun cancelInit() {
+        logController.d(TAG) { "cancelInit: Cancelling SDK initialization" }
+        initJob?.cancel()
+        initJob = null
+        modelsPrepared = false
+        _initStatus.value = SdkInitStatus.NotInitialized
+        logController.d(TAG) { "cancelInit: SDK initialization cancelled" }
     }
 
     override fun reset() {

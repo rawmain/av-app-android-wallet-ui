@@ -16,6 +16,7 @@
 
 package eu.europa.ec.presentationfeature.interactor
 
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.config.PresentationMode
 import eu.europa.ec.commonfeature.config.RequestUriConfig
@@ -57,6 +58,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.net.URI
+import java.net.UnknownHostException
 
 class TestPresentationRequestInteractor {
 
@@ -367,6 +369,77 @@ class TestPresentationRequestInteractor {
             // When
             interactor.getRequestDocuments().expectNoEvents()
         }
+
+    // Case 9:
+    // walletCorePresentationController.events emits:
+    // TransferEventPartialState.Error, with:
+    // 1. an error message
+    // 2. errorType NO_CONNECTION
+
+    // Case 9 Expected Result:
+    // PresentationRequestInteractorPartialState.Failure with:
+    // 1. the same error message
+    // 2. errorType NO_CONNECTION
+    @Test
+    fun `Given Case 9, When getRequestDocuments is called, Then Case 9 expected result is returned`() =
+        coroutineRule.runTest {
+            // Given
+            mockWalletCorePresentationControllerEventEmission(
+                event = TransferEventPartialState.Error(
+                    error = mockedPlainFailureMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                )
+            )
+
+            // When
+            interactor.getRequestDocuments().runFlowTest {
+                val expectedResult = PresentationRequestInteractorPartialState.Failure(
+                    error = mockedPlainFailureMessage,
+                    errorType = ErrorType.NO_CONNECTION,
+                )
+
+                // Then
+                assertEquals(expectedResult, awaitItem())
+            }
+        }
+
+    // Case 10:
+    // 1. walletCorePresentationController.events emits:
+    // TransferEventPartialState.RequestReceived
+    // and 2. walletCoreDocumentsController getAllIssuedDocuments throws a network exception
+
+    // Case 10 Expected Result:
+    // PresentationRequestInteractorPartialState.Failure with:
+    // 1. the exception's message
+    // 2. errorType NO_CONNECTION
+    @Test
+    fun `Given Case 10, When getRequestDocuments is called, Then Case 10 expected result is returned`() =
+        coroutineRule.runTest {
+            // Given
+            mockWalletCorePresentationControllerEventEmission(
+                event = TransferEventPartialState.RequestReceived(
+                    requestData = listOf(
+                        mockedValidMdlWithBasicFieldsRequestDocument
+                    ),
+                    verifierName = mockedVerifierName,
+                    verifierIsTrusted = mockedVerifierIsTrusted
+                )
+            )
+            whenever(walletCoreDocumentsController.getAllIssuedDocuments())
+                .thenThrow(mockedNetworkException)
+
+            // When
+            interactor.getRequestDocuments().runFlowTest {
+                val expectedResult =
+                    PresentationRequestInteractorPartialState.Failure(
+                        error = mockedNetworkExceptionMessage,
+                        errorType = ErrorType.NO_CONNECTION,
+                    )
+
+                // Then
+                assertEquals(expectedResult, awaitItem())
+            }
+        }
     //endregion
 
     //region updateRequestedDocuments
@@ -454,5 +527,10 @@ class TestPresentationRequestInteractor {
 
     //region mocked objects
     private val mockedInitiatorRoute = "mockedInitiatorRoute"
+    private val mockedNetworkExceptionMessage = "Unable to resolve host"
+    private val mockedNetworkException = RuntimeException(
+        mockedNetworkExceptionMessage,
+        UnknownHostException(mockedNetworkExceptionMessage)
+    )
     //endregion
 }

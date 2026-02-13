@@ -16,6 +16,7 @@
 
 package eu.europa.ec.onboardingfeature.ui.passport.passportscanintro
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -70,10 +72,13 @@ fun PassportScanIntroScreen(
         isLoading = state.isLoading,
         navigatableAction = ScreenNavigateAction.NONE,
         onBack = { viewModel.setEvent(Event.OnBackPressed) },
+        contentErrorConfig = state.error,
         stickyBottom = { paddingValues ->
             ActionButtons(
+                state = state,
                 onBackPressed = { viewModel.setEvent(Event.OnBackPressed) },
-                onStartProcedure = { viewModel.setEvent(Event.OnStartProcedure(context)) },
+                onDownloadClicked = { viewModel.setEvent(Event.OnDownloadClicked(context)) },
+                onStartClicked = { viewModel.setEvent(Event.OnStartClicked) },
                 paddingValues = paddingValues
             )
         }
@@ -86,18 +91,21 @@ fun PassportScanIntroScreen(
             handleEffect(effect, hostNavController)
         }.collect()
     }
-
-    LaunchedEffect(Unit) {
-        viewModel.setEvent(Event.Init)
-    }
 }
 
 @Composable
 private fun ActionButtons(
+    state: State,
     onBackPressed: () -> Unit = {},
-    onStartProcedure: () -> Unit = {},
+    onDownloadClicked: () -> Unit = {},
+    onStartClicked: () -> Unit = {},
     paddingValues: PaddingValues,
 ) {
+    val isDownloading = state.sdkReadiness == SdkReadiness.Downloading
+    val isReady = state.sdkReadiness == SdkReadiness.Ready
+
+    val primaryButtonOnClick = if (isReady) onStartClicked else onDownloadClicked
+
     val buttons = StickyBottomType.TwoButtons(
         primaryButtonConfig = ButtonConfig(
             type = ButtonType.SECONDARY,
@@ -105,22 +113,37 @@ private fun ActionButtons(
         ),
         secondaryButtonConfig = ButtonConfig(
             type = ButtonType.PRIMARY,
-            onClick = { onStartProcedure() }
+            enabled = !isDownloading,
+            onClick = primaryButtonOnClick
         )
     )
+
     Column {
-        WrapText(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues),
-            text = stringResource(R.string.passport_scan_intro_data_download_notice),
-            textConfig = TextConfig(
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                textAlign = TextAlign.Center,
-                maxLines = Int.MAX_VALUE
-            ),
-        )
+        AnimatedVisibility(visible = isDownloading && state.downloadProgress > 0) {
+            LinearProgressIndicator(
+                progress = { state.downloadProgress / 100f },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues)
+                    .padding(bottom = 8.dp),
+            )
+        }
+
+        AnimatedVisibility(visible = !isReady) {
+            WrapText(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues),
+                text = stringResource(R.string.passport_scan_intro_data_download_notice),
+                textConfig = TextConfig(
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    textAlign = TextAlign.Center,
+                    maxLines = Int.MAX_VALUE
+                ),
+            )
+        }
+
         WrapStickyBottomContent(
             modifier = Modifier
                 .fillMaxWidth()
@@ -128,7 +151,17 @@ private fun ActionButtons(
             stickyBottomConfig = StickyBottomConfig(type = buttons, showDivider = false)
         ) {
             when (it?.type) {
-                ButtonType.PRIMARY -> Text(text = stringResource(R.string.passport_scan_intro_start_button))
+                ButtonType.PRIMARY -> {
+                    val buttonText = when {
+                        isReady -> stringResource(R.string.passport_scan_intro_start_button)
+                        isDownloading -> stringResource(
+                            R.string.passport_scan_intro_downloading_button,
+                            state.downloadProgress
+                        )
+                        else -> stringResource(R.string.passport_scan_intro_download_button)
+                    }
+                    Text(text = buttonText)
+                }
                 ButtonType.SECONDARY -> Text(text = stringResource(R.string.passport_scan_intro_back_button))
                 else -> {}
             }
@@ -231,8 +264,10 @@ private fun PassportScanIntroScreenPreview() {
             onBack = {},
             stickyBottom = { paddingValues ->
                 ActionButtons(
+                    state = State(),
                     onBackPressed = {},
-                    onStartProcedure = {},
+                    onDownloadClicked = {},
+                    onStartClicked = {},
                     paddingValues = paddingValues
                 )
             }

@@ -20,6 +20,8 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.businesslogic.extension.toErrorType
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.commonfeature.config.IssuanceSuccessUiConfig
 import eu.europa.ec.commonfeature.config.OfferUiConfig
 import eu.europa.ec.commonfeature.config.PresentationMode
@@ -28,10 +30,12 @@ import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
 import eu.europa.ec.onboardingfeature.interactor.CredentialIssuancePartialState
 import eu.europa.ec.onboardingfeature.interactor.PassportCredentialIssuanceInteractor
 import eu.europa.ec.onboardingfeature.ui.passport.passportcredentialissuance.Effect.Navigation.OpenDeepLinkAction
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.config.NavigationType.PushScreen
+import eu.europa.ec.uilogic.extension.createErrorConfigFromMessage
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -60,7 +64,7 @@ sealed class Event : ViewEvent {
     data class Init(val context: Context) : Event()
     data class OnResume(val deepLink: Uri?) : Event()
     data object OnBackPressed : Event()
-    data object OnRetry : Event()
+    data class OnRetry(val context: Context) : Event()
     data object OnPause : Event()
     data class OnResumeIssuance(val uri: String) : Event()
     data class OnDynamicPresentation(val uri: String) : Event()
@@ -79,6 +83,7 @@ sealed class Effect : ViewSideEffect {
 class IdentityDocumentCredentialIssuanceViewModel(
     private val uiSerializer: UiSerializer,
     private val logController: LogController,
+    private val resourceProvider: ResourceProvider,
     private val passportCredentialIssuanceInteractor: PassportCredentialIssuanceInteractor,
 ) : MviViewModel<Event, State, Effect>() {
 
@@ -148,8 +153,9 @@ class IdentityDocumentCredentialIssuanceViewModel(
                 Effect.Navigation.GoBack
             }
 
-            Event.OnRetry -> {
+            is Event.OnRetry -> {
                 setState { copy(error = null) }
+                issueCredential(event.context)
             }
 
             is Event.OnPause -> {
@@ -200,14 +206,22 @@ class IdentityDocumentCredentialIssuanceViewModel(
                             is CredentialIssuancePartialState.Failure -> {
                                 logController.e(TAG) { "Document issuance failed: ${issueState.error}" }
                                 setState { copy(isLoading = false) }
-                                showError(issueState.error)
+                                showError(
+                                    errorMessage = issueState.error,
+                                    errorType = issueState.errorType,
+                                    context = context,
+                                )
                             }
                         }
                     }
             } catch (e: Exception) {
                 logController.e(TAG, e) { "Exception in consent and issue flow" }
                 setState { copy(isLoading = false) }
-                showError(e.message)
+                showError(
+                    errorMessage = e.message,
+                    errorType = e.toErrorType(),
+                    context = context,
+                )
             }
         }
     }
@@ -327,13 +341,19 @@ class IdentityDocumentCredentialIssuanceViewModel(
         }
     }
 
-    private fun showError(errorMessage: String?) {
+    private fun showError(
+        errorMessage: String?,
+        errorType: ErrorType = ErrorType.GENERIC,
+        context: Context,
+    ) {
         setState {
             copy(
-                error = ContentErrorConfig(
-                    errorSubTitle = errorMessage,
+                error = createErrorConfigFromMessage(
+                    errorMessage = errorMessage.orEmpty(),
+                    resourceProvider = resourceProvider,
+                    errorType = errorType,
+                    onRetry = { setEvent(Event.OnRetry(context)) },
                     onCancel = { setEvent(Event.OnBackPressed) },
-                    onRetry = { setEvent(Event.OnRetry) }
                 )
             )
         }

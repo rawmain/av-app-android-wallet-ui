@@ -30,6 +30,7 @@ import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
+import eu.europa.ec.uilogic.extension.createErrorConfigFromMessage
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -208,7 +209,10 @@ class EnrollmentViewModel(
                         setState {
                             copy(
                                 isLoading = false,
-                                error = ContentErrorConfig(
+                                error = createErrorConfigFromMessage(
+                                    errorMessage = state.error,
+                                    resourceProvider = resourceProvider,
+                                    errorType = state.errorType,
                                     onRetry = {
                                         setEvent(
                                             Event.SelectEnrollmentMethod(
@@ -217,7 +221,6 @@ class EnrollmentViewModel(
                                             )
                                         )
                                     },
-                                    errorSubTitle = state.error,
                                     onCancel = {
                                         setEvent(Event.DismissError)
                                         if (!viewState.value.isOnboarding) {

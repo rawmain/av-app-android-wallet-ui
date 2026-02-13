@@ -33,7 +33,7 @@ interface ResourceProvider {
     fun getQuantityString(@PluralsRes resId: Int, quantity: Int, vararg formatArgs: Any): String
     fun getString(@StringRes resId: Int, vararg formatArgs: Any): String
     fun genericErrorMessage(): String
-    fun genericNetworkErrorMessage(): String
+    fun genericNetworkErrorTitle(): String
     fun getLocale(): Locale
 }
 
@@ -48,7 +48,7 @@ class ResourceProviderImpl(
     override fun genericErrorMessage() =
         context.getString(R.string.generic_error_description)
 
-    override fun genericNetworkErrorMessage() =
+    override fun genericNetworkErrorTitle() =
         context.getString(R.string.generic_network_error_message)
 
 

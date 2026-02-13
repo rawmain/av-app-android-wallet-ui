@@ -17,21 +17,20 @@
 package eu.europa.ec.onboardingfeature.interactor
 
 import android.content.Context
-import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchController
 import eu.europa.ec.passportscanner.face.SdkInitStatus
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.rule.CoroutineTestRule
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
-import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -42,9 +41,6 @@ class TestPassportScanIntroInteractor {
 
     @Mock
     private lateinit var faceMatchController: FaceMatchController
-
-    @Mock
-    private lateinit var logController: LogController
 
     @Mock
     private lateinit var context: Context
@@ -58,8 +54,7 @@ class TestPassportScanIntroInteractor {
         closeable = MockitoAnnotations.openMocks(this)
 
         interactor = PassportScanIntroInteractorImpl(
-            faceMatchController = faceMatchController,
-            logController = logController
+            faceMatchController = faceMatchController
         )
     }
 
@@ -68,47 +63,45 @@ class TestPassportScanIntroInteractor {
         closeable.close()
     }
 
-    //region init
+    //region initFaceMatchSDK
 
     @Test
-    fun `Given SDK initialization, When init is called, Then triggers controller init and completes successfully`() {
+    fun `Given SDK initialization, When initFaceMatchSDK is called, Then emits all status updates`() {
         coroutineRule.runTest {
             // Given
-            val initFlow = flowOf(
+            val expectedStatuses = listOf(
                 SdkInitStatus.NotInitialized,
                 SdkInitStatus.Preparing(50),
                 SdkInitStatus.Initializing,
                 SdkInitStatus.Ready
             )
-            whenever(faceMatchController.init(any())).thenReturn(initFlow)
+            whenever(faceMatchController.init(any())).thenReturn(flowOf(*expectedStatuses.toTypedArray()))
 
             // When
-            interactor.init(context)
+            val result = interactor.initFaceMatchSDK(context).toList()
 
-            // Then - verify init was called (with timeout since it's fire-and-forget)
-            // Give some time for the launched coroutine to start
-            delay(100)
-            verify(faceMatchController, timeout(1000)).init(context)
+            // Then
+            verify(faceMatchController).init(context)
+            assertEquals(expectedStatuses, result)
         }
     }
 
     @Test
-    fun `Given SDK initialization fails, When init is called, Then still completes without throwing`() {
+    fun `Given SDK initialization fails, When initFaceMatchSDK is called, Then emits error status`() {
         coroutineRule.runTest {
             // Given
-            val initFlow = flowOf(
+            val expectedStatuses = listOf(
                 SdkInitStatus.NotInitialized,
                 SdkInitStatus.Error("Init failed")
             )
-            whenever(faceMatchController.init(any())).thenReturn(initFlow)
+            whenever(faceMatchController.init(any())).thenReturn(flowOf(*expectedStatuses.toTypedArray()))
 
-            // When - should not throw
-            interactor.init(context)
+            // When
+            val result = interactor.initFaceMatchSDK(context).toList()
 
-            // Then - verify init was called (with timeout since it's fire-and-forget)
-            // Give some time for the launched coroutine to start
-            delay(100)
-            verify(faceMatchController, timeout(1000)).init(context)
+            // Then
+            verify(faceMatchController).init(context)
+            assertEquals(expectedStatuses, result)
         }
     }
 
