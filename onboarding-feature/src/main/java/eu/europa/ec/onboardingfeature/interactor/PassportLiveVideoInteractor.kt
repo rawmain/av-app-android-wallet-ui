@@ -18,6 +18,7 @@ package eu.europa.ec.onboardingfeature.interactor
 
 import android.content.Context
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.onboardingfeature.controller.FaceMatchController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchResult
 import eu.europa.ec.passportscanner.face.SdkInitStatus
@@ -33,7 +34,10 @@ sealed class FaceMatchSDKPartialState {
     data class Preparing(val progress: Int) : FaceMatchSDKPartialState()
     data object Initializing : FaceMatchSDKPartialState()
     data object Ready : FaceMatchSDKPartialState()
-    data class Error(val message: String) : FaceMatchSDKPartialState()
+    data class Error(
+        val message: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : FaceMatchSDKPartialState()
 }
 
 sealed class FaceMatchPartialState {
@@ -79,7 +83,7 @@ class PassportLiveVideoInteractorImpl(
 
                 is SdkInitStatus.Error -> {
                     logController.e(TAG) { "SDK error: ${sdkStatus.message}" }
-                    FaceMatchSDKPartialState.Error(sdkStatus.message)
+                    FaceMatchSDKPartialState.Error(sdkStatus.message, sdkStatus.errorType)
                 }
             }
         }

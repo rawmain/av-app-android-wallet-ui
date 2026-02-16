@@ -19,6 +19,7 @@ package eu.europa.ec.onboardingfeature.ui.passport.passportlivevideo
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchPartialState
 import eu.europa.ec.onboardingfeature.interactor.FaceMatchSDKPartialState
@@ -26,6 +27,7 @@ import eu.europa.ec.onboardingfeature.interactor.PassportLiveVideoInteractor
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
+import eu.europa.ec.uilogic.extension.createErrorConfigFromMessage
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -145,7 +147,7 @@ class PassportLiveVideoViewModel(
                         is FaceMatchSDKPartialState.Error -> {
                             logController.e(TAG) { "SDK initialization error: ${initState.message}" }
                             setState { copy(isInitializing = false, progress = 0) }
-                            showError(initState.message)
+                            showError(initState.message, initState.errorType)
                         }
                     }
                 }
@@ -211,13 +213,15 @@ class PassportLiveVideoViewModel(
     }
 
 
-    private fun showError(errorMessage: String) {
+    private fun showError(errorMessage: String, errorType: ErrorType = ErrorType.GENERIC) {
         setState {
             copy(
-                error = ContentErrorConfig(
-                    errorSubTitle = errorMessage,
+                error = createErrorConfigFromMessage(
+                    errorMessage = errorMessage,
+                    resourceProvider = resourceProvider,
+                    errorType = errorType,
                     onCancel = { setEvent(Event.OnBackPressed) },
-                    onRetry = { setEvent(Event.OnRetry) }
+                    onRetry = { setEvent(Event.OnRetry) },
                 )
             )
         }

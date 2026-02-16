@@ -18,6 +18,7 @@ package eu.europa.ec.passportscanner.face
 
 import android.content.Context
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.businesslogic.extension.isNoConnectionError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -132,6 +133,7 @@ class ModelDownloader(
             }
         } catch (e: Exception) {
             logController.e(TAG, e) { "downloadModelFromUrl: Failed to download from $urlString" }
+            if (e.isNoConnectionError()) throw e
             null
         } finally {
             // Clean up temp file if it wasn't successfully renamed

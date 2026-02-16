@@ -18,6 +18,7 @@ package eu.europa.ec.onboardingfeature.interactor
 
 import android.content.Context
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.onboardingfeature.controller.FaceMatchController
 import eu.europa.ec.onboardingfeature.controller.FaceMatchResult
 import eu.europa.ec.passportscanner.face.SdkInitStatus
@@ -150,6 +151,34 @@ class TestPassportLiveVideoInteractor {
             assert(results[1] is FaceMatchSDKPartialState.Preparing)
             assert(results[2] is FaceMatchSDKPartialState.Error)
             assertEquals(errorMessage, (results[2] as FaceMatchSDKPartialState.Error).message)
+            assertEquals(ErrorType.GENERIC, (results[2] as FaceMatchSDKPartialState.Error).errorType)
+        }
+    }
+
+    @Test
+    fun `Given SDK initialization fails with no connection, When init called, Then emits Error state with NO_CONNECTION`() {
+        coroutineRule.runTest {
+            // Given
+            val errorMessage = "Initialization failed: Unable to resolve host"
+            val initFlow = flowOf(
+                SdkInitStatus.NotInitialized,
+                SdkInitStatus.Error(
+                    message = errorMessage,
+                    errorType = ErrorType.NO_CONNECTION
+                )
+            )
+            whenever(faceMatchController.init(any())).thenReturn(initFlow)
+
+            // When
+            val results = interactor.initFaceMatchSDK(context).toList()
+
+            // Then
+            assertEquals(2, results.size)
+            assert(results[0] is FaceMatchSDKPartialState.NotInitialized)
+            assert(results[1] is FaceMatchSDKPartialState.Error)
+            val errorState = results[1] as FaceMatchSDKPartialState.Error
+            assertEquals(errorMessage, errorState.message)
+            assertEquals(ErrorType.NO_CONNECTION, errorState.errorType)
         }
     }
 

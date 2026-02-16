@@ -27,6 +27,8 @@ package eu.europa.ec.passportscanner.face
 import android.content.Context
 import android.content.Intent
 import eu.europa.ec.businesslogic.controller.log.LogController
+import eu.europa.ec.businesslogic.extension.toErrorType
+import eu.europa.ec.businesslogic.model.ErrorType
 import kl.open.fmandroid.NativeBridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -90,6 +92,7 @@ class AVFaceMatchSdkImpl(
 
         // Start new initialization
         logController.d(TAG) { "init: Starting SDK initialization" }
+        _initStatus.value = SdkInitStatus.NotInitialized
         initJob = sdkScope.launch {
             performInitialization(config, context)
         }
@@ -176,12 +179,12 @@ class AVFaceMatchSdkImpl(
             throw e
         } catch (e: Exception) {
             logController.e(TAG, e) { "init: Exception during initialization" }
-            failWithError("Initialization failed: ${e.message}")
+            failWithError("Initialization failed: ${e.message}", e.toErrorType())
         }
     }
 
-    private fun failWithError(message: String) {
-        _initStatus.value = SdkInitStatus.Error(message)
+    private fun failWithError(message: String, errorType: ErrorType = ErrorType.GENERIC) {
+        _initStatus.value = SdkInitStatus.Error(message, errorType)
     }
 
     override fun captureAndMatch(referenceImagePath: String, onResult: (AVMatchResult) -> Unit) {
