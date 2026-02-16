@@ -14,8 +14,8 @@
  * governing permissions and limitations under the Licence.
  */
 
+import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.variant.LibraryAndroidComponentsExtension
-import com.android.build.gradle.LibraryExtension
 import com.google.android.libraries.mapsplatform.secrets_gradle_plugin.SecretsPluginExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -58,6 +58,9 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             val openId4VpScheme = "openid4vp"
             val openid4VpHost = "*"
 
+            val haipOpenId4VpScheme = "haip-vp"
+            val haipOpenid4VpHost = "*"
+
             val credentialOfferScheme = "openid-credential-offer"
             val credentialOfferHost = "*"
 
@@ -69,13 +72,12 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 apply("project.android.library.kover")
                 apply("project.android.lint")
                 apply("project.android.koin")
-                apply("org.jetbrains.kotlin.android")
                 apply("kotlinx-serialization")
                 apply("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
                 apply("kotlin-parcelize")
             }
 
-            extensions.configure<LibraryExtension> {
+            extensions.configure<LibraryExtension>("android") {
                 configureKotlinAndroid(this)
                 with(defaultConfig) {
 
@@ -90,6 +92,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     addConfigField("AVSP_SCHEME", avspScheme)
                     addConfigField("AV_SCHEME", avScheme)
                     addConfigField("CREDENTIAL_OFFER_SCHEME", credentialOfferScheme)
+                    addConfigField("CREDENTIAL_OFFER_HAIP_SCHEME", credentialOfferHaipScheme)
                     addConfigField("ISSUE_AUTHORIZATION_SCHEME", openId4VciAuthorizationScheme)
                     addConfigField("ISSUE_AUTHORIZATION_HOST", openId4VciAuthorizationHost)
                     addConfigField(
@@ -116,6 +119,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     // Manifest placeholders used for OpenId4VCI
                     manifestPlaceholders["credentialOfferHost"] = credentialOfferHost
                     manifestPlaceholders["credentialOfferScheme"] = credentialOfferScheme
+                    manifestPlaceholders["credentialOfferHaipHost"] = credentialOfferHaipHost
+                    manifestPlaceholders["credentialOfferHaipScheme"] = credentialOfferHaipScheme
 
                     // Manifest placeholders used for OpenId4VCI Authorization
                     manifestPlaceholders["openId4VciAuthorizationScheme"] =

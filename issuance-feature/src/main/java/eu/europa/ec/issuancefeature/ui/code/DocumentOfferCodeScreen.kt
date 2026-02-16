@@ -70,6 +70,7 @@ fun DocumentOfferCodeScreen(
         onBack = { viewModel.setEvent(Event.Pop) },
     ) { paddingValues ->
         Content(
+            context = context,
             title = state.screenTitle,
             subTitle = state.screenSubtitle,
             pinCodeLength = state.offerCodeUiConfig.txCodeLength,
@@ -85,6 +86,7 @@ fun DocumentOfferCodeScreen(
 
 @Composable
 private fun Content(
+    context: Context,
     title: String,
     subTitle: String,
     pinCodeLength: Int,
@@ -126,8 +128,6 @@ private fun Content(
                 )
             )
         }
-
-        val context = LocalContext.current
 
         CodeFieldLayout(
             modifier = Modifier

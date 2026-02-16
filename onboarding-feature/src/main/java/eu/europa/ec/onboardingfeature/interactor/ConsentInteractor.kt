@@ -14,6 +14,7 @@
  * governing permissions and limitations under the Licence.
  */
 
+<<<<<<<< HEAD:onboarding-feature/src/main/java/eu/europa/ec/onboardingfeature/interactor/ConsentInteractor.kt
 package eu.europa.ec.onboardingfeature.interactor
 
 import eu.europa.ec.commonfeature.model.PinFlow
@@ -36,4 +37,22 @@ class ConsentInteractorImpl(
     }
 
 
+========
+import org.gradle.api.Plugin
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.dependencies
+import project.convention.logic.libs
+
+class KtorPlugin : Plugin<Project> {
+    override fun apply(target: Project) {
+        with(target) {
+            dependencies {
+                add("implementation", libs.findLibrary("ktor-android").get())
+                add("implementation", libs.findLibrary("ktor-logging").get())
+                add("implementation", libs.findLibrary("ktor-client-content-negotiation").get())
+                add("implementation", libs.findLibrary("ktor-serialization-kotlinx-json").get())
+            }
+        }
+    }
+>>>>>>>> ref/main:build-logic/convention/src/main/kotlin/KtorPlugin.kt
 }

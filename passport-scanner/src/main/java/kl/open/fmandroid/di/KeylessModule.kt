@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 European Commission
+ * Copyright (c) 2025 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -14,6 +14,7 @@
  * governing permissions and limitations under the Licence.
  */
 
+<<<<<<<< HEAD:passport-scanner/src/main/java/kl/open/fmandroid/di/KeylessModule.kt
 package kl.open.fmandroid.di
 
 import eu.europa.ec.businesslogic.controller.log.LogController
@@ -28,3 +29,23 @@ class KeylessModule
 
 @Factory
 fun provideNativeBridge(logController: LogController): NativeBridge = NativeBridge(logController)
+========
+package eu.europa.ec.dashboardfeature.ui.transactions.list.model
+
+import eu.europa.ec.businesslogic.util.toDisplayedDate
+import java.time.LocalDate
+
+data class FilterDateRangeSelectionUi(
+    val startDate: LocalDate? = null,
+    val endDate: LocalDate? = null
+) {
+    val displayedStartDate: String
+        get() = startDate.toDisplayedDate()
+
+    val displayedEndDate: String
+        get() = endDate.toDisplayedDate()
+
+    val isEmpty: Boolean
+        get() = startDate == null && endDate == null
+}
+>>>>>>>> ref/main:dashboard-feature/src/main/java/eu/europa/ec/dashboardfeature/ui/transactions/list/model/FilterDateRangeSelectionUi.kt

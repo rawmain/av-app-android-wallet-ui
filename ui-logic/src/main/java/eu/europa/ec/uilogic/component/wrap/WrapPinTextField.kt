@@ -50,6 +50,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalTextToolbar
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -66,6 +67,7 @@ import eu.europa.ec.uilogic.component.utils.HSpacer
 import eu.europa.ec.uilogic.component.utils.OneTimeLaunchedEffect
 import eu.europa.ec.uilogic.component.utils.SIZE_EXTRA_SMALL
 import eu.europa.ec.uilogic.component.utils.SPACING_SMALL
+import eu.europa.ec.uilogic.util.TestTag
 
 @Composable
 fun WrapPinTextField(
@@ -143,6 +145,7 @@ fun WrapPinTextField(
                     DisableSelection {
                         OutlinedTextField(
                             modifier = Modifier
+                                .testTag(TestTag.pinTextField(currentTextField))
                                 .focusRequester(focusRequesters[currentTextField])
                                 .then(pinWidth?.let { dp ->
                                     Modifier

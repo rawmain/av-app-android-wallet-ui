@@ -37,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -45,6 +46,7 @@ import androidx.navigation.NavController
 import eu.europa.ec.commonfeature.config.BiometricMode
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
 import eu.europa.ec.commonfeature.config.OnBackNavigationConfig
+import eu.europa.ec.commonfeature.util.TestTag
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.AppIcons
 import eu.europa.ec.uilogic.component.content.ContentHeader
@@ -201,6 +203,7 @@ private fun Body(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
+                .verticalScroll(rememberScrollState())
         ) {
             MainContent(
                 state = state,
@@ -363,20 +366,21 @@ private fun VerifyIdentity(
             config = ContentHeaderConfig(description = description)
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = SPACING_SMALL.dp)
-        ) {
-            Text(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = SPACING_SMALL.dp),
-                text = mode.textAbovePin,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface
+                    .padding(vertical = SPACING_SMALL.dp)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .testTag(TestTag.BiometricScreen.PIN_TEXT)
+                        .fillMaxWidth()
+                        .padding(vertical = SPACING_SMALL.dp),
+                    text = mode.textAbovePin,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 )
-            )
 
             PinFieldLayout(
                 state = state,

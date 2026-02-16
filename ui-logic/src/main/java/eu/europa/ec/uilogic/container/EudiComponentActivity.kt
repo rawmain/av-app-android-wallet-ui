@@ -29,6 +29,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.resourceslogic.theme.ThemeManager
+import eu.europa.ec.uilogic.extension.exposeTestTagsAsResourceId
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
 import eu.europa.ec.uilogic.navigation.RouterHost
 import eu.europa.ec.uilogic.navigation.helper.DeepLinkAction
@@ -68,7 +69,9 @@ open class EudiComponentActivity : FragmentActivity() {
         logController.d("DCAPI") { "Content called with intent: $intent, action: ${intent?.action}" }
         ThemeManager.instance.Theme(darkTheme = false) {
             Surface(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .exposeTestTagsAsResourceId()
+                    .fillMaxSize(),
                 color = MaterialTheme.colorScheme.surface
             ) {
                 routerHost.StartFlow {

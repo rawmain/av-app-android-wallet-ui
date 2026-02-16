@@ -14,6 +14,7 @@
  * governing permissions and limitations under the Licence.
  */
 
+<<<<<<<< HEAD:passport-scanner/src/main/java/org/jmrtd/Verdict.kt
 package org.jmrtd
 
 /**
@@ -28,3 +29,12 @@ enum class Verdict {
     PRESENT,
     NOT_PRESENT;
 }
+========
+package eu.europa.ec.dashboardfeature.ui.document_sign.model
+
+import eu.europa.ec.uilogic.component.ListItemDataUi
+
+data class DocumentSignButtonUi(
+    val data: ListItemDataUi
+)
+>>>>>>>> ref/main:dashboard-feature/src/main/java/eu/europa/ec/dashboardfeature/ui/document_sign/model/DocumentSignButtonUi.kt

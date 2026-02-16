@@ -14,6 +14,7 @@
  * governing permissions and limitations under the Licence.
  */
 
+<<<<<<<< HEAD:landing-feature/src/main/java/eu/europa/ec/landingfeature/model/AgeCredentialUi.kt
 package eu.europa.ec.landingfeature.model
 
 import eu.europa.ec.corelogic.model.ClaimDomain
@@ -23,3 +24,14 @@ data class AgeCredentialUi(
     val claims: List<ClaimDomain>,
     val credentialCount: Int,
 )
+========
+package eu.europa.ec.uilogic.util
+
+object TestTag {
+
+    fun pinTextField(index: Int) = "pin_text_field_$index"
+
+    fun buttonInBottomSheetWithTwoBigIcons(hostTab: String, index: Int) =
+        "${hostTab}_tab_bottom_sheet_button_${index}"
+}
+>>>>>>>> ref/main:ui-logic/src/main/java/eu/europa/ec/uilogic/util/TestTag.kt

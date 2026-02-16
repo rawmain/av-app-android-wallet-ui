@@ -38,6 +38,7 @@ import eu.europa.ec.uilogic.component.ListItemTrailingContentDataUi
 import eu.europa.ec.uilogic.component.wrap.ExpandableListItemUi
 import eu.europa.ec.uilogic.config.ConfigNavigation
 import eu.europa.ec.uilogic.config.NavigationType
+import eu.europa.ec.uilogic.navigation.DashboardScreens
 import eu.europa.ec.uilogic.navigation.IssuanceScreens
 import eu.europa.ec.uilogic.navigation.LandingScreens
 
@@ -60,6 +61,7 @@ private const val mockedConfigIssuerId = "configurationId"
 
 internal val mockedPidOptionItemUi = AddDocumentUi(
     credentialIssuerId = mockedIssuerId,
+    configurationId = mockedConfigIssuerId,
     itemData = ListItemDataUi(
         itemId = mockedConfigIssuerId,
         mainContentData = ListItemMainContentDataUi.Text(text = mockedPidDocName),
@@ -69,6 +71,7 @@ internal val mockedPidOptionItemUi = AddDocumentUi(
 
 internal val mockedMdlOptionItemUi = AddDocumentUi(
     credentialIssuerId = mockedIssuerId,
+    configurationId = mockedConfigIssuerId,
     itemData = ListItemDataUi(
         itemId = mockedConfigIssuerId,
         mainContentData = ListItemMainContentDataUi.Text(text = mockedMdlDocName),
@@ -78,6 +81,7 @@ internal val mockedMdlOptionItemUi = AddDocumentUi(
 
 internal val mockedAgeOptionItemUi = AddDocumentUi(
     credentialIssuerId = mockedIssuerId,
+    configurationId = mockedConfigIssuerId,
     itemData = ListItemDataUi(
         itemId = mockedConfigIssuerId,
         mainContentData = ListItemMainContentDataUi.Text(text = mockedAgeVerificationDocName),
@@ -87,6 +91,7 @@ internal val mockedAgeOptionItemUi = AddDocumentUi(
 
 internal val mockedPhotoIdOptionItemUi = AddDocumentUi(
     credentialIssuerId = mockedIssuerId,
+    configurationId = mockedConfigIssuerId,
     itemData = ListItemDataUi(
         itemId = mockedConfigIssuerId,
         mainContentData = ListItemMainContentDataUi.Text(text = mockedPhotoIdDocName),

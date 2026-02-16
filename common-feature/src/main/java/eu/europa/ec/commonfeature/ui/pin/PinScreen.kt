@@ -34,12 +34,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import eu.europa.ec.commonfeature.model.PinFlow
+import eu.europa.ec.commonfeature.util.TestTag
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.uilogic.component.TopStepBar
 import eu.europa.ec.uilogic.component.content.ContentScreen
@@ -92,6 +95,7 @@ fun PinScreen(
         stickyBottom = { paddingValues ->
             WrapStickyBottomContent(
                 modifier = Modifier
+                    .testTag(TestTag.PinScreen.BUTTON)
                     .fillMaxWidth()
                     .padding(paddingValues),
 

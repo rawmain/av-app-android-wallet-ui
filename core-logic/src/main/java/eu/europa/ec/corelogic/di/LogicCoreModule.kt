@@ -35,7 +35,6 @@ import eu.europa.ec.eudi.wallet.EudiWallet
 import eu.europa.ec.networklogic.repository.WalletAttestationRepository
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
-import eu.europa.ec.storagelogic.dao.TransactionLogDao
 import io.ktor.client.HttpClient
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Factory

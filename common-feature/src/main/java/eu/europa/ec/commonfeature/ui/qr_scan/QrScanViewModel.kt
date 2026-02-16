@@ -29,6 +29,7 @@ import eu.europa.ec.commonfeature.config.QrScanFlow
 import eu.europa.ec.commonfeature.config.QrScanUiConfig
 import eu.europa.ec.commonfeature.config.RequestUriConfig
 import eu.europa.ec.commonfeature.di.getOrCreateCredentialOfferScope
+import eu.europa.ec.commonfeature.interactor.QrScanInteractor
 import eu.europa.ec.corelogic.di.getOrCreatePresentationScope
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
