@@ -53,6 +53,9 @@ fastlane/report.xml
 # Kotlin
 .kotlin/*
 
+# extensions
+*.apk
+
 # Claude
 CLAUDE.md
 .claude/*
