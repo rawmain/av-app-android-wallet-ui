@@ -14,12 +14,18 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.landingfeature.model
+package eu.europa.ec.issuancefeature.util
 
-import eu.europa.ec.corelogic.model.ClaimDomain
+object TestTag {
 
-data class AgeCredentialUi(
-    val docId: String,
-    val claims: List<ClaimDomain>,
-    val credentialCount: Int,
-)
+    object AddDocumentScreen {
+        const val SUBTITLE = "add_document_screen_subtitle"
+        fun optionItem(issuerId: String, configId: String) =
+            "add_document_screen_attestation_${issuerId}_$configId"
+    }
+
+    object DocumentOfferScreen {
+        const val CONTENT_HEADER_DESCRIPTION = "document_offer_screen_content_header_description"
+        const val BUTTON = "document_offer_screen_button"
+    }
+}

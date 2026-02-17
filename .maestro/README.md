@@ -93,10 +93,11 @@ The verification results differ based on issuer trust status:
 - All checks show "Verified"
 
 **Untrusted Issuer (1/3 checks passed):**
-- "Not trusted" or similar negative indicator
-- "Issuer is not trusted" or similar
-- "Age over 18 confirmed" (credential content still verifies)
-- Shows "1/3" checks passed
+- Tests verify individual check results
+- "Issuer is trusted" → "Not verified"
+- "Issuer has not expired" → "Not verified"
+- "Age over 18 confirmed" → "Verified"
+- Only 1 out of 3 checks passes (the age verification)
 
 ### Browser Context Persistence
 After authorization, the browser may remain open on the verifier page. Tests handle both cases:

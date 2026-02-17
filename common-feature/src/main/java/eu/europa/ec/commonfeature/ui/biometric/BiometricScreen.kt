@@ -203,7 +203,6 @@ private fun Body(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
         ) {
             MainContent(
                 state = state,

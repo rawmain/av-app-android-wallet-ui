@@ -18,6 +18,7 @@ package eu.europa.ec.uilogic.component.preview
 
 import android.content.res.Configuration
 import android.content.res.Configuration.UI_MODE_NIGHT_NO
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.ui.tooling.preview.Preview
 import eu.europa.ec.resourceslogic.theme.values.ThemeColors
 

@@ -58,9 +58,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             val openId4VpScheme = "openid4vp"
             val openid4VpHost = "*"
 
-            val haipOpenId4VpScheme = "haip-vp"
-            val haipOpenid4VpHost = "*"
-
             val credentialOfferScheme = "openid-credential-offer"
             val credentialOfferHost = "*"
 
@@ -83,8 +80,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-                    targetSdk = 36
-
                     addConfigField("DEEPLINK", "$walletScheme://")
                     addConfigField("EUDI_OPENID4VP_SCHEME", eudiOpenId4VpScheme)
                     addConfigField("MDOC_OPENID4VP_SCHEME", mdocOpenId4VpScheme)
@@ -92,7 +87,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     addConfigField("AVSP_SCHEME", avspScheme)
                     addConfigField("AV_SCHEME", avScheme)
                     addConfigField("CREDENTIAL_OFFER_SCHEME", credentialOfferScheme)
-                    addConfigField("CREDENTIAL_OFFER_HAIP_SCHEME", credentialOfferHaipScheme)
                     addConfigField("ISSUE_AUTHORIZATION_SCHEME", openId4VciAuthorizationScheme)
                     addConfigField("ISSUE_AUTHORIZATION_HOST", openId4VciAuthorizationHost)
                     addConfigField(
@@ -119,8 +113,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                     // Manifest placeholders used for OpenId4VCI
                     manifestPlaceholders["credentialOfferHost"] = credentialOfferHost
                     manifestPlaceholders["credentialOfferScheme"] = credentialOfferScheme
-                    manifestPlaceholders["credentialOfferHaipHost"] = credentialOfferHaipHost
-                    manifestPlaceholders["credentialOfferHaipScheme"] = credentialOfferHaipScheme
 
                     // Manifest placeholders used for OpenId4VCI Authorization
                     manifestPlaceholders["openId4VciAuthorizationScheme"] =

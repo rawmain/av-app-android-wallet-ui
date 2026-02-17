@@ -16,6 +16,7 @@
 
 package eu.europa.ec.issuancefeature.ui.code
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -61,6 +62,7 @@ fun DocumentOfferCodeScreen(
     viewModel: DocumentOfferCodeViewModel
 ) {
     val state: State by viewModel.viewState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     ContentScreen(
         isLoading = state.isLoading,
@@ -202,6 +204,7 @@ private fun DocumentOfferCodeScreenEmptyPreview() {
             onEventSend = {},
             onNavigationRequested = {},
             paddingValues = PaddingValues(SPACING_MEDIUM.dp),
+            context = LocalContext.current
         )
     }
 }
