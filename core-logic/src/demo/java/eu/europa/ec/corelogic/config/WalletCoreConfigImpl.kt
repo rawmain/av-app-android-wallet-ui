@@ -86,11 +86,7 @@ internal class WalletCoreConfigImpl(
         get() = listOf(
             OpenId4VciManager.Config.Builder()
                 .withIssuerUrl(issuerUrl = "https://test.issuer.dev.ageverification.dev") // no end slash
-                .withClientAuthenticationType(
-                    OpenId4VciManager.ClientAuthenticationType.None(
-                        clientId = "wallet-dev"
-                    )
-                )
+                .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
                 .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
                 .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
                 .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
@@ -103,11 +99,7 @@ internal class WalletCoreConfigImpl(
     override val passportScanningIssuerConfig: OpenId4VciManager.Config =
         OpenId4VciManager.Config.Builder()
             .withIssuerUrl(issuerUrl = "https://passport.issuer.dev.ageverification.dev") // no end slash
-            .withClientAuthenticationType(
-                OpenId4VciManager.ClientAuthenticationType.None(
-                    clientId = "wallet-dev"
-                )
-            )
+            .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
             .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
             .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
             .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
@@ -126,5 +118,5 @@ internal class WalletCoreConfigImpl(
     )
 
     override val walletProviderHost: String
-        get() = "https://wallet-provider.eudiw.dev"
+        get() = "https://wallet-provider.ageverification.dev"
 }
