@@ -206,6 +206,8 @@
     <string name="onboarding_verification_passport_id_card">Reisepass oder Personalausweis</string>
     <string name="onboarding_verification_passport_id_card_description">Scannen Sie Ihren Reisepass oder Personalausweis zur Verifizierung</string>
     <string name="onboarding_verification_title">Wählen Sie Ihre Altersverifizierungsmethode</string>
+    <string name="onboarding_token_qr_intro_title">Token / QR-Code</string>
+    <string name="onboarding_token_qr_intro_description">Wenn Sie Ihre Identität vor Ort verifiziert haben, können Sie ein Token oder einen QR-Code erhalten. Tippen Sie auf Scannen und scannen Sie den QR-Code, um die Registrierung zu starten.</string>
     <string name="open_system_settings">Open Settings</string>
     <string name="passport_biometrics">Biometrie</string>
     <string name="passport_biometrics_back">Zurück</string>

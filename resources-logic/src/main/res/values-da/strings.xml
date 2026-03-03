@@ -206,6 +206,8 @@
     <string name="onboarding_verification_passport_id_card">Pas eller ID-kort</string>
     <string name="onboarding_verification_passport_id_card_description">Scanner dit pas eller ID-kort til verifikation</string>
     <string name="onboarding_verification_title">Vælg din metode til aldersverifikation</string>
+    <string name="onboarding_token_qr_intro_title">Token / QR-kode</string>
+    <string name="onboarding_token_qr_intro_description">Hvis du har verificeret din identitet på stedet, kan du modtage et token eller en QR-kode. Tryk på Scan og scan QR-koden for at starte registreringen.</string>
     <string name="open_system_settings">Open Settings</string>
     <string name="passport_biometrics">Biometri</string>
     <string name="passport_biometrics_back">Tilbage</string>
