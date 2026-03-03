@@ -55,7 +55,7 @@ jobs:
         run: ./gradlew lint
 
       - name: Run unit tests
-        run: ./gradlew testDemoReleaseUnitTest
+        run: ./gradlew testDemoDebugUnitTest
 
       - name: Build DEMO release APK
         run: ./gradlew assembleDemoRelease
