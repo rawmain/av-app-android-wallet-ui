@@ -18,7 +18,6 @@ package eu.europa.ec.commonfeature.ui.qr_scan
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
-import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.validator.Form
 import eu.europa.ec.businesslogic.validator.FormValidator
 import eu.europa.ec.businesslogic.validator.Rule
@@ -84,7 +83,6 @@ class QrScanViewModel(
     private val uiSerializer: UiSerializer,
     private val resourceProvider: ResourceProvider,
     @InjectedParam private val qrScannedConfig: String,
-    private val logController: LogController,
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State {

@@ -225,6 +225,7 @@ private fun EnrollmentMethodCard(
                 iconData = when (method) {
                     EnrollmentMethod.NATIONAL_ID -> AppIcons.NationalEID
                     EnrollmentMethod.PASSPORT_ID_CARD -> AppIcons.Id
+                    EnrollmentMethod.TOKEN_QR -> AppIcons.QrScanner
                 },
                 customTint = MaterialTheme.colorScheme.primary
             )
@@ -255,6 +256,7 @@ private fun getMethodTitle(method: EnrollmentMethod): String {
         when (method) {
             EnrollmentMethod.NATIONAL_ID -> R.string.onboarding_verification_national_id
             EnrollmentMethod.PASSPORT_ID_CARD -> R.string.onboarding_verification_passport_id_card
+            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_token_qr
         }
     )
 }
@@ -265,6 +267,7 @@ private fun getMethodDescription(method: EnrollmentMethod): String {
         when (method) {
             EnrollmentMethod.NATIONAL_ID -> R.string.onboarding_verification_national_id_description
             EnrollmentMethod.PASSPORT_ID_CARD -> R.string.onboarding_verification_passport_id_card_description
+            EnrollmentMethod.TOKEN_QR -> R.string.onboarding_verification_token_qr_description
         }
     )
 }

@@ -76,6 +76,7 @@ sealed class Effect : ViewSideEffect {
 enum class EnrollmentMethod {
     NATIONAL_ID,
     PASSPORT_ID_CARD,
+    TOKEN_QR,
 }
 
 @KoinViewModel
@@ -88,15 +89,19 @@ class EnrollmentViewModel(
     private var issuanceJob: Job? = null
 
     override fun setInitialState(): State {
+        val isOnboarding = !enrollmentInteractor.hasDocuments()
         val availableMethods = buildList {
             add(EnrollmentMethod.NATIONAL_ID)
             if (enrollmentInteractor.isPassportScanningAvailable()) {
                 add(EnrollmentMethod.PASSPORT_ID_CARD)
             }
+            if (isOnboarding) {
+                add(EnrollmentMethod.TOKEN_QR)
+            }
         }
 
         return State(
-            isOnboarding = !enrollmentInteractor.hasDocuments(),
+            isOnboarding = isOnboarding,
             availableEnrollmentMethods = availableMethods
         )
     }
@@ -119,6 +124,10 @@ class EnrollmentViewModel(
 
                     EnrollmentMethod.PASSPORT_ID_CARD -> {
                         navigateToPassportScanIntro()
+                    }
+
+                    EnrollmentMethod.TOKEN_QR -> {
+                        navigateToTokenQrIntro()
                     }
                 }
             }
@@ -278,6 +287,15 @@ class EnrollmentViewModel(
         setEffect {
             Effect.Navigation.SwitchScreen(
                 screenRoute = OnboardingScreens.DocumentScanIntro.screenRoute,
+                inclusive = false
+            )
+        }
+    }
+
+    private fun navigateToTokenQrIntro() {
+        setEffect {
+            Effect.Navigation.SwitchScreen(
+                screenRoute = OnboardingScreens.TokenQrIntro.screenRoute,
                 inclusive = false
             )
         }

@@ -206,6 +206,8 @@
     <string name="onboarding_verification_passport_id_card">Passeport ou Carte d\'identité</string>
     <string name="onboarding_verification_passport_id_card_description">Scannez votre passeport ou carte d\'identité pour la vérification</string>
     <string name="onboarding_verification_title">Choisissez la méthode de vérification d\'âge souhaitée</string>
+    <string name="onboarding_token_qr_intro_title">Token / Code QR</string>
+    <string name="onboarding_token_qr_intro_description">Si vous avez vérifié votre identité sur place, vous pouvez recevoir un token ou un code QR. Appuyez sur Scanner et scannez le code QR pour commencer l\'inscription.</string>
     <string name="open_system_settings">Open Settings</string>
     <string name="passport_biometrics">Biométrie</string>
     <string name="passport_biometrics_back">Retour</string>

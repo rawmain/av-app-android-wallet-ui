@@ -21,6 +21,8 @@ import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.validator.Form
 import eu.europa.ec.businesslogic.validator.FormValidationResult
 import eu.europa.ec.businesslogic.validator.Rule
+import eu.europa.ec.commonfeature.config.IssuanceFlowType
+import eu.europa.ec.commonfeature.config.IssuanceUiConfig
 import eu.europa.ec.commonfeature.config.SuccessUIConfig
 import eu.europa.ec.commonfeature.countdown.LockoutCountdownManager
 import eu.europa.ec.commonfeature.interactor.QuickPinInteractor

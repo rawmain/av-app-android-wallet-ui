@@ -206,6 +206,8 @@
     <string name="onboarding_verification_passport_id_card">Passaporto o Carta d\'identità</string>
     <string name="onboarding_verification_passport_id_card_description">Scansiona il tuo passaporto o carta d\'identità per la verifica</string>
     <string name="onboarding_verification_title">Scegli il tuo metodo di verifica dell\'età</string>
+    <string name="onboarding_token_qr_intro_title">Token / Codice QR</string>
+    <string name="onboarding_token_qr_intro_description">Se hai verificato la tua identità di persona, potresti ricevere un token o un codice QR. Tocca Scansiona e scansiona il codice QR per avviare la registrazione.</string>
     <string name="open_system_settings">Open Settings</string>
     <string name="passport_biometrics">Biometria</string>
     <string name="passport_biometrics_back">Indietro</string>
@@ -251,7 +253,7 @@
     <string name="passport_scan_intro_back_button">Indietro</string>
     <string name="passport_scan_intro_data_download_notice">La verifica richiede dati aggiuntivi. Toccando Scarica, verranno scaricati circa 250 MB di risorse per il riconoscimento facciale.</string>
     <string name="passport_scan_intro_description">Il metodo passaporto / carta d\'identità è veloce e sicuro! Scatta una foto del tuo passaporto / carta d\'identità, scansiona il tuo passaporto / carta d\'identità e registra un video di te stesso—tre passaggi per un onboarding sicuro.</string>
-    <string name="passport_scan_intro_download_button">Scaricamento</string>
+    <string name="passport_scan_intro_download_button">Scarica</string>
     <string name="passport_scan_intro_downloading_button">%d%%</string>
     <string name="passport_scan_intro_enrollment_method">Metodo di verifica dell\'età</string>
     <string name="passport_scan_intro_start_button">Inizia</string>

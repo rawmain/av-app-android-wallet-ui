@@ -27,6 +27,7 @@ import eu.europa.ec.commonfeature.config.IssuanceSuccessUiConfig
 import eu.europa.ec.commonfeature.config.IssuanceUiConfig
 import eu.europa.ec.commonfeature.config.OfferCodeUiConfig
 import eu.europa.ec.commonfeature.config.OfferUiConfig
+import eu.europa.ec.commonfeature.di.getOrCreateCredentialOfferScope
 import eu.europa.ec.issuancefeature.BuildConfig
 import eu.europa.ec.issuancefeature.ui.add.AddDocumentScreen
 import eu.europa.ec.issuancefeature.ui.code.DocumentOfferCodeScreen
@@ -84,6 +85,7 @@ fun NavGraphBuilder.featureIssuanceGraph(navController: NavController) {
                 },
             )
         ) {
+            getOrCreateCredentialOfferScope()
             DocumentOfferScreen(
                 navController,
                 koinViewModel(

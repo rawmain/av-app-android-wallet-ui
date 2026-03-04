@@ -32,6 +32,8 @@ sealed class OnboardingScreens {
     data object Consent : Screen(name = "CONSENT")
     data object Enrollment : Screen(name = "ENROLLMENT")
 
+    data object TokenQrIntro : Screen(name = "TOKEN_QR_INTRO")
+
     // Identity Document Verification
     data object DocumentScanIntro : Screen(name = "DOCUMENT_SCAN_INTRO")
     data object DocumentIdentification : Screen(name = "DOCUMENT_IDENTIFICATION")
