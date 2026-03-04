@@ -14,25 +14,18 @@
  * governing permissions and limitations under the Licence.
  */
 
-import com.android.build.api.dsl.LibraryExtension
-import project.convention.logic.config.LibraryModule
+package eu.europa.ec.issuancefeature.util
 
-plugins {
-    id("project.android.library")
-    id("project.android.library.compose")
-}
+object TestTag {
 
-extensions.configure<LibraryExtension>("android") {
-    namespace = "eu.europa.ec.resourceslogic"
-}
+    object AddDocumentScreen {
+        const val SUBTITLE = "add_document_screen_subtitle"
+        fun optionItem(issuerId: String, configId: String) =
+            "add_document_screen_attestation_${issuerId}_$configId"
+    }
 
-moduleConfig {
-    module = LibraryModule.ResourcesLogic
-}
-
-dependencies {
-    api(libs.androidx.compose.material3)
-    api(libs.androidx.compose.material.icons.extended)
-    api(libs.androidx.compose.material3.windowSizeClass)
-    api(libs.material)
+    object DocumentOfferScreen {
+        const val CONTENT_HEADER_DESCRIPTION = "document_offer_screen_content_header_description"
+        const val BUTTON = "document_offer_screen_button"
+    }
 }

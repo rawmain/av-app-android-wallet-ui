@@ -10,6 +10,8 @@
 -dontwarn java.beans.MethodDescriptor
 -dontwarn java.beans.PropertyDescriptor
 -dontwarn java.beans.Transient
+-dontwarn javax.script.ScriptEngine
+-dontwarn javax.script.ScriptEngineManager
 -dontwarn javax.swing.tree.TreeNode
 -dontwarn org.apache.xml.utils.PrefixResolver
 -dontwarn org.apache.xpath.XPathContext

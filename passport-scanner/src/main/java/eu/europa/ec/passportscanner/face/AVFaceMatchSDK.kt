@@ -25,6 +25,7 @@
 package eu.europa.ec.passportscanner.face
 
 import android.content.Context
+import eu.europa.ec.businesslogic.model.ErrorType
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -68,7 +69,10 @@ sealed class SdkInitStatus {
      * Initialization failed with an error
      * @param message Error message describing the failure
      */
-    data class Error(val message: String) : SdkInitStatus()
+    data class Error(
+        val message: String,
+        val errorType: ErrorType = ErrorType.GENERIC,
+    ) : SdkInitStatus()
 }
 
 /**

@@ -17,6 +17,7 @@
 package eu.europa.ec.onboardingfeature.interactor
 
 import android.content.Context
+import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.onboardingfeature.controller.FaceMatchController
 import eu.europa.ec.passportscanner.face.SdkInitStatus
 import eu.europa.ec.testlogic.extension.runTest
@@ -93,6 +94,28 @@ class TestPassportScanIntroInteractor {
             val expectedStatuses = listOf(
                 SdkInitStatus.NotInitialized,
                 SdkInitStatus.Error("Init failed")
+            )
+            whenever(faceMatchController.init(any())).thenReturn(flowOf(*expectedStatuses.toTypedArray()))
+
+            // When
+            val result = interactor.initFaceMatchSDK(context).toList()
+
+            // Then
+            verify(faceMatchController).init(context)
+            assertEquals(expectedStatuses, result)
+        }
+    }
+
+    @Test
+    fun `Given SDK initialization fails with no connection, When initFaceMatchSDK called, Then emits error status with NO_CONNECTION`() {
+        coroutineRule.runTest {
+            // Given
+            val expectedStatuses = listOf(
+                SdkInitStatus.NotInitialized,
+                SdkInitStatus.Error(
+                    message = "Initialization failed: Unable to resolve host",
+                    errorType = ErrorType.NO_CONNECTION
+                )
             )
             whenever(faceMatchController.init(any())).thenReturn(flowOf(*expectedStatuses.toTypedArray()))
 

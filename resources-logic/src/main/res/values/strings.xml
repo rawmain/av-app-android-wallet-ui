@@ -120,6 +120,13 @@
     <string name="generic_ok">OK</string>
     <string name="generic_or">OR</string>
     <string name="generic_scan_qr">Scan QR</string>
+
+    <!-- Onboarding: Enrollment via Token / QR -->
+    <string name="onboarding_verification_token_qr">Token / QR Code</string>
+    <string name="onboarding_verification_token_qr_description">Use a token or QR code you received during an on-site identity check to start enrollment.</string>
+
+    <string name="onboarding_token_qr_intro_title">Token / QR Code</string>
+    <string name="onboarding_token_qr_intro_description">If you verified your identity on-site, you may receive a token or QR code. Tap Scan and scan the QR code to start the enrollment.</string>
     <string name="generic_success">Success</string>
     <string name="generic_unknown">Unknown</string>
     <string name="generic_view_details">Credential details</string>

@@ -53,6 +53,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -364,7 +365,7 @@ class TestEnrollmentInteractor {
         mockBiometricsAvailabilityResponse(
             response = BiometricsAvailability.Failure(mockedPlainFailureMessage)
         )
-        whenever(resultHandler.onAuthenticationFailure).thenReturn {}
+        doReturn({  }).whenever(resultHandler).onAuthenticationFailure
 
         // When
         interactor.handleUserAuth(

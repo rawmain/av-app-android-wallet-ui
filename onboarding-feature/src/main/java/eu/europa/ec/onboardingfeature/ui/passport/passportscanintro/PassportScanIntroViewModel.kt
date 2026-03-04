@@ -21,7 +21,9 @@ import androidx.lifecycle.viewModelScope
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.onboardingfeature.interactor.PassportScanIntroInteractor
 import eu.europa.ec.passportscanner.face.SdkInitStatus
+import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.uilogic.component.content.ContentErrorConfig
+import eu.europa.ec.uilogic.extension.createErrorConfigFromMessage
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
@@ -60,6 +62,7 @@ sealed class Effect : ViewSideEffect {
 class PassportScanIntroViewModel(
     private val logController: LogController,
     private val passportScanIntroInteractor: PassportScanIntroInteractor,
+    private val resourceProvider: ResourceProvider,
 ) : MviViewModel<Event, State, Effect>() {
 
     private var downloadJob: Job? = null
@@ -140,8 +143,10 @@ class PassportScanIntroViewModel(
                             copy(
                                 sdkReadiness = SdkReadiness.NotReady,
                                 downloadProgress = 0,
-                                error = ContentErrorConfig(
-                                    errorSubTitle = status.message,
+                                error = createErrorConfigFromMessage(
+                                    errorMessage = status.message,
+                                    resourceProvider = resourceProvider,
+                                    errorType = status.errorType,
                                     onRetry = {
                                         setEvent(Event.OnRetryClicked(context))
                                     },

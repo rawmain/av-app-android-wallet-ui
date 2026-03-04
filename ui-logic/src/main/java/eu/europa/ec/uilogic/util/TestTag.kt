@@ -14,25 +14,12 @@
  * governing permissions and limitations under the Licence.
  */
 
-import com.android.build.api.dsl.LibraryExtension
-import project.convention.logic.config.LibraryModule
+package eu.europa.ec.uilogic.util
 
-plugins {
-    id("project.android.library")
-    id("project.android.library.compose")
-}
+object TestTag {
 
-extensions.configure<LibraryExtension>("android") {
-    namespace = "eu.europa.ec.resourceslogic"
-}
+    fun pinTextField(index: Int) = "pin_text_field_$index"
 
-moduleConfig {
-    module = LibraryModule.ResourcesLogic
-}
-
-dependencies {
-    api(libs.androidx.compose.material3)
-    api(libs.androidx.compose.material.icons.extended)
-    api(libs.androidx.compose.material3.windowSizeClass)
-    api(libs.material)
+    fun buttonInBottomSheetWithTwoBigIcons(hostTab: String, index: Int) =
+        "${hostTab}_tab_bottom_sheet_button_${index}"
 }

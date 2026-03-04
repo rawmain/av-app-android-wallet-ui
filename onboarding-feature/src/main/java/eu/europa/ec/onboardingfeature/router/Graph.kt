@@ -27,6 +27,7 @@ import eu.europa.ec.onboardingfeature.BuildConfig
 import eu.europa.ec.onboardingfeature.config.PassportLiveVideoUiConfig
 import eu.europa.ec.onboardingfeature.ui.consent.ConsentScreen
 import eu.europa.ec.onboardingfeature.ui.enrollment.EnrollmentScreen
+import eu.europa.ec.onboardingfeature.ui.tokenqr.TokenQrIntroScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportbiometrics.PassportBiometricScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportcredentialissuance.IdentityDocumentCredentialIssuanceScreen
 import eu.europa.ec.onboardingfeature.ui.passport.passportidentification.DocumentIdentificationScreen
@@ -54,6 +55,10 @@ fun NavGraphBuilder.featureOnboardingGraph(navController: NavController) {
 
         composable(route = OnboardingScreens.Enrollment.screenRoute) {
             EnrollmentScreen(navController, koinViewModel())
+        }
+
+        composable(route = OnboardingScreens.TokenQrIntro.screenRoute) {
+            TokenQrIntroScreen(navController, koinViewModel())
         }
 
         composable(route = OnboardingScreens.DocumentScanIntro.screenRoute) {
