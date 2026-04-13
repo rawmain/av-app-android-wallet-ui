@@ -65,6 +65,10 @@ private fun keyIsUserPseudonym(key: String): Boolean {
     return key == DocumentJsonKeys.USER_PSEUDONYM
 }
 
+private fun keyIsAgeClaim(key: String): Boolean {
+    return key.startsWith("age_over_")
+}
+
 private fun keyIsGender(key: String): Boolean {
     val listOfGenderKeys = DocumentJsonKeys.GENDER_KEYS
     return listOfGenderKeys.contains(key)
@@ -270,6 +274,13 @@ fun createKeyValue(
                         R.string.document_details_boolean_item_false_readable_value
                 )
 
+                keyIsAgeClaim(groupKey) && item is String -> resourceProvider.getString(
+                    resId = if (item.equals("true", ignoreCase = true))
+                        R.string.document_details_boolean_item_true_readable_value
+                    else
+                        R.string.document_details_boolean_item_false_readable_value
+                )
+
                 else -> item.toString()
             }
 
@@ -337,10 +348,11 @@ private fun insertPath(
 
     return if (path.value.size == 1) {
         // Leaf node (Primitive or Nested Structure)
-        if (existingNode == null && currentClaim != null) {
+        val claimValue = currentClaim?.value
+        if (existingNode == null && currentClaim != null && claimValue != null) {
             val accumulatedClaims: MutableList<ClaimDomain> = mutableListOf()
             createKeyValue(
-                item = currentClaim.value!!,
+                item = claimValue,
                 groupKey = currentClaim.identifier,
                 resourceProvider = resourceProvider,
                 uuidProvider = uuidProvider,

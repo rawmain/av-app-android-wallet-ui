@@ -30,10 +30,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
@@ -47,9 +49,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -105,6 +109,7 @@ fun LandingScreen(controller: NavController, viewModel: LandingViewModel) {
             paddingValues = paddingValues,
             documentClaims = state.documentClaims,
             credentialCount = state.credentialCount,
+            ageThreshold = state.ageThreshold,
             onAddCredential = { viewModel.setEvent(Event.AddCredentials) }
         )
     }
@@ -221,6 +226,7 @@ private fun Content(
     paddingValues: PaddingValues,
     documentClaims: List<ExpandableListItemUi>?,
     credentialCount: Int?,
+    ageThreshold: Int,
     onAddCredential: () -> Unit,
 ) {
 
@@ -244,7 +250,11 @@ private fun Content(
         )
         VSpacer.ExtraLarge()
 
-        AgeVerificationCard(credentialCount = credentialCount, onAddCredential = onAddCredential)
+        AgeVerificationCard(
+            credentialCount = credentialCount,
+            ageThreshold = ageThreshold,
+            onAddCredential = onAddCredential,
+        )
 
         if (!documentClaims.isNullOrEmpty()) {
             CredentialDetails(documentClaims)
@@ -280,8 +290,53 @@ private fun CredentialDetails(documentClaims: List<ExpandableListItemUi>) {
 }
 
 @Composable
+private fun AgeOverBadge(age: Int) {
+    Box(modifier = Modifier.size(width = 64.dp, height = 61.dp)) {
+        Box(
+            modifier = Modifier
+                .size(53.dp)
+                .align(Alignment.BottomStart)
+                .clip(CircleShape)
+                .background(Color(0xFF9FB5EA)),
+            contentAlignment = Alignment.Center
+        ) {
+            WrapText(
+                text = "$age+",
+                textConfig = TextConfig(
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = Color(0xFF003399),
+                    maxLines = 1,
+                )
+            )
+        }
+        Box(
+            modifier = Modifier
+                .size(26.dp)
+                .align(Alignment.TopEnd)
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 13.dp,
+                        topEnd = 13.dp,
+                        bottomEnd = 13.dp,
+                        bottomStart = 0.dp
+                    )
+                )
+                .background(Color(0xFF1544C5)),
+            contentAlignment = Alignment.Center
+        ) {
+            WrapIcon(
+                iconData = AppIcons.Check,
+                modifier = Modifier.size(14.dp),
+                customTint = Color.White,
+            )
+        }
+    }
+}
+
+@Composable
 private fun AgeVerificationCard(
     credentialCount: Int?,
+    ageThreshold: Int,
     onAddCredential: () -> Unit,
 ) {
     Box {
@@ -354,10 +409,7 @@ private fun AgeVerificationCard(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Absolute.Center
                     ) {
-                        WrapImage(
-                            iconData = AppIcons.Over18,
-                            contentScale = ContentScale.Fit
-                        )
+                        AgeOverBadge(age = ageThreshold)
                         HSpacer.Small()
                         WrapText(
                             text = stringResource(R.string.landing_screen_card_age_verification),
@@ -376,7 +428,7 @@ private fun AgeVerificationCard(
 @Composable
 private fun BoxScope.CredentialCountBadge(credentialCount: Int, onAddCredential: () -> Unit) {
     Badge(
-        modifier = Modifier.Companion
+        modifier = Modifier
             .align(Alignment.TopEnd)
             .padding(top = SPACING_SMALL.dp, end = SPACING_SMALL.dp)
             .zIndex(1f)
@@ -433,6 +485,7 @@ private fun LandingScreenPreview() {
                 ),
                 paddingValues = paddingValues,
                 credentialCount = 3,
+                ageThreshold = 18,
                 onAddCredential = { }
             )
         }

@@ -20,17 +20,21 @@ import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.util.transformPathsToDomainClaims
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.extension.toClaimPaths
+import eu.europa.ec.eudi.wallet.document.format.SdJwtVcClaim
+import eu.europa.ec.eudi.wallet.document.format.SdJwtVcData
 import eu.europa.ec.landingfeature.interactor.LandingPageInteractor.GetAgeCredentialPartialState
 import eu.europa.ec.landingfeature.model.AgeCredentialUi
 import eu.europa.ec.resourceslogic.R
 import eu.europa.ec.resourceslogic.provider.ResourceProvider
 import eu.europa.ec.testfeature.util.copy
+import eu.europa.ec.testfeature.util.getMockedEmptyPid
 import eu.europa.ec.testfeature.util.getMockedMainPid
 import eu.europa.ec.testfeature.util.mockedDefaultLocale
 import eu.europa.ec.testfeature.util.mockedExceptionWithMessage
 import eu.europa.ec.testfeature.util.mockedExceptionWithNoMessage
 import eu.europa.ec.testfeature.util.mockedGenericErrorMessage
 import eu.europa.ec.testfeature.util.mockedPlainFailureMessage
+import org.mockito.kotlin.mock
 import eu.europa.ec.testlogic.extension.runFlowTest
 import eu.europa.ec.testlogic.extension.runTest
 import eu.europa.ec.testlogic.rule.CoroutineTestRule
@@ -115,7 +119,8 @@ class TestLandingPageInteractor {
                             resourceProvider = resourceProvider,
                             uuidProvider = uuidProvider
                         ),
-                        credentialCount = 2
+                        credentialCount = 2,
+                        ageThreshold = 21,
                     )
                 )
                 assertEquals(expectedState, awaitItem())
@@ -197,5 +202,106 @@ class TestLandingPageInteractor {
             }
         }
     }
+
+    // Case 5:
+    // 1. walletCoreDocumentsController.getAgeOver18IssuedDocument() returns a document with no claims.
+    // 2. No age_over_* claim with a true value is found.
+
+    // Case 5 Expected Result:
+    // GetAgeCredentialPartialState.Success with ageThreshold = null.
+    @Test
+    fun `Given Case 5, When getAgeCredential is called, Then Case 5 Expected Result is returned`() {
+        coroutineRule.runTest {
+            val mockedDoc = getMockedEmptyPid().copy(availableCredentials = 2)
+
+            // Given
+            whenever(walletCoreDocumentsController.getAgeOver18IssuedDocument())
+                .thenReturn(mockedDoc)
+
+            whenever(resourceProvider.getString(any())).thenReturn("mockedString")
+
+            // When
+            interactor.getAgeCredential().runFlowTest {
+                // Then
+                val expectedState = GetAgeCredentialPartialState.Success(
+                    ageCredentialUi = AgeCredentialUi(
+                        docId = mockedDoc.id,
+                        claims = transformPathsToDomainClaims(
+                            paths = mockedDoc.data.claims.flatMap { it.toClaimPaths() },
+                            claims = mockedDoc.data.claims,
+                            resourceProvider = resourceProvider,
+                            uuidProvider = uuidProvider
+                        ),
+                        credentialCount = 2,
+                        ageThreshold = null,
+                    )
+                )
+                assertEquals(expectedState, awaitItem())
+            }
+        }
+    }
+
+    // Case 6:
+    // 1. walletCoreDocumentsController.getAgeOver18IssuedDocument() returns a document where the
+    //    age_over_21 claim is itself an SdJwtVcClaim with non-empty children (i.e. a container node).
+    // 2. flattenClaims must include the parent node itself so the threshold is not lost.
+
+    // Case 6 Expected Result:
+    // GetAgeCredentialPartialState.Success with ageThreshold = 21.
+    @Test
+    fun `Given Case 6, When getAgeCredential is called, Then Case 6 Expected Result is returned`() {
+        coroutineRule.runTest {
+            val ageClaim = SdJwtVcClaim(
+                identifier = "age_over_21",
+                value = true,
+                rawValue = "true",
+                issuerMetadata = null,
+                selectivelyDisclosable = true,
+                children = listOf(
+                    SdJwtVcClaim(
+                        identifier = "sub_claim",
+                        value = null,
+                        rawValue = "",
+                        issuerMetadata = null,
+                        selectivelyDisclosable = false,
+                        children = emptyList()
+                    )
+                )
+            )
+            val mockedData = mock<SdJwtVcData>()
+            whenever(mockedData.claims).thenReturn(listOf(ageClaim))
+
+            val mockedDoc = getMockedMainPid().copy(
+                data = mockedData,
+                availableCredentials = 1
+            )
+
+            // Given
+            whenever(walletCoreDocumentsController.getAgeOver18IssuedDocument())
+                .thenReturn(mockedDoc)
+
+            whenever(resourceProvider.getString(any())).thenReturn("mockedString")
+
+            // When
+            interactor.getAgeCredential().runFlowTest {
+                // Then
+                val expectedState = GetAgeCredentialPartialState.Success(
+                    ageCredentialUi = AgeCredentialUi(
+                        docId = mockedDoc.id,
+                        claims = transformPathsToDomainClaims(
+                            paths = mockedData.claims.flatMap { it.toClaimPaths() },
+                            claims = mockedData.claims,
+                            resourceProvider = resourceProvider,
+                            uuidProvider = uuidProvider
+                        ),
+                        credentialCount = 1,
+                        ageThreshold = 21,
+                    )
+                )
+                assertEquals(expectedState, awaitItem())
+            }
+        }
+    }
+
     //endregion
-} 
+}
