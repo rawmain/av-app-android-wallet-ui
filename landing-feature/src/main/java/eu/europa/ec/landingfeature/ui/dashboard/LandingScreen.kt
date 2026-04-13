@@ -303,7 +303,7 @@ private fun AgeOverBadge(age: Int) {
             WrapText(
                 text = "$age+",
                 textConfig = TextConfig(
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = Color(0xFF003399),
                     maxLines = 1,
                 )
