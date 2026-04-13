@@ -20,8 +20,8 @@ import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.util.transformPathsToDomainClaims
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.extension.toClaimPaths
-import eu.europa.ec.eudi.wallet.document.format.DocumentData
 import eu.europa.ec.eudi.wallet.document.format.SdJwtVcClaim
+import eu.europa.ec.eudi.wallet.document.format.SdJwtVcData
 import eu.europa.ec.landingfeature.interactor.LandingPageInteractor.GetAgeCredentialPartialState
 import eu.europa.ec.landingfeature.model.AgeCredentialUi
 import eu.europa.ec.resourceslogic.R
@@ -268,7 +268,7 @@ class TestLandingPageInteractor {
                     )
                 )
             )
-            val mockedData = mock<DocumentData>()
+            val mockedData = mock<SdJwtVcData>()
             whenever(mockedData.claims).thenReturn(listOf(ageClaim))
 
             val mockedDoc = getMockedMainPid().copy(

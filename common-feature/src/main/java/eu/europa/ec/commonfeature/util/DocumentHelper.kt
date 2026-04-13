@@ -337,10 +337,11 @@ private fun insertPath(
 
     return if (path.value.size == 1) {
         // Leaf node (Primitive or Nested Structure)
-        if (existingNode == null && currentClaim != null) {
+        val claimValue = currentClaim?.value
+        if (existingNode == null && currentClaim != null && claimValue != null) {
             val accumulatedClaims: MutableList<ClaimDomain> = mutableListOf()
             createKeyValue(
-                item = currentClaim.value!!,
+                item = claimValue,
                 groupKey = currentClaim.identifier,
                 resourceProvider = resourceProvider,
                 uuidProvider = uuidProvider,
