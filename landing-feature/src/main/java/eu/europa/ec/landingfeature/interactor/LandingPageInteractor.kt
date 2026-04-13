@@ -45,7 +45,7 @@ interface LandingPageInteractor {
 
 private fun DocumentClaim.flattenClaims(): List<DocumentClaim> =
     if (this is SdJwtVcClaim && children.isNotEmpty())
-        children.flatMap { it.flattenClaims() }
+        listOf(this) + children.flatMap { it.flattenClaims() }
     else
         listOf(this)
 
