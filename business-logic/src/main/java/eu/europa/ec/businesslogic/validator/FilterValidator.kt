@@ -317,7 +317,7 @@ class FilterValidatorImpl(
             }
 
             // Flatten all filters from all filter groups into a single list
-            val allFilters = appliedFilters.filterGroups.flatMap { it.filters }
+            val allFilters = appliedFilters.filterGroups.flatMap<FilterGroup, FilterElement> { it.filters }
 
             // Check if all selected filters are default filters
             val allSelectedAreDefault = allFilters

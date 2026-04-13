@@ -55,7 +55,7 @@ data class State(
     val error: ContentErrorConfig? = null,
     val documentClaims: List<ExpandableListItemUi>? = null,
     val credentialCount: Int? = null,
-    val ageThreshold: Int? = null,
+    val ageThreshold: Int = 18,
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -145,7 +145,7 @@ class LandingViewModel(
                                     isLoading = false,
                                     documentClaims = listItems,
                                     credentialCount = result.ageCredentialUi.credentialCount,
-                                    ageThreshold = result.ageCredentialUi.ageThreshold,
+                                    ageThreshold = result.ageCredentialUi.ageThreshold ?: 18,
                                 )
                             }
                         }

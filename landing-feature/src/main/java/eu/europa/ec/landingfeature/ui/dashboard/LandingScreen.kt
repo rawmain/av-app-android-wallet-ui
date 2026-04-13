@@ -226,7 +226,7 @@ private fun Content(
     paddingValues: PaddingValues,
     documentClaims: List<ExpandableListItemUi>?,
     credentialCount: Int?,
-    ageThreshold: Int?,
+    ageThreshold: Int,
     onAddCredential: () -> Unit,
 ) {
 
@@ -336,7 +336,7 @@ private fun AgeOverBadge(age: Int) {
 @Composable
 private fun AgeVerificationCard(
     credentialCount: Int?,
-    ageThreshold: Int?,
+    ageThreshold: Int,
     onAddCredential: () -> Unit,
 ) {
     Box {
@@ -409,7 +409,7 @@ private fun AgeVerificationCard(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Absolute.Center
                     ) {
-                        AgeOverBadge(age = ageThreshold ?: 18)
+                        AgeOverBadge(age = ageThreshold)
                         HSpacer.Small()
                         WrapText(
                             text = stringResource(R.string.landing_screen_card_age_verification),
