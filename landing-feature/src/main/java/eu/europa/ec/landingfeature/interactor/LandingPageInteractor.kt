@@ -21,6 +21,8 @@ import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.commonfeature.util.transformPathsToDomainClaims
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.extension.toClaimPaths
+import eu.europa.ec.eudi.wallet.document.format.DocumentClaim
+import eu.europa.ec.eudi.wallet.document.format.SdJwtVcClaim
 import eu.europa.ec.landingfeature.interactor.LandingPageInteractor.GetAgeCredentialPartialState
 import eu.europa.ec.landingfeature.model.AgeCredentialUi
 import eu.europa.ec.resourceslogic.R
@@ -40,6 +42,12 @@ interface LandingPageInteractor {
         data class Failure(val error: String) : GetAgeCredentialPartialState()
     }
 }
+
+private fun DocumentClaim.flattenClaims(): List<DocumentClaim> =
+    if (this is SdJwtVcClaim && children.isNotEmpty())
+        children.flatMap { it.flattenClaims() }
+    else
+        listOf(this)
 
 class LandingPageInteractorImpl(
     private val walletCoreDocumentsController: WalletCoreDocumentsController,
@@ -64,10 +72,24 @@ class LandingPageInteractorImpl(
                     uuidProvider = uuidProvider
                 )
 
+                val flatClaims = it.data.claims.flatMap { claim -> claim.flattenClaims() }
+
+                val ageThreshold = flatClaims
+                    .filter { claim ->
+                        claim.identifier.startsWith("age_over_") &&
+                                (claim.value == true ||
+                                        claim.value?.toString()?.equals("true", ignoreCase = true) == true)
+                    }
+                    .mapNotNull { claim ->
+                        claim.identifier.removePrefix("age_over_").toIntOrNull()
+                    }
+                    .maxOrNull()
+
                 val ageCredentialUi = AgeCredentialUi(
                     docId = it.id,
                     claims = domainClaims,
-                    credentialCount = it.credentialsCount()
+                    credentialCount = it.credentialsCount(),
+                    ageThreshold = ageThreshold,
                 )
 
                 emit(GetAgeCredentialPartialState.Success(ageCredentialUi))

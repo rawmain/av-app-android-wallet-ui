@@ -115,7 +115,8 @@ class TestLandingPageInteractor {
                             resourceProvider = resourceProvider,
                             uuidProvider = uuidProvider
                         ),
-                        credentialCount = 2
+                        credentialCount = 2,
+                        ageThreshold = 21,
                     )
                 )
                 assertEquals(expectedState, awaitItem())
