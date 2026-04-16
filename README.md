@@ -4,6 +4,11 @@ SPDX-FileCopyrightText: 2025 European Commission
 SPDX-License-Identifier: Apache-2.0
 -->
 
+
+> [!IMPORTANT]
+> The demo version is being updated.
+> We will continue to release updates on the demo versions for community testing.
+
 ![Proof of age attestations for all Europeans - An age verification solution for EU citizens and residents](./docs/media/top-banner-av.png)
 
 <h1 align="center">
@@ -19,6 +24,8 @@ SPDX-License-Identifier: Apache-2.0
   <a href="#code-of-conduct">Code of Conduct</a> •
   <a href="#license">Licensing</a>
 </p>
+
+
 
 ## About
 
