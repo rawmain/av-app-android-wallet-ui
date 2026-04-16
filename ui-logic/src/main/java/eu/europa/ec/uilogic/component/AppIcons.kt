@@ -275,12 +275,6 @@ object AppIcons {
         imageVector = null
     )
 
-    val Over18: IconDataUi = IconDataUi(
-        resourceId = R.drawable.ic_over_18,
-        contentDescriptionId = R.string.content_description_over_18_icon,
-        imageVector = null
-    )
-
     val NationalEID: IconDataUi = IconDataUi(
         resourceId = R.drawable.ic_national_eid,
         contentDescriptionId = R.string.content_description_national_eid_icon,

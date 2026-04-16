@@ -18,6 +18,7 @@ package eu.europa.ec.businesslogic.extension
 
 import eu.europa.ec.businesslogic.validator.model.FilterAction
 import eu.europa.ec.businesslogic.validator.model.FilterElement
+import eu.europa.ec.businesslogic.validator.model.FilterGroup
 import eu.europa.ec.businesslogic.validator.model.FilterableList
 import eu.europa.ec.businesslogic.validator.model.Filters
 
@@ -35,7 +36,7 @@ fun FilterableList.filterByQuery(searchQuery: String): FilterableList {
 }
 
 internal fun FilterableList.applySort(filters: Filters): FilterableList {
-    return filters.filterGroups.flatMap { it.filters }
+    return filters.filterGroups.flatMap<FilterGroup, FilterElement> { it.filters }
         .firstOrNull { it.filterableAction is FilterAction.Sort<*, *> && it.selected }?.filterableAction?.applyFilter(
             filters.sortOrder, this, FilterElement.FilterItem.emptyFilter()
         ) ?: this

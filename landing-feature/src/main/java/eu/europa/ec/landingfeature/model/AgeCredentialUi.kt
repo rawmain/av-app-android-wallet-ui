@@ -22,4 +22,5 @@ data class AgeCredentialUi(
     val docId: String,
     val claims: List<ClaimDomain>,
     val credentialCount: Int,
+    val ageThreshold: Int?,
 )
