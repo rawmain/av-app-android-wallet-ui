@@ -55,7 +55,12 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nfc)
         // Fetch MRZ from log intent
-        val mrz = intent.getStringExtra(ScannerConstants.NFC_MRZ_STRING) as String
+        val mrz = intent.getStringExtra(ScannerConstants.NFC_MRZ_STRING)
+            ?: run {
+                Toast.makeText(applicationContext, "Missing MRZ data", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
         // setup nfc adapter
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         try {
@@ -80,6 +85,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
 
     public override fun onResume() {
         super.onResume()
+        // NFC foreground dispatch requires FLAG_MUTABLE so the NFC stack can inject tag extras
         val flags = if (VERSION.SDK_INT >= VERSION_CODES.S) {
             PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         } else PendingIntent.FLAG_UPDATE_CURRENT or 0

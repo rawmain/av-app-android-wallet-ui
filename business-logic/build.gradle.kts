@@ -35,6 +35,7 @@ dependencies {
     implementation(project(LibraryModule.ResourcesLogic.path))
     implementation(libs.gson)
     implementation(libs.androidx.appAuth)
+    implementation(libs.androidx.security.crypto)
     implementation(libs.google.phonenumber)
     implementation(libs.timber)
     implementation(libs.treessence)

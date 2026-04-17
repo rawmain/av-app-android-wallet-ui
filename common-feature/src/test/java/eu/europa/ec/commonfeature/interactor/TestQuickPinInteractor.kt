@@ -79,60 +79,37 @@ class TestQuickPinInteractor {
     //region hasPin
 
     // Case 1:
-    // prefKeys.getDevicePin() returns empty String.
+    // pinStorageController.hasPin() returns false.
     @Test
     fun `Given Case 1, When hasPin is called, Then it returns false`() {
         // Given
-        whenever(pinStorageController.retrievePin())
-            .thenReturn(mockedEmptyPin)
+        whenever(pinStorageController.hasPin())
+            .thenReturn(false)
 
         // When
         val actual = interactor.hasPin()
 
         // Then
-        val expected = false
-
-        assertEquals(expected, actual)
+        assertEquals(false, actual)
         verify(pinStorageController, times(1))
-            .retrievePin()
+            .hasPin()
     }
 
     // Case 2:
-    // pinStorageController.retrievePin() returns blank String.
+    // pinStorageController.hasPin() returns true.
     @Test
-    fun `Given Case 2, When hasPin is called, Then it returns false`() {
+    fun `Given Case 2, When hasPin is called, Then it returns true`() {
         // Given
-        whenever(pinStorageController.retrievePin())
-            .thenReturn(mockedBlankPin)
+        whenever(pinStorageController.hasPin())
+            .thenReturn(true)
 
         // When
         val actual = interactor.hasPin()
 
         // Then
-        val expected = false
-
-        assertEquals(expected, actual)
+        assertEquals(true, actual)
         verify(pinStorageController, times(1))
-            .retrievePin()
-    }
-
-    // Case 3:
-    // pinStorageController.retrievePin() returns a valid String.
-    @Test
-    fun `Given Case 3, When hasPin is called, Then it returns true`() {
-        // Given
-        whenever(pinStorageController.retrievePin())
-            .thenReturn(mockedPin)
-
-        // When
-        val actual = interactor.hasPin()
-
-        // Then
-        val expected = true
-
-        assertEquals(expected, actual)
-        verify(pinStorageController, times(1))
-            .retrievePin()
+            .hasPin()
     }
     //endregion
 
@@ -539,7 +516,5 @@ class TestQuickPinInteractor {
     private val mockedInitialPin = "0000"
     private val mockedPinsDontMatchMessage = "Pins do not match"
     private val mockedInvalidPinMessage = "Invalid quick pin"
-    private val mockedEmptyPin = ""
-    private val mockedBlankPin = "    "
     //endregion
 }

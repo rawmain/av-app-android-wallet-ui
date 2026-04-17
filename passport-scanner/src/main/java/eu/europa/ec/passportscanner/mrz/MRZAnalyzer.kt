@@ -47,6 +47,7 @@ abstract class MRZAnalyzer(
 ) : BaseImageAnalyzer() {
 
     companion object {
+        // Intentional: shows detected text regions to guide users in positioning the passport correctly
         private const val SHOW_DEBUG_BOUNDING_BOXES = true
         val GUIDE_HEIGHT_IN_PX = 75.toPx
     }

@@ -100,7 +100,7 @@ class NFCFragment : Fragment() {
         }
         val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
         val cscaInputStream = requireContext().assets.open("csca.ks")
-        val keyStore = KeyStoreUtils().readKeystoreFromFile(cscaInputStream)
+        val keyStore = KeyStoreUtils().readKeystoreFromFile(cscaInputStream, "")
 
         val mrtdTrustStore = MRTDTrustStore()
         if (keyStore != null) {

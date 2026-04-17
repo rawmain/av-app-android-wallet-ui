@@ -22,6 +22,7 @@ import eu.europa.ec.networklogic.repository.WalletAttestationRepository
 import eu.europa.ec.networklogic.repository.WalletAttestationRepositoryImpl
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
@@ -52,9 +53,15 @@ fun provideHttpClient(json: Json, configLogic: ConfigLogic): HttpClient {
         install(Logging) {
             logger = Logger.DEFAULT
             level = when (configLogic.appBuildType) {
-                AppBuildType.DEBUG -> LogLevel.BODY
+                AppBuildType.DEBUG -> LogLevel.HEADERS
                 AppBuildType.RELEASE -> LogLevel.NONE
             }
+        }
+
+        install(HttpTimeout) {
+            requestTimeoutMillis = 30_000
+            connectTimeoutMillis = 10_000
+            socketTimeoutMillis = 30_000
         }
 
         install(ContentNegotiation) {

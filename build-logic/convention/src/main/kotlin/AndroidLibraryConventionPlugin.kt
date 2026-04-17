@@ -44,22 +44,22 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             val walletHost = "*"
 
             val eudiOpenId4VpScheme = "eudi-openid4vp"
-            val eudiOpenid4VpHost = "*"
+            val eudiOpenid4VpHost = "authorize"
 
             val mdocOpenId4VpScheme = "mdoc-openid4vp"
-            val mdocOpenid4VpHost = "*"
+            val mdocOpenid4VpHost = "authorize"
 
             val avspScheme = "avsp"
-            val avspHost = "*"
+            val avspHost = "present"
 
             val avScheme = "av"
             val avHost = "*"
 
             val openId4VpScheme = "openid4vp"
-            val openid4VpHost = "*"
+            val openid4VpHost = "authorize"
 
             val credentialOfferScheme = "openid-credential-offer"
-            val credentialOfferHost = "*"
+            val credentialOfferHost = "credential-offer"
 
             val openId4VciAuthorizationScheme = "eu.europa.ec.av"
             val openId4VciAuthorizationHost = "authorization"

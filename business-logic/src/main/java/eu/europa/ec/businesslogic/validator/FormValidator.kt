@@ -182,6 +182,16 @@ class FormValidatorImpl(
                 checkIfNotPalindrome(value),
                 errorMessage = rule.errorMessage
             )
+
+            is Rule.ValidateNotCommonPin -> checkValidationResult(
+                !COMMON_PINS.contains(value),
+                rule.errorMessage
+            )
+
+            is Rule.ValidateNotKeyboardPattern -> checkValidationResult(
+                !KEYBOARD_PATTERNS.contains(value),
+                rule.errorMessage
+            )
         }
     }
 
@@ -445,4 +455,23 @@ sealed class Rule(val errorMsg: String) {
     data class ValidateFileName(
         val errorMessage: String
     ) : Rule(errorMessage)
+
+    data class ValidateNotCommonPin(
+        val errorMessage: String
+    ) : Rule(errorMessage)
+
+    data class ValidateNotKeyboardPattern(
+        val errorMessage: String
+    ) : Rule(errorMessage)
 }
+
+private val COMMON_PINS = setOf(
+    "000000", "111111", "222222", "333333", "444444", "555555",
+    "666666", "777777", "888888", "999999", "123456", "654321",
+    "123123", "112233", "121212", "696969", "000001", "131313"
+)
+
+private val KEYBOARD_PATTERNS = setOf(
+    "135246", "147258", "258369", "159357", "147852", "258963",
+    "369741", "753951", "963852", "852741", "159753", "357159"
+)
