@@ -144,7 +144,7 @@ class NFCDocumentTag(private val logController: LogController) {
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { passportDTO ->
+            .subscribe({ passportDTO ->
                 if (passportDTO.cardServiceException != null) {
                     val cardServiceException = passportDTO.cardServiceException
                     if (cardServiceException is AccessDeniedException) {
@@ -162,7 +162,11 @@ class NFCDocumentTag(private val logController: LogController) {
                     passportCallback.onPassportRead(passportDTO.passport)
                 }
                 passportCallback.onPassportReadFinish()
-            }
+            }, { error ->
+                logController.e(TAG, error as? Exception ?: RuntimeException(error))
+                passportCallback.onGeneralException(error as? Exception ?: RuntimeException(error))
+                passportCallback.onPassportReadFinish()
+            })
     }
 
     data class PassportDTO(

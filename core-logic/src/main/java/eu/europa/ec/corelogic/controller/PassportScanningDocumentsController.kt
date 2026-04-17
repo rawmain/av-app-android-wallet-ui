@@ -321,7 +321,9 @@ class PassportScanningDocumentsControllerImpl(
                         return@OnIssueEvent
                     }
 
-                    if (event.issuedDocuments.size == totalDocumentsToBeIssued) {
+                    if (nonIssuedDocuments.isEmpty() &&
+                        (totalDocumentsToBeIssued == 0 || event.issuedDocuments.size == totalDocumentsToBeIssued)
+                    ) {
                         trySendBlocking(
                             IssueDocumentsPartialState.Success(
                                 documentIds = event.issuedDocuments

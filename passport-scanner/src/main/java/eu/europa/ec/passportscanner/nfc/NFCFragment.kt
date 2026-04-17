@@ -107,9 +107,13 @@ class NFCFragment : Fragment() {
             val certStore = KeyStoreUtils().toCertStore(keyStore = keyStore)
             mrtdTrustStore.addAsCSCACertStore(certStore)
         }
+        val currentMrzInfo = mrzInfo ?: run {
+            logController.e(TAG) { "mrzInfo is null, cannot handle NFC tag" }
+            return
+        }
         val subscribe = NFCDocumentTag(logController).handleTag(
             tag,
-            mrzInfo!!,
+            currentMrzInfo,
             mrtdTrustStore,
             object : NFCDocumentTag.PassportCallback {
 

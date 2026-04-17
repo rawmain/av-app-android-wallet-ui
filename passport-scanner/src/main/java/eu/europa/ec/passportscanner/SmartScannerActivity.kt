@@ -194,6 +194,11 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
         orientationEventListener.disable()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
+    }
+
     @SuppressLint("ClickableViewAccessibility", "UnsafeOptInUsageError")
     private fun startCamera(analyzer: ImageAnalysis.Analyzer? = null) {
         viewFinder.post {
@@ -211,11 +216,21 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                     .setTargetRotation(rotation)
                     .build()
                 val imageAnalysisBuilder = ImageAnalysis.Builder()
-
-                imageAnalyzer = imageAnalysisBuilder
                     .setTargetResolution(resolution)
                     .setTargetRotation(rotation)
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+
+                val camera2InterOp = Camera2Interop.Extender(imageAnalysisBuilder)
+                camera2InterOp.setCaptureRequestOption(
+                    CaptureRequest.CONTROL_AF_MODE,
+                    CaptureRequest.CONTROL_AF_MODE_AUTO
+                )
+                camera2InterOp.setCaptureRequestOption(
+                    CaptureRequest.CONTROL_AE_MODE,
+                    CaptureRequest.CONTROL_AE_MODE_ON
+                )
+
+                imageAnalyzer = imageAnalysisBuilder
                     .build()
                     .also {
                         analyzer?.let { analysis -> it.setAnalyzer(cameraExecutor, analysis) }
@@ -251,21 +266,11 @@ class SmartScannerActivity : BaseActivity(), OnClickListener {
                             imageCapture
                         )
                     }
-                    // Adjust initial zoom ratio of camera to aid high resolution capture of Pdf417 or QR Code or ID PASS Lite
                     preview?.surfaceProvider = viewFinder.surfaceProvider
                     logController.d(TAG) {
                         "Measured size: ${viewFinder.width}x${viewFinder.height}"
                     }
-                    // Autofocus modes and Tap to focus
-                    val camera2InterOp = Camera2Interop.Extender(imageAnalysisBuilder)
-                    camera2InterOp.setCaptureRequestOption(
-                        CaptureRequest.CONTROL_AF_MODE,
-                        CaptureRequest.CONTROL_AF_MODE_AUTO
-                    )
-                    camera2InterOp.setCaptureRequestOption(
-                        CaptureRequest.CONTROL_AE_MODE,
-                        CaptureRequest.CONTROL_AE_MODE_ON
-                    )
+                    // Tap to focus
                     viewFinder.afterMeasured {
                         viewFinder.setOnTouchListener { _, event ->
                             return@setOnTouchListener when (event.action) {

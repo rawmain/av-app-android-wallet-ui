@@ -111,7 +111,11 @@ abstract class MRZAnalyzer(
     @SuppressLint("UnsafeExperimentalUsageError", "UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
         val bitmap = BitmapUtils.getBitmap(imageProxy, logController)
-        bitmap?.let { bf ->
+        if (bitmap == null) {
+            imageProxy.close()
+            return
+        }
+        bitmap.let { bf ->
             val rotation = imageProxy.imageInfo.rotationDegrees
             bf.apply {
                 // Increase brightness and contrast for clearer image to be processed

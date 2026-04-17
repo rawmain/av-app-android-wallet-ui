@@ -18,16 +18,10 @@
 package eu.europa.ec.passportscanner.nfc
 
 import eu.europa.ec.businesslogic.controller.log.LogController
-import eu.europa.ec.passportscanner.SmartScannerActivity.Companion.TAG
 import eu.europa.ec.passportscanner.nfc.passport.Passport
-import eu.europa.ec.passportscanner.parser.records.MrtdTd1
-import eu.europa.ec.passportscanner.parser.types.MrzDate
-import eu.europa.ec.passportscanner.utils.DateUtils
 import eu.europa.ec.passportscanner.utils.DateUtils.BIRTH_DATE_THRESHOLD
 import eu.europa.ec.passportscanner.utils.DateUtils.EXPIRY_DATE_THRESHOLD
 import eu.europa.ec.passportscanner.utils.DateUtils.formatStandardDate
-import java.util.Locale
-
 
 data class NFCResult(
     var dateOfBirth: String? = null,
@@ -43,12 +37,10 @@ data class NFCResult(
 
             // Get proper date of birth
             val dateOfBirth = if (additionalPersonDetails?.fullDateOfBirth.isNullOrEmpty()) {
-                DateUtils.toAdjustedDate(
-                    formatStandardDate(
-                        personDetails?.dateOfBirth,
-                        threshold = BIRTH_DATE_THRESHOLD,
-                        logController = logController
-                    )
+                formatStandardDate(
+                    personDetails?.dateOfBirth,
+                    threshold = BIRTH_DATE_THRESHOLD,
+                    logController = logController
                 )
             } else formatStandardDate(
                 additionalPersonDetails.fullDateOfBirth,
@@ -56,53 +48,14 @@ data class NFCResult(
                 logController = logController
             )
             return NFCResult(
-                dateOfExpiry = DateUtils.toReadableDate(
-                    formatStandardDate(
-                        personDetails?.dateOfExpiry,
-                        threshold = EXPIRY_DATE_THRESHOLD,
-                        logController = logController
-                    )
+                dateOfExpiry = formatStandardDate(
+                    personDetails?.dateOfExpiry,
+                    threshold = EXPIRY_DATE_THRESHOLD,
+                    logController = logController
                 ),
                 dateOfBirth = dateOfBirth,
             )
         }
 
-        fun fromEID(mrzRecord: MrtdTd1, logController: LogController): NFCResult {
-            val dateOfBirth = formatMrzDateToStandard(mrzRecord.dateOfBirth, logController)
-            val dateOfExpiry = formatMrzDateToStandard(mrzRecord.expirationDate, logController)
-
-            return NFCResult(
-                dateOfBirth = DateUtils.toAdjustedDate(
-                    formatStandardDate(
-                        dateOfBirth,
-                        threshold = BIRTH_DATE_THRESHOLD,
-                        logController = logController,
-                    )
-                ), dateOfExpiry = DateUtils.toReadableDate(
-                    formatStandardDate(
-                        dateOfExpiry,
-                        threshold = EXPIRY_DATE_THRESHOLD,
-                        logController = logController
-                    )
-                )
-            )
-        }
-
-        private fun formatMrzDateToStandard(
-            mrzDate: MrzDate,
-            logController: LogController
-        ): String? {
-            return try {
-                // Format MrzDate directly to yyMMdd format
-                String.format(
-                    Locale.US, "%02d%02d%02d", mrzDate.year, mrzDate.month, mrzDate.day
-                )
-            } catch (e: Exception) {
-                logController.e(TAG, e) {
-                    "Error formatting MRZ date:" + " ${mrzDate.day}/${mrzDate.month}/${mrzDate.year}"
-                }
-                null
-            }
-        }
     }
 }
