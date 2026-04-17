@@ -43,9 +43,8 @@ class LogicAuthenticationModule
 @Single
 fun provideStorageConfig(
     prefsController: PrefsController,
-    cryptoController: CryptoController
 ): StorageConfig = StorageConfigImpl(
-    pinImpl = PrefsPinStorageProvider(prefsController, cryptoController),
+    pinImpl = PrefsPinStorageProvider(prefsController),
     biometryImpl = PrefsBiometryStorageProvider(prefsController)
 )
 

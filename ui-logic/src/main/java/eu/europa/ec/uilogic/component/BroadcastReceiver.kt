@@ -16,45 +16,32 @@
 
 package eu.europa.ec.uilogic.component
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
+import eu.europa.ec.businesslogic.util.InProcessEventBus
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 @Composable
 fun SystemBroadcastReceiver(
     intentFilters: List<String>,
     onTrigger: (intent: Intent?) -> Unit
 ) {
-    val context = LocalContext.current
-
-    // If either context or Action changes, unregister and register again
-    DisposableEffect(context, intentFilters) {
-        val intentFilter = IntentFilter().apply {
-            intentFilters.forEach {
-                addAction(it)
-            }
-        }
-        val broadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                onTrigger(intent)
+    DisposableEffect(intentFilters) {
+        val job: Job = CoroutineScope(Dispatchers.Main.immediate).launch {
+            InProcessEventBus.events.collect { intent ->
+                if (intent.action in intentFilters) {
+                    InProcessEventBus.clearReplayCache()
+                    onTrigger(intent)
+                }
             }
         }
 
-        ContextCompat.registerReceiver(
-            context,
-            broadcastReceiver,
-            intentFilter,
-            ContextCompat.RECEIVER_EXPORTED
-        )
-
-        // When the effect leaves the Composition, remove the callback
         onDispose {
-            context.unregisterReceiver(broadcastReceiver)
+            job.cancel()
         }
     }
 }

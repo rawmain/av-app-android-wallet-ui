@@ -134,7 +134,7 @@ class CameraActivity : AppCompatActivity() {
     private fun captureFrame() {
         logController.d("CameraActivity") { "captureFrame: Capturing frame" }
         val finalFile =
-            File(getExternalFilesDir(null), "captured_frame_${System.currentTimeMillis()}.png")
+            File(cacheDir, "captured_frame_${System.currentTimeMillis()}.png")
 
         val imageCaptureCallback = object : ImageCapture.OnImageCapturedCallback() {
             override fun onCaptureSuccess(imageProxy: ImageProxy) {
@@ -256,7 +256,22 @@ class CameraActivity : AppCompatActivity() {
         )
 
         avCameraCallbackHolder.triggerCallback(finalResult)
+        cleanupCapturedFrames()
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cleanupCapturedFrames()
+    }
+
+    private fun cleanupCapturedFrames() {
+        try {
+            cacheDir.listFiles()?.filter { it.name.startsWith("captured_frame_") }
+                ?.forEach { it.delete() }
+        } catch (e: Exception) {
+            logController.e("CameraActivity", e) { "Failed to clean up captured frames" }
+        }
     }
 }
 
