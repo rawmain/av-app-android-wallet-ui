@@ -49,13 +49,10 @@ object BitmapUtils {
                 YuvImage(
                     imageInBuffer, ImageFormat.NV21, metadata.width, metadata.height, null
                 )
-            val stream = ByteArrayOutputStream()
-            image.compressToJpeg(Rect(0, 0, metadata.width, metadata.height), 80, stream)
-
-            val bmp = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size())
-
-            stream.close()
-            return bmp
+            return ByteArrayOutputStream().use { stream ->
+                image.compressToJpeg(Rect(0, 0, metadata.width, metadata.height), 80, stream)
+                BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size())
+            }
         } catch (e: Exception) {
             logController.e("VisionProcessorBase", e)
         }
@@ -67,6 +64,7 @@ object BitmapUtils {
      */
     @ExperimentalGetImage
     fun getBitmap(image: ImageProxy, logController: LogController): Bitmap? {
+        val planes = image.image?.planes ?: return null
         val frameMetadata =
             FrameMetadata.Builder()
                 .setWidth(image.width)
@@ -74,7 +72,7 @@ object BitmapUtils {
                 .build()
 
         val nv21Buffer = yuv420ThreePlanesToNV21(
-            image.image!!.planes,
+            planes,
             image.width,
             image.height
         )

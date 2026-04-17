@@ -54,32 +54,27 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nfc)
-        // Fetch MRZ from log intent
-        val mrz = intent.getStringExtra(ScannerConstants.NFC_MRZ_STRING) as String
-        // setup nfc adapter
+        val mrz = intent.getStringExtra(ScannerConstants.NFC_MRZ_STRING)
+            ?: run {
+                Toast.makeText(applicationContext, "Missing MRZ data", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         try {
             mrzInfo = MRZInfo(mrz)
         } catch (e: Exception) {
             logController.e(TAG, e)
-        } finally {
-            // when an exception occurs and mrzInfo is still null execute initialization of MrzInfo
-            try {
-                if (mrzInfo == null) {
-                    mrzInfo = MRZInfo(mrz)
-                }
-            } catch (ioe: IllegalArgumentException) {
-                logController.e(TAG, ioe)
-                this.finish()
-                Toast.makeText(applicationContext, "Invalid MRZ scanned", Toast.LENGTH_SHORT).show()
-            }
-
+            Toast.makeText(applicationContext, "Invalid MRZ scanned", Toast.LENGTH_SHORT).show()
+            finish()
+            return
         }
         showNFCFragment()
     }
 
     public override fun onResume() {
         super.onResume()
+        // NFC foreground dispatch requires FLAG_MUTABLE so the NFC stack can inject tag extras
         val flags = if (VERSION.SDK_INT >= VERSION_CODES.S) {
             PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         } else PendingIntent.FLAG_UPDATE_CURRENT or 0
@@ -136,7 +131,9 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
             if (nfcAdapter?.isEnabled == false) {
                 showWirelessSettings()
             }
-            nfcAdapter?.enableForegroundDispatch(this@NFCActivity, pendingIntent, null, null)
+            pendingIntent?.let {
+                nfcAdapter?.enableForegroundDispatch(this@NFCActivity, it, null, null)
+            }
         } else {
             Toast.makeText(this, string.required_nfc_not_supported, Toast.LENGTH_LONG).show()
         }

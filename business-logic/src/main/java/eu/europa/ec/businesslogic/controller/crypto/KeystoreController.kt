@@ -28,6 +28,15 @@ import javax.crypto.SecretKey
 
 interface KeystoreController {
     fun retrieveOrGenerateSecretKey(userAuthenticationRequired: Boolean): SecretKey?
+    fun rotateKey(userAuthenticationRequired: Boolean): RotationResult
+    fun getKeyVersion(): Int
+    fun getSecretKeyByAlias(alias: String): SecretKey?
+    fun cleanupOldKey()
+}
+
+sealed class RotationResult {
+    data class Success(val oldAlias: String, val newAlias: String, val newVersion: Int) : RotationResult()
+    data class Failure(val reason: String) : RotationResult()
 }
 
 class KeystoreControllerImpl(
@@ -118,16 +127,55 @@ class KeystoreControllerImpl(
         keyGenerator.generateKey()
     }
 
+    override fun rotateKey(userAuthenticationRequired: Boolean): RotationResult {
+        return try {
+            androidKeyStore ?: return RotationResult.Failure("KeyStore unavailable")
+            val oldAlias = prefKeys.getCryptoAlias()
+            if (oldAlias.isEmpty()) return RotationResult.Failure("No existing key to rotate")
+
+            val newAlias = createPublicKey()
+            generateSecretKey(newAlias, userAuthenticationRequired)
+
+            prefKeys.setPreviousCryptoAlias(oldAlias)
+
+            val newVersion = prefKeys.getCryptoKeyVersion() + 1
+            prefKeys.setCryptoAlias(newAlias)
+            prefKeys.setCryptoKeyVersion(newVersion)
+
+            RotationResult.Success(oldAlias, newAlias, newVersion)
+        } catch (e: Exception) {
+            logController.e(this.javaClass.simpleName, e)
+            RotationResult.Failure(e.message ?: "Unknown error")
+        }
+    }
+
+    override fun cleanupOldKey() {
+        try {
+            val oldAlias = prefKeys.getPreviousCryptoAlias()
+            if (oldAlias.isNotEmpty()) {
+                androidKeyStore?.deleteEntry(oldAlias)
+                prefKeys.clearPreviousCryptoAlias()
+            }
+        } catch (e: Exception) {
+            logController.e(this.javaClass.simpleName, e)
+        }
+    }
+
+    override fun getSecretKeyByAlias(alias: String): SecretKey? {
+        return try {
+            androidKeyStore?.let { getSecretKey(it, alias) }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    override fun getKeyVersion(): Int = prefKeys.getCryptoKeyVersion()
+
     private fun getSecretKey(keyStore: KeyStore, alias: String): SecretKey {
         keyStore.load(null)
         return keyStore.getKey(alias, null) as SecretKey
     }
 
-    /**
-     * Get random GUID string
-     *
-     * @return a string containing 64 characters
-     */
     private fun createPublicKey(): GUID =
         (uuidProvider.provideUuid() + uuidProvider.provideUuid())
             .take(CryptoControllerImpl.MAX_GUID_LENGTH)

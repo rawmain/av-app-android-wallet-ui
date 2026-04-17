@@ -39,6 +39,7 @@ import eu.europa.ec.uilogic.serializer.UiSerializer
 import org.koin.android.annotation.KoinViewModel
 import java.io.File
 import java.io.FileOutputStream
+import java.util.UUID
 
 sealed class DocumentErrors(val errorMessage: Int) {
     data object NoDocumentDataReceived : DocumentErrors(R.string.passport_biometrics_no_passport_data)
@@ -51,6 +52,7 @@ data class State(
     val scanComplete: Boolean = false,
     val scannedDocument: ScannedDocument? = null,
     val error: ContentErrorConfig? = null,
+    val faceImageTempPath: String? = null,
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -80,7 +82,10 @@ class DocumentIdentificationViewModel(
     private val resourceProvider: ResourceProvider,
 ) : MviViewModel<Event, State, Effect>() {
 
-    override fun setInitialState(): State = State()
+    override fun setInitialState(): State {
+        cleanupStaleFaceImages()
+        return State()
+    }
 
     override fun handleEvents(event: Event) {
         when (event) {
@@ -167,15 +172,35 @@ class DocumentIdentificationViewModel(
         )
 
     private fun generateUiConfig(passport: ScannedDocument.Passport): PassportLiveVideoUiConfig {
-        val tempFile = File(context.cacheDir, "passport_face_${System.currentTimeMillis()}.png")
+        val tempFile = File(context.cacheDir, "passport_face_${UUID.randomUUID()}.png")
         FileOutputStream(tempFile).use { fos ->
             passport.faceImage!!.compress(Bitmap.CompressFormat.PNG, 100, fos)
         }
+        setState { copy(faceImageTempPath = tempFile.absolutePath) }
         return PassportLiveVideoUiConfig(
             dateOfBirth = passport.dateOfBirth!!,
             expiryDate = passport.expiryDate!!,
             faceImageTempPath = tempFile.absolutePath,
         )
+    }
+
+    private fun cleanupStaleFaceImages() {
+        try {
+            context.cacheDir.listFiles { file ->
+                file.name.startsWith("passport_face_") && file.name.endsWith(".png")
+            }?.forEach { it.delete() }
+        } catch (e: Exception) {
+            logController.e { "Failed to clean up stale face images: ${e.message}" }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewState.value.faceImageTempPath?.let { path ->
+            try {
+                File(path).delete()
+            } catch (_: Exception) {}
+        }
     }
 
     private fun showError(errorMessage: String) {

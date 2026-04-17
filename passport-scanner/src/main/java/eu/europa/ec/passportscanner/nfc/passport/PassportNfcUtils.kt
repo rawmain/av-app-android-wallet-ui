@@ -216,12 +216,11 @@ object PassportNfcUtils {
                 /* See if we have a private key for that certificate. */
                 privateKey = cvcaStore.getKey(holderRef.name, "".toCharArray()) as PrivateKey
                 chain = cvcaStore.getCertificateChain(holderRef.name)
-                logController.d(TAG) { "found a key, privateKey = $privateKey" }
+                logController.d(TAG) { "found a key for holder ${holderRef.name}" }
                 return EACCredentials(privateKey, chain!!)
             }
             logController.d(TAG) {
-                "null chain or key for entry $alias: chain = ${Arrays.toString(chain)}, " +
-                        "privateKey = $privateKey"
+                "null chain or key for entry $alias: chain = ${Arrays.toString(chain)}"
             }
             continue
         }

@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import eu.europa.ec.businesslogic.util.InProcessEventBus
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.model.RevokedDocumentDataDomain
 import eu.europa.ec.corelogic.util.CoreActions
@@ -153,12 +154,12 @@ class RevocationWorkManager(
             )
         }
 
-        applicationContext.sendBroadcast(messageIntent)
-        applicationContext.sendBroadcast(detailsIntent)
+        InProcessEventBus.send(messageIntent)
+        InProcessEventBus.send(detailsIntent)
     }
 
     private fun notifyDocumentsList() {
         val refreshIntent = Intent(CoreActions.REVOCATION_WORK_REFRESH_ACTION)
-        applicationContext.sendBroadcast(refreshIntent)
+        InProcessEventBus.send(refreshIntent)
     }
 }

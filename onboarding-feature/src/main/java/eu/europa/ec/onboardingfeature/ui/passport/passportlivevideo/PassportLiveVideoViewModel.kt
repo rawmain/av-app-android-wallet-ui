@@ -213,6 +213,11 @@ class PassportLiveVideoViewModel(
     }
 
 
+    override fun onCleared() {
+        super.onCleared()
+        viewState.value.config?.faceImageTempPath?.let { deleteTempFile(it) }
+    }
+
     private fun showError(errorMessage: String, errorType: ErrorType = ErrorType.GENERIC) {
         setState {
             copy(

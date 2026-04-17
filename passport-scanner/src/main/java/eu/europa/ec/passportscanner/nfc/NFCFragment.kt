@@ -100,16 +100,20 @@ class NFCFragment : Fragment() {
         }
         val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
         val cscaInputStream = requireContext().assets.open("csca.ks")
-        val keyStore = KeyStoreUtils().readKeystoreFromFile(cscaInputStream)
+        val keyStore = KeyStoreUtils().readKeystoreFromFile(cscaInputStream, "")
 
         val mrtdTrustStore = MRTDTrustStore()
         if (keyStore != null) {
             val certStore = KeyStoreUtils().toCertStore(keyStore = keyStore)
             mrtdTrustStore.addAsCSCACertStore(certStore)
         }
+        val currentMrzInfo = mrzInfo ?: run {
+            logController.e(TAG) { "mrzInfo is null, cannot handle NFC tag" }
+            return
+        }
         val subscribe = NFCDocumentTag(logController).handleTag(
             tag,
-            mrzInfo!!,
+            currentMrzInfo,
             mrtdTrustStore,
             object : NFCDocumentTag.PassportCallback {
 

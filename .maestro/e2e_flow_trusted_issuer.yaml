@@ -29,7 +29,7 @@ appId: com.scytales.av
 # Step 4: Enter PIN (159753) - auto-advances when complete
 - tapOn:
     index: 0
-- inputText: "159753"
+- inputText: "246813"
 
 # Step 5: Wait for confirm PIN screen to appear
 - waitForAnimationToEnd
@@ -41,7 +41,7 @@ appId: com.scytales.av
 # Step 6: Repeat PIN (159753) - auto-advances when complete
 - tapOn:
     index: 0
-- inputText: "159753"
+- inputText: "246813"
 
 # Step 7: Wait for biometric setup screen
 - waitForAnimationToEnd
@@ -128,7 +128,7 @@ appId: com.scytales.av
 - extendedWaitUntil:
     visible:
       text: "Authorize"
-    timeout: 10000
+    timeout: 30000
 
 # Tap Authorize button
 - tapOn:
@@ -161,51 +161,47 @@ appId: com.scytales.av
 # PART 2: CREDENTIAL VERIFICATION FLOW
 # ===============================================
 
-# Step 19: Open browser and navigate to verifier (or use existing browser)
-# Check if already on verifier page (from redirect)
-- runFlow:
-    when:
-      visible: "For mobile login click here"
-    commands:
-      # Already on verifier page, proceed to mobile login
-      - tapOn:
-          text: "For mobile login click here"
+# Step 19: Navigate to verifier and select OpenID4VP
+- openLink: "https://verifier.ageverification.dev"
+- waitForAnimationToEnd
 
-# If not already on verifier, navigate there
+# Step 19a: Handle DC API / OpenID4VP selection (only on real devices with Chrome + DC API)
+# If the selection screen is visible, tap OpenID4VP
 - runFlow:
     when:
-      notVisible: "For mobile login click here"
+      visible: "OpenID4VP"
     commands:
-      - openLink: "https://verifier.ageverification.dev"
+      - tapOn:
+          text: "OpenID4VP"
+      - waitForAnimationToEnd
+      # Scroll down to reveal the QR code and mobile login link
+      - scroll
       - waitForAnimationToEnd
 
-      # Step 19a: Handle DC API / OpenID4VP selection (only on real devices with Chrome + DC API)
-      # If the selection screen is visible, tap OpenID4VP
-      - runFlow:
-          when:
-            visible: "OpenID4VP"
-          commands:
-            - tapOn:
-                text: "OpenID4VP"
-            - waitForAnimationToEnd
-            # Scroll down to reveal the QR code and mobile login link
-            - scroll
-            - waitForAnimationToEnd
+# Now wait for the mobile login link to appear
+- extendedWaitUntil:
+    visible:
+      text: "For mobile login click here"
+    timeout: 15000
+- tapOn:
+    text: "For mobile login click here"
 
-      # Now wait for the mobile login link to appear
-      - extendedWaitUntil:
-          visible:
-            text: "For mobile login click here"
-          timeout: 15000
+# Handle Android app chooser dialog if multiple wallet apps are installed
+- runFlow:
+    when:
+      visible: "Just once"
+    commands:
       - tapOn:
-          text: "For mobile login click here"
+          text: "Age Verification.*"
+      - tapOn:
+          text: "Just once"
 
 # Wait for app to open with presentation request
 - waitForAnimationToEnd
 - extendedWaitUntil:
     visible:
       text: "Share"
-    timeout: 15000
+    timeout: 30000
 
 # Step 17: Tap Share button
 - tapOn:
@@ -215,7 +211,7 @@ appId: com.scytales.av
 - waitForAnimationToEnd
 - tapOn:
     index: 0
-- inputText: "159753"
+- inputText: "246813"
 
 # Wait for authentication and success screen
 - extendedWaitUntil:

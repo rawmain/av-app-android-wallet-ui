@@ -17,91 +17,71 @@
 package eu.europa.ec.authenticationlogic.storage
 
 import eu.europa.ec.authenticationlogic.provider.PinStorageProvider
-import eu.europa.ec.businesslogic.controller.crypto.CryptoController
 import eu.europa.ec.businesslogic.controller.storage.PrefsController
-import eu.europa.ec.businesslogic.extension.decodeFromBase64
-import eu.europa.ec.businesslogic.extension.encodeToBase64String
+import java.security.MessageDigest
+import java.security.SecureRandom
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 class PrefsPinStorageProvider(
     private val prefsController: PrefsController,
-    private val cryptoController: CryptoController
 ) : PinStorageProvider {
 
     companion object {
-        private const val KEY_DEVICE_PIN = "DevicePin"
+        private const val KEY_PIN_HASH = "PinHash"
+        private const val KEY_PIN_SALT = "PinSalt"
         private const val KEY_FAILED_ATTEMPTS = "PinFailedAttempts"
         private const val KEY_LOCKOUT_UNTIL = "PinLockoutUntil"
+        private const val PBKDF2_ITERATIONS = 210_000
+        private const val KEY_LENGTH_BITS = 256
     }
 
-    /**
-     * Retrieves the stored PIN after decrypting it.
-     *
-     * @return The decrypted PIN as a String. Returns an empty string if no PIN is stored or if decryption fails.
-     */
-    override fun retrievePin(): String = decryptedAndLoad()
+    override fun hasPin(): Boolean {
+        return prefsController.getString(KEY_PIN_HASH, "").isNotEmpty()
+    }
 
-    /**
-     * Stores the given PIN in an encrypted format.
-     * This method encrypts the provided PIN using cryptographic functions
-     * and stores the encrypted data along with its initialization vector (IV)
-     * in the preferences.
-     *
-     * @param pin The PIN to be stored.
-     */
     override fun setPin(pin: String) {
-        encryptAndStore(pin)
+        val salt = generateSalt()
+        val hash = hashPin(pin, salt)
+        prefsController.setString(KEY_PIN_HASH, hash.toHexString())
+        prefsController.setString(KEY_PIN_SALT, salt.toHexString())
         resetFailedAttempts()
     }
 
-    /**
-     * Checks if the provided PIN is valid.
-     *
-     * @param pin The PIN to validate.
-     * @return True if the provided PIN matches the stored PIN, false otherwise.
-     */
-    override fun isPinValid(pin: String): Boolean = retrievePin() == pin
+    override fun isPinValid(pin: String): Boolean {
+        val storedHashHex = prefsController.getString(KEY_PIN_HASH, "")
+        val saltHex = prefsController.getString(KEY_PIN_SALT, "")
+        if (storedHashHex.isEmpty() || saltHex.isEmpty()) return false
 
-    private fun encryptAndStore(pin: String) {
-
-        val cipher = cryptoController.getCipher(
-            encrypt = true,
-            userAuthenticationRequired = false
-        )
-
-        val encryptedBytes = cryptoController.encryptDecrypt(
-            cipher = cipher,
-            byteArray = pin.toByteArray(Charsets.UTF_8)
-        )
-
-        val ivBytes = cipher?.iv ?: return
-
-        prefsController.setString("PinEnc", encryptedBytes.encodeToBase64String())
-        prefsController.setString("PinIv", ivBytes.encodeToBase64String())
+        val salt = saltHex.hexToByteArray()
+        val computedHash = hashPin(pin, salt)
+        return MessageDigest.isEqual(computedHash, storedHashHex.hexToByteArray())
     }
 
-    private fun decryptedAndLoad(): String {
-
-        val encryptedBase64 = prefsController.getString(
-            "PinEnc", ""
-        ).ifEmpty { return "" }
-
-        val ivBase64 = prefsController.getString(
-            "PinIv", ""
-        ).ifEmpty { return "" }
-
-        val cipher = cryptoController.getCipher(
-            encrypt = false,
-            ivBytes = decodeFromBase64(ivBase64),
-            userAuthenticationRequired = false
-        )
-
-        val decryptedBytes = cryptoController.encryptDecrypt(
-            cipher = cipher,
-            byteArray = decodeFromBase64(encryptedBase64)
-        )
-
-        return String(decryptedBytes, Charsets.UTF_8)
+    private fun hashPin(pin: String, salt: ByteArray): ByteArray {
+        val spec = PBEKeySpec(pin.toCharArray(), salt, PBKDF2_ITERATIONS, KEY_LENGTH_BITS)
+        return try {
+            val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+            factory.generateSecret(spec).encoded
+        } finally {
+            spec.clearPassword()
+        }
     }
+
+    private fun generateSalt(): ByteArray {
+        val salt = ByteArray(32)
+        SecureRandom().nextBytes(salt)
+        return salt
+    }
+
+    private fun ByteArray.toHexString(): String = joinToString("") { "%02x".format(it) }
+
+    private fun String.hexToByteArray(): ByteArray =
+        try {
+            chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+        } catch (_: NumberFormatException) {
+            ByteArray(0)
+        }
 
     override fun getFailedAttempts(): Int {
         return prefsController.getInt(KEY_FAILED_ATTEMPTS, 0)

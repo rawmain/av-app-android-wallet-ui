@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 European Commission
+ * Copyright (c) 2023 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -14,18 +14,22 @@
  * governing permissions and limitations under the Licence.
  */
 
-package eu.europa.ec.authenticationlogic.provider
+package eu.europa.ec.businesslogic.util
 
-interface PinStorageProvider {
-    fun hasPin(): Boolean
-    fun setPin(pin: String)
-    fun isPinValid(pin: String): Boolean
+import android.content.Intent
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
-    fun getFailedAttempts(): Int
-    fun incrementFailedAttempts(): Int
-    fun resetFailedAttempts()
+object InProcessEventBus {
+    private val _events = MutableSharedFlow<Intent>(replay = 1, extraBufferCapacity = 16)
+    val events: SharedFlow<Intent> = _events.asSharedFlow()
 
-    fun setLockoutUntil(timestampMillis: Long)
-    fun getLockoutUntil(): Long
-    fun isCurrentlyLockedOut(): Boolean
+    fun send(intent: Intent) {
+        _events.tryEmit(intent)
+    }
+
+    fun clearReplayCache() {
+        _events.resetReplayCache()
+    }
 }
