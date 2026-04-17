@@ -76,6 +76,12 @@ interface CryptoController {
      * [byteArray] that needed to be encrypted or decrypted (Depending always on [Cipher] provided.
      */
     fun encryptDecrypt(cipher: Cipher?, byteArray: ByteArray): ByteArray
+
+    fun rotateKey(
+        reEncryptData: (decryptCipher: (ByteArray) -> Cipher?, encryptCipher: () -> Cipher?) -> Boolean
+    ): RotationResult
+
+    fun getKeyVersion(): Int
 }
 
 class CryptoControllerImpl(
@@ -124,4 +130,46 @@ class CryptoControllerImpl(
     override fun encryptDecrypt(cipher: Cipher?, byteArray: ByteArray): ByteArray {
         return cipher?.doFinal(byteArray) ?: ByteArray(0)
     }
+
+    override fun rotateKey(
+        reEncryptData: (decryptCipher: (ByteArray) -> Cipher?, encryptCipher: () -> Cipher?) -> Boolean
+    ): RotationResult {
+        val result = keystoreController.rotateKey(userAuthenticationRequired = false)
+        if (result is RotationResult.Failure) return result
+
+        val success = result as RotationResult.Success
+
+        val decryptWithOld: (ByteArray) -> Cipher? = decryptWithOld@{ iv ->
+            try {
+                val oldKey = keystoreController.getSecretKeyByAlias(success.oldAlias)
+                    ?: return@decryptWithOld null
+                Cipher.getInstance(AES_EXTERNAL_TRANSFORMATION).apply {
+                    init(Cipher.DECRYPT_MODE, oldKey, GCMParameterSpec(IV_SIZE, iv))
+                }
+            } catch (_: Exception) {
+                null
+            }
+        }
+
+        val encryptWithNew: () -> Cipher? = encryptWithNew@{
+            try {
+                val newKey = keystoreController.getSecretKeyByAlias(success.newAlias)
+                    ?: return@encryptWithNew null
+                Cipher.getInstance(AES_EXTERNAL_TRANSFORMATION).apply {
+                    init(Cipher.ENCRYPT_MODE, newKey)
+                }
+            } catch (_: Exception) {
+                null
+            }
+        }
+
+        val reEncrypted = reEncryptData(decryptWithOld, encryptWithNew)
+        if (reEncrypted) {
+            keystoreController.cleanupOldKey()
+        }
+
+        return result
+    }
+
+    override fun getKeyVersion(): Int = keystoreController.getKeyVersion()
 }

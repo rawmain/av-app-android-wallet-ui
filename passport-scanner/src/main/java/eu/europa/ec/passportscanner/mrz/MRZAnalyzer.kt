@@ -47,6 +47,7 @@ abstract class MRZAnalyzer(
 ) : BaseImageAnalyzer() {
 
     companion object {
+        // Intentional: shows detected text regions to guide users in positioning the passport correctly
         private const val SHOW_DEBUG_BOUNDING_BOXES = true
         val GUIDE_HEIGHT_IN_PX = 75.toPx
     }
@@ -110,7 +111,11 @@ abstract class MRZAnalyzer(
     @SuppressLint("UnsafeExperimentalUsageError", "UnsafeOptInUsageError")
     override fun analyze(imageProxy: ImageProxy) {
         val bitmap = BitmapUtils.getBitmap(imageProxy, logController)
-        bitmap?.let { bf ->
+        if (bitmap == null) {
+            imageProxy.close()
+            return
+        }
+        bitmap.let { bf ->
             val rotation = imageProxy.imageInfo.rotationDegrees
             bf.apply {
                 // Increase brightness and contrast for clearer image to be processed

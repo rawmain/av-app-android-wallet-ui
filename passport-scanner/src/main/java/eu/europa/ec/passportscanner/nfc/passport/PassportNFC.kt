@@ -136,8 +136,9 @@ private constructor(private val logController: LogController) {
         set(cert) {
             field = cert
             try {
+                val holderRef = cert?.holderReference?.name ?: return
                 val cvcaFile =
-                    CVCAFile(PassportService.EF_CVCA, cvCertificate!!.holderReference.name)
+                    CVCAFile(PassportService.EF_CVCA, holderRef)
                 putFile(PassportService.EF_CVCA, cvcaFile.encoded)
             } catch (ce: CertificateException) {
                 logController.e(TAG, ce) { "Certificate exception" }
@@ -330,13 +331,15 @@ private constructor(private val logController: LogController) {
 
         /* Get the list of DGs from EF.SOd, we don't trust EF.COM. */
         val dgNumbers = ArrayList<Int>()
-        if (sodFile != null) {
-            dgNumbers.addAll(sodFile!!.dataGroupHashes.keys)
-        } else if (comFile != null) {
+        val currentSodFile = sodFile
+        val currentComFile = comFile
+        if (currentSodFile != null) {
+            dgNumbers.addAll(currentSodFile.dataGroupHashes.keys)
+        } else if (currentComFile != null) {
             /* Get the list from EF.COM since we failed to parse EF.SOd. */
             logController.w(TAG) { "Failed to get DG list from EF.SOd. Getting DG list from EF.COM." }
-            val tagList = comFile!!.tagList
-            dgNumbers.addAll(toDataGroupList(tagList)!!)
+            val tagList = currentComFile.tagList
+            toDataGroupList(tagList)?.let { dgNumbers.addAll(it) }
         }
         Collections.sort(dgNumbers) /* NOTE: need to sort it, since we get keys as a set. */
 
@@ -348,21 +351,23 @@ private constructor(private val logController: LogController) {
             hashResults = TreeMap<Int, VerificationStatus.HashMatchResult>()
         }
 
-        if (sodFile != null) {
+        if (currentSodFile != null) {
             /* Initial hash results: we know the stored hashes, but not the computed hashes yet. */
-            val storedHashes = sodFile!!.dataGroupHashes
+            val storedHashes = currentSodFile.dataGroupHashes
             for (dgNumber in dgNumbers) {
-                val storedHash = storedHashes[dgNumber]
+                val storedHash = storedHashes[dgNumber] ?: continue
                 var hashResult: VerificationStatus.HashMatchResult? = hashResults[dgNumber]
                 if (hashResult != null) {
                     continue
                 }
-                if (dgNumbersAlreadyRead.contains(dgNumber)) {
-                    hashResult = verifyHash(dgNumber)
+                hashResult = if (dgNumbersAlreadyRead.contains(dgNumber)) {
+                    verifyHash(dgNumber)
                 } else {
-                    hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
+                    VerificationStatus.HashMatchResult(storedHash, null)
                 }
-                hashResults[dgNumber] = hashResult!!
+                if (hashResult != null) {
+                    hashResults[dgNumber] = hashResult
+                }
             }
         }
         verificationStatus.setHT(
@@ -508,13 +513,15 @@ private constructor(private val logController: LogController) {
      */
     private fun updateCOMSODFile(newCertificate: X509Certificate?) {
         try {
-            val digestAlg = sodFile!!.digestAlgorithm
-            val signatureAlg = sodFile!!.digestEncryptionAlgorithm
-            val cert = newCertificate ?: sodFile!!.docSigningCertificate
-            val signature = sodFile!!.encryptedDigest
+            val currentSodFile = sodFile ?: return
+            val currentComFile = comFile
+            val digestAlg = currentSodFile.digestAlgorithm
+            val signatureAlg = currentSodFile.digestEncryptionAlgorithm
+            val cert = newCertificate ?: currentSodFile.docSigningCertificate
+            val signature = currentSodFile.encryptedDigest
             val dgHashes = TreeMap<Int, ByteArray>()
 
-            val dgFids = LDSFileUtil.getDataGroupNumbers(sodFile)
+            val dgFids = LDSFileUtil.getDataGroupNumbers(currentSodFile)
             val digest: MessageDigest = MessageDigest.getInstance(digestAlg)
             for (fid in dgFids) {
                 if (fid != PassportService.EF_COM.toInt() && fid != PassportService.EF_SOD.toInt() && fid != PassportService.EF_CVCA.toInt()) {
@@ -526,7 +533,7 @@ private constructor(private val logController: LogController) {
                     val tag = dg.encoded[0]
                     dgHashes[LDSFileUtil.lookupDataGroupNumberByTag(tag.toInt())] =
                         digest.digest(dg.encoded)
-                    comFile!!.insertTag(tag.toInt() and 0xFF)
+                    currentComFile?.insertTag(tag.toInt() and 0xFF)
                 }
             }
             if (this.docSigningPrivateKey != null) {
@@ -550,9 +557,13 @@ private constructor(private val logController: LogController) {
     private fun verifyDS() {
         try {
             verificationStatus.setDS(VerificationStatus.Verdict.UNKNOWN, "Unknown")
+            val currentSodFile = sodFile ?: run {
+                verificationStatus.setDS(VerificationStatus.Verdict.FAILED, "No SOd file")
+                return
+            }
 
             /* Check document signing signature. */
-            val docSigningCert = sodFile!!.docSigningCertificate
+            val docSigningCert = currentSodFile.docSigningCertificate
             if (docSigningCert == null) {
                 logController.w(TAG) { "Could not get document signer certificate from EF.SOd" }
             }
@@ -583,7 +594,8 @@ private constructor(private val logController: LogController) {
 
             val chain = ArrayList<Certificate>()
 
-            if (sodFile == null) {
+            val currentSodFile = sodFile
+            if (currentSodFile == null) {
                 verificationStatus.setCS(
                     VerificationStatus.Verdict.FAILED,
                     "Unable to build certificate chain",
@@ -597,9 +609,9 @@ private constructor(private val logController: LogController) {
             var sodIssuer: X500Principal? = null
             var sodSerialNumber: BigInteger? = null
             try {
-                sodIssuer = sodFile!!.issuerX500Principal
-                sodSerialNumber = sodFile!!.serialNumber
-                docSigningCertificate = sodFile!!.docSigningCertificate
+                sodIssuer = currentSodFile.issuerX500Principal
+                sodSerialNumber = currentSodFile.serialNumber
+                docSigningCertificate = currentSodFile.docSigningCertificate
             } catch (e: Exception) {
                 logController.w(
                     TAG,
@@ -651,12 +663,20 @@ private constructor(private val logController: LogController) {
             }
 
             /* Run PKIX algorithm to build chain to any trust anchor. Add certificates to our chain. */
+            if (sodIssuer == null || sodSerialNumber == null || cscaStores == null || cscaTrustAnchors == null) {
+                verificationStatus.setCS(
+                    VerificationStatus.Verdict.FAILED,
+                    "Missing data to build certificate chain",
+                    chain
+                )
+                return
+            }
             val pkixChain = PassportNfcUtils.getCertificateChain(
                 docSigningCertificate,
-                sodIssuer!!,
-                sodSerialNumber!!,
-                cscaStores!!,
-                cscaTrustAnchors!!,
+                sodIssuer,
+                sodSerialNumber,
+                cscaStores,
+                cscaTrustAnchors,
                 logController
             )
 
@@ -706,12 +726,13 @@ private constructor(private val logController: LogController) {
             hashResults = TreeMap<Int, VerificationStatus.HashMatchResult>()
         }
 
-        if (sodFile == null) {
+        val currentSodFile = sodFile
+        if (currentSodFile == null) {
             verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "No SOd", hashResults)
             return
         }
 
-        val storedHashes = sodFile!!.dataGroupHashes
+        val storedHashes = currentSodFile.dataGroupHashes
         for (dgNumber in storedHashes.keys) {
             verifyHash(dgNumber, hashResults)
         }
@@ -724,7 +745,7 @@ private constructor(private val logController: LogController) {
         } else {
             /* Update storedHashes and computedHashes. */
             verificationStatus.setHT(
-                verificationStatus.ht!!,
+                verificationStatus.ht ?: VerificationStatus.Verdict.UNKNOWN,
                 verificationStatus.htReason,
                 hashResults
             )
@@ -756,23 +777,18 @@ private constructor(private val logController: LogController) {
             15 to PassportService.EF_DG15,
         )
 
-        if (!efdgMap.containsKey(n)) {
-            return null
-        }
+        val ef = efdgMap[n] ?: return null
 
-        val ef = efdgMap[n]!!
-
-        val dgInputStream = service.getInputStream(ef)
-        val buf = ByteArray(dgInputStream.length)
-        var qb: Int
-        var i = 0
-        while (dgInputStream.read().also { qb = it } != -1) {
-            buf[i] = qb.toByte()
-            i++
+        return service.getInputStream(ef).use { dgInputStream ->
+            val buf = ByteArray(dgInputStream.length)
+            var qb: Int
+            var i = 0
+            while (dgInputStream.read().also { qb = it } != -1) {
+                buf[i] = qb.toByte()
+                i++
+            }
+            buf.copyOfRange(0, i)
         }
-        val retbuf = ByteArray(i)
-        System.arraycopy(buf, 0, retbuf, 0, retbuf.size)
-        return retbuf.clone()
     }
 
     private fun verifyHash(dgNumber: Int): VerificationStatus.HashMatchResult? {
@@ -798,13 +814,24 @@ private constructor(private val logController: LogController) {
         hashResults: MutableMap<Int, VerificationStatus.HashMatchResult>
     ): VerificationStatus.HashMatchResult? {
         val fid = LDSFileUtil.lookupFIDByTag(LDSFileUtil.lookupTagByDataGroupNumber(dgNumber))
-
+        val currentSodFile = sodFile ?: run {
+            verificationStatus.setHT(VerificationStatus.Verdict.FAILED, "No SOd", hashResults)
+            return null
+        }
+        val currentService = service ?: return null
 
         /* Get the stored hash for the DG. */
-        var storedHash: ByteArray?
+        val storedHash: ByteArray
         try {
-            val storedHashes = sodFile!!.dataGroupHashes
-            storedHash = storedHashes[dgNumber]
+            val storedHashes = currentSodFile.dataGroupHashes
+            storedHash = storedHashes[dgNumber] ?: run {
+                verificationStatus.setHT(
+                    VerificationStatus.Verdict.FAILED,
+                    "DG$dgNumber failed, no stored hash in SOD",
+                    hashResults
+                )
+                return null
+            }
         } catch (_: Exception) {
             verificationStatus.setHT(
                 VerificationStatus.Verdict.FAILED,
@@ -815,7 +842,7 @@ private constructor(private val logController: LogController) {
         }
 
         /* Initialize hash. */
-        val digestAlgorithm = sodFile!!.digestAlgorithm
+        val digestAlgorithm = currentSodFile.digestAlgorithm
         try {
             digest = getDigest(digestAlgorithm)
         } catch (_: NoSuchAlgorithmException) {
@@ -832,24 +859,24 @@ private constructor(private val logController: LogController) {
         try {
             val abstractTaggedLDSFile = getDG(dgNumber)
             if (abstractTaggedLDSFile != null) {
-                dgBytes = readEF(service!!, dgNumber)
+                dgBytes = readEF(currentService, dgNumber)
             }
 
             if (abstractTaggedLDSFile == null && verificationStatus.eac != VerificationStatus.Verdict.SUCCEEDED && (fid == PassportService.EF_DG3 || fid == PassportService.EF_DG4)) {
                 logController.w(TAG) { "Skipping DG$dgNumber during HT verification because EAC failed." }
-                val hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
+                val hashResult = VerificationStatus.HashMatchResult(storedHash, null)
                 hashResults[dgNumber] = hashResult
                 return hashResult
             }
             if (abstractTaggedLDSFile == null) {
                 logController.w(TAG) { "Skipping DG$dgNumber during HT verification because file could not be read." }
-                val hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
+                val hashResult = VerificationStatus.HashMatchResult(storedHash, null)
                 hashResults[dgNumber] = hashResult
                 return hashResult
             }
 
         } catch (_: Exception) {
-            val hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
+            val hashResult = VerificationStatus.HashMatchResult(storedHash, null)
             hashResults[dgNumber] = hashResult
             verificationStatus.setHT(
                 VerificationStatus.Verdict.FAILED,
@@ -861,8 +888,8 @@ private constructor(private val logController: LogController) {
 
         /* Compute the hash and compare. */
         try {
-            val computedHash = digest!!.digest(dgBytes)
-            val hashResult = VerificationStatus.HashMatchResult(storedHash!!, computedHash)
+            val computedHash = (digest ?: return null).digest(dgBytes)
+            val hashResult = VerificationStatus.HashMatchResult(storedHash, computedHash)
             hashResults[dgNumber] = hashResult
 
             if (!Arrays.equals(storedHash, computedHash)) {
@@ -875,7 +902,7 @@ private constructor(private val logController: LogController) {
 
             return hashResult
         } catch (_: Exception) {
-            val hashResult = VerificationStatus.HashMatchResult(storedHash!!, null)
+            val hashResult = VerificationStatus.HashMatchResult(storedHash, null)
             hashResults[dgNumber] = hashResult
             verificationStatus.setHT(
                 VerificationStatus.Verdict.FAILED,
@@ -890,9 +917,9 @@ private constructor(private val logController: LogController) {
 
     @Throws(NoSuchAlgorithmException::class)
     private fun getDigest(digestAlgorithm: String): MessageDigest? {
-        if (digest != null) {
-            digest!!.reset()
-            return digest
+        digest?.let {
+            it.reset()
+            return it
         }
         logController.d(TAG) { "Using hash algorithm $digestAlgorithm" }
         if (Security.getAlgorithms("MessageDigest").contains(digestAlgorithm)) {
@@ -955,11 +982,12 @@ private constructor(private val logController: LogController) {
     /* FIXME: move this out of lds package. */
     @Throws(GeneralSecurityException::class)
     private fun checkDocSignature(docSigningCert: Certificate?): Boolean {
-        val eContent = sodFile!!.eContent
-        val signature = sodFile!!.encryptedDigest
+        val currentSodFile = sodFile ?: return false
+        val eContent = currentSodFile.eContent
+        val signature = currentSodFile.encryptedDigest
 
         var digestEncryptionAlgorithm = try {
-            sodFile!!.digestEncryptionAlgorithm
+            currentSodFile.digestEncryptionAlgorithm
         } catch (_: Exception) {
             null
         }
@@ -969,7 +997,7 @@ private constructor(private val logController: LogController) {
          * thus this is guessing)
          */
         if (digestEncryptionAlgorithm == null) {
-            val digestAlg = sodFile!!.signerInfoDigestAlgorithm
+            val digestAlg = currentSodFile.signerInfoDigestAlgorithm
             var digest: MessageDigest
             try {
                 digest = MessageDigest.getInstance(digestAlg)
@@ -989,12 +1017,12 @@ private constructor(private val logController: LogController) {
          * So it has to be specified "manually".
          */
         if ("SSAwithRSA/PSS" == digestEncryptionAlgorithm) {
-            val digestAlg = sodFile!!.signerInfoDigestAlgorithm
+            val digestAlg = currentSodFile.signerInfoDigestAlgorithm
             digestEncryptionAlgorithm = digestAlg.replace("-", "") + "withRSA/PSS"
         }
 
         if ("RSA" == digestEncryptionAlgorithm) {
-            val digestJavaString = sodFile!!.signerInfoDigestAlgorithm
+            val digestJavaString = currentSodFile.signerInfoDigestAlgorithm
             digestEncryptionAlgorithm = digestJavaString.replace("-", "") + "withRSA"
         }
 

@@ -19,7 +19,7 @@
         <activity
             android:name="SmartScannerActivity"
             android:configChanges="screenSize|screenLayout|smallestScreenSize|keyboardHidden"
-            android:exported="true"
+            android:exported="false"
             android:keepScreenOn="true">
         </activity>
         <activity

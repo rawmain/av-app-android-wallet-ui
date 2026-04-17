@@ -370,8 +370,6 @@ class PinViewModel(
     }
 
     private fun getListOfRules(pin: String): Form {
-        // TODO enhance security: Sequential or easily guessable patterns (such as "135246 or "147258") should not be permitted.
-        // TODO enhance security: The validation should check the most pwned PINs
         return Form(
             mapOf(
                 listOf(
@@ -392,6 +390,12 @@ class PinViewModel(
                         errorMessage = resourceProvider.getString(R.string.quick_pin_invalid_generic_error)
                     ),
                     Rule.ValidateNotPalindrome(
+                        errorMessage = resourceProvider.getString(R.string.quick_pin_invalid_generic_error)
+                    ),
+                    Rule.ValidateNotCommonPin(
+                        errorMessage = resourceProvider.getString(R.string.quick_pin_invalid_generic_error)
+                    ),
+                    Rule.ValidateNotKeyboardPattern(
                         errorMessage = resourceProvider.getString(R.string.quick_pin_invalid_generic_error)
                     )
                 ) to pin

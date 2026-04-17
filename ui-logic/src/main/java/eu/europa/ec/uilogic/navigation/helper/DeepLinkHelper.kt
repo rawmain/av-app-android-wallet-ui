@@ -21,6 +21,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import eu.europa.ec.businesslogic.util.InProcessEventBus
 import androidx.navigation.NavController
 import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.businesslogic.util.safeLet
@@ -203,6 +204,6 @@ private fun notify(context: Context, action: String, bundle: Bundle? = null) {
     Intent().also { intent ->
         intent.action = action
         bundle?.let { intent.putExtras(it) }
-        context.sendBroadcast(intent)
+        InProcessEventBus.send(intent)
     }
 }

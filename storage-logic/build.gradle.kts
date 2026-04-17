@@ -34,6 +34,8 @@ moduleConfig {
 
 dependencies {
     implementation(project(LibraryModule.BusinessLogic.path))
+    implementation(libs.sqlcipher)
+    implementation(libs.androidx.security.crypto)
 }
 
 excludeFromKoverReport(

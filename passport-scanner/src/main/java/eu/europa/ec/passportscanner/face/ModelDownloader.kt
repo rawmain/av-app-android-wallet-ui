@@ -180,9 +180,11 @@ class ModelDownloader(
     ): String? {
         if (modelPath.isEmpty()) return null
 
-        return if (modelPath.startsWith("http://") || modelPath.startsWith("https://")) {
-            // Download from URL
+        return if (modelPath.startsWith("https://")) {
             downloadModelFromUrl(modelPath, destDir, outputFilename, onProgress)
+        } else if (modelPath.startsWith("http://")) {
+            logController.e(TAG) { "Rejecting insecure HTTP URL for model download: $modelPath" }
+            null
         } else {
             // Copy from assets
             copyAssetIfNeeded(modelPath, destDir)

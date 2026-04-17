@@ -815,6 +815,7 @@ class WalletCoreDocumentsControllerImpl(
     private fun extractCredentialIssuerFromOfferUri(offerUri: String): Result<String> =
         runCatching {
             val credentialOffer = offerUri.toUri().getQueryParameter("credential_offer")
+                ?: error("Missing 'credential_offer' query parameter in offer URI")
             val decoded = URLDecoder.decode(credentialOffer, "UTF-8")
             val json = JSONObject(decoded)
             json.getString("credential_issuer")

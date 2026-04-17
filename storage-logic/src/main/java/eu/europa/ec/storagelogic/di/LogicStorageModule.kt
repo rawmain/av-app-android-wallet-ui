@@ -18,25 +18,58 @@ package eu.europa.ec.storagelogic.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import eu.europa.ec.storagelogic.dao.BookmarkDao
 import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
 import eu.europa.ec.storagelogic.dao.TransactionLogDao
 import eu.europa.ec.storagelogic.service.DatabaseService
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import org.koin.core.annotation.ComponentScan
 import org.koin.core.annotation.Module
 import org.koin.core.annotation.Single
+import java.security.SecureRandom
 
 @Module
 @ComponentScan("eu.europa.ec.storagelogic")
 class LogicStorageModule
 
 @Single
-fun provideAppDatabase(context: Context): DatabaseService =
-    Room.databaseBuilder(
+fun provideAppDatabase(context: Context): DatabaseService {
+    System.loadLibrary("sqlcipher")
+    val passphrase = getOrCreateDbPassphrase(context)
+    val factory = SupportOpenHelperFactory(passphrase)
+    return Room.databaseBuilder(
         context,
         DatabaseService::class.java,
         "eudi.app.wallet.storage"
-    ).fallbackToDestructiveMigration(true).build()
+    )
+        .openHelperFactory(factory)
+        .fallbackToDestructiveMigration(true)
+        .build()
+}
+
+private const val DB_KEY_PREFS = "db-key-prefs"
+private const val DB_PASSPHRASE_KEY = "db_passphrase"
+
+private fun getOrCreateDbPassphrase(context: Context): ByteArray {
+    val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+    val prefs = EncryptedSharedPreferences.create(
+        DB_KEY_PREFS,
+        masterKeyAlias,
+        context,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+    val hex = prefs.getString(DB_PASSPHRASE_KEY, null) ?: run {
+        val bytes = ByteArray(32)
+        SecureRandom().nextBytes(bytes)
+        val generated = bytes.joinToString("") { "%02x".format(it) }
+        prefs.edit().putString(DB_PASSPHRASE_KEY, generated).apply()
+        generated
+    }
+    return hex.toByteArray(Charsets.UTF_8)
+}
 
 @Single
 fun provideBookmarkDao(service: DatabaseService): BookmarkDao = service.bookmarkDao()
