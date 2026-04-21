@@ -25,6 +25,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.MessageDigest
 
 /**
  * Handles downloading and preparing model files for face matching SDK
@@ -40,18 +41,16 @@ class ModelDownloader(
     }
 
     /**
-     * Download file from HTTP URL to internal storage
-     * @param urlString URL to download from
-     * @param destDir Destination directory path
-     * @param outputFilename Optional custom filename for the downloaded file. If null, extracts from URL
-     * @param onProgress Optional callback for download progress (percentage: 0-100)
-     * @return The local filename of the downloaded file, or null if failed
+     * Download a model file from a remote URL, verifying the SHA-256 hash before
+     * accepting it. A mismatched hash — whether on the cached file or a fresh download —
+     * causes the file to be deleted and the call to fail.
      */
-    suspend fun downloadModelFromUrl(
+    private suspend fun downloadModelFromUrl(
         urlString: String,
         destDir: String,
-        outputFilename: String? = null,
-        onProgress: ((Int) -> Unit)? = null,
+        outputFilename: String?,
+        expectedSha256: String,
+        onProgress: ((Int) -> Unit)?,
     ): String? = withContext(Dispatchers.IO) {
         logController.d(TAG) { "downloadModelFromUrl: Starting download from $urlString" }
 
@@ -60,8 +59,14 @@ class ModelDownloader(
         val destFile = File(destDir, filename)
 
         if (destFile.exists()) {
-            logController.d(TAG) { "File already exists. Not downloading." }
-            return@withContext filename
+            val actual = sha256Hex(destFile)
+            if (!actual.equals(expectedSha256, ignoreCase = true)) {
+                logController.e(TAG) { "Cached model hash mismatch — expected $expectedSha256, got $actual. Re-downloading." }
+                destFile.delete()
+            } else {
+                logController.d(TAG) { "Cached model hash verified." }
+                return@withContext filename
+            }
         }
 
         logController.d(TAG) { "downloadModelFromUrl: Downloading to ${destFile.absolutePath}" }
@@ -124,6 +129,14 @@ class ModelDownloader(
                     }
                 }
 
+                val actual = sha256Hex(tempFile)
+                if (!actual.equals(expectedSha256, ignoreCase = true)) {
+                    tempFile.delete()
+                    logController.e(TAG) { "Model hash mismatch — expected $expectedSha256, got $actual. Aborting." }
+                    return@withContext null
+                }
+                logController.d(TAG) { "Model hash verified." }
+
                 tempFile.renameTo(destFile)
                 logController.d(TAG) { "downloadModelFromUrl: Download complete: ${destFile.length()} bytes" }
                 filename
@@ -139,6 +152,18 @@ class ModelDownloader(
             // Clean up temp file if it wasn't successfully renamed
             tempFile.delete()
         }
+    }
+
+    private fun sha256Hex(file: File): String {
+        val digest = MessageDigest.getInstance("SHA-256")
+        file.inputStream().use { input ->
+            val buffer = ByteArray(8192)
+            var read: Int
+            while (input.read(buffer).also { read = it } != -1) {
+                digest.update(buffer, 0, read)
+            }
+        }
+        return digest.digest().joinToString("") { "%02x".format(it) }
     }
 
     /**
@@ -165,30 +190,41 @@ class ModelDownloader(
     }
 
     /**
-     * Prepare model file (either from asset or URL) to internal storage
-     * @param modelPath Either an asset filename or HTTP(S) URL
+     * Prepare a model from either an APK asset or a remote URL with a pinned SHA-256.
+     *
+     * @param source Where to fetch the model from. Remote sources carry their own hash,
+     *               so adding a URL without a hash is impossible at the type level.
      * @param destDir Destination directory path
-     * @param outputFilename Optional custom filename for downloaded files. Only used for URLs
+     * @param outputFilename Optional custom filename for downloaded files. Only used for Remote sources
      * @param onProgress Optional callback for download progress (percentage: 0-100)
      * @return The local filename, or null if preparation failed
      */
     suspend fun prepareModel(
-        modelPath: String,
+        source: FaceMatchModelSource,
         destDir: String,
         outputFilename: String? = null,
         onProgress: ((Int) -> Unit)? = null,
     ): String? {
-        if (modelPath.isEmpty()) return null
+        return when (source) {
+            is FaceMatchModelSource.Asset -> {
+                if (source.filename.isEmpty()) return null
+                copyAssetIfNeeded(source.filename, destDir)
+                source.filename
+            }
 
-        return if (modelPath.startsWith("https://")) {
-            downloadModelFromUrl(modelPath, destDir, outputFilename, onProgress)
-        } else if (modelPath.startsWith("http://")) {
-            logController.e(TAG) { "Rejecting insecure HTTP URL for model download: $modelPath" }
-            null
-        } else {
-            // Copy from assets
-            copyAssetIfNeeded(modelPath, destDir)
-            modelPath
+            is FaceMatchModelSource.Remote -> {
+                if (!source.url.startsWith("https://")) {
+                    logController.e(TAG) { "Rejecting non-https URL for model download: ${source.url}" }
+                    return null
+                }
+                downloadModelFromUrl(
+                    urlString = source.url,
+                    destDir = destDir,
+                    outputFilename = outputFilename,
+                    expectedSha256 = source.sha256Hex,
+                    onProgress = onProgress,
+                )
+            }
         }
     }
 }

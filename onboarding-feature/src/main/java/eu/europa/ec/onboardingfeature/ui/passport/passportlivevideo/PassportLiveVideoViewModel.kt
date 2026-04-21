@@ -213,6 +213,10 @@ class PassportLiveVideoViewModel(
     }
 
 
+    // Intentional: the temp face image is deleted here (on ViewModel destruction) rather than
+    // immediately on failure. The file is needed so the user can retry the face match from the
+    // error screen or by navigating back, without re-capturing the image. It is cleaned up when
+    // the user definitively leaves the flow and the ViewModel is destroyed.
     override fun onCleared() {
         super.onCleared()
         viewState.value.config?.faceImageTempPath?.let { deleteTempFile(it) }

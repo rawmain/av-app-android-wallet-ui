@@ -29,13 +29,28 @@ import eu.europa.ec.businesslogic.model.ErrorType
 import kotlinx.coroutines.flow.Flow
 
 /**
+ * Where a face-match model is loaded from. The sealed hierarchy couples a remote URL
+ * to its expected SHA-256 so a configuration cannot supply a URL without a pinned hash.
+ */
+sealed interface FaceMatchModelSource {
+    /** Model shipped inside the APK as an asset file. */
+    data class Asset(val filename: String) : FaceMatchModelSource
+
+    /**
+     * Model fetched from [url] and verified against [sha256Hex] (case-insensitive hex digest).
+     * Downloads whose hash does not match are discarded.
+     */
+    data class Remote(val url: String, val sha256Hex: String) : FaceMatchModelSource
+}
+
+/**
  * Configuration for Face Match SDK
  */
 data class FaceMatchConfig(
-    val faceDetectorModel: String,
-    val embeddingExtractorModel: String,
-    val livenessModel0: String,
-    val livenessModel1: String,
+    val faceDetectorModel: FaceMatchModelSource,
+    val embeddingExtractorModel: FaceMatchModelSource,
+    val livenessModel0: FaceMatchModelSource,
+    val livenessModel1: FaceMatchModelSource,
     val livenessThreshold: Double,
     val matchingThreshold: Double,
 )

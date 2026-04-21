@@ -300,6 +300,12 @@ class WalletCorePresentationControllerImpl(
                             .firstOrNull()?.readerAuth?.isVerified == true
                         verifierIsTrusted = isTrusted
 
+                        // Intentional: an unverified verifier (isTrusted == false) is not
+                        // blocked. The trust status is surfaced as a UI badge on the
+                        // presentation request screen so the user can make an informed choice.
+                        // This wallet issues only age-over-X attestations; blocking unverified
+                        // RPs would prevent use with parties that lack a formal mDL certificate
+                        // but still need to verify age.
                         TransferEventPartialState.RequestReceived(
                             requestData = requestedDocuments.requestedDocuments,
                             verifierName = verifierName,
