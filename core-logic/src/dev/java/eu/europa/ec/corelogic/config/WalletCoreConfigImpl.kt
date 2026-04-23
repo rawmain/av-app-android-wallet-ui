@@ -21,6 +21,7 @@ import eu.europa.ec.corelogic.BuildConfig
 import eu.europa.ec.eudi.wallet.EudiWalletConfig
 import eu.europa.ec.eudi.wallet.document.CreateDocumentSettings.CredentialPolicy
 import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
+import eu.europa.ec.eudi.wallet.issue.openid4vci.dpop.DPopConfig
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.ClientIdScheme
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.Format
 import eu.europa.ec.resourceslogic.R
@@ -79,7 +80,7 @@ internal class WalletCoreConfigImpl(
                 .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
                 .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
                 .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-                .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
+                .withDPopConfig(DPopConfig.Disabled)
                 .build()
         )
 
@@ -92,7 +93,7 @@ internal class WalletCoreConfigImpl(
             .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
             .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
             .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-            .withDPoPUsage(OpenId4VciManager.Config.DPoPUsage.Disabled)
+            .withDPopConfig(DPopConfig.Disabled)
             .build()
 
     /**
