@@ -40,7 +40,7 @@ internal fun Project.configureKotlinAndroid(
     commonExtension.apply {
         compileSdk = 36
 
-        defaultConfig.minSdk = 29
+        defaultConfig.minSdk = 26
 
         buildFeatures.buildConfig = true
 
