@@ -110,6 +110,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
+            <!--
+                Intentional: custom URI schemes are used instead of https:// App Links because
+                the OpenID4VP, mDL, and credential-offer protocol specifications mandate them.
+                Even if a link is intercepted by another app, no credential data travels in the
+                inbound URL — the wallet still requires user confirmation and PIN/biometric before
+                sharing anything. android:autoVerify is not applicable to custom schemes.
+            -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

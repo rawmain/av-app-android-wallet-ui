@@ -17,9 +17,10 @@
 package eu.europa.ec.storagelogic.di
 
 import android.content.Context
+import android.os.Build
 import androidx.room.Room
 import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
+import androidx.security.crypto.MasterKey
 import eu.europa.ec.storagelogic.dao.BookmarkDao
 import eu.europa.ec.storagelogic.dao.RevokedDocumentDao
 import eu.europa.ec.storagelogic.dao.TransactionLogDao
@@ -45,6 +46,8 @@ fun provideAppDatabase(context: Context): DatabaseService {
         "eudi.app.wallet.storage"
     )
         .openHelperFactory(factory)
+        // Intentional: this is a template repository with no shipped user data to preserve.
+        // Teams forking for production must replace this with explicit Migration objects.
         .fallbackToDestructiveMigration(true)
         .build()
 }
@@ -53,11 +56,15 @@ private const val DB_KEY_PREFS = "db-key-prefs"
 private const val DB_PASSPHRASE_KEY = "db_passphrase"
 
 private fun getOrCreateDbPassphrase(context: Context): ByteArray {
-    val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+    val masterKey = MasterKey.Builder(context)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .setRequestStrongBoxBacked(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
+        .setUserAuthenticationRequired(false) // Passphrase key does not gate on biometrics; the DB cipher provides at-rest protection
+        .build()
     val prefs = EncryptedSharedPreferences.create(
-        DB_KEY_PREFS,
-        masterKeyAlias,
         context,
+        DB_KEY_PREFS,
+        masterKey,
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )

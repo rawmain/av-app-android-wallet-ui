@@ -18,11 +18,13 @@ package eu.europa.ec.corelogic.controller
 
 import androidx.core.net.toUri
 import eu.europa.ec.authenticationlogic.controller.authentication.DeviceAuthenticationResult
+import eu.europa.ec.authenticationlogic.controller.storage.BiometryStorageController
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.safeAsync
 import eu.europa.ec.businesslogic.extension.toErrorType
 import eu.europa.ec.businesslogic.model.ErrorType
 import eu.europa.ec.corelogic.config.WalletCoreConfig
+import eu.europa.ec.corelogic.extension.createDocumentSettingsForUser
 import eu.europa.ec.corelogic.extension.documentIdentifier
 import eu.europa.ec.corelogic.extension.getLocalizedDisplayName
 import eu.europa.ec.corelogic.model.DeferredDocumentDataDomain
@@ -39,7 +41,6 @@ import eu.europa.ec.eudi.wallet.EudiWallet
 import eu.europa.ec.eudi.wallet.document.CreateDocumentSettings
 import eu.europa.ec.eudi.wallet.document.DeferredDocument
 import eu.europa.ec.eudi.wallet.document.Document
-import eu.europa.ec.eudi.wallet.document.DocumentExtensions.getDefaultCreateDocumentSettings
 import eu.europa.ec.eudi.wallet.document.DocumentExtensions.getDefaultKeyUnlockData
 import eu.europa.ec.eudi.wallet.document.DocumentId
 import eu.europa.ec.eudi.wallet.document.IssuedDocument
@@ -217,6 +218,7 @@ class WalletCoreDocumentsControllerImpl(
     private val eudiWallet: EudiWallet,
     private val walletCoreConfig: WalletCoreConfig,
     private val revokedDocumentDao: RevokedDocumentDao,
+    private val biometryStorageController: BiometryStorageController,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : WalletCoreDocumentsController {
 
@@ -720,10 +722,11 @@ class WalletCoreDocumentsControllerImpl(
                             .getRuleForDocument(documentIdentifier = offeredDocIdentifier)
 
                         event.resume(
-                            eudiWallet.getDefaultCreateDocumentSettings(
+                            eudiWallet.createDocumentSettingsForUser(
                                 offeredDocument = event.offeredDocument,
                                 credentialPolicy = documentIssuanceRule.policy,
                                 numberOfCredentials = documentIssuanceRule.numberOfCredentials,
+                                biometryStorageController = biometryStorageController,
                             )
                         )
                     }
