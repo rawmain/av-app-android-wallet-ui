@@ -80,7 +80,7 @@ internal class WalletCoreConfigImpl(
                 .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
                 .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
                 .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-                .withDPopConfig(DPopConfig.Disabled)
+                .withDPopConfig(DPopConfig.Default)
                 .build()
         )
 
@@ -93,7 +93,7 @@ internal class WalletCoreConfigImpl(
             .withClientAuthenticationType(OpenId4VciManager.ClientAuthenticationType.AttestationBased)
             .withAuthFlowRedirectionURI(BuildConfig.ISSUE_AUTHORIZATION_DEEPLINK)
             .withParUsage(OpenId4VciManager.Config.ParUsage.NEVER)
-            .withDPopConfig(DPopConfig.Disabled)
+            .withDPopConfig(DPopConfig.Default)
             .build()
 
     /**
