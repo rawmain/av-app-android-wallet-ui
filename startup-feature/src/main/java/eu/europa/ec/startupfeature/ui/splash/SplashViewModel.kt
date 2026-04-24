@@ -24,10 +24,8 @@ import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.ModuleRoute
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -63,11 +61,10 @@ class SplashViewModel(
         viewModelScope.launch {
             delay(500.milliseconds)
 
-            val integrityResult = withContext(Dispatchers.IO) {
-                interactor.getDeviceIntegrityResult()
-            }
+            val integrityResult = interactor.getDeviceIntegrityResult()
 
             when (integrityResult.level) {
+                DeviceIntegrityLevel.POTENTIALLY_COMPROMISED,
                 DeviceIntegrityLevel.COMPROMISED -> {
                     setState {
                         copy(
@@ -76,8 +73,6 @@ class SplashViewModel(
                         )
                     }
                 }
-
-                DeviceIntegrityLevel.POTENTIALLY_COMPROMISED,
                 DeviceIntegrityLevel.TRUSTED -> proceedToApp()
             }
         }

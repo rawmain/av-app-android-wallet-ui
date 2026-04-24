@@ -37,7 +37,7 @@ import eu.europa.ec.uilogic.serializer.UiSerializer
 
 interface SplashInteractor {
     fun getAfterSplashRoute(): String
-    fun getDeviceIntegrityResult(): DeviceIntegrityResult
+    suspend fun getDeviceIntegrityResult(): DeviceIntegrityResult
 }
 
 class SplashInteractorImpl(
@@ -51,7 +51,7 @@ class SplashInteractorImpl(
     private val hasDocuments: Boolean
         get() = walletCoreDocumentsController.getAgeOver18IssuedDocument() != null
 
-    override fun getDeviceIntegrityResult(): DeviceIntegrityResult {
+    override suspend fun getDeviceIntegrityResult(): DeviceIntegrityResult {
         return deviceIntegrityController.checkIntegrity()
     }
 

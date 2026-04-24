@@ -20,10 +20,12 @@ import android.content.Context
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
 import eu.europa.ec.passportscanner.face.FaceMatchConfig
+import eu.europa.ec.passportscanner.face.FaceMatchModelSource
 import eu.europa.ec.passportscanner.face.SdkInitStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
+import eu.europa.ec.corelogic.config.FaceMatchModelSource as CoreFaceMatchModelSource
 
 data class FaceMatchResult(
     val processed: Boolean,
@@ -62,13 +64,18 @@ class FaceMatchControllerImpl(
     private fun convertConfig(): FaceMatchConfig {
         val coreConfig = walletCoreConfig.faceMatchConfig
         return FaceMatchConfig(
-            faceDetectorModel = coreConfig.faceDetectorModel,
-            embeddingExtractorModel = coreConfig.embeddingExtractorModel,
-            livenessModel0 = coreConfig.livenessModel0,
-            livenessModel1 = coreConfig.livenessModel1,
+            faceDetectorModel = coreConfig.faceDetectorModel.toScannerSource(),
+            embeddingExtractorModel = coreConfig.embeddingExtractorModel.toScannerSource(),
+            livenessModel0 = coreConfig.livenessModel0.toScannerSource(),
+            livenessModel1 = coreConfig.livenessModel1.toScannerSource(),
             livenessThreshold = coreConfig.livenessThreshold,
-            matchingThreshold = coreConfig.matchingThreshold
+            matchingThreshold = coreConfig.matchingThreshold,
         )
+    }
+
+    private fun CoreFaceMatchModelSource.toScannerSource(): FaceMatchModelSource = when (this) {
+        is CoreFaceMatchModelSource.Asset -> FaceMatchModelSource.Asset(filename)
+        is CoreFaceMatchModelSource.Remote -> FaceMatchModelSource.Remote(url, sha256Hex)
     }
 
     override fun init(context: Context): Flow<SdkInitStatus> {

@@ -31,6 +31,10 @@ import eu.europa.ec.businesslogic.controller.storage.PrefKeys
 import eu.europa.ec.businesslogic.controller.storage.PrefKeysImpl
 import eu.europa.ec.businesslogic.controller.storage.PrefsController
 import eu.europa.ec.businesslogic.controller.storage.PrefsControllerImpl
+import android.os.SystemClock
+import android.provider.Settings
+import eu.europa.ec.businesslogic.provider.BootIdProvider
+import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.businesslogic.provider.UuidProviderImpl
 import eu.europa.ec.businesslogic.validator.FilterValidator
@@ -84,6 +88,19 @@ fun provideFiltersValidator(): FilterValidator = FilterValidatorImpl()
 @Single
 fun provideUuidProvider(): UuidProvider {
     return UuidProviderImpl()
+}
+
+@Single
+fun provideElapsedRealtimeClock(): ElapsedRealtimeClock =
+    ElapsedRealtimeClock { SystemClock.elapsedRealtime() }
+
+@Single
+fun provideBootIdProvider(context: Context): BootIdProvider = BootIdProvider {
+    // BOOT_COUNT is monotonically incremented on every device boot since API 24 and
+    // cannot be reset without a factory reset. Fall back to a sentinel if unavailable,
+    // in which case lockouts simply retain their legacy behaviour (still safe — only
+    // adds a reboot-relief equal to one full duration).
+    Settings.Global.getString(context.contentResolver, Settings.Global.BOOT_COUNT) ?: "unknown"
 }
 
 @Single
