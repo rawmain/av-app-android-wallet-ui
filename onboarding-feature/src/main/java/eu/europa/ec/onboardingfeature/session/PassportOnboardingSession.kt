@@ -21,25 +21,41 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Holds the passport face bitmap in memory for the duration of the passport onboarding flow.
- * Nothing is written to disk. On process death the bitmap is gone, which is the correct security
- * behaviour — re-capture is cheap and there is no reason to persist biometric material.
  */
 class PassportOnboardingSession {
 
     private val bitmaps = ConcurrentHashMap<String, Bitmap>()
 
     fun put(sessionId: String, bitmap: Bitmap) {
-        bitmaps[sessionId] = bitmap
+        bitmaps[sessionId] = ensureMutable(bitmap)
     }
 
     fun get(sessionId: String): Bitmap? = bitmaps[sessionId]
 
     fun remove(sessionId: String) {
-        bitmaps.remove(sessionId)?.recycle()
+        bitmaps.remove(sessionId)?.let(::zeroAndRecycle)
     }
 
     fun clear() {
-        bitmaps.values.forEach { it.recycle() }
+        bitmaps.values.forEach(::zeroAndRecycle)
         bitmaps.clear()
+    }
+
+    // Bitmap.recycle() does not overwrite the backing pixel memory, so an in-process heap dump
+    // could still read the face image. Keeping the bitmap mutable lets us overwrite with zeros
+    // before releasing the reference.
+    private fun ensureMutable(bitmap: Bitmap): Bitmap {
+        if (bitmap.isMutable) return bitmap
+        val mutable = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+        bitmap.recycle()
+        return mutable
+    }
+
+    private fun zeroAndRecycle(bitmap: Bitmap) {
+        if (bitmap.isRecycled) return
+        if (bitmap.isMutable) {
+            runCatching { bitmap.eraseColor(0) }
+        }
+        bitmap.recycle()
     }
 }
