@@ -45,11 +45,6 @@ internal class SecurePrefsStore(private val context: Context) {
         private const val STORE_TYPE = "AndroidKeyStore"
     }
 
-    init {
-        // Clean up the legacy EncryptedSharedPreferences file from previous installs.
-        context.deleteSharedPreferences("eudi-wallet-encrypted")
-    }
-
     private val plainPrefs by lazy {
         context.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
     }

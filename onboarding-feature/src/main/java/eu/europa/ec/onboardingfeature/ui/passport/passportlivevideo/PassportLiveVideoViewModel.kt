@@ -207,11 +207,12 @@ class PassportLiveVideoViewModel(
         }
     }
 
-    // Bitmap is removed from session on success. If the ViewModel is destroyed before that (back
-    // press, process death route), the session entry is left for DocumentIdentificationViewModel's
-    // onCleared to clean up, which holds the canonical reference.
+    // On success the bitmap is removed from the session immediately after matching. On any other
+    // exit (back press, error, process death) DocumentIdentificationViewModel.onCleared is the
+    // canonical owner and will recycle it. Nothing to do here.
     override fun onCleared() {
         super.onCleared()
+        viewState.value.config?.sessionId?.let { passportOnboardingSession.remove(it) }
     }
 
     private fun showError(errorMessage: String, errorType: ErrorType = ErrorType.GENERIC) {

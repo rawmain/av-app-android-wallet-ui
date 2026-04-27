@@ -192,7 +192,6 @@ class AVFaceMatchSdkImpl(
                     referenceIsValid = false,
                     capturedIsLive = false,
                     isSameSubject = false,
-                    capturedPath = null
                 )
             )
             return
@@ -221,7 +220,6 @@ class AVFaceMatchSdkImpl(
                         referenceIsValid = false,
                         capturedIsLive = false,
                         isSameSubject = false,
-                        capturedPath = null
                     )
                 )
                 return
@@ -256,7 +254,6 @@ class AVFaceMatchSdkImpl(
                     referenceIsValid = false,
                     capturedIsLive = false,
                     isSameSubject = false,
-                    capturedPath = null
                 )
             )
         }

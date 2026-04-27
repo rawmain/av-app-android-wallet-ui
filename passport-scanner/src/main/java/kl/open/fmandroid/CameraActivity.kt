@@ -241,7 +241,6 @@ class CameraActivity : AppCompatActivity() {
             referenceIsValid = true,
             capturedIsLive = isLive,
             isSameSubject = isSameSubject,
-            capturedPath = null
         )
 
         avCameraCallbackHolder.triggerCallback(finalResult)
@@ -263,7 +262,6 @@ object MatchResult {
             referenceIsValid = false,
             capturedIsLive = false,
             isSameSubject = false,
-            capturedPath = null
         )
     }
 }

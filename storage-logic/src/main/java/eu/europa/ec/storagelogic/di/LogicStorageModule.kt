@@ -66,8 +66,6 @@ private const val GCM_TAG_SIZE_BITS = 128
 private const val STORE_TYPE = "AndroidKeyStore"
 
 private fun getOrCreateDbPassphrase(context: Context): ByteArray {
-    // Clean up legacy EncryptedSharedPreferences file from previous installs.
-    context.deleteSharedPreferences(DB_KEY_PREFS)
     val plainPrefs =
         context.getSharedPreferences("${DB_KEY_PREFS}_plain", Context.MODE_PRIVATE)
     val wrapKey = getOrCreateDbWrapKey()
@@ -77,6 +75,11 @@ private fun getOrCreateDbPassphrase(context: Context): ByteArray {
         if (decoded.size > GCM_IV_SIZE) {
             val decrypted = tryDecrypt(wrapKey, decoded)
             if (decrypted != null) return decrypted
+            // Keystore key lost (most likely backup/restore to a new device — Keystore keys are
+            // hardware-bound and are never included in Android backups). The encrypted blob is
+            // unreadable, so wipe it and generate a fresh passphrase. Room's
+            // fallbackToDestructiveMigration will recreate the database on next open.
+            plainPrefs.edit().remove(DB_PASSPHRASE_KEY).apply()
         }
     }
     val passphrase = ByteArray(32).also { SecureRandom().nextBytes(it) }

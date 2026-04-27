@@ -151,5 +151,4 @@ data class AVMatchResult(
     val referenceIsValid: Boolean,
     val capturedIsLive: Boolean,
     val isSameSubject: Boolean,
-    val capturedPath: String?
 )
