@@ -122,13 +122,13 @@ interface AVFaceMatchSDK {
     ): Flow<SdkInitStatus>
 
     /**
-     * Capture live face and match against reference image
-     * SDK must be in Ready state before calling this method
+     * Capture live face and match against reference image supplied as encoded bytes (PNG/JPEG).
+     * SDK must be in Ready state before calling this method.
      *
-     * @param referenceImagePath Path to the reference image from passport
+     * @param referenceImageBytes PNG or JPEG encoded bytes of the reference face image
      * @param onResult Callback with the matching result
      */
-    fun captureAndMatch(referenceImagePath: String, onResult: (AVMatchResult) -> Unit)
+    fun captureAndMatch(referenceImageBytes: ByteArray, onResult: (AVMatchResult) -> Unit)
 
     /**
      * Cancel any ongoing initialization (model download/preparation).

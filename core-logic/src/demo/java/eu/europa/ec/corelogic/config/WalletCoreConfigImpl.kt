@@ -118,7 +118,7 @@ internal class WalletCoreConfigImpl(
         livenessModel0 = FaceMatchModelSource.Asset("silentface40.onnx"),
         livenessModel1 = FaceMatchModelSource.Asset("silentface27.onnx"),
         livenessThreshold = 0.972017,
-        matchingThreshold = 0.85,
+        matchingThreshold = 0.5,
     )
 
     override val walletProviderHost: String
