@@ -17,7 +17,6 @@
 package eu.europa.ec.startupfeature.ui.splash
 
 import androidx.lifecycle.viewModelScope
-import eu.europa.ec.businesslogic.controller.device.DeviceIntegrityLevel
 import eu.europa.ec.startupfeature.interactor.SplashInteractor
 import eu.europa.ec.uilogic.mvi.MviViewModel
 import eu.europa.ec.uilogic.mvi.ViewEvent
@@ -30,8 +29,7 @@ import org.koin.android.annotation.KoinViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
 data class State(
-    val deviceCompromised: Boolean = false,
-    val integrityDetails: List<String> = emptyList()
+    val placeholder: Unit = Unit
 ) : ViewState
 
 sealed class Event : ViewEvent {
@@ -60,28 +58,10 @@ class SplashViewModel(
     private fun enterApplication() {
         viewModelScope.launch {
             delay(500.milliseconds)
-
-            val integrityResult = interactor.getDeviceIntegrityResult()
-
-            when (integrityResult.level) {
-                DeviceIntegrityLevel.POTENTIALLY_COMPROMISED,
-                DeviceIntegrityLevel.COMPROMISED -> {
-                    setState {
-                        copy(
-                            deviceCompromised = true,
-                            integrityDetails = integrityResult.details
-                        )
-                    }
-                }
-                DeviceIntegrityLevel.TRUSTED -> proceedToApp()
+            val screenRoute = interactor.getAfterSplashRoute()
+            setEffect {
+                Effect.Navigation.SwitchScreen(screenRoute)
             }
-        }
-    }
-
-    private fun proceedToApp() {
-        val screenRoute = interactor.getAfterSplashRoute()
-        setEffect {
-            Effect.Navigation.SwitchScreen(screenRoute)
         }
     }
 }
