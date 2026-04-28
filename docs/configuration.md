@@ -7,7 +7,6 @@
 * [Scoped Issuance Document Configuration](#scoped-issuance-document-configuration)
     * [Passport Scanning Issuer Configuration](#passport-scanning-issuer-configuration)
     * [Face Match Configuration](#face-match-configuration)
-* [How to work with self-signed certificates](#how-to-work-with-self-signed-certificates)
 * [Batch Document Issuance Configuration](#batch-document-issuance-configuration)
 * [Theme configuration](#theme-configuration)
 * [Pin Storage configuration](#pin-storage-configuration)
@@ -415,75 +414,6 @@ The model paths can be specified as:
 >
 > The models referenced in the default configuration are currently hosted on GitHub Releases for
 > development and testing purposes only. **This is NOT recommended for production environments.**
-
-## How to work with self-signed certificates
-
-This section describes configuring the application to interact with services utilizing self-signed certificates.
-
-*To enable support for self-signed certificates, you must customize the existing Ktor `HttpClient`
-used by the application.*
-
-1. Open the `NetworkModule.kt` file of the `network-logic` module.
-2. Add the following imports:
-
-    ```kotlin
-    import android.annotation.SuppressLint
-    import java.security.SecureRandom
-    import javax.net.ssl.HostnameVerifier
-    import javax.net.ssl.SSLContext
-    import javax.net.ssl.TrustManager
-    import javax.net.ssl.X509TrustManager
-    import javax.security.cert.CertificateException
-    ```
-
-3. Replace the `provideHttpClient` function with the following:
-
-    ```kotlin
-    @SuppressLint("TrustAllX509TrustManager", "CustomX509TrustManager")
-    @Single
-    fun provideHttpClient(json: Json): HttpClient {
-        val trustAllCerts = arrayOf<TrustManager>(
-            object : X509TrustManager {
-                @Throws(CertificateException::class)
-                override fun checkClientTrusted(
-                    chain: Array<java.security.cert.X509Certificate>,
-                    authType: String
-                ) {
-                }
-    
-                @Throws(CertificateException::class)
-                override fun checkServerTrusted(
-                    chain: Array<java.security.cert.X509Certificate>,
-                    authType: String
-                ) {
-                }
-    
-                override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> {
-                    return arrayOf()
-                }
-            }
-        )
-    
-        return HttpClient(Android) {
-            install(Logging)
-            install(ContentNegotiation) {
-                json(
-                    json = json,
-                    contentType = ContentType.Application.Json
-                )
-            }
-            engine {
-                requestConfig
-                sslManager = { httpsURLConnection ->
-                    httpsURLConnection.sslSocketFactory = SSLContext.getInstance("TLS").apply {
-                        init(null, trustAllCerts, SecureRandom())
-                    }.socketFactory
-                    httpsURLConnection.hostnameVerifier = HostnameVerifier { _, _ -> true }
-                }
-            }
-        }
-    }
-    ```
 
 ## Batch Document Issuance Configuration
 
