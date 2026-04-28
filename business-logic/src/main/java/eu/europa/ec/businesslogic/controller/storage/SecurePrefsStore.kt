@@ -142,6 +142,7 @@ internal class SecurePrefsStore(private val context: Context) {
 
     fun getString(key: String, default: String): String {
         val encoded = plainPrefs.getString(hashKey(key), null) ?: return default
+        // Intended, must use toString(Charsets.UTF_8), not contentToString()
         return decryptBytes(encoded)?.toString(Charsets.UTF_8) ?: default
     }
 

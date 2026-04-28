@@ -96,6 +96,8 @@ To publish the app on the Google Play Store, several steps must be completed. A 
 
 [Age Verification Solution Technical Specification](https://github.com/eu-digital-identity-wallet/av-doc-technical-specification)
 
+[Hardware-Backed Authentication](./docs/hardware_backed_authentication.md) - Biometric security configuration, device fallback behavior, and usability trade-offs.
+
 ## Support and feedback
 
 The following channels are available for discussions, feedback, and support requests:
