@@ -17,6 +17,7 @@
 package eu.europa.ec.onboardingfeature.controller
 
 import android.content.Context
+import android.graphics.Bitmap
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.passportscanner.face.AVFaceMatchSDK
 import eu.europa.ec.passportscanner.face.FaceMatchConfig
@@ -24,6 +25,7 @@ import eu.europa.ec.passportscanner.face.FaceMatchModelSource
 import eu.europa.ec.passportscanner.face.SdkInitStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.io.ByteArrayOutputStream
 import kotlin.coroutines.resume
 import eu.europa.ec.corelogic.config.FaceMatchModelSource as CoreFaceMatchModelSource
 
@@ -49,11 +51,14 @@ interface FaceMatchController {
     fun cancelInit()
 
     /**
-     * Capture and match face against reference image
-     * @param faceImagePath Path to the reference face image
+     * Capture and match face against the in-memory reference bitmap.
+     * The bitmap is encoded to PNG bytes in memory and passed directly to the native layer —
+     * nothing is written to disk.
+     *
+     * @param passportFace Reference face bitmap from the passport NFC chip
      * @return FaceMatchResult with matching details
      */
-    suspend fun captureAndMatch(faceImagePath: String): FaceMatchResult
+    suspend fun captureAndMatch(passportFace: Bitmap): FaceMatchResult
 }
 
 class FaceMatchControllerImpl(
@@ -86,9 +91,12 @@ class FaceMatchControllerImpl(
         faceMatchSDK.cancelInit()
     }
 
-    override suspend fun captureAndMatch(faceImagePath: String): FaceMatchResult {
+    override suspend fun captureAndMatch(passportFace: Bitmap): FaceMatchResult {
+        val pngBytes = ByteArrayOutputStream().also { buf ->
+            passportFace.compress(Bitmap.CompressFormat.PNG, 100, buf)
+        }.toByteArray()
         return suspendCancellableCoroutine { continuation ->
-            faceMatchSDK.captureAndMatch(faceImagePath) { result ->
+            faceMatchSDK.captureAndMatch(pngBytes) { result ->
                 continuation.resume(
                     FaceMatchResult(
                         processed = result.processed,
