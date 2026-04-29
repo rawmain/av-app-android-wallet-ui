@@ -490,23 +490,58 @@ interface StorageConfig {
 You can provide your storage implementation by implementing the *PinStorageProvider* interface and then setting it as the default to the *StorageConfigImpl* pinStorageProvider variable.
 The project utilizes Koin for Dependency Injection (DI), thus requiring adjustment of the *LogicAuthenticationModule* graph to provide the configuration.
 
+The *PinStorageProvider* interface:
+
+```kotlin
+interface PinStorageProvider {
+    fun hasPin(): Boolean
+    fun setPin(pin: String)
+    fun isPinValid(pin: String): Boolean
+
+    fun getFailedAttempts(): Int
+    fun incrementFailedAttempts(): Int
+    fun resetFailedAttempts()
+
+    fun setLockoutForDuration(durationMillis: Long)
+    fun getLockoutUntil(): Long
+    fun isCurrentlyLockedOut(): Boolean
+}
+```
+
 Implementation Example:
 
 ```kotlin
 class PrefsPinStorageProvider(
     private val prefsController: PrefsController,
-    private val cryptoController: CryptoController
+    private val clock: ElapsedRealtimeClock,
+    private val bootIdProvider: BootIdProvider,
 ) : PinStorageProvider {
 
-    override fun retrievePin(): String = decryptedAndLoad()
-
-    override fun setPin(pin: String) {
-       encryptAndStore(pin)
+    override fun hasPin(): Boolean {
+        return prefsController.getString(KEY_PIN_HASH, "").isNotEmpty()
     }
 
-    override fun isPinValid(pin: String): Boolean = retrievePin() == pin
+    override fun setPin(pin: String) {
+        val salt = generateSalt()
+        val hash = hashPin(pin, salt)
+        prefsController.setString(KEY_PIN_HASH, hash.toHexString())
+        prefsController.setString(KEY_PIN_SALT, salt.toHexString())
+        resetFailedAttempts()
+    }
+
+    override fun isPinValid(pin: String): Boolean {
+        val storedHashHex = prefsController.getString(KEY_PIN_HASH, "")
+        val saltHex = prefsController.getString(KEY_PIN_SALT, "")
+        if (storedHashHex.isEmpty() || saltHex.isEmpty()) return false
+
+        val salt = saltHex.hexToByteArray()
+        val computedHash = hashPin(pin, salt)
+        return MessageDigest.isEqual(computedHash, storedHashHex.hexToByteArray())
+    }
 }
 ```
+
+The default implementation uses PBKDF2 with HMAC-SHA256 for PIN hashing with a random salt, constant-time comparison to prevent timing attacks, and reboot-aware lockout via `ElapsedRealtimeClock` and `BootIdProvider`.
 
 Config Example:
 
@@ -528,9 +563,10 @@ Config Construction via Koin DI Example:
 @Single
 fun provideStorageConfig(
     prefsController: PrefsController,
-    cryptoController: CryptoController
+    clock: ElapsedRealtimeClock,
+    bootIdProvider: BootIdProvider,
 ): StorageConfig = StorageConfigImpl(
-    pinImpl = PrefsPinStorageProvider(prefsController, cryptoController),
+    pinImpl = PrefsPinStorageProvider(prefsController, clock, bootIdProvider),
     biometryImpl = PrefsBiometryStorageProvider(prefsController)
 )
 ```
