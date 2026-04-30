@@ -117,7 +117,7 @@ The following channels are available for discussions, feedback, and support requ
 
 ## Important note
 
-This white-label application is a reference implementation of the Age Verification solution that should be customised before publishing it. The current version is not feature complete and will require further integration work before production deployment. In particular, any national-specific enrolment procedures must be implemented by the respective Member States or publishing parties.
+This white-label application is a reference implementation of the Age Verification solution that should be customised before publishing it. The current version is not feature complete and will require further integration work before production deployment. (e.g. hardening, see more information at link: [Implementers tasks](https://ageverification.dev/Getting%20started/app_implementers_tasks/)). In particular, any national-specific enrolment procedures must be implemented by the respective Member States or publishing parties.
 
 To enhance security, it is strongly recommended that the allowed PINs raise the overall security level. Sequential or easily guessable patterns (such as "135246 or "147258") should not be permitted. Additionally, it is advisable to check against a list of the most commonly used or "pwned" PINs to prevent users from choosing weak credentials.
 
