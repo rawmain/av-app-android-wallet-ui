@@ -26,6 +26,7 @@ import eu.europa.ec.eudi.wallet.transfer.openId4vp.Format
 import eu.europa.ec.eudi.wallet.zkp.LongfellowCircuits
 import eu.europa.ec.eudi.wallet.zkp.LongfellowZkSystemRepository
 import eu.europa.ec.resourceslogic.R
+import kotlin.time.Duration.Companion.seconds
 
 internal class WalletCoreConfigImpl(
     private val context: Context
@@ -37,9 +38,11 @@ internal class WalletCoreConfigImpl(
         get() {
             if (_config == null) {
                 _config = EudiWalletConfig {
-                    // Per-document key settings (auth requirement, StrongBox) are applied
-                    // at issuance time in WalletCoreDocumentsController so they can reflect
-                    // the user's biometric choice made during onboarding.
+                    configureDocumentKeyCreation(
+                        userAuthenticationRequired = true,
+                        userAuthenticationTimeout = 10.seconds,
+                        useStrongBoxForKeys = true
+                    )
                     configureOpenId4Vp {
                         withClientIdSchemes(
                             listOf(
@@ -115,7 +118,7 @@ internal class WalletCoreConfigImpl(
         livenessModel0 = FaceMatchModelSource.Asset("silentface40.onnx"),
         livenessModel1 = FaceMatchModelSource.Asset("silentface27.onnx"),
         livenessThreshold = 0.972017,
-        matchingThreshold = 0.85,
+        matchingThreshold = 0.5,
     )
 
     override val walletProviderHost: String

@@ -19,6 +19,7 @@ package eu.europa.ec.passportscanner.face
 import android.content.Context
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.extension.isNoConnectionError
+import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
@@ -40,11 +41,6 @@ class ModelDownloader(
         private const val TAG = "ModelDownloader"
     }
 
-    /**
-     * Download a model file from a remote URL, verifying the SHA-256 hash before
-     * accepting it. A mismatched hash — whether on the cached file or a fresh download —
-     * causes the file to be deleted and the call to fail.
-     */
     private suspend fun downloadModelFromUrl(
         urlString: String,
         destDir: String,
@@ -58,27 +54,17 @@ class ModelDownloader(
         val filename = outputFilename ?: url.path.substringAfterLast('/').ifEmpty { "model.onnx" }
         val destFile = File(destDir, filename)
 
-        if (destFile.exists()) {
-            val actual = sha256Hex(destFile)
-            if (!actual.equals(expectedSha256, ignoreCase = true)) {
-                logController.e(TAG) { "Cached model hash mismatch — expected $expectedSha256, got $actual. Re-downloading." }
-                destFile.delete()
-            } else {
-                logController.d(TAG) { "Cached model hash verified." }
-                return@withContext filename
-            }
-        }
+        getCachedModelIfValid(destFile, expectedSha256)?.let { return@withContext it }
 
         logController.d(TAG) { "downloadModelFromUrl: Downloading to ${destFile.absolutePath}" }
 
         val tempFile = File(destDir, "$filename.tmp")
 
         try {
-            // Use HttpURLConnection with proper configuration
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
-            connection.connectTimeout = 30000 // 30 seconds
-            connection.readTimeout = 60000 // 60 seconds
+            connection.connectTimeout = 30000
+            connection.readTimeout = 60000
             connection.instanceFollowRedirects = true
             connection.setRequestProperty("User-Agent", "Mozilla/5.0")
 
@@ -87,71 +73,107 @@ class ModelDownloader(
             val responseCode = connection.responseCode
             logController.d(TAG) { "downloadModelFromUrl: Response code: $responseCode" }
 
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                val contentLength = connection.contentLength
-                logController.d(TAG) { "downloadModelFromUrl: Content length: $contentLength bytes" }
-
-                connection.inputStream.use { input ->
-                    tempFile.outputStream().use { output ->
-                        val buffer = ByteArray(8192)
-                        var bytesRead: Int
-                        var totalBytesRead = 0L
-                        var lastLoggedMB = 0L
-                        var lastReportedPercentage = 0
-
-                        while (input.read(buffer).also { bytesRead = it } != -1) {
-                            coroutineContext.ensureActive()
-                            output.write(buffer, 0, bytesRead)
-                            totalBytesRead += bytesRead
-
-                            val currentMB = totalBytesRead / (1024 * 1024)
-                            val percentage = if (contentLength > 0) {
-                                ((totalBytesRead * 100) / contentLength).toInt()
-                            } else {
-                                0
-                            }
-
-                            // Log progress every 10MB
-                            if (currentMB >= lastLoggedMB + 10) {
-                                logController.d(TAG) { "downloadModelFromUrl: Downloaded $currentMB MB" }
-                                lastLoggedMB = currentMB
-                            }
-
-                            // Report progress every 5%
-                            if (percentage >= lastReportedPercentage + 5) {
-                                onProgress?.invoke(percentage)
-                                lastReportedPercentage = percentage
-                            }
-                        }
-
-                        logController.d(TAG) { "downloadModelFromUrl: Download complete: ${totalBytesRead / (1024 * 1024)} MB total" }
-                        onProgress?.invoke(100)
-                    }
-                }
-
-                val actual = sha256Hex(tempFile)
-                if (!actual.equals(expectedSha256, ignoreCase = true)) {
-                    tempFile.delete()
-                    logController.e(TAG) { "Model hash mismatch — expected $expectedSha256, got $actual. Aborting." }
-                    return@withContext null
-                }
-                logController.d(TAG) { "Model hash verified." }
-
-                tempFile.renameTo(destFile)
-                logController.d(TAG) { "downloadModelFromUrl: Download complete: ${destFile.length()} bytes" }
-                filename
-            } else {
+            if (responseCode != HttpURLConnection.HTTP_OK) {
                 logController.e(TAG) { "downloadModelFromUrl: HTTP error code: $responseCode" }
-                null
+                return@withContext null
             }
+
+            streamToFile(connection, tempFile, onProgress)
+
+            if (!verifyAndFinalize(tempFile, destFile, expectedSha256)) {
+                return@withContext null
+            }
+
+            filename
         } catch (e: Exception) {
             logController.e(TAG, e) { "downloadModelFromUrl: Failed to download from $urlString" }
             if (e.isNoConnectionError()) throw e
             null
         } finally {
-            // Clean up temp file if it wasn't successfully renamed
-            tempFile.delete()
+            if (tempFile.exists() && !tempFile.delete()) {
+                logController.e(TAG) { "Failed to delete temp file: ${tempFile.absolutePath}" }
+            }
         }
+    }
+
+    private fun getCachedModelIfValid(destFile: File, expectedSha256: String): String? {
+        if (!destFile.exists()) return null
+
+        val actual = sha256Hex(destFile)
+        if (actual.lowercase() == expectedSha256.lowercase()) {
+            logController.d(TAG) { "Cached model hash verified." }
+            return destFile.name
+        }
+
+        logController.e(TAG) { "Cached model hash mismatch — expected $expectedSha256, got $actual. Re-downloading." }
+        if (!destFile.delete()) {
+            logController.e(TAG) { "Failed to delete stale cached model: ${destFile.absolutePath}" }
+        }
+        return null
+    }
+
+    private suspend fun streamToFile(
+        connection: HttpURLConnection,
+        tempFile: File,
+        onProgress: ((Int) -> Unit)?,
+    ) {
+        val contentLength = connection.contentLength
+        logController.d(TAG) { "downloadModelFromUrl: Content length: $contentLength bytes" }
+
+        connection.inputStream.use { input ->
+            tempFile.outputStream().use { output ->
+                val buffer = ByteArray(8192)
+                var bytesRead: Int
+                var totalBytesRead = 0L
+                var lastLoggedMB = 0L
+                var lastReportedPercentage = 0
+
+                while (input.read(buffer).also { bytesRead = it } != -1) {
+                    coroutineContext.ensureActive()
+                    output.write(buffer, 0, bytesRead)
+                    totalBytesRead += bytesRead
+
+                    val currentMB = totalBytesRead / (1024 * 1024)
+                    val percentage = calculatePercentage(totalBytesRead, contentLength)
+
+                    if (currentMB >= lastLoggedMB + 10) {
+                        logController.d(TAG) { "downloadModelFromUrl: Downloaded $currentMB MB" }
+                        lastLoggedMB = currentMB
+                    }
+
+                    if (percentage >= lastReportedPercentage + 5) {
+                        onProgress?.invoke(percentage)
+                        lastReportedPercentage = percentage
+                    }
+                }
+
+                logController.d(TAG) { "downloadModelFromUrl: Download complete: ${totalBytesRead / (1024 * 1024)} MB total" }
+                onProgress?.invoke(100)
+            }
+        }
+    }
+
+    private fun calculatePercentage(totalBytesRead: Long, contentLength: Int): Int {
+        if (contentLength <= 0) return 0
+        return ((totalBytesRead * 100) / contentLength).toInt()
+    }
+
+    private fun verifyAndFinalize(tempFile: File, destFile: File, expectedSha256: String): Boolean {
+        val actual = sha256Hex(tempFile)
+        if (actual.lowercase() != expectedSha256.lowercase()) {
+            if (!tempFile.delete()) {
+                logController.e(TAG) { "Failed to delete temp file after hash mismatch: ${tempFile.absolutePath}" }
+            }
+            logController.e(TAG) { "Model hash mismatch — expected $expectedSha256, got $actual. Aborting." }
+            return false
+        }
+        logController.d(TAG) { "Model hash verified." }
+        if (!tempFile.renameTo(destFile)) {
+            logController.e(TAG) { "Failed to rename temp file to ${destFile.absolutePath}" }
+            return false
+        }
+        logController.d(TAG) { "downloadModelFromUrl: Download complete: ${destFile.length()} bytes" }
+        return true
     }
 
     private fun sha256Hex(file: File): String {

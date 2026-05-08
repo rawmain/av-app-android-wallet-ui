@@ -17,7 +17,6 @@
 package eu.europa.ec.corelogic.controller
 
 import android.content.Intent
-import androidx.activity.ComponentActivity
 import eu.europa.ec.authenticationlogic.model.BiometricCrypto
 import eu.europa.ec.businesslogic.extension.addOrReplace
 import eu.europa.ec.businesslogic.extension.safeAsync
@@ -180,11 +179,6 @@ interface WalletCorePresentationController {
      * [TransferEventPartialState.Connected] -> Connected. We can proceed to the next screen
      * */
     fun startQrEngagement()
-
-    /**
-     * Enable/Disable NFC service
-     * */
-    fun toggleNfcEngagement(componentActivity: ComponentActivity, toggle: Boolean)
 
     /**
      * Transform UI models to Domain and create -> sent the request.
@@ -350,17 +344,6 @@ class WalletCorePresentationControllerImpl(
 
     override fun startQrEngagement() {
         eudiWallet.startProximityPresentation()
-    }
-
-    override fun toggleNfcEngagement(componentActivity: ComponentActivity, toggle: Boolean) {
-        try {
-            if (toggle) {
-                eudiWallet.enableNFCEngagement(componentActivity)
-            } else {
-                eudiWallet.disableNFCEngagement(componentActivity)
-            }
-        } catch (_: Exception) {
-        }
     }
 
     override fun checkForKeyUnlock() = flow {

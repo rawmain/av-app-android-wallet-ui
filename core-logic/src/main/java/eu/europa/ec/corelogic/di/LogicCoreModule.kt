@@ -17,7 +17,6 @@
 package eu.europa.ec.corelogic.di
 
 import android.content.Context
-import eu.europa.ec.authenticationlogic.controller.storage.BiometryStorageController
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.provider.UuidProvider
 import eu.europa.ec.corelogic.config.WalletCoreConfig
@@ -103,14 +102,12 @@ fun provideWalletCoreDocumentsController(
     eudiWallet: EudiWallet,
     walletCoreConfig: WalletCoreConfig,
     revokedDocumentDao: RevokedDocumentDao,
-    biometryStorageController: BiometryStorageController,
 ): WalletCoreDocumentsController =
     WalletCoreDocumentsControllerImpl(
         resourceProvider,
         eudiWallet,
         walletCoreConfig,
-        revokedDocumentDao,
-        biometryStorageController
+        revokedDocumentDao
     )
 
 @Factory
@@ -119,14 +116,12 @@ fun providePassportScanningDocumentsController(
     resourceProvider: ResourceProvider,
     eudiWallet: EudiWallet,
     walletCoreConfig: WalletCoreConfig,
-    biometryStorageController: BiometryStorageController,
 ): PassportScanningDocumentsController =
     PassportScanningDocumentsControllerImpl(
         walletCoreDocumentsController,
         resourceProvider,
         eudiWallet,
-        walletCoreConfig,
-        biometryStorageController
+        walletCoreConfig
     )
 
 /**

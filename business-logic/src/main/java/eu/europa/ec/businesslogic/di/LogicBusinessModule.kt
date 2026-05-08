@@ -23,8 +23,6 @@ import eu.europa.ec.businesslogic.controller.crypto.CryptoController
 import eu.europa.ec.businesslogic.controller.crypto.CryptoControllerImpl
 import eu.europa.ec.businesslogic.controller.crypto.KeystoreController
 import eu.europa.ec.businesslogic.controller.crypto.KeystoreControllerImpl
-import eu.europa.ec.businesslogic.controller.device.DeviceIntegrityController
-import eu.europa.ec.businesslogic.controller.device.DeviceIntegrityControllerImpl
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.controller.log.LogControllerImpl
 import eu.europa.ec.businesslogic.controller.storage.PrefKeys
@@ -103,9 +101,3 @@ fun provideBootIdProvider(context: Context): BootIdProvider = BootIdProvider {
     Settings.Global.getString(context.contentResolver, Settings.Global.BOOT_COUNT) ?: "unknown"
 }
 
-@Single
-fun provideDeviceIntegrityController(
-    context: Context,
-    logController: LogController
-): DeviceIntegrityController =
-    DeviceIntegrityControllerImpl(context, logController)
