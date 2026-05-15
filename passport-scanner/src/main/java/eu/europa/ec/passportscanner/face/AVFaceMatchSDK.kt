@@ -27,6 +27,7 @@ package eu.europa.ec.passportscanner.face
 import android.content.Context
 import eu.europa.ec.businesslogic.model.ErrorType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Where a face-match model is loaded from. The sealed hierarchy couples a remote URL
@@ -101,6 +102,8 @@ sealed class SdkInitStatus {
  * - Calling init() after an error automatically retries
  */
 interface AVFaceMatchSDK {
+
+    val initStatusFlow: StateFlow<SdkInitStatus>
 
     /**
      * Initialize the SDK with configuration.

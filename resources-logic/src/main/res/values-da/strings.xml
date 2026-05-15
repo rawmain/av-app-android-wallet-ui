@@ -240,6 +240,8 @@
     <string name="passport_live_video">Live-video</string>
     <string name="passport_live_video_back">Tilbage</string>
     <string name="passport_live_video_description">I dette trin skal du optage en kort video af dig selv for at bekræfte din identitet. Sørg for at:</string>
+    <string name="passport_live_video_download_channel">Model download</string>
+    <string name="passport_live_video_downloading">Downloader verifikationsdata</string>
     <string name="passport_live_video_downloading_progress">Downloader verifikationsdata… %d%%</string>
     <string name="passport_live_video_error_not_live">Liveness-tjek mislykkedes. Sørg venligst for, at du optager en live-video.</string>
     <string name="passport_live_video_error_not_matching">Ansigtet matcher ikke pas / ID-kort fotet. Prøv venligst igen.</string>

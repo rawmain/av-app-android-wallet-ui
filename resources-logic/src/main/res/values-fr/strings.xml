@@ -240,6 +240,8 @@
     <string name="passport_live_video">Vidéo en direct</string>
     <string name="passport_live_video_back">Retour</string>
     <string name="passport_live_video_description">À cette étape, vous allez enregistrer une courte vidéo de vous pour confirmer votre identité. Veuillez :</string>
+    <string name="passport_live_video_download_channel">Téléchargement du modèle</string>
+    <string name="passport_live_video_downloading">Téléchargement des ressources de vérification</string>
     <string name="passport_live_video_downloading_progress">Téléchargement des ressources de vérification… %d%%</string>
     <string name="passport_live_video_error_not_live">La vérification de vivacité a échoué. Assurez-vous que vous enregistrez une vidéo en direct.</string>
     <string name="passport_live_video_error_not_matching">Le visage ne correspond pas à la photo du passeport / carte d\'identité. Veuillez réessayer.</string>

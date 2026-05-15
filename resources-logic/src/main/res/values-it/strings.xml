@@ -240,6 +240,8 @@
     <string name="passport_live_video">Video in diretta</string>
     <string name="passport_live_video_back">Indietro</string>
     <string name="passport_live_video_description">In questo passaggio, registrerai un breve video di te stesso per confermare la tua identità. Assicurati di:</string>
+    <string name="passport_live_video_download_channel">Download del modello</string>
+    <string name="passport_live_video_downloading">Download risorse di verifica</string>
     <string name="passport_live_video_downloading_progress">Download risorse di verifica… %d%%</string>
     <string name="passport_live_video_error_not_live">Verifica della vitalità fallita. Assicurati di registrare un video dal vivo.</string>
     <string name="passport_live_video_error_not_matching">Il volto non corrisponde alla foto del passaporto / carta d\'identità. Riprova.</string>

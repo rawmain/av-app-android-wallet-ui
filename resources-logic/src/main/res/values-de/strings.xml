@@ -240,6 +240,8 @@
     <string name="passport_live_video">Live-video</string>
     <string name="passport_live_video_back">Zurück</string>
     <string name="passport_live_video_description">In diesem Schritt nehmen Sie ein kurzes Video von sich auf, um Ihre Identität zu bestätigen. Achten Sie darauf:</string>
+    <string name="passport_live_video_download_channel">Modell-Download</string>
+    <string name="passport_live_video_downloading">Verifizierungsdaten werden heruntergeladen</string>
     <string name="passport_live_video_downloading_progress">Verifizierungsdaten werden heruntergeladen… %d%%</string>
     <string name="passport_live_video_error_not_live">Lebensechtheitsüberprüfung fehlgeschlagen. Bitte stellen Sie sicher, dass Sie ein Live-Video aufnehmen.</string>
     <string name="passport_live_video_error_not_matching">Das Gesicht stimmt nicht mit dem Reisepass / Personalausweis Foto überein. Bitte versuchen Sie es erneut.</string>

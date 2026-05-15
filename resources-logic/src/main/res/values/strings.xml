@@ -245,6 +245,8 @@
     <string name="passport_live_video">Live video</string>
     <string name="passport_live_video_back">Back</string>
     <string name="passport_live_video_description">In this step, you will record a short video of yourself to confirm your identity. Make sure to:</string>
+    <string name="passport_live_video_download_channel">Model Download</string>
+    <string name="passport_live_video_downloading">Downloading verification assets</string>
     <string name="passport_live_video_downloading_progress">Downloading verification assets… %d%%</string>
     <string name="passport_live_video_error_not_live">Liveness check failed. Please ensure you are recording a live video.</string>
     <string name="passport_live_video_error_not_matching">Face does not match the passport / ID card photo. Please try again</string>
