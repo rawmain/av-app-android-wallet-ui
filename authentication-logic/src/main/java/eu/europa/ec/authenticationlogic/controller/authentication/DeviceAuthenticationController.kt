@@ -17,7 +17,9 @@
 package eu.europa.ec.authenticationlogic.controller.authentication
 
 import android.content.Context
-import androidx.biometric.BiometricManager
+import android.os.Build
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -56,15 +58,10 @@ class DeviceAuthenticationControllerImpl(
         (context as? FragmentActivity)?.let { activity ->
 
             activity.lifecycleScope.launch {
-
                 val data = biometricAuthenticationController.authenticate(
                     activity = activity,
                     biometryCrypto = biometryCrypto,
-                    promptInfo = BiometricPrompt.PromptInfo.Builder()
-                        .setTitle(resourceProvider.getString(R.string.biometric_prompt_title))
-                        .setSubtitle(resourceProvider.getString(R.string.biometric_prompt_subtitle))
-                        .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-                        .build(),
+                    promptInfo = buildPromptInfo(biometryCrypto),
                     notifyOnAuthenticationFailure = notifyOnAuthenticationFailure
                 )
 
@@ -82,7 +79,55 @@ class DeviceAuthenticationControllerImpl(
     override fun launchBiometricSystemScreen() {
         biometricAuthenticationController.launchBiometricSystemScreen()
     }
+
+    private fun buildPromptInfo(biometryCrypto: BiometricCrypto): BiometricPrompt.PromptInfo {
+        val promptConfiguration = resolvePromptConfiguration(
+            sdkInt = Build.VERSION.SDK_INT,
+            hasCryptoObject = biometryCrypto.cryptoObject != null,
+            cancelButtonText = resourceProvider.getString(R.string.generic_cancel)
+        )
+
+        return BiometricPrompt.PromptInfo.Builder()
+            .setTitle(resourceProvider.getString(R.string.biometric_prompt_title))
+            .setSubtitle(resourceProvider.getString(R.string.biometric_prompt_subtitle))
+            .apply {
+                promptConfiguration.allowedAuthenticators?.let(::setAllowedAuthenticators)
+                promptConfiguration.negativeButtonText?.let(::setNegativeButtonText)
+
+                if (promptConfiguration.isDeviceCredentialAllowed) {
+                    @Suppress("DEPRECATION")
+                    setDeviceCredentialAllowed(true)
+                }
+            }
+            .build()
+    }
 }
+
+internal fun resolvePromptConfiguration(
+    sdkInt: Int,
+    hasCryptoObject: Boolean,
+    cancelButtonText: String,
+): DeviceAuthenticationPromptConfiguration =
+    when {
+        sdkInt >= Build.VERSION_CODES.R -> DeviceAuthenticationPromptConfiguration(
+            allowedAuthenticators = BIOMETRIC_STRONG or DEVICE_CREDENTIAL
+        )
+
+        hasCryptoObject -> DeviceAuthenticationPromptConfiguration(
+            allowedAuthenticators = BIOMETRIC_STRONG,
+            negativeButtonText = cancelButtonText
+        )
+
+        else -> DeviceAuthenticationPromptConfiguration(
+            isDeviceCredentialAllowed = true
+        )
+    }
+
+internal data class DeviceAuthenticationPromptConfiguration(
+    val allowedAuthenticators: Int? = null,
+    val isDeviceCredentialAllowed: Boolean = false,
+    val negativeButtonText: String? = null,
+)
 
 data class DeviceAuthenticationResult(
     val onAuthenticationSuccess: suspend () -> Unit = {},
