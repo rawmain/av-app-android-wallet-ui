@@ -17,134 +17,164 @@
 package eu.europa.ec.authenticationlogic.storage
 
 import eu.europa.ec.authenticationlogic.provider.PinStorageProvider
-import eu.europa.ec.businesslogic.controller.storage.PrefsController
+import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
+import eu.europa.ec.businesslogic.controller.crypto.Argon2KeyDerivation
 import eu.europa.ec.businesslogic.provider.BootIdProvider
 import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
-import java.security.MessageDigest
+import kotlinx.coroutines.runBlocking
 import java.security.SecureRandom
-import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.PBEKeySpec
+import javax.crypto.Cipher
+import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 class PrefsPinStorageProvider(
-    private val prefsController: PrefsController,
+    private val authMetadataStore: AuthMetadataStore,
     private val clock: ElapsedRealtimeClock,
     private val bootIdProvider: BootIdProvider,
+    private val vaultKeyProvider: VaultKeyProvider,
 ) : PinStorageProvider {
 
     companion object {
-        private const val KEY_PIN_HASH = "PinHash"
-        private const val KEY_PIN_SALT = "PinSalt"
-        private const val KEY_FAILED_ATTEMPTS = "PinFailedAttempts"
-        private const val KEY_LOCKOUT_UNTIL = "PinLockoutUntil"
-        private const val KEY_LOCKOUT_DURATION = "PinLockoutDurationMs"
-        private const val KEY_LOCKOUT_BOOT_ID = "PinLockoutBootId"
-        private const val PBKDF2_ITERATIONS = 210_000
-        private const val KEY_LENGTH_BITS = 256
+        private const val GCM_TAG_BITS = 128
+        private const val KDF_ALGO: Byte = 0x01
     }
 
-    override fun hasPin(): Boolean {
-        return prefsController.getString(KEY_PIN_HASH, "").isNotEmpty()
-    }
+    override fun hasPin(): Boolean = runBlocking { authMetadataStore.read() != null }
 
     override fun setPin(pin: String) {
-        val salt = generateSalt()
-        val hash = hashPin(pin, salt)
-        prefsController.setString(KEY_PIN_HASH, hash.toHexString())
-        prefsController.setString(KEY_PIN_SALT, salt.toHexString())
-        resetFailedAttempts()
+        val pinChars = pin.toCharArray()
+        try {
+            val pinSalt = ByteArray(Argon2KeyDerivation.SALT_LEN)
+                .also { SecureRandom().nextBytes(it) }
+            val kPin = Argon2KeyDerivation.derive(pinChars, pinSalt)
+            val kVault = ByteArray(32).also { SecureRandom().nextBytes(it) }
+            val (wrappedVaultIv, wrappedVault) = aesGcmEncrypt(kPin, kVault, pinSalt)
+            kPin.fill(0)
+            kVault.fill(0)
+            val meta = AuthMetadata(
+                version = 0x01,
+                kdfAlgo = KDF_ALGO,
+                kdfM = Argon2KeyDerivation.M_COST_KIB,
+                kdfT = Argon2KeyDerivation.T_COST,
+                kdfP = Argon2KeyDerivation.PARALLELISM,
+                pinSalt = pinSalt,
+                wrappedVaultIv = wrappedVaultIv,
+                wrappedVault = wrappedVault,
+                failedAttempts = 0,
+                lockoutDeadline = 0L,
+                lockoutDuration = 0L,
+                bootId = bootIdProvider.currentBootId(),
+                biometricEnabled = false,
+                biometricWrappedVaultIv = null,
+                biometricWrappedVault = null,
+                writeCounter = 0L,
+            )
+            runBlocking { authMetadataStore.write(meta) }
+        } finally {
+            pinChars.fill('\u0000')
+        }
     }
 
     override fun isPinValid(pin: String): Boolean {
-        val storedHashHex = prefsController.getString(KEY_PIN_HASH, "")
-        val saltHex = prefsController.getString(KEY_PIN_SALT, "")
-        if (storedHashHex.isEmpty() || saltHex.isEmpty()) return false
-
-        val salt = saltHex.hexToByteArray()
-        val computedHash = hashPin(pin, salt)
-        return MessageDigest.isEqual(computedHash, storedHashHex.hexToByteArray())
-    }
-
-    private fun hashPin(pin: String, salt: ByteArray): ByteArray {
-        val spec = PBEKeySpec(pin.toCharArray(), salt, PBKDF2_ITERATIONS, KEY_LENGTH_BITS)
+        val meta = readWithReanchor() ?: return false
+        if (isLockedOutByMeta(meta)) return false
+        val pinChars = pin.toCharArray()
         return try {
-            val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-            factory.generateSecret(spec).encoded
+            val kPin = Argon2KeyDerivation.derive(
+                pin = pinChars,
+                salt = meta.pinSalt,
+                mCostKib = meta.kdfM,
+                tCost = meta.kdfT,
+                parallelism = meta.kdfP,
+            )
+            val kVault = try {
+                aesGcmDecrypt(kPin, meta.wrappedVault, meta.wrappedVaultIv, meta.pinSalt)
+            } catch (_: Exception) {
+                null
+            } finally {
+                kPin.fill(0)
+            }
+            if (kVault != null) {
+                vaultKeyProvider.unlock(kVault)
+                kVault.fill(0)
+                true
+            } else {
+                false
+            }
         } finally {
-            spec.clearPassword()
+            pinChars.fill('\u0000')
         }
     }
 
-    private fun generateSalt(): ByteArray {
-        val salt = ByteArray(32)
-        SecureRandom().nextBytes(salt)
-        return salt
-    }
-
-    private fun ByteArray.toHexString(): String = joinToString("") { "%02x".format(it) }
-
-    private fun String.hexToByteArray(): ByteArray =
-        try {
-            chunked(2).map { it.toInt(16).toByte() }.toByteArray()
-        } catch (_: NumberFormatException) {
-            ByteArray(0)
-        }
-
-    override fun getFailedAttempts(): Int {
-        return prefsController.getInt(KEY_FAILED_ATTEMPTS, 0)
-    }
+    override fun getFailedAttempts(): Int = readWithReanchor()?.failedAttempts ?: 0
 
     override fun incrementFailedAttempts(): Int {
-        val currentAttempts = getFailedAttempts() + 1
-        prefsController.setInt(KEY_FAILED_ATTEMPTS, currentAttempts)
-        return currentAttempts
+        val meta = readWithReanchor() ?: return 1
+        val next = meta.failedAttempts + 1
+        val updated = meta.copy(failedAttempts = next)
+        runBlocking { authMetadataStore.write(updated) }
+        return next
     }
 
     override fun resetFailedAttempts() {
-        prefsController.setInt(KEY_FAILED_ATTEMPTS, 0)
-        prefsController.setLong(KEY_LOCKOUT_UNTIL, 0L)
-        prefsController.setLong(KEY_LOCKOUT_DURATION, 0L)
-        prefsController.setString(KEY_LOCKOUT_BOOT_ID, "")
+        val meta = readWithReanchor() ?: return
+        val updated = meta.copy(
+            failedAttempts = 0,
+            lockoutDeadline = 0L,
+            lockoutDuration = 0L,
+        )
+        runBlocking { authMetadataStore.write(updated) }
     }
 
     override fun setLockoutForDuration(durationMillis: Long) {
-        prefsController.setLong(KEY_LOCKOUT_UNTIL, clock.now() + durationMillis)
-        prefsController.setLong(KEY_LOCKOUT_DURATION, durationMillis)
-        prefsController.setString(KEY_LOCKOUT_BOOT_ID, bootIdProvider.currentBootId())
+        val meta = readWithReanchor() ?: return
+        val updated = meta.copy(
+            lockoutDeadline = clock.now() + durationMillis,
+            lockoutDuration = durationMillis,
+            bootId = bootIdProvider.currentBootId(),
+        )
+        runBlocking { authMetadataStore.write(updated) }
     }
 
-    /**
-     * Returns the effective lockout deadline, re-anchoring after a reboot. Elapsed-realtime
-     * resets on reboot, so a stale absolute deadline could either free the user early (bad) or
-     * keep them locked for an unbounded interval (bad). Instead, on reboot we persist a fresh
-     * `now + duration` deadline — the attacker gains nothing (they still wait a full duration),
-     * and the legitimate user waits at most one extra full cycle.
-     */
     override fun getLockoutUntil(): Long {
-        val stored = prefsController.getLong(KEY_LOCKOUT_UNTIL, 0L)
-        if (stored <= 0L) return 0L
-
-        val storedBootId = prefsController.getString(KEY_LOCKOUT_BOOT_ID, "")
-        val currentBootId = bootIdProvider.currentBootId()
-        if (storedBootId.isNotEmpty() && storedBootId == currentBootId) {
-            return stored
-        }
-
-        // Reboot (or missing boot id from an older install) — re-anchor the deadline
-        val duration = prefsController.getLong(KEY_LOCKOUT_DURATION, 0L)
-        if (duration <= 0L) {
-            // Legacy entry without duration metadata: clear it and release the user
-            prefsController.setLong(KEY_LOCKOUT_UNTIL, 0L)
-            prefsController.setString(KEY_LOCKOUT_BOOT_ID, "")
-            return 0L
-        }
-        val reanchored = clock.now() + duration
-        prefsController.setLong(KEY_LOCKOUT_UNTIL, reanchored)
-        prefsController.setString(KEY_LOCKOUT_BOOT_ID, currentBootId)
-        return reanchored
+        return readWithReanchor()?.lockoutDeadline ?: 0L
     }
 
     override fun isCurrentlyLockedOut(): Boolean {
-        val lockoutUntil = getLockoutUntil()
-        return lockoutUntil > 0L && clock.now() < lockoutUntil
+        val meta = readWithReanchor() ?: return false
+        return isLockedOutByMeta(meta)
+    }
+
+    private fun readWithReanchor(): AuthMetadata? {
+        val meta = runBlocking { authMetadataStore.read() } ?: return null
+        if (meta.lockoutDeadline > 0L && meta.bootId != bootIdProvider.currentBootId()) {
+            val remaining = meta.lockoutDuration
+            val reanchored = meta.copy(
+                lockoutDeadline = clock.now() + remaining,
+                bootId = bootIdProvider.currentBootId(),
+            )
+            runBlocking { authMetadataStore.write(reanchored) }
+            return reanchored
+        }
+        return meta
+    }
+
+    private fun isLockedOutByMeta(meta: AuthMetadata): Boolean {
+        return meta.lockoutDeadline > 0L && clock.now() < meta.lockoutDeadline
+    }
+
+    private fun aesGcmEncrypt(key: ByteArray, plaintext: ByteArray, aad: ByteArray): Pair<ByteArray, ByteArray> {
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"))
+        cipher.updateAAD(aad)
+        val ciphertext = cipher.doFinal(plaintext)
+        return Pair(cipher.iv, ciphertext)
+    }
+
+    private fun aesGcmDecrypt(key: ByteArray, ciphertext: ByteArray, iv: ByteArray, aad: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(GCM_TAG_BITS, iv))
+        cipher.updateAAD(aad)
+        return cipher.doFinal(ciphertext)
     }
 }

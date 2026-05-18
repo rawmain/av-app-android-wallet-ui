@@ -18,10 +18,14 @@ package eu.europa.ec.authenticationlogic.controller.storage
 
 import eu.europa.ec.authenticationlogic.config.StorageConfig
 import eu.europa.ec.authenticationlogic.provider.PinStorageProvider
+import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
+import eu.europa.ec.testlogic.extension.runTest
+import eu.europa.ec.testlogic.rule.CoroutineTestRule
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
@@ -33,21 +37,26 @@ import org.mockito.kotlin.whenever
 
 class TestPinStorageController {
 
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
+
     @Mock
     private lateinit var pinStorageProvider: PinStorageProvider
 
     @Mock
     private lateinit var storageConfig: StorageConfig
 
+    private var fakeNow: Long = 0L
+    private lateinit var clock: ElapsedRealtimeClock
     private lateinit var controller: PinStorageControllerImpl
     private lateinit var closeable: AutoCloseable
 
     @Before
     fun before() {
         closeable = MockitoAnnotations.openMocks(this)
-
+        clock = ElapsedRealtimeClock { fakeNow }
         whenever(storageConfig.pinStorageProvider).thenReturn(pinStorageProvider)
-        controller = PinStorageControllerImpl(storageConfig)
+        controller = PinStorageControllerImpl(storageConfig, clock)
     }
 
     @After
@@ -92,40 +101,67 @@ class TestPinStorageController {
     // Case 1:
     // Device is currently locked out.
     @Test
-    fun `Given Case 1, When isPinValid is called while locked out, Then it returns LockedOut`() {
-        // Given
-        whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(true)
-        whenever(pinStorageProvider.getLockoutUntil()).thenReturn(1_060_000L)
-        whenever(pinStorageProvider.getFailedAttempts()).thenReturn(4)
+    fun `Given Case 1, When isPinValid is called while locked out, Then it returns LockedOut`() =
+        coroutineTestRule.runTest {
+            // Given
+            whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(true)
+            whenever(pinStorageProvider.getLockoutUntil()).thenReturn(1_060_000L)
+            whenever(pinStorageProvider.getFailedAttempts()).thenReturn(4)
 
-        // When
-        val result = controller.isPinValid(mockedPin)
+            // When
+            val result = controller.isPinValid(mockedPin)
 
-        // Then
-        assertTrue(result is PinValidationResult.LockedOut)
-        val lockedOut = result as PinValidationResult.LockedOut
-        assertEquals(1_060_000L, lockedOut.lockoutEndTimeMillis)
-        assertEquals(4, lockedOut.attemptsUsed)
-    }
+            // Then
+            assertTrue(result is PinValidationResult.LockedOut)
+            val lockedOut = result as PinValidationResult.LockedOut
+            assertEquals(1_060_000L, lockedOut.lockoutEndTimeMillis)
+            assertEquals(4, lockedOut.attemptsUsed)
+        }
     //endregion
 
     //region isPinValid — correct PIN
 
-    // Case 2:
-    // PIN is valid; failed attempts are reset.
+    // Case 2a:
+    // PIN is valid with 0 prior failures — no reset write and no timing floor.
     @Test
-    fun `Given Case 2, When isPinValid is called with the correct pin, Then it returns Success and resets attempts`() {
-        // Given
-        whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
-        whenever(pinStorageProvider.isPinValid(mockedPin)).thenReturn(true)
+    fun `Given Case 2a, When isPinValid is called with the correct pin and no prior failures, Then it returns Success without reset or delay`() =
+        coroutineTestRule.runTest {
+            // Given
+            whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
+            whenever(pinStorageProvider.getFailedAttempts()).thenReturn(0)
+            whenever(pinStorageProvider.isPinValid(mockedPin)).thenReturn(true)
+            fakeNow = 0L
+            clock = ElapsedRealtimeClock { fakeNow }
+            controller = PinStorageControllerImpl(storageConfig, clock)
 
-        // When
-        val result = controller.isPinValid(mockedPin)
+            // When
+            val result = controller.isPinValid(mockedPin)
 
-        // Then
-        assertEquals(PinValidationResult.Success, result)
-        verify(pinStorageProvider, times(1)).resetFailedAttempts()
-    }
+            // Then
+            assertEquals(PinValidationResult.Success, result)
+            verify(pinStorageProvider, times(0)).resetFailedAttempts()
+        }
+
+    // Case 2b:
+    // PIN is valid after prior failures — reset write is issued to clear the counter.
+    @Test
+    fun `Given Case 2b, When isPinValid is called with the correct pin after prior failures, Then it returns Success and resets attempts`() =
+        coroutineTestRule.runTest {
+            // Given
+            whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
+            whenever(pinStorageProvider.getFailedAttempts()).thenReturn(2)
+            whenever(pinStorageProvider.isPinValid(mockedPin)).thenReturn(true)
+            fakeNow = 0L
+            clock = ElapsedRealtimeClock { fakeNow }
+            controller = PinStorageControllerImpl(storageConfig, clock)
+
+            // When
+            val result = controller.isPinValid(mockedPin)
+
+            // Then
+            assertEquals(PinValidationResult.Success, result)
+            verify(pinStorageProvider, times(1)).resetFailedAttempts()
+        }
     //endregion
 
     //region isPinValid — wrong PIN, no lockout yet
@@ -133,20 +169,25 @@ class TestPinStorageController {
     // Case 3:
     // Wrong PIN, attempts below threshold — returns Failed with remaining count.
     @Test
-    fun `Given Case 3, When isPinValid is called with wrong pin below threshold, Then it returns Failed with attempts remaining`() {
-        // Given
-        whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
-        whenever(pinStorageProvider.isPinValid(mockedPin)).thenReturn(false)
-        whenever(pinStorageProvider.incrementFailedAttempts()).thenReturn(2)
+    fun `Given Case 3, When isPinValid is called with wrong pin below threshold, Then it returns Failed with attempts remaining`() =
+        coroutineTestRule.runTest {
+            // Given
+            whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
+            whenever(pinStorageProvider.getFailedAttempts()).thenReturn(0)
+            whenever(pinStorageProvider.isPinValid(mockedPin)).thenReturn(false)
+            whenever(pinStorageProvider.incrementFailedAttempts()).thenReturn(2)
+            fakeNow = 2_000L
+            clock = ElapsedRealtimeClock { fakeNow }
+            controller = PinStorageControllerImpl(storageConfig, clock)
 
-        // When
-        val result = controller.isPinValid(mockedPin)
+            // When
+            val result = controller.isPinValid(mockedPin)
 
-        // Then
-        assertTrue(result is PinValidationResult.Failed)
-        val failed = result as PinValidationResult.Failed
-        assertEquals(2, failed.attemptsRemaining) // MAX_ATTEMPTS(4) - 2
-    }
+            // Then
+            assertTrue(result is PinValidationResult.Failed)
+            val failed = result as PinValidationResult.Failed
+            assertEquals(2, failed.attemptsRemaining) // MAX_ATTEMPTS(4) - 2
+        }
     //endregion
 
     //region isPinValid — lockout triggered
@@ -154,58 +195,94 @@ class TestPinStorageController {
     // Case 4:
     // Wrong PIN, attempts reach MAX_ATTEMPTS(4) — first lockout of 1 minute duration.
     @Test
-    fun `Given Case 4, When isPinValid reaches MAX_ATTEMPTS, Then it requests a 1-minute lockout`() {
-        // Given
-        whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
-        whenever(pinStorageProvider.isPinValid(mockedPin)).thenReturn(false)
-        whenever(pinStorageProvider.incrementFailedAttempts()).thenReturn(4)
-        whenever(pinStorageProvider.getLockoutUntil()).thenReturn(1_060_000L)
+    fun `Given Case 4, When isPinValid reaches MAX_ATTEMPTS, Then it requests a 1-minute lockout`() =
+        coroutineTestRule.runTest {
+            // Given
+            whenever(pinStorageProvider.getFailedAttempts()).thenReturn(0)
+            whenever(pinStorageProvider.getLockoutUntil()).thenReturn(0L, 1_060_000L)
+            whenever(pinStorageProvider.isPinValid(mockedPin)).thenReturn(false)
+            whenever(pinStorageProvider.incrementFailedAttempts()).thenReturn(4)
+            fakeNow = 2_000L
+            clock = ElapsedRealtimeClock { fakeNow }
+            controller = PinStorageControllerImpl(storageConfig, clock)
 
-        // When
-        val result = controller.isPinValid(mockedPin)
+            // When
+            val result = controller.isPinValid(mockedPin)
 
-        // Then
-        assertTrue(result is PinValidationResult.LockedOut)
-        val lockedOut = result as PinValidationResult.LockedOut
-        assertEquals(1_060_000L, lockedOut.lockoutEndTimeMillis)
-        verify(pinStorageProvider, times(1)).setLockoutForDuration(60_000L)
-    }
+            // Then
+            assertTrue(result is PinValidationResult.LockedOut)
+            val lockedOut = result as PinValidationResult.LockedOut
+            assertEquals(1_060_000L, lockedOut.lockoutEndTimeMillis)
+            verify(pinStorageProvider, times(1)).setLockoutForDuration(60_000L)
+        }
 
     // Case 5:
     // 5th attempt — lockout duration escalates to 5 minutes.
     @Test
-    fun `Given Case 5, When isPinValid reaches 5 attempts, Then lockout duration is 5 minutes`() {
-        // Given
-        whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
-        whenever(pinStorageProvider.isPinValid(mockedPin)).thenReturn(false)
-        whenever(pinStorageProvider.incrementFailedAttempts()).thenReturn(5)
+    fun `Given Case 5, When isPinValid reaches 5 attempts, Then lockout duration is 5 minutes`() =
+        coroutineTestRule.runTest {
+            // Given
+            whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
+            whenever(pinStorageProvider.getFailedAttempts()).thenReturn(0)
+            whenever(pinStorageProvider.isPinValid(mockedPin)).thenReturn(false)
+            whenever(pinStorageProvider.incrementFailedAttempts()).thenReturn(5)
+            fakeNow = 2_000L
+            clock = ElapsedRealtimeClock { fakeNow }
+            controller = PinStorageControllerImpl(storageConfig, clock)
 
-        // When
-        controller.isPinValid(mockedPin)
+            // When
+            controller.isPinValid(mockedPin)
 
-        // Then
-        val captor = argumentCaptor<Long>()
-        verify(pinStorageProvider).setLockoutForDuration(captor.capture())
-        assertEquals(5 * 60_000L, captor.firstValue)
-    }
+            // Then
+            val captor = argumentCaptor<Long>()
+            verify(pinStorageProvider).setLockoutForDuration(captor.capture())
+            assertEquals(5 * 60_000L, captor.firstValue)
+        }
 
     // Case 6:
     // 10th+ attempt — lockout caps at 8 hours.
     @Test
-    fun `Given Case 6, When isPinValid exceeds 9 attempts, Then lockout duration is 8 hours`() {
-        // Given
-        whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
-        whenever(pinStorageProvider.isPinValid(any())).thenReturn(false)
-        whenever(pinStorageProvider.incrementFailedAttempts()).thenReturn(10)
+    fun `Given Case 6, When isPinValid exceeds 9 attempts, Then lockout duration is 8 hours`() =
+        coroutineTestRule.runTest {
+            // Given
+            whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
+            whenever(pinStorageProvider.getFailedAttempts()).thenReturn(0)
+            whenever(pinStorageProvider.isPinValid(any())).thenReturn(false)
+            whenever(pinStorageProvider.incrementFailedAttempts()).thenReturn(10)
+            fakeNow = 2_000L
+            clock = ElapsedRealtimeClock { fakeNow }
+            controller = PinStorageControllerImpl(storageConfig, clock)
 
-        // When
-        controller.isPinValid(mockedPin)
+            // When
+            controller.isPinValid(mockedPin)
 
-        // Then
-        val captor = argumentCaptor<Long>()
-        verify(pinStorageProvider).setLockoutForDuration(captor.capture())
-        assertEquals(480 * 60_000L, captor.firstValue)
-    }
+            // Then
+            val captor = argumentCaptor<Long>()
+            verify(pinStorageProvider).setLockoutForDuration(captor.capture())
+            assertEquals(480 * 60_000L, captor.firstValue)
+        }
+
+    // Case 7:
+    // Rate limiter applies only on wrong PIN: when the hash finishes faster than enforceMs the
+    // call is padded up to at least BASE_ATTEMPT_DELAY_MS.
+    @Test
+    fun `Given Case 7, When isPinValid fails and completes faster than enforceMs, Then it returns Failed after the enforced delay`() =
+        coroutineTestRule.runTest {
+            // Given
+            whenever(pinStorageProvider.isCurrentlyLockedOut()).thenReturn(false)
+            whenever(pinStorageProvider.getFailedAttempts()).thenReturn(0)
+            whenever(pinStorageProvider.isPinValid(mockedPin)).thenReturn(false)
+            whenever(pinStorageProvider.incrementFailedAttempts()).thenReturn(1)
+            fakeNow = 0L
+            clock = ElapsedRealtimeClock { fakeNow }
+            controller = PinStorageControllerImpl(storageConfig, clock)
+
+            // When — virtual time advances through the delay() automatically in TestScope
+            val result = controller.isPinValid(mockedPin)
+
+            // Then
+            assertTrue(result is PinValidationResult.Failed)
+        }
     //endregion
 
     //region Mocked objects

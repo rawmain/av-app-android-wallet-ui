@@ -26,9 +26,13 @@ import eu.europa.ec.authenticationlogic.controller.storage.BiometryStorageContro
 import eu.europa.ec.authenticationlogic.controller.storage.BiometryStorageControllerImpl
 import eu.europa.ec.authenticationlogic.controller.storage.PinStorageController
 import eu.europa.ec.authenticationlogic.controller.storage.PinStorageControllerImpl
+import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
+import eu.europa.ec.authenticationlogic.provider.VaultKeyProviderImpl
+import eu.europa.ec.authenticationlogic.storage.AuthMetadataStore
 import eu.europa.ec.authenticationlogic.storage.PrefsBiometryStorageProvider
 import eu.europa.ec.authenticationlogic.storage.PrefsPinStorageProvider
 import eu.europa.ec.businesslogic.controller.crypto.CryptoController
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.controller.storage.PrefsController
 import eu.europa.ec.businesslogic.provider.BootIdProvider
 import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
@@ -43,12 +47,23 @@ import org.koin.core.annotation.Single
 class LogicAuthenticationModule
 
 @Single
-fun provideStorageConfig(
+fun provideAuthMetadataStore(
     prefsController: PrefsController,
+    logController: LogController,
+): AuthMetadataStore = AuthMetadataStore(prefsController, logController)
+
+@Single
+fun provideVaultKeyProvider(): VaultKeyProvider = VaultKeyProviderImpl()
+
+@Single
+fun provideStorageConfig(
+    authMetadataStore: AuthMetadataStore,
     clock: ElapsedRealtimeClock,
     bootIdProvider: BootIdProvider,
+    vaultKeyProvider: VaultKeyProvider,
+    prefsController: PrefsController,
 ): StorageConfig = StorageConfigImpl(
-    pinImpl = PrefsPinStorageProvider(prefsController, clock, bootIdProvider),
+    pinImpl = PrefsPinStorageProvider(authMetadataStore, clock, bootIdProvider, vaultKeyProvider),
     biometryImpl = PrefsBiometryStorageProvider(prefsController)
 )
 
@@ -74,10 +89,11 @@ fun provideDeviceAuthenticationController(
         biometricAuthenticationController
     )
 
-@Factory
+@Single
 fun providePinStorageController(
     storageConfig: StorageConfig,
-): PinStorageController = PinStorageControllerImpl(storageConfig)
+    clock: ElapsedRealtimeClock,
+): PinStorageController = PinStorageControllerImpl(storageConfig, clock)
 
 @Factory
 fun provideBiometryStorageController(

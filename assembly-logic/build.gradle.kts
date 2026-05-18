@@ -55,6 +55,8 @@ moduleConfig {
 
 dependencies {
 
+    implementation(libs.androidx.lifecycle.process)
+
     // Logic Modules
     api(project(ResourcesLogic.path))
     api(project(BusinessLogic.path))

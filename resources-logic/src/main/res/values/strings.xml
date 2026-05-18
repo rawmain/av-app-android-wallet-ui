@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2025 European Commission
+  ~ Copyright (c) 2026 European Commission
   ~
   ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
   ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -14,6 +14,7 @@
   ~ governing permissions and limitations under the Licence.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="age_over">Age over %d</string>
     <string name="age_over_18">Age over 18</string>
     <string name="biometric_confirm_request">Confirm request</string>
     <string name="biometric_default_mode_text_above_pin_field">PIN</string>
@@ -120,17 +121,12 @@
     <string name="generic_ok">OK</string>
     <string name="generic_or">OR</string>
     <string name="generic_scan_qr">Scan QR</string>
-
-    <!-- Onboarding: Enrollment via Token / QR -->
-    <string name="onboarding_verification_token_qr">Token / QR Code</string>
-    <string name="onboarding_verification_token_qr_description">Use a token or QR code you received during an on-site identity check to start enrollment.</string>
-
-    <string name="onboarding_token_qr_intro_title">Token / QR Code</string>
-    <string name="onboarding_token_qr_intro_description">If you verified your identity on-site, you may receive a token or QR code. Tap Scan and scan the QR code to start the enrollment.</string>
     <string name="generic_success">Success</string>
     <string name="generic_unknown">Unknown</string>
     <string name="generic_view_details">Credential details</string>
     <string name="generic_yes">Yes</string>
+    <string name="hardware_keystore_block_description">This device does not meet the security requirements needed to protect your wallet. Please use a device with hardware-based security.</string>
+    <string name="hardware_keystore_block_title">Device Not Supported</string>
     <string name="issuance_add_document_deferred_success_description">Your document has been requested. You will be notified when it has been issued to your application.</string>
     <string name="issuance_add_document_deferred_success_primary_button_text">OK</string>
     <string name="issuance_add_document_deferred_success_text">In progress!</string>
@@ -207,12 +203,16 @@
     <string name="onboarding_step_2_title">Consent</string>
     <string name="onboarding_step_3_title">Security</string>
     <string name="onboarding_step_4_title">Verification</string>
+    <string name="onboarding_token_qr_intro_description">If you have verified your identity in person, you may receive a token or QR code. Tap Scan and scan the QR code to start the enrollment.</string>
+    <string name="onboarding_token_qr_intro_title">Token / QR Code</string>
     <string name="onboarding_verification_description">This verification is needed to create a proof that you are over 18. The eID details will not be shared with online services you access.</string>
     <string name="onboarding_verification_national_id">National eID / National IDP</string>
     <string name="onboarding_verification_national_id_description">Identify online using your eID</string>
     <string name="onboarding_verification_passport_id_card">Passport or ID Card</string>
     <string name="onboarding_verification_passport_id_card_description">Scan your passport or ID card for verification</string>
     <string name="onboarding_verification_title">Choose your age verification method</string>
+    <string name="onboarding_verification_token_qr">Token / QR Code</string>
+    <string name="onboarding_verification_token_qr_description">Use a token or QR code you received during an on-site identity check to start enrollment.</string>
     <string name="open_system_settings">Open Settings</string>
     <string name="passport_biometrics">Biometrics</string>
     <string name="passport_biometrics_back">Back</string>

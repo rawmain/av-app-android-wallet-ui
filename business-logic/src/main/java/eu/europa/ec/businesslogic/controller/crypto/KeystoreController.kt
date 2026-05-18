@@ -18,6 +18,7 @@ package eu.europa.ec.businesslogic.controller.crypto
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyInfo
 import android.security.keystore.KeyProperties
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.controller.storage.PrefKeys
@@ -25,6 +26,9 @@ import eu.europa.ec.businesslogic.provider.UuidProvider
 import java.security.KeyStore
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import javax.crypto.SecretKeyFactory
+
+enum class KeystoreSecurityLevel { STRONGBOX, TEE, SOFTWARE, UNKNOWN }
 
 interface KeystoreController {
     fun retrieveOrGenerateSecretKey(userAuthenticationRequired: Boolean): SecretKey?
@@ -32,6 +36,7 @@ interface KeystoreController {
     fun getKeyVersion(): Int
     fun getSecretKeyByAlias(alias: String): SecretKey?
     fun cleanupOldKey()
+    fun getSecurityLevel(alias: String): KeystoreSecurityLevel
 }
 
 sealed class RotationResult {
@@ -170,6 +175,29 @@ class KeystoreControllerImpl(
     }
 
     override fun getKeyVersion(): Int = prefKeys.getCryptoKeyVersion()
+
+    override fun getSecurityLevel(alias: String): KeystoreSecurityLevel {
+        return try {
+            val ks = KeyStore.getInstance(STORE_TYPE).also { it.load(null) }
+            val key = (ks.getKey(alias, null) as? SecretKey)
+                ?: return KeystoreSecurityLevel.UNKNOWN
+            val factory = SecretKeyFactory.getInstance(key.algorithm, STORE_TYPE)
+            val keyInfo = factory.getKeySpec(key, KeyInfo::class.java) as KeyInfo
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                when (keyInfo.securityLevel) {
+                    KeyProperties.SECURITY_LEVEL_STRONGBOX -> KeystoreSecurityLevel.STRONGBOX
+                    KeyProperties.SECURITY_LEVEL_TRUSTED_ENVIRONMENT -> KeystoreSecurityLevel.TEE
+                    else -> KeystoreSecurityLevel.SOFTWARE
+                }
+            } else {
+                @Suppress("DEPRECATION")
+                if (keyInfo.isInsideSecureHardware) KeystoreSecurityLevel.TEE
+                else KeystoreSecurityLevel.SOFTWARE
+            }
+        } catch (_: Exception) {
+            KeystoreSecurityLevel.UNKNOWN
+        }
+    }
 
     private fun getSecretKey(keyStore: KeyStore, alias: String): SecretKey {
         keyStore.load(null)
