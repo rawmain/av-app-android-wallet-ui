@@ -52,7 +52,8 @@ slf4j = "2.0.17"
 gson = "2.13.2"
 googlePhoneNumber = "9.0.24"
 zxing = "3.5.4"
-eudiWalletCore = "0.26.1"
+eudiWalletCore = "0.28.1"
+credentialsRegistry = "1.0.0-alpha04"
 cameraCore = "1.5.3"
 owaspDependencyCheck = "12.2.0"
 material3 = "1.4.0"
@@ -157,6 +158,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 google-phonenumber = { group = "com.googlecode.libphonenumber", name = "libphonenumber", version.ref = "googlePhoneNumber" }
 zxing = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 eudi-wallet-core = { group = "eu.europa.ec.eudi", name = "eudi-lib-android-wallet-core", version.ref = "eudiWalletCore" }
+credentials-registry-provider = { group = "androidx.credentials.registry", name = "registry-provider-play-services", version.ref = "credentialsRegistry" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 treessence = { group = "com.github.bastienpaulfr", name = "Treessence", version.ref = "treessence" }
 androidx-room = { group = "androidx.room", name = "room-runtime", version.ref = "androidxRoom" }
