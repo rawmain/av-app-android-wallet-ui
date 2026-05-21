@@ -23,8 +23,10 @@ import eu.europa.ec.uilogic.mvi.ViewEvent
 import eu.europa.ec.uilogic.mvi.ViewSideEffect
 import eu.europa.ec.uilogic.mvi.ViewState
 import eu.europa.ec.uilogic.navigation.ModuleRoute
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -58,7 +60,7 @@ class SplashViewModel(
     private fun enterApplication() {
         viewModelScope.launch {
             delay(500.milliseconds)
-            val screenRoute = interactor.getAfterSplashRoute()
+            val screenRoute = withContext(Dispatchers.IO) { interactor.getAfterSplashRoute() }
             setEffect {
                 Effect.Navigation.SwitchScreen(screenRoute)
             }

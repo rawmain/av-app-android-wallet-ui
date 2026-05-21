@@ -17,11 +17,15 @@
 package eu.europa.ec.assemblylogic
 
 import android.app.Application
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import eu.europa.ec.analyticslogic.controller.AnalyticsController
 import eu.europa.ec.assemblylogic.di.setupKoin
+import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.businesslogic.config.ConfigLogic
 import eu.europa.ec.corelogic.config.WalletCoreConfig
 import eu.europa.ec.corelogic.worker.RevocationWorkManager
@@ -33,12 +37,14 @@ class Application : Application() {
     private val analyticsController: AnalyticsController by inject()
     private val configLogic: ConfigLogic by inject()
     private val walletCoreConfig: WalletCoreConfig by inject()
+    private val vaultKeyProvider: VaultKeyProvider by inject()
 
     override fun onCreate() {
         super.onCreate()
         initializeKoin()
         initializeReporting()
         initializeRevocationWorkManager()
+        initializeVaultKeyLocking()
     }
 
     private fun initializeKoin(): KoinApplication {
@@ -47,6 +53,17 @@ class Application : Application() {
 
     private fun initializeReporting() {
         analyticsController.initialize(this)
+    }
+
+    private fun initializeVaultKeyLocking() {
+        // Wipes the in-memory vault key when backgrounded (defense against memory forensics).
+        // Re-authentication is not required on foreground because this app displays no sensitive
+        // PII on the landing screen; credential sharing always requires PIN/biometric regardless.
+        ProcessLifecycleOwner.get().lifecycle.addObserver(LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                vaultKeyProvider.lock()
+            }
+        })
     }
 
     private fun initializeRevocationWorkManager() {

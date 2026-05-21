@@ -38,6 +38,16 @@ plugins {
     id("com.github.jk1.dependency-license-report") version "3.0.1"
 }
 
+tasks.register("checkNoPbkdf2") {
+    doLast {
+        val hits = mutableListOf<String>()
+        fileTree("authentication-logic/src").matching { include("**/*.kt") }.forEach { f ->
+            if (f.readText().contains("PBKDF2")) hits.add(f.path)
+        }
+        if (hits.isNotEmpty()) throw GradleException("PBKDF2 found in authentication-logic: $hits")
+    }
+}
+
 licenseReport {
     renderers = arrayOf<ReportRenderer>(
         CsvReportRenderer(),

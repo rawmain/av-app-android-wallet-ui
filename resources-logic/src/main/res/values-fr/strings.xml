@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2025 European Commission
+  ~ Copyright (c) 2026 European Commission
   ~
   ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
   ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -14,6 +14,7 @@
   ~ governing permissions and limitations under the Licence.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="age_over">Âgé de plus de %d ans</string>
     <string name="age_over_18">Âge supérieur à 18 ans</string>
     <string name="biometric_confirm_request">Confirm request</string>
     <string name="biometric_default_mode_text_above_pin_field">PIN</string>
@@ -124,6 +125,8 @@
     <string name="generic_unknown">Inconnu</string>
     <string name="generic_view_details">Détails d\'identification</string>
     <string name="generic_yes">Oui</string>
+    <string name="hardware_keystore_block_description">Cet appareil ne répond pas aux exigences de sécurité nécessaires pour protéger votre portefeuille. Veuillez utiliser un appareil doté d\'une sécurité matérielle.</string>
+    <string name="hardware_keystore_block_title">Appareil non pris en charge</string>
     <string name="issuance_add_document_deferred_success_description">Votre document a été demandé. Vous serez informé quand il aura été délivré à votre portefeuille.</string>
     <string name="issuance_add_document_deferred_success_primary_button_text">OK</string>
     <string name="issuance_add_document_deferred_success_text">En cours!</string>
@@ -200,14 +203,16 @@
     <string name="onboarding_step_2_title">Consentement</string>
     <string name="onboarding_step_3_title">Sécurité</string>
     <string name="onboarding_step_4_title">Vérification</string>
+    <string name="onboarding_token_qr_intro_description">Si vous avez vérifié votre identité sur place, vous pouvez recevoir un token ou un code QR. Appuyez sur Scanner et scannez le code QR pour démarrer l\'inscription.</string>
+    <string name="onboarding_token_qr_intro_title">Token / Code QR</string>
     <string name="onboarding_verification_description">Cette vérification est nécessaire pour créer une preuve que vous avez plus de 18 ans. Les détails de l\'eID ne seront pas communiqués aux services en ligne auxquels vous accédez.</string>
     <string name="onboarding_verification_national_id">eID national / IdP national</string>
     <string name="onboarding_verification_national_id_description">Identifiez-vous en ligne en utilisant votre eID</string>
     <string name="onboarding_verification_passport_id_card">Passeport ou Carte d\'identité</string>
     <string name="onboarding_verification_passport_id_card_description">Scannez votre passeport ou carte d\'identité pour la vérification</string>
     <string name="onboarding_verification_title">Choisissez la méthode de vérification d\'âge souhaitée</string>
-    <string name="onboarding_token_qr_intro_title">Token / Code QR</string>
-    <string name="onboarding_token_qr_intro_description">Si vous avez vérifié votre identité sur place, vous pouvez recevoir un token ou un code QR. Appuyez sur Scanner et scannez le code QR pour commencer l\'inscription.</string>
+    <string name="onboarding_verification_token_qr">Jeton / Code QR</string>
+    <string name="onboarding_verification_token_qr_description">Utilisez le jeton ou le code QR que vous avez reçu lors d\'un contrôle d\'identité sur place pour commencer votre inscription.</string>
     <string name="open_system_settings">Open Settings</string>
     <string name="passport_biometrics">Biométrie</string>
     <string name="passport_biometrics_back">Retour</string>
@@ -240,6 +245,8 @@
     <string name="passport_live_video">Vidéo en direct</string>
     <string name="passport_live_video_back">Retour</string>
     <string name="passport_live_video_description">À cette étape, vous allez enregistrer une courte vidéo de vous pour confirmer votre identité. Veuillez :</string>
+    <string name="passport_live_video_download_channel">Téléchargement du modèle</string>
+    <string name="passport_live_video_downloading">Téléchargement des ressources de vérification</string>
     <string name="passport_live_video_downloading_progress">Téléchargement des ressources de vérification… %d%%</string>
     <string name="passport_live_video_error_not_live">La vérification de vivacité a échoué. Assurez-vous que vous enregistrez une vidéo en direct.</string>
     <string name="passport_live_video_error_not_matching">Le visage ne correspond pas à la photo du passeport / carte d\'identité. Veuillez réessayer.</string>

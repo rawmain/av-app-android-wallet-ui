@@ -23,6 +23,7 @@ import eu.europa.ec.eudi.wallet.issue.openid4vci.OpenId4VciManager
 import eu.europa.ec.eudi.wallet.issue.openid4vci.dpop.DPopConfig
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.ClientIdScheme
 import eu.europa.ec.eudi.wallet.transfer.openId4vp.Format
+import eu.europa.ec.eudi.iso18013.transfer.response.ReaderAuthPolicy
 import eu.europa.ec.eudi.wallet.zkp.LongfellowCircuits
 import eu.europa.ec.eudi.wallet.zkp.LongfellowZkSystemRepository
 import eu.europa.ec.resourceslogic.R
@@ -68,6 +69,8 @@ internal class WalletCoreConfigImpl(
                         context,
                         R.raw.av_issuer_ca01
                     )
+
+                    configureReaderAuthPolicy(ReaderAuthPolicy.DoNotEnforce)
 
                     configureDCAPI {
                         withEnabled(true)

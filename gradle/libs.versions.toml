@@ -52,7 +52,8 @@ slf4j = "2.0.17"
 gson = "2.13.2"
 googlePhoneNumber = "9.0.24"
 zxing = "3.5.4"
-eudiWalletCore = "0.26.1"
+eudiWalletCore = "0.28.1"
+credentialsRegistry = "1.0.0-alpha04"
 cameraCore = "1.5.3"
 owaspDependencyCheck = "12.2.0"
 material3 = "1.4.0"
@@ -64,6 +65,7 @@ treessence = "1.1.2"
 androidxRoom = "2.8.4"
 cloudy = "0.5.0"
 sqlcipher = "4.6.1"
+bouncycastle = "1.79"
 
 # Passport reading dependencies
 jsonPath = "2.10.0"
@@ -104,6 +106,7 @@ androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscree
 androidx-dataStore-core = { group = "androidx.datastore", name = "datastore", version.ref = "androidxDataStore" }
 androidx-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "androidxLifecycle" }
 androidx-metrics = { group = "androidx.metrics", name = "metrics-performance", version.ref = "androidxMetrics" }
 androidx-biometric = { group = "androidx.biometric", name = "biometric-ktx", version.ref = "androidxBiometric" }
 androidx-appAuth = { group = "androidx.security", name = "security-app-authenticator", version.ref = "androidxAppAuth" }
@@ -155,12 +158,14 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 google-phonenumber = { group = "com.googlecode.libphonenumber", name = "libphonenumber", version.ref = "googlePhoneNumber" }
 zxing = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 eudi-wallet-core = { group = "eu.europa.ec.eudi", name = "eudi-lib-android-wallet-core", version.ref = "eudiWalletCore" }
+credentials-registry-provider = { group = "androidx.credentials.registry", name = "registry-provider-play-services", version.ref = "credentialsRegistry" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 treessence = { group = "com.github.bastienpaulfr", name = "Treessence", version.ref = "treessence" }
 androidx-room = { group = "androidx.room", name = "room-runtime", version.ref = "androidxRoom" }
 androidx-room-ksp = { group = "androidx.room", name = "room-compiler", version.ref = "androidxRoom" }
 compose-cloudy = { module = "com.github.skydoves:cloudy", version.ref = "cloudy" }
 sqlcipher = { group = "net.zetetic", name = "sqlcipher-android", version.ref = "sqlcipher" }
+bouncycastle-provider = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "bouncycastle" }
 
 # Passport reading libraries
 json-path = { group = "com.jayway.jsonpath", name = "json-path", version.ref = "jsonPath" }

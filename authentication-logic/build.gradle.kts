@@ -46,3 +46,14 @@ excludeFromKoverReport(
     excludedClasses = KoverExclusionRules.AuthenticationLogic.classes,
     excludedPackages = KoverExclusionRules.AuthenticationLogic.packages,
 )
+
+tasks.register("checkNoPbkdf2") {
+    doLast {
+        val hits = mutableListOf<String>()
+        fileTree("src").matching { include("**/*.kt") }.forEach { f ->
+            if (f.readText().contains("PBKDF2")) hits.add(f.path)
+        }
+        if (hits.isNotEmpty()) throw GradleException("PBKDF2 found in authentication-logic: $hits")
+    }
+}
+tasks.named("check") { dependsOn("checkNoPbkdf2") }
