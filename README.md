@@ -87,6 +87,8 @@ https://github.com/user-attachments/assets/e4701cbc-df0e-4bb2-9c34-3fa682630b6a
 
 [Hardware-Backed Authentication](./docs/hardware_backed_authentication.md) - Biometric security configuration, device fallback behavior, and usability trade-offs.
 
+[Production Hardening Guide](./docs/production-hardening-guide-v3.8.md) - Mobile security considerations for taking the reference app toward production distribution: app integrity, secure storage, certificate pinning, release signing and runtime protection.
+
 ## Support and feedback
 
 The following channels are available for discussions, feedback, and support requests:
