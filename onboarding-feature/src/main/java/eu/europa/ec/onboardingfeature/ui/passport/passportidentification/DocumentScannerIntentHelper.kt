@@ -83,9 +83,7 @@ object DocumentScannerIntentHelper {
         val expiryDate = intent.getStringExtra(ScannerConstants.EXPIRY_DATE)
         val isPassport = intent.getBooleanExtra(ScannerConstants.IS_PASSPORT, false)
 
-        logController.d("DocumentScan") {
-            "Extracted from Intent extras: dateOfBirth: $dateOfBirth expiryDate: $expiryDate"
-        }
+        logController.d("DocumentScan") { "Document scan data extracted" }
 
         if (!isPassport) {
             return ScannedDocument.EID(
@@ -108,26 +106,18 @@ object DocumentScannerIntentHelper {
         val mimeType = intent.getStringExtra(ScannerConstants.NFC_FACE_IMAGE_MIME_TYPE)
         val imageLength = intent.getIntExtra(ScannerConstants.NFC_FACE_IMAGE_LENGTH, 0)
 
-        logController.d("DocumentScan") {
-            "faceImageBytes: ${faceImageBytes?.size} bytes mimeType: $mimeType imageLength: $imageLength"
-        }
+        logController.d("DocumentScan") { "Face image data available" }
 
         val faceImage = if (faceImageBytes != null && mimeType != null && imageLength > 0) {
             logController.d("DocumentScan") { "Converting raw image bytes to bitmap..." }
             convertRawImageBytesToBitmap(faceImageBytes, mimeType, imageLength, logController)
         } else {
-            logController.d("DocumentScan") {
-                "Missing face image data - bytes: ${faceImageBytes != null}, " +
-                        "mime: $mimeType, length: $imageLength"
-            }
+            logController.d("DocumentScan") { "Missing face image data" }
             null
         }
 
         logController.d("DocumentScan") {
-            "faceImage result: ${
-                if (faceImage != null) "Available (${faceImage.width}x" +
-                        "${faceImage.height})" else "null"
-            }"
+            "Face image result: ${if (faceImage != null) "available" else "null"}"
         }
         return faceImage
     }
@@ -139,24 +129,17 @@ object DocumentScannerIntentHelper {
         logController: LogController,
     ): Bitmap? {
         return try {
-            logController.d("DocumentScan") {
-                "Decoding image - mimeType: $mimeType, length: $imageLength, " +
-                        "actual bytes: ${imageBytes.size}"
-            }
+            logController.d("DocumentScan") { "Decoding face image" }
 
             val inputStream = ByteArrayInputStream(imageBytes, 0, imageLength)
-            logController.d("DocumentScan") {
-                "Using ImageUtils.decodeImage for format: $mimeType"
-            }
+            logController.d("DocumentScan") { "Using ImageUtils.decodeImage" }
 
             val bitmap = ImageUtils.decodeImage(inputStream, imageLength, mimeType, logController)
 
-            logController.d("DocumentScan") {
-                "Decoded bitmap: ${bitmap.width}x${bitmap.height}"
-            }
+            logController.d("DocumentScan") { "Decoded bitmap: available" }
             bitmap
         } catch (e: Exception) {
-            logController.e("DocumentScan", e) {
+            logController.e("DocumentScan") {
                 "Failed to decode face image from raw compressed bytes"
             }
             null

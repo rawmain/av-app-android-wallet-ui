@@ -121,9 +121,7 @@ abstract class MrzRecord protected constructor(
 
 
     override fun toString(): String {
-        return ("MrzRecord{" + "code=" + code + "[" + code1 + code2 + "], issuingCountry=" + issuingCountry + ", documentNumber=" + documentNumber
-                + ", surname=" + surname + ", givenNames=" + givenNames + ", dateOfBirth=" + dateOfBirth + ", sex=" + sex + ", expirationDate="
-                + expirationDate + ", nationality=" + nationality + '}')
+        return ("MrzRecord{ code=" + code + "[" + code1 + code2 + "], issuingCountry=" + issuingCountry + ", *rest fields skipped* }")
     }
 
     /**
@@ -133,10 +131,9 @@ abstract class MrzRecord protected constructor(
      */
     @Throws(MrzParseException::class)
     open fun fromMrz(mrz: String, logController: LogController) {
-        if (format != get(mrz, logController)) {
+        if (format != get(mrz)) {
             throw MrzParseException(
-                "invalid format: " + get(mrz, logController),
-                mrz,
+                "invalid format: " + get(mrz),
                 MrzRange(0, 0, 0),
                 format
             )
@@ -153,7 +150,7 @@ abstract class MrzRecord protected constructor(
      */
     protected fun setName(name: Array<String?>) {
         surname =
-            name[0] ?: throw MrzParseException("surname is null", "", MrzRange(0, 0, 0), format)
+            name[0] ?: throw MrzParseException("surname is null", MrzRange(0, 0, 0), format)
         givenNames = name[1]
     }
 

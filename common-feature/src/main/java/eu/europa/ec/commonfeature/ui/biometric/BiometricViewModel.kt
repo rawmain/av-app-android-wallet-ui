@@ -54,7 +54,9 @@ sealed class Event : ViewEvent {
     data object OnNavigateBack : Event()
     data object OnErrorDismiss : Event()
     data object Init : Event()
-    data class OnQuickPinEntered(val quickPin: String) : Event()
+    data class OnQuickPinEntered(val quickPin: String) : Event() {
+        override fun toString(): String = "OnQuickPinEntered(quickPin=****)"
+    }
 }
 
 data class State(
@@ -69,7 +71,13 @@ data class State(
     val quickPinSize: Int = 6,
     val isLockedOut: Boolean = false,
     val lockoutEndTime: Long = 0L,
-) : ViewState
+) : ViewState {
+    override fun toString(): String =
+        "State(isLoading=$isLoading, error=$error, config=$config, quickPinError=$quickPinError, " +
+            "quickPin=****, userBiometricsAreEnabled=$userBiometricsAreEnabled, isBackable=$isBackable, " +
+            "notifyOnAuthenticationFailure=$notifyOnAuthenticationFailure, quickPinSize=$quickPinSize, " +
+            "isLockedOut=$isLockedOut, lockoutEndTime=$lockoutEndTime)"
+}
 
 sealed class Effect : ViewSideEffect {
     data object InitializeBiometricAuthOnCreate : Effect()

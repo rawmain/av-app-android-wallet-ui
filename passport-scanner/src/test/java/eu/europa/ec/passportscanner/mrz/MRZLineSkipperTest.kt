@@ -40,7 +40,7 @@ class MRZLineSkipperTest {
     val alwaysInvalidMRZCallback: (String, LogController) -> MrzRecord = { mrzString, _ ->
         callCount++
         // never succeed to get all combinations
-        throw MrzParseException("Invalid MRZ", mrzString, null, null)
+        throw MrzParseException("Invalid MRZ", null, null)
     }
 
     @Before

@@ -187,6 +187,21 @@
     @org.koin.core.annotation.Factory <methods>;
 }
 
+# Strip android.util.Log calls in release (R8 assumenosideeffects)
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+}
+
+# Strip Timber d/i/v call sites in release (R8 assumenosideeffects)
+-assumenosideeffects class timber.log.Timber {
+    public static *** d(...);
+    public static *** v(...);
+    public static *** i(...);
+}
+
 # Face Matching SDK (JNI)
 # Keep all classes used by native code to prevent obfuscation/removal
 -keep class kl.open.fmandroid.** { *; }

@@ -57,6 +57,14 @@ data class AuthMetadata(
             writeCounter == other.writeCounter
     }
 
+    override fun toString(): String =
+        "AuthMetadata(version=$version, kdfAlgo=$kdfAlgo, kdfM=$kdfM, kdfT=$kdfT, kdfP=$kdfP, " +
+            "pinSalt=[REDACTED], wrappedVaultIv=[REDACTED], wrappedVault=[REDACTED], " +
+            "failedAttempts=$failedAttempts, lockoutDeadline=$lockoutDeadline, " +
+            "lockoutDuration=$lockoutDuration, bootId=$bootId, biometricEnabled=$biometricEnabled, " +
+            "biometricWrappedVaultIv=[REDACTED], biometricWrappedVault=[REDACTED], " +
+            "writeCounter=$writeCounter)"
+
     override fun hashCode(): Int {
         var result = version.toInt()
         result = 31 * result + kdfAlgo
