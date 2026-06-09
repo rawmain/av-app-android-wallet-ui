@@ -31,9 +31,10 @@
         <pin-set expiration="2027-04-17">
             <pin digest="SHA-256">obEJm4ZE7IHepIv+IC5iIE1c9H0hjg2qriuPtGV/S7g=</pin>
             <pin digest="SHA-256">1D3OMb2zD16wZqoE91OnwYX7Z3yV2x4fwdKmXu6f210=</pin>
-            <!-- backend.issuer.dev.ageverification.dev leaf pin (R13-signed, expires Jun 2026) -->
-            <pin digest="SHA-256">HHLc3T6ahlwDCLjh6Xd8vuzCoa2AioWjGXchYl8oRPE=</pin>
-            <!-- Intermediate CA backup pins (R12 and R13) -->
+            <!-- backend.issuer.dev.ageverification.dev leaf pin (YR2-signed, expires Aug 2026) -->
+            <pin digest="SHA-256">lbppns/TeIVTrCLQffEkp+YxRA4gcH4BZVANplansaU=</pin>
+            <!-- Intermediate CA backup pins (YR2, R12, R13) -->
+            <pin digest="SHA-256">nWN7PSep5XDQdge5zK24CnCRXHr3KvzhKEGxsdqCX9E=</pin>
             <pin digest="SHA-256">kZwN96eHtZftBWrOZUsd6cA4es80n3NzSk/XtYz2EqQ=</pin>
             <pin digest="SHA-256">AlSQhgtJirc8ahLyekmtX+Iw+v46yPYRLJt9Cq1GlB0=</pin>
         </pin-set>
