@@ -19,23 +19,23 @@
 
     <domain-config>
         <domain includeSubdomains="false">wallet-provider.ageverification.dev</domain>
-        <pin-set expiration="2027-04-17">
+        <pin-set expiration="2027-11-02">
             <pin digest="SHA-256">YXtUYcQAF/9EUVCdjY/RfIaq3CkeG2xlRqqUOh4RzS0=</pin>
-            <!-- Intermediate CA backup pin -->
+            <!-- GeoTrust TLS RSA CA G1 intermediate backup pin -->
             <pin digest="SHA-256">SDG5orEv8iX6MNenIAxa8nQFNpROB/6+llsZdXHZNqs=</pin>
         </pin-set>
     </domain-config>
 
     <domain-config>
         <domain includeSubdomains="true">issuer.dev.ageverification.dev</domain>
-        <pin-set expiration="2027-04-17">
-            <pin digest="SHA-256">obEJm4ZE7IHepIv+IC5iIE1c9H0hjg2qriuPtGV/S7g=</pin>
-            <pin digest="SHA-256">1D3OMb2zD16wZqoE91OnwYX7Z3yV2x4fwdKmXu6f210=</pin>
+        <pin-set expiration="2027-03-12">
+            <!-- issuer.dev.ageverification.dev leaf pin (R12-signed, expires Jul 2026) -->
+            <pin digest="SHA-256">kLSOVQB5XnJ7RxpZluD7dinfCApcGomiQMbmuTVLAbc=</pin>
             <!-- backend.issuer.dev.ageverification.dev leaf pin (YR2-signed, expires Aug 2026) -->
             <pin digest="SHA-256">lbppns/TeIVTrCLQffEkp+YxRA4gcH4BZVANplansaU=</pin>
-            <!-- Intermediate CA backup pins (YR2, R12, R13) -->
-            <pin digest="SHA-256">nWN7PSep5XDQdge5zK24CnCRXHr3KvzhKEGxsdqCX9E=</pin>
+            <!-- Intermediate CA backup pins (R12, YR2, R13) -->
             <pin digest="SHA-256">kZwN96eHtZftBWrOZUsd6cA4es80n3NzSk/XtYz2EqQ=</pin>
+            <pin digest="SHA-256">nWN7PSep5XDQdge5zK24CnCRXHr3KvzhKEGxsdqCX9E=</pin>
             <pin digest="SHA-256">AlSQhgtJirc8ahLyekmtX+Iw+v46yPYRLJt9Cq1GlB0=</pin>
         </pin-set>
     </domain-config>
