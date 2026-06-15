@@ -27,16 +27,21 @@
     </domain-config>
 
     <domain-config>
+        <!-- Covers the issuer hosts the app actually contacts:
+             test.issuer.dev.ageverification.dev (primary, YR1-signed)
+             passport.issuer.dev.ageverification.dev (YR2-signed).
+             Pin the intermediates + root, NOT leaves: Let's Encrypt rotates
+             leaf certs ~every 60 days, so leaf pins break the app on renewal. -->
         <domain includeSubdomains="true">issuer.dev.ageverification.dev</domain>
-        <pin-set expiration="2027-03-12">
-            <!-- issuer.dev.ageverification.dev leaf pin (R12-signed, expires Jul 2026) -->
-            <pin digest="SHA-256">kLSOVQB5XnJ7RxpZluD7dinfCApcGomiQMbmuTVLAbc=</pin>
-            <!-- backend.issuer.dev.ageverification.dev leaf pin (YR2-signed, expires Aug 2026) -->
-            <pin digest="SHA-256">lbppns/TeIVTrCLQffEkp+YxRA4gcH4BZVANplansaU=</pin>
-            <!-- Intermediate CA backup pins (R12, YR2, R13) -->
-            <pin digest="SHA-256">kZwN96eHtZftBWrOZUsd6cA4es80n3NzSk/XtYz2EqQ=</pin>
+        <pin-set expiration="2028-08-01">
+            <!-- ISRG Root YR (stable backup, expires 2032) -->
+            <pin digest="SHA-256">fk6IOKit1ild5647BH06ujSIq5XbCgqlbYl6ANhhi88=</pin>
+            <!-- Let's Encrypt YR1 intermediate (signs test.issuer) -->
+            <pin digest="SHA-256">LoMHBotttiDko50Gi13uXW71eIy7LAttI+rYT8wXF4w=</pin>
+            <!-- Let's Encrypt YR2 intermediate (signs passport.issuer) -->
             <pin digest="SHA-256">nWN7PSep5XDQdge5zK24CnCRXHr3KvzhKEGxsdqCX9E=</pin>
-            <pin digest="SHA-256">AlSQhgtJirc8ahLyekmtX+Iw+v46yPYRLJt9Cq1GlB0=</pin>
+            <!-- Let's Encrypt R12 intermediate (ISRG Root X1 chain, backup) -->
+            <pin digest="SHA-256">kZwN96eHtZftBWrOZUsd6cA4es80n3NzSk/XtYz2EqQ=</pin>
         </pin-set>
     </domain-config>
 </network-security-config>
