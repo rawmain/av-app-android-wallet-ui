@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2025 European Commission
+  ~ Copyright (c) 2026 European Commission
   ~
   ~ Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
   ~ Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -14,6 +14,7 @@
   ~ governing permissions and limitations under the Licence.
   -->
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="age_over">Maggiore di %d anni\n</string>
     <string name="age_over_18">Età superiore a 18 anni</string>
     <string name="biometric_confirm_request">Confirm request</string>
     <string name="biometric_default_mode_text_above_pin_field">PIN</string>
@@ -124,6 +125,8 @@
     <string name="generic_unknown">Sconosciuto</string>
     <string name="generic_view_details">Credenziali</string>
     <string name="generic_yes">SÌ</string>
+    <string name="hardware_keystore_block_description">Questo dispositivo non soddisfa i requisiti di sicurezza necessari per proteggere il tuo portafoglio. Utilizza un dispositivo con sicurezza basata su hardware.</string>
+    <string name="hardware_keystore_block_title">Dispositivo non supportato</string>
     <string name="issuance_add_document_deferred_success_description">Il tuo documento è stato richiesto. Ti avviseremo quando sarà disponibile sulla tua applicazione.</string>
     <string name="issuance_add_document_deferred_success_primary_button_text">OK</string>
     <string name="issuance_add_document_deferred_success_text">Operazione in corso!</string>
@@ -200,14 +203,16 @@
     <string name="onboarding_step_2_title">Consenso</string>
     <string name="onboarding_step_3_title">Sicurezza</string>
     <string name="onboarding_step_4_title">Verifica</string>
+    <string name="onboarding_token_qr_intro_description">Se hai verificato la tua identità di persona, potresti ricevere un token o un codice QR. Tocca Scansiona e scansiona il codice QR per avviare la registrazione.</string>
+    <string name="onboarding_token_qr_intro_title">Token / Codice QR</string>
     <string name="onboarding_verification_description">Questa verifica è necessaria per creare un\'attestazione che dimostri che hai più di 18 anni. I dettagli eID non saranno condivisi con i servizi online a cui accedi.</string>
     <string name="onboarding_verification_national_id">eID nazionale / IdP nazionale</string>
     <string name="onboarding_verification_national_id_description">Identificati online usando il tuo eID</string>
     <string name="onboarding_verification_passport_id_card">Passaporto o Carta d\'identità</string>
     <string name="onboarding_verification_passport_id_card_description">Scansiona il tuo passaporto o carta d\'identità per la verifica</string>
     <string name="onboarding_verification_title">Scegli il tuo metodo di verifica dell\'età</string>
-    <string name="onboarding_token_qr_intro_title">Token / Codice QR</string>
-    <string name="onboarding_token_qr_intro_description">Se hai verificato la tua identità di persona, potresti ricevere un token o un codice QR. Tocca Scansiona e scansiona il codice QR per avviare la registrazione.</string>
+    <string name="onboarding_verification_token_qr">Token / Codice QR</string>
+    <string name="onboarding_verification_token_qr_description">Utilizza il token o il codice QR che hai ricevuto durante il controllo di identità in loco per avviare la procedura di registrazione.</string>
     <string name="open_system_settings">Open Settings</string>
     <string name="passport_biometrics">Biometria</string>
     <string name="passport_biometrics_back">Indietro</string>
@@ -240,6 +245,8 @@
     <string name="passport_live_video">Video in diretta</string>
     <string name="passport_live_video_back">Indietro</string>
     <string name="passport_live_video_description">In questo passaggio, registrerai un breve video di te stesso per confermare la tua identità. Assicurati di:</string>
+    <string name="passport_live_video_download_channel">Download del modello</string>
+    <string name="passport_live_video_downloading">Download risorse di verifica</string>
     <string name="passport_live_video_downloading_progress">Download risorse di verifica… %d%%</string>
     <string name="passport_live_video_error_not_live">Verifica della vitalità fallita. Assicurati di registrare un video dal vivo.</string>
     <string name="passport_live_video_error_not_matching">Il volto non corrisponde alla foto del passaporto / carta d\'identità. Riprova.</string>
@@ -334,8 +341,6 @@
     <string name="settings_screen_version">Versione</string>
     <string name="splash_screen_sponsors">Fornito da</string>
     <string name="splash_screen_title">Verifica dell\'età</string>
-    <string name="device_integrity_compromised_title">Avviso di sicurezza del dispositivo</string>
-    <string name="device_integrity_compromised_message">Questo dispositivo sembra essere rootato o manomesso. Per la sicurezza delle tue credenziali, il portafoglio non può funzionare su dispositivi compromessi.</string>
     <string name="unknown_verifier">Servizio online</string>
     <string name="warning_authentication_failed">Autenticazione non riuscita! Prova a scansionare di nuovo il documento o inserisci i dati manualmente.</string>
     <string name="warning_cla_not_supported">Impossibile leggere il documento. Il passaporto non supporta il CLA.</string>

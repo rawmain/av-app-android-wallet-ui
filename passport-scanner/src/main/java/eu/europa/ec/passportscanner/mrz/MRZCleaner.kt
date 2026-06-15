@@ -21,7 +21,6 @@ import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.SmartScannerActivity.Companion.TAG
 import eu.europa.ec.passportscanner.parser.MrzParser
 import eu.europa.ec.passportscanner.parser.MrzRecord
-import java.net.URLEncoder
 
 
 object MRZCleaner {
@@ -101,11 +100,7 @@ object MRZCleaner {
                 else -> throw IllegalArgumentException("Invalid MRZ string. Wrong number of lines.")
             }
         } else {
-            logController.d(TAG) {
-                "Error = [${
-                    URLEncoder.encode(result, "UTF-8").replace("%3C", "<").replace("%0A", "↩")
-                }]"
-            }
+            logController.d(TAG) { "MRZ parsing failed: invalid format" }
             throw IllegalArgumentException("Invalid MRZ string. No '<' or 'P', 'I', 'A', 'C', 'V' detected.")
         }
 

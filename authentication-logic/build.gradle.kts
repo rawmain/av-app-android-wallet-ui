@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 European Commission
+ * Copyright (c) 2026 European Commission
  *
  * Licensed under the EUPL, Version 1.2 or - as soon they will be approved by the European
  * Commission - subsequent versions of the EUPL (the "Licence"); You may not use this work
@@ -38,6 +38,8 @@ dependencies {
 
     implementation(libs.gson)
     api(libs.androidx.biometric)
+    implementation(libs.tink.android)
+    implementation(libs.androidx.dataStore.core)
 
     testImplementation(project(LibraryModule.TestLogic.path))
 }
@@ -46,3 +48,14 @@ excludeFromKoverReport(
     excludedClasses = KoverExclusionRules.AuthenticationLogic.classes,
     excludedPackages = KoverExclusionRules.AuthenticationLogic.packages,
 )
+
+tasks.register("checkNoPbkdf2") {
+    doLast {
+        val hits = mutableListOf<String>()
+        fileTree("src").matching { include("**/*.kt") }.forEach { f ->
+            if (f.readText().contains("PBKDF2")) hits.add(f.path)
+        }
+        if (hits.isNotEmpty()) throw GradleException("PBKDF2 found in authentication-logic: $hits")
+    }
+}
+tasks.named("check") { dependsOn("checkNoPbkdf2") }

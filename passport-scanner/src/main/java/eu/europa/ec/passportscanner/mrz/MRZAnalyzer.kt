@@ -213,12 +213,12 @@ abstract class MRZAnalyzer(
                         val cleanMRZ = MRZCleaner.clean(rawFullRead, logController, skipReconstruction = true)
                         processResult(result = cleanMRZ, bitmap = bf, rotation = rotation)
                     } catch (e: Exception) {
-                        logController.d("${SmartScannerActivity.TAG}/SmartScanner", {e.message.orEmpty()})
+                        logController.d("${SmartScannerActivity.TAG}/SmartScanner") { "MRZ parsing failed" }
                     }
                     imageProxy.close()
                 }
                 .addOnFailureListener { e ->
-                    logController.d("${SmartScannerActivity.TAG}/SmartScanner", e)
+                    logController.d("${SmartScannerActivity.TAG}/SmartScanner") { "Camera analysis failed" }
                     imageProxy.close()
                 }
         }

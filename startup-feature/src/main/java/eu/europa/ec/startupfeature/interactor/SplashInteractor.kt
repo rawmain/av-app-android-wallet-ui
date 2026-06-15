@@ -16,9 +16,11 @@
 
 package eu.europa.ec.startupfeature.interactor
 
-import eu.europa.ec.businesslogic.controller.device.DeviceIntegrityController
-import eu.europa.ec.businesslogic.controller.device.DeviceIntegrityLevel
-import eu.europa.ec.businesslogic.controller.device.DeviceIntegrityResult
+import eu.europa.ec.authenticationlogic.storage.AuthMetadataStore
+import eu.europa.ec.businesslogic.config.ConfigLogic
+import eu.europa.ec.businesslogic.controller.crypto.KeystoreController
+import eu.europa.ec.businesslogic.controller.crypto.KeystoreSecurityLevel
+import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.commonfeature.config.BiometricMode
 import eu.europa.ec.commonfeature.config.BiometricUiConfig
 import eu.europa.ec.commonfeature.config.OnBackNavigationConfig
@@ -31,13 +33,13 @@ import eu.europa.ec.uilogic.config.NavigationType
 import eu.europa.ec.uilogic.navigation.CommonScreens
 import eu.europa.ec.uilogic.navigation.LandingScreens
 import eu.europa.ec.uilogic.navigation.OnboardingScreens
+import eu.europa.ec.uilogic.navigation.StartupScreens
 import eu.europa.ec.uilogic.navigation.helper.generateComposableArguments
 import eu.europa.ec.uilogic.navigation.helper.generateComposableNavigationLink
 import eu.europa.ec.uilogic.serializer.UiSerializer
 
 interface SplashInteractor {
     fun getAfterSplashRoute(): String
-    suspend fun getDeviceIntegrityResult(): DeviceIntegrityResult
 }
 
 class SplashInteractorImpl(
@@ -45,23 +47,32 @@ class SplashInteractorImpl(
     private val uiSerializer: UiSerializer,
     private val resourceProvider: ResourceProvider,
     private val walletCoreDocumentsController: WalletCoreDocumentsController,
-    private val deviceIntegrityController: DeviceIntegrityController,
+    private val keystoreController: KeystoreController,
+    private val configLogic: ConfigLogic,
+    private val logController: LogController,
 ) : SplashInteractor {
+
+    companion object {
+        private const val TAG = "SplashInteractor"
+    }
 
     private val hasDocuments: Boolean
         get() = walletCoreDocumentsController.getAgeOver18IssuedDocument() != null
 
-    override suspend fun getDeviceIntegrityResult(): DeviceIntegrityResult {
-        return deviceIntegrityController.checkIntegrity()
-    }
-
-    override fun getAfterSplashRoute(): String = when (quickPinInteractor.hasPin()) {
-        true -> {
-            getBiometricsConfig()
+    override fun getAfterSplashRoute(): String {
+        val hasPinEnrolled = quickPinInteractor.hasPin()
+        if (hasPinEnrolled) {
+            val metaKeyLevel = keystoreController.getSecurityLevel(AuthMetadataStore.META_KEY_ALIAS)
+            logController.d(TAG) { "Keystore security level for meta-key: $metaKeyLevel" }
+            val isHardwareBacked = metaKeyLevel == KeystoreSecurityLevel.STRONGBOX ||
+                metaKeyLevel == KeystoreSecurityLevel.TEE
+            if (!isHardwareBacked && !configLogic.isBuildTypeDebug()) {
+                return StartupScreens.HardwareKeystoreBlock.screenRoute
+            }
         }
-
-        false -> {
-            getOnboardingRoute()
+        return when (hasPinEnrolled) {
+            true -> getBiometricsConfig()
+            false -> getOnboardingRoute()
         }
     }
 

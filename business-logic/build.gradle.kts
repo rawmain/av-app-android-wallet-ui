@@ -34,8 +34,10 @@ moduleConfig {
 dependencies {
     implementation(project(LibraryModule.ResourcesLogic.path))
     implementation(libs.gson)
+    // Explicit declaration — needed for Argon2id (transitively present via wallet-core today,
+    // but declared here so a wallet-core upgrade cannot silently remove it)
+    implementation(libs.bouncycastle.provider)
     implementation(libs.androidx.appAuth)
-    implementation(libs.androidx.security.crypto)
     implementation(libs.google.phonenumber)
     implementation(libs.timber)
     implementation(libs.treessence)

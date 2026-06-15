@@ -26,22 +26,26 @@ package eu.europa.ec.passportscanner.face
 
 import android.content.Context
 import android.content.Intent
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.businesslogic.extension.toErrorType
-import eu.europa.ec.businesslogic.model.ErrorType
+import eu.europa.ec.passportscanner.worker.ModelDownloadWorker
 import kl.open.fmandroid.NativeBridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.File
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Implementation of AVFaceMatchSDK for passport face verification
@@ -55,22 +59,15 @@ class AVFaceMatchSdkImpl(
 ) : AVFaceMatchSDK {
 
     private val sdkScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private var initJob: Job? = null
-    private val modelDownloader = ModelDownloader(context, logController)
-    @Volatile
-    private var modelsPrepared = false
+    private var observeJob: Job? = null
     @Volatile
     private var sdkInitialized = false
-    private val embeddingOutputFilename = "embedding.onnx"
 
-    // On-disk filenames resolved during model preparation, used to build the native config.
-    private var preparedFaceDetectorFilename: String? = null
-    private var preparedLiveness0Filename: String? = null
-    private var preparedLiveness1Filename: String? = null
-    private var preparedEmbeddingFilename: String? = null
+    @Volatile
+    private var pendingConfig: FaceMatchConfig? = null
 
     private val _initStatus = MutableStateFlow<SdkInitStatus>(SdkInitStatus.NotInitialized)
-    private val initStatusFlow: StateFlow<SdkInitStatus> = _initStatus.asStateFlow()
+    override val initStatusFlow: StateFlow<SdkInitStatus> = _initStatus.asStateFlow()
 
     companion object {
         private const val TAG = "AVFaceMatchSdk"
@@ -91,71 +88,116 @@ class AVFaceMatchSdkImpl(
         }
 
         // Check if initialization is actively running
-        if (initJob?.isActive == true) {
+        if (observeJob?.isActive == true) {
             logController.d(TAG) { "init: Initialization already in progress, returning existing flow" }
             return initStatusFlow
         }
 
-        // Start new initialization
-        logController.d(TAG) { "init: Starting SDK initialization" }
+        logController.d(TAG) { "init: Starting SDK initialization via WorkManager" }
         _initStatus.value = SdkInitStatus.NotInitialized
-        initJob = sdkScope.launch {
-            performInitialization(config, context)
+        pendingConfig = config
+
+        val embeddingSource = config.embeddingExtractorModel as? FaceMatchModelSource.Remote
+        if (embeddingSource == null) {
+            _initStatus.value = SdkInitStatus.Error("Embedding model must be a Remote source")
+            return initStatusFlow
+        }
+
+        // Optionally: request POST_NOTIFICATIONS runtime permission here (required on API 33+)
+        //  for the foreground service notification to be visible during download.
+
+        val inputData = workDataOf(
+            ModelDownloadWorker.KEY_INPUT_EMBEDDING_URL to embeddingSource.url,
+            ModelDownloadWorker.KEY_INPUT_EMBEDDING_SHA256 to embeddingSource.sha256Hex,
+        )
+
+        val workRequest = OneTimeWorkRequestBuilder<ModelDownloadWorker>()
+            .setInputData(inputData)
+            .build()
+
+        val workManager = WorkManager.getInstance(context.applicationContext)
+        _initStatus.value = SdkInitStatus.Preparing(0)
+
+        workManager.enqueueUniqueWork(
+            ModelDownloadWorker.WORK_NAME,
+            ExistingWorkPolicy.KEEP,
+            workRequest,
+        )
+
+        observeJob = sdkScope.launch {
+            workManager.getWorkInfoByIdFlow(workRequest.id)
+                .collect { workInfo ->
+                    if (workInfo == null) return@collect
+                    handleWorkInfo(workInfo, context)
+                }
         }
 
         return initStatusFlow
     }
 
-    private suspend fun performInitialization(config: FaceMatchConfig, context: Context) {
-        val modelBasePath = context.filesDir.absolutePath
-
-        try {
-            // Prepare models if not already prepared
-            if (!modelsPrepared) {
-                logController.d(TAG) { "init: Preparing models..." }
-
-                // Prepare small models instantly (no progress updates)
-                val liveness0Filename = modelDownloader.prepareModel(config.livenessModel0, modelBasePath)
-                    ?: return failWithError("Failed to prepare liveness model 0")
-
-                val liveness1Filename = modelDownloader.prepareModel(config.livenessModel1, modelBasePath)
-                    ?: return failWithError("Failed to prepare liveness model 1")
-
-                val faceDetectorFilename = modelDownloader.prepareModel(config.faceDetectorModel, modelBasePath)
-                    ?: return failWithError("Failed to prepare face detector model")
-
-                // Embedding model may be remote — download + hash-verify with progress
-                val embeddingFilename = modelDownloader.prepareModel(
-                    source = config.embeddingExtractorModel,
-                    destDir = modelBasePath,
-                    outputFilename = when (config.embeddingExtractorModel) {
-                        is FaceMatchModelSource.Remote -> embeddingOutputFilename
-                        is FaceMatchModelSource.Asset -> null
-                    },
-                ) { progress ->
-                    _initStatus.value = SdkInitStatus.Preparing(progress)
-                } ?: return failWithError("Failed to prepare embedding extractor model")
-
-                modelsPrepared = true
-                preparedFaceDetectorFilename = faceDetectorFilename
-                preparedLiveness0Filename = liveness0Filename
-                preparedLiveness1Filename = liveness1Filename
-                preparedEmbeddingFilename = embeddingFilename
-                logController.d(TAG) { "init: Model preparation succeeded" }
+    private fun handleWorkInfo(workInfo: WorkInfo, context: Context) {
+        when (workInfo.state) {
+            WorkInfo.State.RUNNING -> {
+                val progress = workInfo.progress.getInt(ModelDownloadWorker.KEY_PROGRESS, 0)
+                _initStatus.value = SdkInitStatus.Preparing(progress)
             }
 
-            // Initialize native SDK
-            _initStatus.value = SdkInitStatus.Initializing
-            logController.d(TAG) { "init: Initializing native SDK..." }
+            WorkInfo.State.SUCCEEDED -> {
+                logController.d(TAG) { "init: Worker succeeded, performing native init" }
+                _initStatus.value = SdkInitStatus.Initializing
+                performNativeInit(workInfo, context)
+            }
 
-            // Build config JSON from FaceMatchConfig using the actual on-disk filenames
+            WorkInfo.State.FAILED -> {
+                val error = workInfo.outputData.getString(ModelDownloadWorker.KEY_ERROR)
+                    ?: "Model download failed"
+                logController.e(TAG) { "init: Worker failed: $error" }
+                _initStatus.value = SdkInitStatus.Error(error)
+            }
+
+            WorkInfo.State.CANCELLED -> {
+                logController.d(TAG) { "init: Worker cancelled" }
+                _initStatus.value = SdkInitStatus.NotInitialized
+            }
+
+            WorkInfo.State.ENQUEUED,
+            WorkInfo.State.BLOCKED -> {
+                // Waiting to run — keep current state
+            }
+        }
+    }
+
+    private fun performNativeInit(workInfo: WorkInfo, context: Context) {
+        val embeddingFilename = workInfo.outputData.getString(ModelDownloadWorker.KEY_EMBEDDING)
+        if (embeddingFilename == null) {
+            _initStatus.value = SdkInitStatus.Error("Missing embedding filename from worker output")
+            return
+        }
+
+        val config = pendingConfig ?: run {
+            _initStatus.value = SdkInitStatus.Error("Configuration lost during initialization")
+            return
+        }
+
+        try {
+            val modelBasePath = context.applicationContext.filesDir.absolutePath
+
+            val liveness0Filename = extractAssetModel(config.livenessModel0, modelBasePath)
+            val liveness1Filename = extractAssetModel(config.livenessModel1, modelBasePath)
+            val faceDetectorFilename = extractAssetModel(config.faceDetectorModel, modelBasePath)
+
+            if (liveness0Filename == null || liveness1Filename == null || faceDetectorFilename == null) {
+                _initStatus.value = SdkInitStatus.Error("Failed to extract asset models")
+                return
+            }
+
             val configJson = JSONObject().apply {
-                put("face_detector_model", preparedFaceDetectorFilename)
-                put("liveness_model0", preparedLiveness0Filename)
-                put("liveness_model1", preparedLiveness1Filename)
+                put("face_detector_model", faceDetectorFilename)
+                put("liveness_model0", liveness0Filename)
+                put("liveness_model1", liveness1Filename)
                 put("liveness_threshold", config.livenessThreshold)
                 put("matching_threshold", config.matchingThreshold)
-                put("embedding_extractor_model", preparedEmbeddingFilename)
+                put("embedding_extractor_model", embeddingFilename)
             }
 
             logController.d(TAG) { "init: Calling native initialization..." }
@@ -167,34 +209,50 @@ class AVFaceMatchSdkImpl(
                 _initStatus.value = SdkInitStatus.Ready
                 logController.i(TAG) { "init: SDK initialization completed successfully" }
             } else {
-                failWithError("Native SDK initialization failed. Check that all model files are valid and compatible.")
+                _initStatus.value = SdkInitStatus.Error(
+                    "Native SDK initialization failed. Check that all model files are valid and compatible."
+                )
             }
-        } catch (e: CancellationException) {
-            logController.d(TAG) { "init: Initialization was cancelled" }
-            throw e
         } catch (e: Exception) {
-            logController.e(TAG, e) { "init: Exception during initialization" }
-            failWithError("Initialization failed: ${e.message}", e.toErrorType())
+            logController.e(TAG, e) { "init: Exception during native initialization" }
+            _initStatus.value = SdkInitStatus.Error(
+                "Initialization failed: ${e.message}",
+                e.toErrorType()
+            )
         }
     }
 
-    private fun failWithError(message: String, errorType: ErrorType = ErrorType.GENERIC) {
-        _initStatus.value = SdkInitStatus.Error(message, errorType)
+    private fun extractAssetModel(source: FaceMatchModelSource, destDir: String): String? {
+        val assetSource = source as? FaceMatchModelSource.Asset ?: return null
+        if (assetSource.filename.isEmpty()) return null
+
+        val destFile = File(destDir, assetSource.filename)
+        if (!destFile.exists()) {
+            try {
+                context.assets.open(assetSource.filename).use { input ->
+                    destFile.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+            } catch (e: Exception) {
+                logController.e(TAG, e) { "extractAssetModel: Failed to copy ${assetSource.filename}" }
+                return null
+            }
+        }
+        return assetSource.filename
     }
 
-    override fun captureAndMatch(referenceImagePath: String, onResult: (AVMatchResult) -> Unit) {
-        logController.d(TAG) { "captureAndMatch: Starting with reference image: $referenceImagePath" }
+    override fun captureAndMatch(referenceImageBytes: ByteArray, onResult: (AVMatchResult) -> Unit) {
+        logController.d(TAG) { "captureAndMatch: Starting with ${referenceImageBytes.size} bytes" }
 
-        // Validate reference image path
-        if (referenceImagePath.isEmpty() || !File(referenceImagePath).exists()) {
-            logController.e(TAG) { "captureAndMatch: Invalid reference image path" }
+        if (referenceImageBytes.isEmpty()) {
+            logController.e(TAG) { "captureAndMatch: Empty reference image bytes" }
             onResult(
                 AVMatchResult(
                     processed = true,
                     referenceIsValid = false,
                     capturedIsLive = false,
                     isSameSubject = false,
-                    capturedPath = null
                 )
             )
             return
@@ -203,9 +261,8 @@ class AVFaceMatchSdkImpl(
         logController.d(TAG) { "captureAndMatch: Processing reference image..." }
 
         try {
-            // Process reference image first
-            val originalResult = nativeBridge.safeProcess(referenceImagePath, true)
-            logController.d(TAG) { "captureAndMatch: Reference processing result - embeddingExtracted: ${originalResult.embeddingExtracted}, faceDetected: ${originalResult.faceDetected}" }
+            val originalResult = nativeBridge.safeProcessEncode(referenceImageBytes, true)
+            logController.d(TAG) { "captureAndMatch: embeddingExtracted=${originalResult.embeddingExtracted}, faceDetected=${originalResult.faceDetected}" }
 
             val referenceResult = AVProcessResult(
                 livenessChecked = originalResult.livenessChecked,
@@ -224,7 +281,6 @@ class AVFaceMatchSdkImpl(
                         referenceIsValid = false,
                         capturedIsLive = false,
                         isSameSubject = false,
-                        capturedPath = null
                     )
                 )
                 return
@@ -232,7 +288,6 @@ class AVFaceMatchSdkImpl(
 
             logController.d(TAG) { "captureAndMatch: Reference image processed successfully, embedding size: ${referenceResult.embedding.size}" }
 
-            // Initialize decision maker for multiple samples
             val decisor = AVDecisor(numSamples = 3, logController)
             logController.d(TAG) { "captureAndMatch: Created decisor with ${decisor.getSampleCount()}/${3} samples" }
 
@@ -260,7 +315,6 @@ class AVFaceMatchSdkImpl(
                     referenceIsValid = false,
                     capturedIsLive = false,
                     isSameSubject = false,
-                    capturedPath = null
                 )
             )
         }
@@ -268,9 +322,10 @@ class AVFaceMatchSdkImpl(
 
     override fun cancelInit() {
         logController.d(TAG) { "cancelInit: Cancelling SDK initialization" }
-        initJob?.cancel()
-        initJob = null
-        modelsPrepared = false
+        observeJob?.cancel()
+        observeJob = null
+        WorkManager.getInstance(context.applicationContext)
+            .cancelUniqueWork(ModelDownloadWorker.WORK_NAME)
         _initStatus.value = SdkInitStatus.NotInitialized
         logController.d(TAG) { "cancelInit: SDK initialization cancelled" }
     }
@@ -281,19 +336,7 @@ class AVFaceMatchSdkImpl(
         nativeBridge.jni_release()
         sdkInitialized = false
         _initStatus.value = SdkInitStatus.NotInitialized
-        // Note: modelsPrepared stays true as models are still in storage
         logController.d(TAG) { "reset: SDK reset complete" }
     }
 
-    /**
-     * Get SDK version information
-     * @return Version string from native library
-     */
-    fun getVersion(): String {
-        return try {
-            nativeBridge.jni_getVersion()
-        } catch (_: Exception) {
-            "Unknown"
-        }
-    }
 }

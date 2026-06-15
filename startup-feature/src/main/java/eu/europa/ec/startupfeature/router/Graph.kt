@@ -22,6 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 import eu.europa.ec.startupfeature.BuildConfig
+import eu.europa.ec.startupfeature.ui.hardblock.HardwareKeystoreBlockScreen
 import eu.europa.ec.startupfeature.ui.splash.SplashScreen
 import eu.europa.ec.uilogic.navigation.ModuleRoute
 import eu.europa.ec.uilogic.navigation.StartupScreens
@@ -42,6 +43,9 @@ fun NavGraphBuilder.featureStartupGraph(navController: NavController) {
             )
         ) {
             SplashScreen(navController, koinViewModel())
+        }
+        composable(route = StartupScreens.HardwareKeystoreBlock.screenRoute) {
+            HardwareKeystoreBlockScreen()
         }
     }
 }

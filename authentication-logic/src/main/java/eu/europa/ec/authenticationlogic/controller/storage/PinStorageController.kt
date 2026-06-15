@@ -17,6 +17,8 @@
 package eu.europa.ec.authenticationlogic.controller.storage
 
 import eu.europa.ec.authenticationlogic.config.StorageConfig
+import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
+import kotlinx.coroutines.delay
 
 sealed class PinValidationResult {
     object Success : PinValidationResult()
@@ -28,16 +30,18 @@ sealed class PinValidationResult {
 interface PinStorageController {
     fun hasPin(): Boolean
     fun setPin(pin: String)
-    fun isPinValid(pin: String): PinValidationResult
+    suspend fun isPinValid(pin: String): PinValidationResult
 }
 
 class PinStorageControllerImpl(
     private val storageConfig: StorageConfig,
+    private val clock: ElapsedRealtimeClock,
 ) : PinStorageController {
 
     companion object {
         private const val MAX_ATTEMPTS = 4
-        private const val BASE_LOCKOUT_DURATION_MS = 60 * 1000L // 1 minute
+        private const val BASE_LOCKOUT_DURATION_MS = 60 * 1000L
+        private const val BASE_ATTEMPT_DELAY_MS = 1_000L
     }
 
     private val pinStorageProvider = storageConfig.pinStorageProvider
@@ -48,18 +52,29 @@ class PinStorageControllerImpl(
         pinStorageProvider.setPin(pin)
     }
 
-    override fun isPinValid(pin: String): PinValidationResult {
-        if (pinStorageProvider.isCurrentlyLockedOut()) {
+    override suspend fun isPinValid(pin: String): PinValidationResult {
+        val failedAttempts = pinStorageProvider.getFailedAttempts()
+        val lockoutUntil = pinStorageProvider.getLockoutUntil()
+        if (lockoutUntil > 0L && clock.now() < lockoutUntil) {
             return PinValidationResult.LockedOut(
-                lockoutEndTimeMillis = pinStorageProvider.getLockoutUntil(),
-                attemptsUsed = pinStorageProvider.getFailedAttempts()
+                lockoutEndTimeMillis = lockoutUntil,
+                attemptsUsed = failedAttempts
             )
         }
 
-        if (pinStorageProvider.isPinValid(pin)) {
-            pinStorageProvider.resetFailedAttempts()
-            return PinValidationResult.Success
+        val enforceMs = BASE_ATTEMPT_DELAY_MS * (1 + failedAttempts)
+        val start = clock.now()
+        val valid = pinStorageProvider.isPinValid(pin)
+
+        return if (valid) {
+            if (failedAttempts > 0) pinStorageProvider.resetFailedAttempts()
+            PinValidationResult.Success
         } else {
+            val elapsed = clock.now() - start
+            val remaining = enforceMs - elapsed
+            if (remaining > 0) {
+                delay(remaining)
+            }
             val newAttemptCount = pinStorageProvider.incrementFailedAttempts()
 
             if (newAttemptCount >= MAX_ATTEMPTS) {
@@ -70,12 +85,12 @@ class PinStorageControllerImpl(
                 // to now + duration so attackers gain nothing from rebooting.
                 pinStorageProvider.setLockoutForDuration(lockoutDuration)
 
-                return PinValidationResult.LockedOut(
+                PinValidationResult.LockedOut(
                     lockoutEndTimeMillis = pinStorageProvider.getLockoutUntil(),
                     attemptsUsed = newAttemptCount
                 )
             } else {
-                return PinValidationResult.Failed(
+                PinValidationResult.Failed(
                     attemptsRemaining = MAX_ATTEMPTS - newAttemptCount
                 )
             }
@@ -85,13 +100,13 @@ class PinStorageControllerImpl(
     private fun calculateLockoutDuration(attemptCount: Int): Long {
         // Progressive lockout times: 3=none, 4=1min, 5=5min, 6=15min, 7=1hr, 8=3hr, 9=8hr
         val multiplier = when (attemptCount) {
-            4 -> 1      // 1 minute
-            5 -> 5      // 5 minutes
-            6 -> 15     // 15 minutes
-            7 -> 60     // 1 hour
-            8 -> 180    // 3 hours
-            9 -> 480    // 8 hours
-            else -> if (attemptCount > 9) 480 else 0  // 8 hours for any attempt beyond 9
+            4 -> 1
+            5 -> 5
+            6 -> 15
+            7 -> 60
+            8 -> 180
+            9 -> 480
+            else -> if (attemptCount > 9) 480 else 0
         }
         return BASE_LOCKOUT_DURATION_MS * multiplier
     }

@@ -57,7 +57,9 @@ data class State(
 sealed class Event : ViewEvent {
     data object Pop : Event()
     data object DismissError : Event()
-    data class OnPinChange(val code: PinCode, val context: Context) : Event()
+    data class OnPinChange(val code: PinCode, val context: Context) : Event() {
+        override fun toString(): String = "OnPinChange(code=****, context=$context)"
+    }
 }
 
 sealed class Effect : ViewSideEffect {

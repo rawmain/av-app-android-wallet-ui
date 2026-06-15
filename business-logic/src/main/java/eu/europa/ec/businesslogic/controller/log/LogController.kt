@@ -68,7 +68,7 @@ class LogControllerImpl(
             if (configLogic.isBuildTypeDebug()) {
                 Log.DEBUG
             } else {
-                Log.INFO
+                Log.WARN
             }
         )
         .appendToFile(true)

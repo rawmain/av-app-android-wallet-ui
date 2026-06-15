@@ -16,15 +16,18 @@
 
 package eu.europa.ec.authenticationlogic.storage
 
-import eu.europa.ec.businesslogic.controller.storage.PrefsController
+import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.businesslogic.provider.BootIdProvider
 import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -32,7 +35,10 @@ import org.mockito.kotlin.whenever
 class TestPrefsPinStorageProvider {
 
     @Mock
-    private lateinit var prefsController: PrefsController
+    private lateinit var authMetadataStore: AuthMetadataStore
+
+    @Mock
+    private lateinit var vaultKeyProvider: VaultKeyProvider
 
     private lateinit var clock: ElapsedRealtimeClock
     private lateinit var bootIdProvider: BootIdProvider
@@ -47,7 +53,7 @@ class TestPrefsPinStorageProvider {
         closeable = MockitoAnnotations.openMocks(this)
         clock = ElapsedRealtimeClock { fakeNow }
         bootIdProvider = BootIdProvider { fakeBootId }
-        provider = PrefsPinStorageProvider(prefsController, clock, bootIdProvider)
+        provider = PrefsPinStorageProvider(authMetadataStore, clock, bootIdProvider, vaultKeyProvider)
     }
 
     @After
@@ -55,169 +61,173 @@ class TestPrefsPinStorageProvider {
         closeable.close()
     }
 
+    private fun buildMeta(
+        failedAttempts: Int = 0,
+        lockoutDeadline: Long = 0L,
+        lockoutDuration: Long = 0L,
+        bootId: String = fakeBootId,
+        writeCounter: Long = 1L,
+    ) = AuthMetadata(
+        version = 0x01,
+        kdfAlgo = 0x01,
+        kdfM = 65_536,
+        kdfT = 3,
+        kdfP = 1,
+        pinSalt = ByteArray(32),
+        wrappedVaultIv = ByteArray(12),
+        wrappedVault = ByteArray(48),
+        failedAttempts = failedAttempts,
+        lockoutDeadline = lockoutDeadline,
+        lockoutDuration = lockoutDuration,
+        bootId = bootId,
+        biometricEnabled = false,
+        biometricWrappedVaultIv = null,
+        biometricWrappedVault = null,
+        writeCounter = writeCounter,
+    )
+
     //region isCurrentlyLockedOut
 
-    // Case 1:
-    // lockoutUntil == 0 — no lockout stored.
+    // Case 1: no lockout stored — not locked out.
     @Test
-    fun `Given Case 1, When isCurrentlyLockedOut is called with no lockout, Then it returns false`() {
-        // Given
-        whenever(prefsController.getLong("PinLockoutUntil", 0L)).thenReturn(0L)
-
-        // When
-        val result = provider.isCurrentlyLockedOut()
-
-        // Then
-        assertEquals(false, result)
+    fun `Given Case 1, When isCurrentlyLockedOut with no lockout, Then it returns false`() {
+        runBlocking {
+            whenever(authMetadataStore.read()).thenReturn(buildMeta(lockoutDeadline = 0L))
+        }
+        assertEquals(false, provider.isCurrentlyLockedOut())
     }
 
-    // Case 2:
-    // lockoutUntil is in the future and boot id matches — user is locked out.
+    // Case 2: lockout deadline in the future (same boot) — locked out.
     @Test
-    fun `Given Case 2, When isCurrentlyLockedOut is called and lockout deadline is in the future, Then it returns true`() {
-        // Given
-        val lockoutUntil = fakeNow + 30_000L
-        whenever(prefsController.getLong("PinLockoutUntil", 0L)).thenReturn(lockoutUntil)
-        whenever(prefsController.getString("PinLockoutBootId", "")).thenReturn(fakeBootId)
-
-        // When
-        val result = provider.isCurrentlyLockedOut()
-
-        // Then
-        assertEquals(true, result)
+    fun `Given Case 2, When lockout deadline is in the future, Then it returns true`() {
+        val deadline = fakeNow + 30_000L
+        runBlocking {
+            whenever(authMetadataStore.read()).thenReturn(buildMeta(lockoutDeadline = deadline))
+        }
+        assertEquals(true, provider.isCurrentlyLockedOut())
     }
 
-    // Case 3:
-    // lockoutUntil is in the past (same boot) — lockout has expired.
+    // Case 3: lockout deadline in the past (same boot) — not locked out.
     @Test
-    fun `Given Case 3, When isCurrentlyLockedOut is called and lockout deadline has passed, Then it returns false`() {
-        // Given
-        val lockoutUntil = fakeNow - 1L
-        whenever(prefsController.getLong("PinLockoutUntil", 0L)).thenReturn(lockoutUntil)
-        whenever(prefsController.getString("PinLockoutBootId", "")).thenReturn(fakeBootId)
-
-        // When
-        val result = provider.isCurrentlyLockedOut()
-
-        // Then
-        assertEquals(false, result)
+    fun `Given Case 3, When lockout deadline has passed, Then it returns false`() {
+        runBlocking {
+            whenever(authMetadataStore.read())
+                .thenReturn(buildMeta(lockoutDeadline = fakeNow - 1L))
+        }
+        assertEquals(false, provider.isCurrentlyLockedOut())
     }
 
-    // Case 4:
-    // lockoutUntil equals fakeNow exactly (same boot) — boundary, not locked out.
+    // Case 4: lockout deadline equals fakeNow — boundary, not locked out.
     @Test
-    fun `Given Case 4, When isCurrentlyLockedOut is called at the exact lockout boundary, Then it returns false`() {
-        // Given
-        whenever(prefsController.getLong("PinLockoutUntil", 0L)).thenReturn(fakeNow)
-        whenever(prefsController.getString("PinLockoutBootId", "")).thenReturn(fakeBootId)
-
-        // When
-        val result = provider.isCurrentlyLockedOut()
-
-        // Then
-        assertEquals(false, result)
+    fun `Given Case 4, When at exact lockout boundary, Then it returns false`() {
+        runBlocking {
+            whenever(authMetadataStore.read())
+                .thenReturn(buildMeta(lockoutDeadline = fakeNow))
+        }
+        assertEquals(false, provider.isCurrentlyLockedOut())
     }
     //endregion
 
     //region reboot re-anchoring
 
-    // Case 5:
-    // After reboot, the stored deadline is re-anchored to now + duration so the attacker
-    // cannot shorten the lockout by rebooting.
+    // Case 5: after reboot with active lockout, deadline is re-anchored.
     @Test
-    fun `Given Case 5, When boot id changes, Then the lockout is re-anchored to now plus duration`() {
-        // Given — original lockout was set at t=0 under boot-A, duration 60s
+    fun `Given Case 5, When boot id changes with active lockout, Then the lockout is re-anchored`() = runBlocking {
         val originalDeadline = 60_000L
-        whenever(prefsController.getLong("PinLockoutUntil", 0L)).thenReturn(originalDeadline)
-        whenever(prefsController.getLong("PinLockoutDurationMs", 0L)).thenReturn(60_000L)
-        whenever(prefsController.getString("PinLockoutBootId", "")).thenReturn("boot-A")
+        val duration = 60_000L
+        whenever(authMetadataStore.read())
+            .thenReturn(buildMeta(lockoutDeadline = originalDeadline, lockoutDuration = duration, bootId = "boot-A"))
 
-        // Simulate reboot: boot id is now boot-B and elapsedRealtime restarted
         fakeBootId = "boot-B"
         fakeNow = 5_000L
 
-        // When
         val result = provider.getLockoutUntil()
 
-        // Then — deadline re-anchored to now + duration, and boot id updated
-        val expected = fakeNow + 60_000L
+        val expected = fakeNow + duration
         assertEquals(expected, result)
-        verify(prefsController, times(1)).setLong("PinLockoutUntil", expected)
-        verify(prefsController, times(1)).setString("PinLockoutBootId", "boot-B")
-    }
-
-    // Case 6:
-    // A legacy entry without duration metadata — clear it rather than keep user locked forever.
-    @Test
-    fun `Given Case 6, When boot id changes and no duration metadata exists, Then the lockout is cleared`() {
-        // Given
-        whenever(prefsController.getLong("PinLockoutUntil", 0L)).thenReturn(60_000L)
-        whenever(prefsController.getLong("PinLockoutDurationMs", 0L)).thenReturn(0L)
-        whenever(prefsController.getString("PinLockoutBootId", "")).thenReturn("boot-A")
-
-        fakeBootId = "boot-B"
-
-        // When
-        val result = provider.getLockoutUntil()
-
-        // Then
-        assertEquals(0L, result)
-        verify(prefsController, times(1)).setLong("PinLockoutUntil", 0L)
+        val captor = argumentCaptor<AuthMetadata>()
+        verify(authMetadataStore, times(1)).write(captor.capture())
+        assertEquals(expected, captor.firstValue.lockoutDeadline)
+        assertEquals("boot-B", captor.firstValue.bootId)
     }
     //endregion
 
     //region setLockoutForDuration
 
-    // Case 7:
-    // Setting a lockout persists deadline = now + duration, the duration, and the boot id.
+    // Case 6: setting a lockout persists deadline = now + duration.
     @Test
-    fun `Given Case 7, When setLockoutForDuration is called, Then deadline, duration and boot id are persisted`() {
-        // Given
+    fun `Given Case 6, When setLockoutForDuration is called, Then deadline and duration are written`() = runBlocking {
         fakeNow = 42_000L
-        fakeBootId = "boot-X"
+        whenever(authMetadataStore.read())
+            .thenReturn(buildMeta())
 
-        // When
         provider.setLockoutForDuration(60_000L)
 
-        // Then
-        verify(prefsController, times(1)).setLong("PinLockoutUntil", 102_000L)
-        verify(prefsController, times(1)).setLong("PinLockoutDurationMs", 60_000L)
-        verify(prefsController, times(1)).setString("PinLockoutBootId", "boot-X")
+        val captor = argumentCaptor<AuthMetadata>()
+        verify(authMetadataStore, times(1)).write(captor.capture())
+        assertEquals(102_000L, captor.firstValue.lockoutDeadline)
+        assertEquals(60_000L, captor.firstValue.lockoutDuration)
     }
     //endregion
 
     //region resetFailedAttempts
 
-    // Case 8:
-    // Reset clears attempts, deadline, duration and boot id.
+    // Case 7: reset clears attempts and lockout.
     @Test
-    fun `Given Case 8, When resetFailedAttempts is called, Then all lockout state is cleared`() {
-        // When
+    fun `Given Case 7, When resetFailedAttempts is called, Then all lockout state is cleared`() = runBlocking {
+        whenever(authMetadataStore.read())
+            .thenReturn(buildMeta(failedAttempts = 3, lockoutDeadline = 1000L, lockoutDuration = 60_000L))
+
         provider.resetFailedAttempts()
 
-        // Then
-        verify(prefsController, times(1)).setInt("PinFailedAttempts", 0)
-        verify(prefsController, times(1)).setLong("PinLockoutUntil", 0L)
-        verify(prefsController, times(1)).setLong("PinLockoutDurationMs", 0L)
-        verify(prefsController, times(1)).setString("PinLockoutBootId", "")
+        val captor = argumentCaptor<AuthMetadata>()
+        verify(authMetadataStore, times(1)).write(captor.capture())
+        assertEquals(0, captor.firstValue.failedAttempts)
+        assertEquals(0L, captor.firstValue.lockoutDeadline)
+        assertEquals(0L, captor.firstValue.lockoutDuration)
     }
     //endregion
 
     //region incrementFailedAttempts
 
-    // Case 9:
-    // incrementFailedAttempts increments and persists.
+    // Case 8: incrementFailedAttempts increments and writes.
     @Test
-    fun `Given Case 9, When incrementFailedAttempts is called, Then the count is incremented and persisted`() {
-        // Given
-        whenever(prefsController.getInt("PinFailedAttempts", 0)).thenReturn(2)
+    fun `Given Case 8, When incrementFailedAttempts is called, Then count is incremented and written`() = runBlocking {
+        whenever(authMetadataStore.read()).thenReturn(buildMeta(failedAttempts = 2))
 
-        // When
         val result = provider.incrementFailedAttempts()
 
-        // Then
         assertEquals(3, result)
-        verify(prefsController, times(1)).setInt("PinFailedAttempts", 3)
+        val captor = argumentCaptor<AuthMetadata>()
+        verify(authMetadataStore, times(1)).write(captor.capture())
+        assertEquals(3, captor.firstValue.failedAttempts)
+    }
+    //endregion
+
+    //region hasPin
+
+    // Case 9: null blob means no PIN enrolled.
+    @Test
+    fun `Given Case 9, When blob is null, Then hasPin returns false`() {
+        runBlocking { whenever(authMetadataStore.read()).thenReturn(null) }
+        assertEquals(false, provider.hasPin())
+    }
+
+    // Case 10: non-null blob means PIN enrolled.
+    @Test
+    fun `Given Case 10, When blob is present, Then hasPin returns true`() {
+        runBlocking { whenever(authMetadataStore.read()).thenReturn(buildMeta()) }
+        assertEquals(true, provider.hasPin())
+    }
+    //endregion
+
+    //region rollback protection
+
+    // Case 11: null returned from store (e.g. rollback detected) means no lockout.
+    @Test
+    fun `Given Case 11, When store returns null after rollback, Then isCurrentlyLockedOut returns false`() {
+        runBlocking { whenever(authMetadataStore.read()).thenReturn(null) }
+        assertEquals(false, provider.isCurrentlyLockedOut())
     }
     //endregion
 }
