@@ -1,5 +1,157 @@
 # Changelog
 
+## 2026.06-2
+
+### Fixed
+
+- Hardened certificate pinning for the issuer hosts: pin the Let's Encrypt
+  intermediate CAs and ISRG root instead of leaf certificates so routine leaf
+  renewal (~every 60 days) no longer breaks connectivity; extended the pin-set
+  expiration to 2028-08-01.
+
+## 2026.06-1
+
+### Added
+
+- Auth improvements including hardware-backed authentication
+- Production hardening guide and Implementer Checklist references
+- Face match model download via foreground service
+
+### Changed
+
+- Store authentication metadata with Tink instead of EncryptedSharedPreferences
+- Updated EUDI Wallet Core to fix the Digital Credentials API
+- Updated the face match library and applied short-term security improvements
+  (pixel zeroing)
+- Hardened release logging and removed sensitive data from logs
+- Updated certificate pins
+
+### Removed
+
+- Basic root-detection logic
+- Leftover proximity permissions
+
+### Fixed
+
+- Crash on the Android 10 biometric prompt
+- Wrong host for the credential-offer deep link
+- `SecurePrefsStore.getString` and decoupled onboarding biometrics from key
+  generation / signing
+
+## 2026.04-3-hotfix
+
+### Fixed
+
+- Reverted the face match threshold to 0.5
+
+## 2026.04-3
+
+### Changed
+
+- Updated EUDI Wallet Core to 0.26.1
+
+### Fixed
+
+- Wallet Core crash when DPoP is disabled
+- Security fixes from the security audit
+
+## 2026.04-2
+
+### Added
+
+- Passport scanning improvements
+
+### Changed
+
+- Security improvements from the security audit
+
+## 2026.04-1
+
+### Added
+
+- Dynamic age value rendering
+
+### Changed
+
+- Display age claims as boolean values and increased age claim size
+- Updated app icon
+
+## 2026.02-2
+
+### Added
+
+- Token/QR enrollment intro screen
+- Wallet instance attestation with attestation-based client authentication
+- Support for HAIP deep link schemes
+- Test tags / resource IDs exposed for UI automation
+- Staging certificate and full certificate chain for the JP case
+
+### Changed
+
+- Replaced Retrofit with Ktor for network operations
+- Moved attestation logic to `network-logic` and adopted the SDK's
+  `WalletAttestationsProvider`
+- Upgraded to AGP 9 and updated Gradle, Wallet Core, and other dependencies
+- Improved grouping of multi-element document claims
+- Configure HTTP client logging based on build type
+- Replaced German "Schnell-PIN" wording with "PIN" and fixed the Italian
+  "Download" label
+
+### Removed
+
+- Unused dashboard files
+
+### Fixed
+
+- Crash on the `openid-credential-offer://` deep link caused by a Koin scope
+- No-internet handling when downloading the face model
+- Screen padding mismatch when showing `ContentError`
+
+## 2026.02-1
+
+### Added
+
+- Download the biometric model on the intro screen
+- App-wide no-internet connection error handling with retry
+- MRZ line reconstruction algorithm to recover passport lines from partial or
+  extra detected text
+- Automated same-device regression tests
+
+### Fixed
+
+- Digital Credentials API QR codes not being handled
+
+## 2026.01-1
+
+### Added
+
+- Integrated EUDI Wallet Core 23.0-SNAPSHOT with Zero-Knowledge Proof (ZKP)
+  configuration
+
+### Changed
+
+- Synced string resources with the CMS
+- Maintainability improvements
+
+## 2025.12-1
+
+### Added
+
+- MRZ TD1 (ID card) support with NFC scanning
+- Imported translations from the CMS
+
+### Changed
+
+- Updated OpenID4VCI to v1.0
+- More informative error when NFC reading fails
+- Reduced logging after the penetration test
+- Updated ProGuard rules and dev configuration
+
+### Fixed
+
+- Go back on PIN re-enter
+- Release exception related to obfuscation of native libraries
+
 ## 2025.11-2
 - updated EUDI Wallet Core dependency to 0.20.0
 
