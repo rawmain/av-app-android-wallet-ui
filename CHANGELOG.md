@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026.06-2
+
+### Fixed
+
+- Hardened certificate pinning for the issuer hosts: pin the Let's Encrypt
+  intermediate CAs and ISRG root instead of leaf certificates so routine leaf
+  renewal (~every 60 days) no longer breaks connectivity; extended the pin-set
+  expiration to 2028-08-01.
+
 ## 2025.11-2
 - updated EUDI Wallet Core dependency to 0.20.0
 
