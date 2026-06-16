@@ -13,29 +13,28 @@
 
 ### Added
 
-- Auth improvements including hardware-backed authentication (EUDIWALLET-1077)
+- Auth improvements including hardware-backed authentication
 - Production hardening guide and Implementer Checklist references
-- Face match model download via foreground service (EUDIWALLET-1261)
+- Face match model download via foreground service
 
 ### Changed
 
 - Store authentication metadata with Tink instead of EncryptedSharedPreferences
-- Updated EUDI Wallet Core to fix the Digital Credentials API (EUDIWALLET-1356)
+- Updated EUDI Wallet Core to fix the Digital Credentials API
 - Updated the face match library and applied short-term security improvements
   (pixel zeroing)
 - Hardened release logging and removed sensitive data from logs
-  (EUDIWALLET-1442)
 - Updated certificate pins
 
 ### Removed
 
-- Basic root-detection logic (EUDIWALLET-1232)
+- Basic root-detection logic
 - Leftover proximity permissions
 
 ### Fixed
 
-- Crash on the Android 10 biometric prompt (EUDIWALLET-1339)
-- Wrong host for the credential-offer deep link (EUDIWALLET-1448)
+- Crash on the Android 10 biometric prompt
+- Wrong host for the credential-offer deep link
 - `SecurePrefsStore.getString` and decoupled onboarding biometrics from key
   generation / signing
 
@@ -54,13 +53,13 @@
 ### Fixed
 
 - Wallet Core crash when DPoP is disabled
-- Security fixes from the security audit (EUDIWALLET-1076)
+- Security fixes from the security audit
 
 ## 2026.04-2
 
 ### Added
 
-- Passport scanning improvements (EUDIWALLET-1067)
+- Passport scanning improvements
 
 ### Changed
 
@@ -70,7 +69,7 @@
 
 ### Added
 
-- Dynamic age value rendering (EUDIWALLET-1012)
+- Dynamic age value rendering
 
 ### Changed
 
@@ -81,7 +80,7 @@
 
 ### Added
 
-- Token/QR enrollment intro screen (EUDIWALLET-713)
+- Token/QR enrollment intro screen
 - Wallet instance attestation with attestation-based client authentication
 - Support for HAIP deep link schemes
 - Test tags / resource IDs exposed for UI automation
@@ -96,7 +95,7 @@
 - Improved grouping of multi-element document claims
 - Configure HTTP client logging based on build type
 - Replaced German "Schnell-PIN" wording with "PIN" and fixed the Italian
-  "Download" label (EUDIWALLET-697)
+  "Download" label
 
 ### Removed
 
@@ -105,34 +104,34 @@
 ### Fixed
 
 - Crash on the `openid-credential-offer://` deep link caused by a Koin scope
-- No-internet handling when downloading the face model (EUDIWALLET-756)
+- No-internet handling when downloading the face model
 - Screen padding mismatch when showing `ContentError`
 
 ## 2026.02-1
 
 ### Added
 
-- Download the biometric model on the intro screen (EUDIWALLET-708)
-- App-wide no-internet connection error handling with retry (EUDIWALLET-692)
+- Download the biometric model on the intro screen
+- App-wide no-internet connection error handling with retry
 - MRZ line reconstruction algorithm to recover passport lines from partial or
-  extra detected text (EUDIWALLET-705)
-- Automated same-device regression tests (EUDIWALLET-681)
+  extra detected text
+- Automated same-device regression tests
 
 ### Fixed
 
-- Digital Credentials API QR codes not being handled (EUDIWALLET-691)
+- Digital Credentials API QR codes not being handled
 
 ## 2026.01-1
 
 ### Added
 
 - Integrated EUDI Wallet Core 23.0-SNAPSHOT with Zero-Knowledge Proof (ZKP)
-  configuration (EUDIWALLET-634)
+  configuration
 
 ### Changed
 
-- Synced string resources with the CMS (EUDIWALLET-580)
-- Maintainability improvements (EUDIWALLET-633)
+- Synced string resources with the CMS
+- Maintainability improvements
 
 ## 2025.12-1
 
@@ -143,14 +142,14 @@
 
 ### Changed
 
-- Updated OpenID4VCI to v1.0 (EUDIWALLET-615)
-- More informative error when NFC reading fails (EUDIWALLET-631)
-- Reduced logging after the penetration test (EUDIWALLET-618)
+- Updated OpenID4VCI to v1.0
+- More informative error when NFC reading fails
+- Reduced logging after the penetration test
 - Updated ProGuard rules and dev configuration
 
 ### Fixed
 
-- Go back on PIN re-enter (EUDIWALLET-621)
+- Go back on PIN re-enter
 - Release exception related to obfuscation of native libraries
 
 ## 2025.11-2
