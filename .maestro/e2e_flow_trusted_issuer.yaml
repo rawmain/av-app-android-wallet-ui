@@ -26,7 +26,7 @@ appId: com.scytales.av
 - tapOn:
     text: "Next"
 
-# Step 4: Enter PIN (159753) - auto-advances when complete
+# Step 4: Enter PIN (246813) - auto-advances when complete
 - tapOn:
     index: 0
 - inputText: "246813"
@@ -38,7 +38,7 @@ appId: com.scytales.av
       text: "Confirm your PIN"
     timeout: 5000
 
-# Step 6: Repeat PIN (159753) - auto-advances when complete
+# Step 6: Repeat PIN (246813) - auto-advances when complete
 - tapOn:
     index: 0
 - inputText: "246813"
@@ -207,7 +207,7 @@ appId: com.scytales.av
 - tapOn:
     text: "Share"
 
-# Step 18: Enter PIN (159753)
+# Step 18: Enter PIN (246813)
 - waitForAnimationToEnd
 - tapOn:
     index: 0
