@@ -9,6 +9,150 @@
   renewal (~every 60 days) no longer breaks connectivity; extended the pin-set
   expiration to 2028-08-01.
 
+## 2026.06-1
+
+### Added
+
+- Auth improvements including hardware-backed authentication (EUDIWALLET-1077)
+- Production hardening guide and Implementer Checklist references
+- Face match model download via foreground service (EUDIWALLET-1261)
+
+### Changed
+
+- Store authentication metadata with Tink instead of EncryptedSharedPreferences
+- Updated EUDI Wallet Core to fix the Digital Credentials API (EUDIWALLET-1356)
+- Updated the face match library and applied short-term security improvements
+  (pixel zeroing)
+- Hardened release logging and removed sensitive data from logs
+  (EUDIWALLET-1442)
+- Updated certificate pins
+
+### Removed
+
+- Basic root-detection logic (EUDIWALLET-1232)
+- Leftover proximity permissions
+
+### Fixed
+
+- Crash on the Android 10 biometric prompt (EUDIWALLET-1339)
+- Wrong host for the credential-offer deep link (EUDIWALLET-1448)
+- `SecurePrefsStore.getString` and decoupled onboarding biometrics from key
+  generation / signing
+
+## 2026.04-3-hotfix
+
+### Fixed
+
+- Reverted the face match threshold to 0.5
+
+## 2026.04-3
+
+### Changed
+
+- Updated EUDI Wallet Core to 0.26.1
+
+### Fixed
+
+- Wallet Core crash when DPoP is disabled
+- Security fixes from the security audit (EUDIWALLET-1076)
+
+## 2026.04-2
+
+### Added
+
+- Passport scanning improvements (EUDIWALLET-1067)
+
+### Changed
+
+- Security improvements from the security audit
+
+## 2026.04-1
+
+### Added
+
+- Dynamic age value rendering (EUDIWALLET-1012)
+
+### Changed
+
+- Display age claims as boolean values and increased age claim size
+- Updated app icon
+
+## 2026.02-2
+
+### Added
+
+- Token/QR enrollment intro screen (EUDIWALLET-713)
+- Wallet instance attestation with attestation-based client authentication
+- Support for HAIP deep link schemes
+- Test tags / resource IDs exposed for UI automation
+- Staging certificate and full certificate chain for the JP case
+
+### Changed
+
+- Replaced Retrofit with Ktor for network operations
+- Moved attestation logic to `network-logic` and adopted the SDK's
+  `WalletAttestationsProvider`
+- Upgraded to AGP 9 and updated Gradle, Wallet Core, and other dependencies
+- Improved grouping of multi-element document claims
+- Configure HTTP client logging based on build type
+- Replaced German "Schnell-PIN" wording with "PIN" and fixed the Italian
+  "Download" label (EUDIWALLET-697)
+
+### Removed
+
+- Unused dashboard files
+
+### Fixed
+
+- Crash on the `openid-credential-offer://` deep link caused by a Koin scope
+- No-internet handling when downloading the face model (EUDIWALLET-756)
+- Screen padding mismatch when showing `ContentError`
+
+## 2026.02-1
+
+### Added
+
+- Download the biometric model on the intro screen (EUDIWALLET-708)
+- App-wide no-internet connection error handling with retry (EUDIWALLET-692)
+- MRZ line reconstruction algorithm to recover passport lines from partial or
+  extra detected text (EUDIWALLET-705)
+- Automated same-device regression tests (EUDIWALLET-681)
+
+### Fixed
+
+- Digital Credentials API QR codes not being handled (EUDIWALLET-691)
+
+## 2026.01-1
+
+### Added
+
+- Integrated EUDI Wallet Core 23.0-SNAPSHOT with Zero-Knowledge Proof (ZKP)
+  configuration (EUDIWALLET-634)
+
+### Changed
+
+- Synced string resources with the CMS (EUDIWALLET-580)
+- Maintainability improvements (EUDIWALLET-633)
+
+## 2025.12-1
+
+### Added
+
+- MRZ TD1 (ID card) support with NFC scanning
+- Imported translations from the CMS
+
+### Changed
+
+- Updated OpenID4VCI to v1.0 (EUDIWALLET-615)
+- More informative error when NFC reading fails (EUDIWALLET-631)
+- Reduced logging after the penetration test (EUDIWALLET-618)
+- Updated ProGuard rules and dev configuration
+
+### Fixed
+
+- Go back on PIN re-enter (EUDIWALLET-621)
+- Release exception related to obfuscation of native libraries
+
 ## 2025.11-2
 - updated EUDI Wallet Core dependency to 0.20.0
 
