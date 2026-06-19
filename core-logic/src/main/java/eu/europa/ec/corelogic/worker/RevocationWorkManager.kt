@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import eu.europa.ec.authenticationlogic.provider.VaultKeyProvider
 import eu.europa.ec.businesslogic.util.InProcessEventBus
 import eu.europa.ec.corelogic.controller.WalletCoreDocumentsController
 import eu.europa.ec.corelogic.model.RevokedDocumentDataDomain
@@ -60,6 +61,7 @@ class RevocationWorkManager(
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams), KoinComponent {
 
+    private val vaultKeyProvider: VaultKeyProvider by inject()
     private val revokedDocumentDao: RevokedDocumentDao by inject()
     private val walletCoreDocumentsController: WalletCoreDocumentsController by inject()
 
@@ -69,47 +71,48 @@ class RevocationWorkManager(
 
     override suspend fun doWork(): Result {
         try {
+            if (vaultKeyProvider.isUnlocked()) {
+                val storedRevokedDocuments = walletCoreDocumentsController.getRevokedDocumentIds()
+                val fromRevokedToValid = mutableListOf<String>()
+                val revokedDocuments = mutableListOf<IssuedDocument>()
 
-            val storedRevokedDocuments = walletCoreDocumentsController.getRevokedDocumentIds()
-            val fromRevokedToValid = mutableListOf<String>()
-            val revokedDocuments = mutableListOf<IssuedDocument>()
-
-            walletCoreDocumentsController
-                .getAllIssuedDocuments()
-                .forEach { document ->
-                    walletCoreDocumentsController.resolveDocumentStatus(document).fold(
-                        onSuccess = { status ->
-                            when (status) {
-                                is Status.Invalid, Status.Suspended -> {
-                                    if (!storedRevokedDocuments.any { it == document.id }) {
-                                        revokedDocuments.add(document)
+                walletCoreDocumentsController
+                    .getAllIssuedDocuments()
+                    .forEach { document ->
+                        walletCoreDocumentsController.resolveDocumentStatus(document).fold(
+                            onSuccess = { status ->
+                                when (status) {
+                                    is Status.Invalid, Status.Suspended -> {
+                                        if (!storedRevokedDocuments.any { it == document.id }) {
+                                            revokedDocuments.add(document)
+                                        }
                                     }
-                                }
 
-                                is Status.Valid -> {
-                                    if (storedRevokedDocuments.any { it == document.id }) {
-                                        fromRevokedToValid.add(document.id)
+                                    is Status.Valid -> {
+                                        if (storedRevokedDocuments.any { it == document.id }) {
+                                            fromRevokedToValid.add(document.id)
+                                        }
                                     }
-                                }
 
-                                else -> {}
-                            }
-                        },
-                        onFailure = {}
-                    )
+                                    else -> {}
+                                }
+                            },
+                            onFailure = {}
+                        )
+                    }
+
+                if (fromRevokedToValid.isNotEmpty()) {
+                    removeRevokedDocumentsFromStorage(fromRevokedToValid)
                 }
 
-            if (fromRevokedToValid.isNotEmpty()) {
-                removeRevokedDocumentsFromStorage(fromRevokedToValid)
-            }
+                if (revokedDocuments.isNotEmpty()) {
+                    storeRevokedDocuments(revokedDocuments)
+                    sendRevocationBroadcasts(revokedDocuments)
+                }
 
-            if (revokedDocuments.isNotEmpty()) {
-                storeRevokedDocuments(revokedDocuments)
-                sendRevocationBroadcasts(revokedDocuments)
-            }
-
-            if (fromRevokedToValid.isNotEmpty() || revokedDocuments.isNotEmpty()) {
-                notifyDocumentsList()
+                if (fromRevokedToValid.isNotEmpty() || revokedDocuments.isNotEmpty()) {
+                    notifyDocumentsList()
+                }
             }
 
             return Result.success()

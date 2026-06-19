@@ -201,8 +201,6 @@ interface WalletCoreDocumentsController {
 
     fun getAllDocumentCategories(): DocumentCategories
 
-    fun getAgeOver18IssuedDocument(): IssuedDocument?
-
     suspend fun getRevokedDocumentIds(): List<String>
 
     suspend fun isDocumentRevoked(id: String): Boolean
@@ -210,6 +208,8 @@ interface WalletCoreDocumentsController {
     suspend fun resolveDocumentStatus(document: IssuedDocument): Result<Status>
 
     suspend fun isDocumentLowOnCredentials(document: IssuedDocument): Boolean
+
+    fun hasIssuedDocuments(): Boolean
 }
 
 class WalletCoreDocumentsControllerImpl(
@@ -651,13 +651,7 @@ class WalletCoreDocumentsControllerImpl(
         return walletCoreConfig.documentCategories
     }
 
-    override fun getAgeOver18IssuedDocument(): IssuedDocument? {
-        return eudiWallet.getDocuments().filterIsInstance<IssuedDocument>()
-            .firstOrNull {
-                it.toDocumentIdentifier() == DocumentIdentifier.AVAgeOver18 ||
-                        it.toDocumentIdentifier() == DocumentIdentifier.MdocEUDIAgeOver18
-            }
-    }
+    override fun hasIssuedDocuments(): Boolean = eudiWallet.getDocuments{ it is IssuedDocument}.isNotEmpty()
 
     override suspend fun isDocumentLowOnCredentials(document: IssuedDocument): Boolean {
         val documentRemainingCredentials = document.credentialsCount()
