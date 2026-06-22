@@ -18,7 +18,6 @@
  */
 package eu.europa.ec.passportscanner.parser.types
 
-import eu.europa.ec.businesslogic.controller.log.LogController
 import eu.europa.ec.passportscanner.parser.MrzParseException
 import eu.europa.ec.passportscanner.parser.MrzRange
 import eu.europa.ec.passportscanner.parser.MrzRecord
@@ -65,21 +64,18 @@ enum class MrzFormat(
 
     companion object {
 
-        private val TAG: String = MrzFormat::class.simpleName!!
         /**
          * Detects given MRZ format.
          * @param mrz the MRZ string.
          * @return the format, never null.
          */
         @JvmStatic
-        fun get(mrz: String, logController: LogController): MrzFormat {
+        fun get(mrz: String): MrzFormat {
             var mrz = mrz
             val dummyRow = 44
             var rows: Array<String?> =
                 mrz.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             val cols = rows[0]!!.length
-            logController.d(TAG) { "mrz: $mrz" }
-            logController.d(TAG) { "rows: " + rows.contentToString() }
             val mrzBuilder = StringBuilder(mrz)
             for (i in 1..<rows.size) {
                 if (rows[i]!!.length != cols) {
@@ -90,8 +86,6 @@ enum class MrzFormat(
             }
             mrz = mrzBuilder.toString()
             rows = mrz.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            logController.d(TAG) { "mrz append: $mrz" }
-            logController.d(TAG) { "rows append: " + rows.contentToString() }
             for (f in MrzFormat.entries) {
                 if (f.isFormatOf(rows)) {
                     return f
@@ -99,7 +93,6 @@ enum class MrzFormat(
             }
             throw MrzParseException(
                 "Unknown format / unsupported number of cols/rows: " + cols + "/" + rows.size,
-                mrz,
                 MrzRange(0, 0, 0),
                 null
             )

@@ -59,7 +59,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             val openid4VpHost = "authorize"
 
             val credentialOfferScheme = "openid-credential-offer"
-            val credentialOfferHost = "credential-offer"
+            val credentialOfferHost = "credential_offer"
 
             val openId4VciAuthorizationScheme = "eu.europa.ec.av"
             val openId4VciAuthorizationHost = "authorization"

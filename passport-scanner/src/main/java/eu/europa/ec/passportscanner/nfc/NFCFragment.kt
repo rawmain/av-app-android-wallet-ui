@@ -142,18 +142,18 @@ class NFCFragment : Fragment() {
                         getString(string.warning_authentication_failed),
                         Toast.LENGTH_SHORT
                     ).show()
-                    logController.e(TAG, exception)
+                    logController.e(TAG) { "NFC access denied" }
 
                     this@NFCFragment.onCardException(exception)
                 }
 
                 override fun onBACDeniedException(exception: BACDeniedException) {
-                    Toast.makeText(context, exception.toString(), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(string.warning_authentication_failed), Toast.LENGTH_SHORT).show()
                     this@NFCFragment.onCardException(exception)
                 }
 
                 override fun onPACEException(exception: PACEException) {
-                    Toast.makeText(context, exception.toString(), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(string.warning_authentication_failed), Toast.LENGTH_SHORT).show()
                     this@NFCFragment.onCardException(exception)
                 }
 
@@ -174,14 +174,14 @@ class NFCFragment : Fragment() {
                         }
 
                         else -> {
-                            Toast.makeText(context, exception.toString(), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, getString(string.warning_authentication_failed), Toast.LENGTH_SHORT).show()
                         }
                     }
                     this@NFCFragment.onCardException(exception)
                 }
 
                 override fun onGeneralException(exception: Exception?) {
-                    Toast.makeText(context, exception?.toString(), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(string.warning_authentication_failed), Toast.LENGTH_SHORT).show()
                     this@NFCFragment.onCardException(exception)
                 }
             })

@@ -194,6 +194,17 @@ Telemetry is useful only if it does not weaken the privacy model. Integrity sign
 - **Unlinkability preservation.** Telemetry identifiers should be scoped and rotated so they do not let the wallet provider, relying parties or analytics systems correlate a user's presentations across relying parties. Where correlation is needed for abuse prevention, it should be documented as a server-side risk decision outside this mobile-only guide.
 - **Server-side policy audit.** Allow, step-up, soft-block and hard-block decisions can be auditable on the wallet provider side without embedding a stable user-tracking identifier in the mobile telemetry stream.
 
+## Application logging policy
+
+Sensitive data must never appear in any log output in any build type.
+
+- **Never log** PINs, passcodes, transaction codes, or any credential material.
+- **Never log** document personal data: date of birth, computed age, raw MRZ strings, document numbers, or expiry dates.
+- **Redact before logging.** Exception messages from third-party libraries (jMRTD, EUDI SDK) may contain personal data. Log a generic message rather than the raw exception.
+- **Data classes holding sensitive fields** must override `toString()` to mask those fields, so that accidental string interpolation or debugger inspection does not leak them.
+- **Release builds** persist only WARN and ERROR to disk; Timber d/i/v call sites are stripped by R8 (`-assumenosideeffects`). Do not lower the log level threshold.
+- **Crash reporting** integrations must be reviewed for the same constraints before enabling.
+
 # Part 8 — Threat model (mobile, focused)
 
 This threat model covers only mobile-app security controls added or verified during production hardening. Protocol correctness, issuer assurance, verifier-side abuse, backend hardening and organisational operations are out of scope for this document.

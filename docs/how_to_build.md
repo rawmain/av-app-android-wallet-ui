@@ -35,7 +35,7 @@ The application has two product flavors:
 
 and two Build Types:
 - "Debug", which has full logging enabled.
-- "Release", which has no logging enabled.
+- "Release", which logs only WARN and ERROR to disk; DEBUG/INFO/VERBOSE log call sites are stripped by R8.
 
 which, ultimately, result in the following Build Variants:
 

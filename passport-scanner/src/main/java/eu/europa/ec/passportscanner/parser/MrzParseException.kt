@@ -28,10 +28,6 @@ import eu.europa.ec.passportscanner.parser.types.MrzFormat
 class MrzParseException(
     message: String?,
     /**
-     * The MRZ string being parsed.
-     */
-    val mrz: String?,
-    /**
      * Range containing problematic characters.
      */
     val range: MrzRange?,
@@ -39,7 +35,7 @@ class MrzParseException(
      * Expected MRZ format.
      */
     val format: MrzFormat?
-) : RuntimeException("Failed to parse MRZ " + format + " " + mrz + " at " + range + ": " + message) {
+) : RuntimeException("Failed to parse MRZ " + format + " at " + range + ": " + message) {
     companion object {
         private const val serialVersionUID = 1L
     }

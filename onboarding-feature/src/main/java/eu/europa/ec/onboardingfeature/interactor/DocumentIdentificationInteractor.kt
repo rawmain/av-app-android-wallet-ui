@@ -55,7 +55,7 @@ class DocumentIdentificationInteractorImpl(
         dateOfBirth: String,
         expiryDate: String,
     ): DocumentValidationState {
-        logController.d(TAG) { "Validating document - DOB: $dateOfBirth, Expiry: $expiryDate" }
+        logController.d(TAG) { "Validating document" }
 
         return try {
             val today = clock.todayIn(TimeZone.currentSystemDefault())
@@ -69,7 +69,7 @@ class DocumentIdentificationInteractorImpl(
             if (expiry < today) {
                 val errorMessage =
                     resourceProvider.getString(R.string.passport_validation_error_expired)
-                logController.w(TAG) { "Document validation failed: expired" }
+                logController.w(TAG) { "Document validation failed" }
                 return DocumentValidationState.Failure(errorMessage)
             }
 
@@ -78,14 +78,14 @@ class DocumentIdentificationInteractorImpl(
             if (age < 18) {
                 val errorMessage =
                     resourceProvider.getString(R.string.passport_validation_error_underage)
-                logController.w(TAG) { "Document validation failed: user is younger" }
+                logController.w(TAG) { "Document validation failed" }
                 return DocumentValidationState.Failure(errorMessage)
             }
 
-            logController.d(TAG) { "Document validation successful - age: $age, expires: $expiry" }
+            logController.d(TAG) { "Document validation successful" }
             DocumentValidationState.Success
         } catch (e: Exception) {
-            logController.e(TAG) { "Error parsing document dates: ${e.message}" }
+            logController.e(TAG) { "Error parsing document dates" }
             DocumentValidationState.Failure(genericErrorMsg)
         }
     }
