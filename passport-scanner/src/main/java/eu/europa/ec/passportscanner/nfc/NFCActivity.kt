@@ -64,7 +64,7 @@ class NFCActivity : FragmentActivity(), NFCFragment.NfcFragmentListener {
         try {
             mrzInfo = MRZInfo(mrz)
         } catch (e: Exception) {
-            logController.e(TAG, e)
+            logController.e(TAG) { "MRZInfo parsing failed" }
             Toast.makeText(applicationContext, "Invalid MRZ scanned", Toast.LENGTH_SHORT).show()
             finish()
             return

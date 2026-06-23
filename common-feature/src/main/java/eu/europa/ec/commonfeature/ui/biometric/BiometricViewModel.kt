@@ -19,7 +19,7 @@ package eu.europa.ec.commonfeature.ui.biometric
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
-import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAuthenticate
+import eu.europa.ec.authenticationlogic.controller.authentication.BiometricVaultResult
 import eu.europa.ec.authenticationlogic.controller.authentication.BiometricsAvailability
 import eu.europa.ec.businesslogic.extension.toUri
 import eu.europa.ec.businesslogic.provider.ElapsedRealtimeClock
@@ -54,7 +54,9 @@ sealed class Event : ViewEvent {
     data object OnNavigateBack : Event()
     data object OnErrorDismiss : Event()
     data object Init : Event()
-    data class OnQuickPinEntered(val quickPin: String) : Event()
+    data class OnQuickPinEntered(val quickPin: String) : Event() {
+        override fun toString(): String = "OnQuickPinEntered(quickPin=****)"
+    }
 }
 
 data class State(
@@ -69,7 +71,13 @@ data class State(
     val quickPinSize: Int = 6,
     val isLockedOut: Boolean = false,
     val lockoutEndTime: Long = 0L,
-) : ViewState
+) : ViewState {
+    override fun toString(): String =
+        "State(isLoading=$isLoading, error=$error, config=$config, quickPinError=$quickPinError, " +
+            "quickPin=****, userBiometricsAreEnabled=$userBiometricsAreEnabled, isBackable=$isBackable, " +
+            "notifyOnAuthenticationFailure=$notifyOnAuthenticationFailure, quickPinSize=$quickPinSize, " +
+            "isLockedOut=$isLockedOut, lockoutEndTime=$lockoutEndTime)"
+}
 
 sealed class Effect : ViewSideEffect {
     data object InitializeBiometricAuthOnCreate : Effect()
@@ -263,16 +271,31 @@ class BiometricViewModel(
     }
 
     private fun authenticate(context: Context) {
-        biometricInteractor.authenticateWithBiometrics(
-            context = context,
-            notifyOnAuthenticationFailure = viewState.value.notifyOnAuthenticationFailure
-        ) {
-            when (it) {
-                is BiometricsAuthenticate.Success -> {
-                    authenticationSuccess()
+        viewModelScope.launch {
+            val result = biometricInteractor.unlockWithBiometrics(context)
+            when (result) {
+                is BiometricVaultResult.Success -> authenticationSuccess()
+                is BiometricVaultResult.KeyInvalidated -> {
+                    setState {
+                        copy(
+                            error = ContentErrorConfig(
+                                errorSubTitle = resourceProvider.getString(R.string.biometric_key_invalidated),
+                                onCancel = { setEvent(Event.OnErrorDismiss) }
+                            )
+                        )
+                    }
                 }
-
-                else -> {}
+                is BiometricVaultResult.Cancelled -> { }
+                is BiometricVaultResult.Failed -> {
+                    setState {
+                        copy(
+                            error = ContentErrorConfig(
+                                errorSubTitle = result.errorMessage,
+                                onCancel = { setEvent(Event.OnErrorDismiss) }
+                            )
+                        )
+                    }
+                }
             }
         }
     }

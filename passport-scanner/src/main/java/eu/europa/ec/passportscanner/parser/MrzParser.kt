@@ -50,7 +50,7 @@ class MrzParser(
     /**
      * MRZ record format.
      */
-    val format: MrzFormat = get(mrz, logController)
+    val format: MrzFormat = get(mrz)
 
     /**
      * @author jllarraz@github
@@ -128,7 +128,6 @@ class MrzParser(
             if (c != FILLER && (c !in '0'..'9') && (c !in 'A'..'Z')) {
                 throw MrzParseException(
                     "Invalid character in MRZ record: $c",
-                    mrz,
                     MrzRange(range.column + i, range.column + i + 1, range.row),
                     format
                 )
@@ -207,9 +206,7 @@ class MrzParser(
 
         if (digit != checkDigit) {
             invalidCheckdigit = MrzRange(col, col + 1, row)
-            logController.d(TAG) {
-                "Check digit verification failed for $fieldName: expected $digit but got $checkDigit"
-            }
+            logController.d(TAG) { "Check digit verification failed" }
         }
         return invalidCheckdigit == null
     }
@@ -226,34 +223,34 @@ class MrzParser(
         var year: Int
         try {
             year = rawValue(r).toInt()
-        } catch (ex: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             year = -1
-            logController.d(TAG) { "Failed to parse MRZ date year ${rawValue(range)}: $ex" }
+            logController.d(TAG) { "Failed to parse MRZ date year" }
         }
         if (year !in 0..99) {
-            logController.d(TAG) { "Invalid year value $year: must be 0..99" }
+            logController.d(TAG) { "Invalid year value: must be 0..99" }
         }
         r = MrzRange(range.column + 2, range.column + 4, range.row)
         var month: Int
         try {
             month = rawValue(r).toInt()
-        } catch (ex: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             month = -1
-            logController.d(TAG) { "Failed to parse MRZ date month ${rawValue(range)}: $ex" }
+            logController.d(TAG) { "Failed to parse MRZ date month" }
         }
         if (month !in 1..12) {
-            logController.d(TAG) { "Invalid month value $month: must be 1..12" }
+            logController.d(TAG) { "Invalid month value: must be 1..12" }
         }
         r = MrzRange(range.column + 4, range.column + 6, range.row)
         var day: Int
         try {
             day = rawValue(r).toInt()
-        } catch (ex: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             day = -1
-            logController.d(TAG) { "Failed to parse MRZ date month ${rawValue(range)}: $ex" }
+            logController.d(TAG) { "Failed to parse MRZ date day" }
         }
         if (day !in 1..31) {
-            logController.d(TAG) { "Invalid day value $day: must be 1..31" }
+            logController.d(TAG) { "Invalid day value: must be 1..31" }
         }
         return MrzDate(year, month, day)
     }
@@ -306,7 +303,7 @@ class MrzParser(
          * @return record class.
          */
         fun parse(mrz: String, logController: LogController): MrzRecord {
-            val result = get(mrz, logController).newRecord()
+            val result = get(mrz).newRecord()
             result.fromMrz(mrz, logController)
             return result
         }

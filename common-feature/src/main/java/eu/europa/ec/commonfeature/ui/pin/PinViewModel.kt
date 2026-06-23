@@ -72,6 +72,14 @@ data class State(
     val isLockedOut: Boolean = false,
     val lockoutEndTime: Long = 0L,
 ) : ViewState {
+
+    override fun toString(): String =
+        "State(pinFlow=$pinFlow, isLoading=$isLoading, isButtonEnabled=$isButtonEnabled, " +
+            "quickPinError=$quickPinError, validationResult=$validationResult, subtitle=$subtitle, " +
+            "title=$title, pin=****, enteredPin=****, buttonText=$buttonText, resetPin=$resetPin, " +
+            "pinState=$pinState, isBottomSheetOpen=$isBottomSheetOpen, quickPinSize=$quickPinSize, " +
+            "isLockedOut=$isLockedOut, lockoutEndTime=$lockoutEndTime)"
+
     val action: ScreenNavigateAction
         get() {
             return when {
@@ -92,8 +100,12 @@ data class State(
 }
 
 sealed class Event : ViewEvent {
-    data class NextButtonPressed(val pin: String) : Event()
-    data class OnQuickPinEntered(val quickPin: String) : Event()
+    data class NextButtonPressed(val pin: String) : Event() {
+        override fun toString(): String = "NextButtonPressed(pin=****)"
+    }
+    data class OnQuickPinEntered(val quickPin: String) : Event() {
+        override fun toString(): String = "OnQuickPinEntered(quickPin=****)"
+    }
     data object CancelPressed : Event()
     data object GoBack : Event()
     sealed class BottomSheet : Event() {
@@ -198,7 +210,6 @@ class PinViewModel(
 
             is Event.NextButtonPressed -> {
                 val state = viewState.value
-                logController.d("PIN") { "state on button pressed: $state" }
                 when (state.pinState) {
                     PinValidationState.ENTER -> {
                         // Set state for re-enter phase
@@ -415,8 +426,6 @@ class PinViewModel(
                     resetPin = false
                 )
             }
-            logController.d("PIN") { "state after validation: ${viewState.value}" }
-
             // FFWD to next screen if the pin is valid
             if (validationResult.isValid) {
                 setEvent(Event.NextButtonPressed(pin))

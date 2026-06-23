@@ -78,7 +78,6 @@ enum class MrzDocumentCode {
             when (code) {
                 "IV" -> throw MrzParseException(
                     "IV document code is not allowed",
-                    mrz,
                     MrzRange(0, 2, 0),
                     null
                 ) // TODO why?
@@ -102,7 +101,6 @@ enum class MrzDocumentCode {
 
             throw MrzParseException(
                 "Unsupported document code: $code",
-                mrz,
                 MrzRange(0, 2, 0),
                 null
             )

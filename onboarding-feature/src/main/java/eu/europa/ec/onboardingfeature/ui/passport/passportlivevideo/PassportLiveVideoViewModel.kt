@@ -82,7 +82,6 @@ class PassportLiveVideoViewModel(
 ) : MviViewModel<Event, State, Effect>() {
 
     override fun setInitialState(): State {
-        logController.d(TAG) { "get the following param=$passportLiveVideoSerializedConfig" }
         val config: PassportLiveVideoUiConfig? = uiSerializer.fromBase64(
             passportLiveVideoSerializedConfig,
             PassportLiveVideoUiConfig::class.java,
